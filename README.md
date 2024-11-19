@@ -1,6 +1,6 @@
-# django-nextjs-template
+# WAJO Quiz App Platform
 
-Django + Nextjs Template: Standardised CFC Tech Stack
+Utilizing the Django + Nextjs Template: Standardised CFC Tech Stack
 
 ## Get started
 
