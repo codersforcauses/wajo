@@ -17,5 +17,7 @@ RUN poetry install
 
 COPY ./server ./
 
+RUN mkdir -p /var/log/accesslogs && chmod -R 777 /var/log/accesslogs
+
 RUN chmod +x /entrypoint.sh
 CMD ["/entrypoint.sh"]
