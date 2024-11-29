@@ -9,7 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import useFetchData from "@/hooks/use-fetch-data";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import type { Leaderboard } from "@/types/leaderboard";
 
 const LeaderboardList = () => {
   const [filters, setFilters] = useState({
@@ -19,26 +20,28 @@ const LeaderboardList = () => {
 
   const {
     data: leaderboards,
-    loading: leaderboardLoading,
+    isLoading: isLeaderboardLoading,
+    isError: isLeaderboardError,
     error: leaderboardError,
-  } = useFetchData("/app/leaderboard/", true);
+  } = useFetchData<Leaderboard[]>({
+    queryKey: ["leaderboards"],
+    endpoint: "/app/leaderboard/",
+  });
 
-  if (leaderboardLoading) {
-    return <div>Loading...</div>;
-  }
+  if (isLeaderboardLoading) return <div>Loading...</div>;
 
-  if (leaderboardError) {
+  if (isLeaderboardError) {
     console.error("Error fetching leaderboards:", leaderboardError);
     return <div>Error fetching leaderboards</div>;
   }
 
   const statusOptions = ["All"].concat(
     Array.from(
-      new Set(leaderboards.map((leaderboard: any) => leaderboard.status)),
+      new Set(leaderboards?.map((leaderboard: any) => leaderboard.status)),
     ),
   );
 
-  const filteredLeaderboards = leaderboards.filter((leaderboard: any) => {
+  const filteredLeaderboards = leaderboards?.filter((leaderboard: any) => {
     const matchesStatus =
       filters.status === "All" || leaderboard.status === filters.status;
 
@@ -68,8 +71,11 @@ const LeaderboardList = () => {
           onChange={(value) => handleFilterChange("status", value)}
         />
       </Search>
-      <Table title="Leaderboard">
-        <TableHeader>
+      <Table
+        title="Leaderboard"
+        className="border-collapse border border-gray-300 text-left shadow-md"
+      >
+        <TableHeader className="bg-gray-100 text-xs uppercase text-gray-700">
           <TableRow>
             <TableHead className="border-b border-r border-[#7D916F] text-black">
               Name
@@ -100,8 +106,15 @@ const LeaderboardList = () => {
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="text-black">
-          {filteredLeaderboards?.length > 0 ? (
+        <TableBody className="divide-gray-200 text-black">
+          {filteredLeaderboards === undefined ||
+          filteredLeaderboards.length < 1 ? (
+            <TableRow>
+              <TableCell colSpan={10} className="py-4 text-center">
+                No results found
+              </TableCell>
+            </TableRow>
+          ) : (
             filteredLeaderboards.map((leaderboard: any) => (
               <TableRow key={leaderboard.user_name}>
                 <TableCell className="border-r border-t border-r-[#7D916F] border-t-[#DEE4DB]">
@@ -133,12 +146,6 @@ const LeaderboardList = () => {
                 </TableCell>
               </TableRow>
             ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={10} className="py-4 text-center">
-                No results found
-              </TableCell>
-            </TableRow>
           )}
         </TableBody>
       </Table>
