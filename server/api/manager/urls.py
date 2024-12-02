@@ -5,6 +5,8 @@ from django.urls import path, include
 
 router = DefaultRouter()
 
+app_name = "manager"
+
 urlpatterns = [
     path("", include(router.urls)),
     path("leaderboard/", LeaderboardView.as_view(), name="leaderboard"),

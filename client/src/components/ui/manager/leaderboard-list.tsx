@@ -24,8 +24,8 @@ const LeaderboardList = () => {
     isError: isLeaderboardError,
     error: leaderboardError,
   } = useFetchData<Leaderboard[]>({
-    queryKey: ["leaderboards"],
-    endpoint: "/app/leaderboard/",
+    queryKey: ["manager.leaderboards"],
+    endpoint: "manager/leaderboard/",
   });
 
   if (isLeaderboardLoading) return <div>Loading...</div>;
