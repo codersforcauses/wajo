@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Search, SearchDropdown, SearchInput } from "@/components/ui/search";
+import { Search, SearchInput, SearchSelect } from "@/components/ui/search";
 import {
   Table,
   TableBody,
@@ -65,9 +65,10 @@ const LeaderboardList = () => {
           placeholder="Enter name..."
           onSearch={(value) => handleFilterChange("search", value)}
         />
-        <SearchDropdown
+        <SearchSelect
           label="Status"
           options={statusOptions}
+          placeholder="Select a Status"
           onChange={(value) => handleFilterChange("status", value)}
         />
       </Search>

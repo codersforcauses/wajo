@@ -1,9 +1,12 @@
-import React, { useId, useState } from "react";
+import React, { useState } from "react";
 
-import DropdownMenu from "@/components/ui/dropdown";
-
-// Style for height
-const defaultHeight = "h-10";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface SearchProps {
   children: React.ReactNode;
@@ -56,30 +59,45 @@ const SearchInput = ({
         onChange={(e) => setTempValue(e.target.value)}
         onBlur={handleOnBlur}
         onKeyDown={handleOnKeyDown}
-        className={`${defaultHeight} rounded border px-3 py-2 text-gray-700 focus:outline-none focus:ring focus:ring-blue-300`}
+        className="rounded border px-3 py-2 text-gray-700 focus:outline-none focus:ring focus:ring-blue-300"
       />
     </div>
   );
 };
 
-interface SearchDropdownProps {
+interface SearchSelectProps {
   label: string;
   options: string[];
   onChange: (value: string) => void;
+  placeholder?: string;
 }
 
-const SearchDropdown = ({ label, options, onChange }: SearchDropdownProps) => {
-  const menuId = useId();
+const SearchSelect = ({
+  label,
+  options,
+  placeholder = "Select an option",
+  onChange,
+}: SearchSelectProps) => {
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium text-gray-600">{label}</label>
-      <DropdownMenu
-        menuId={menuId}
-        options={options}
-        onChange={(value: string) => onChange(value)}
-      />
+      <Select onValueChange={(value: string) => onChange(value)}>
+        <SelectTrigger
+          className={`w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300`}
+        >
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+
+        <SelectContent>
+          {options.map((option, index) => (
+            <SelectItem key={index} value={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };
 
-export { Search, SearchDropdown, SearchInput };
+export { Search, SearchInput, SearchSelect };
