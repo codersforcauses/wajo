@@ -13,6 +13,22 @@ interface SearchProps {
   title: string;
 }
 
+/**
+ * The `Search` component is a container for various search-related input elements.
+ * It provides a styled wrapper for the children components, typically input or select elements.
+ *
+ * @component
+ * @example
+ * <Search title="Users">
+ *   <SearchInput label="Username" value={value} onSearch={handleInputChange} />
+ *   <SearchSelect label="Status" options={statusOptions} onChange={handleStatusChange} />
+ * </Search>
+ *
+ * @param {React.ReactNode} children - The content to be rendered inside the search container.
+ * @param {string} title - The title for the search section.
+ *
+ * @returns {JSX.Element} A styled search container with the title and children.
+ */
 const Search = ({ children, title }: SearchProps) => {
   return (
     <div className="mx-auto mb-6 rounded-lg border bg-white p-4 shadow-md">
@@ -31,6 +47,21 @@ interface SearchInputProps {
   onSearch: (value: string) => void; // Trigger searching on focus out
 }
 
+/**
+ * The `SearchInput` component provides a text input for users to type and trigger searches.
+ * It supports a placeholder, a default value, and triggers a search on `blur` or `Enter` key press.
+ *
+ * @component
+ * @example
+ * <SearchInput label="Username" value={value} onSearch={handleInputChange} />
+ *
+ * @param {string} label - The label for the input field.
+ * @param {string} value - The current value of the input.
+ * @param {string} [placeholder] - Optional placeholder text for the input.
+ * @param {(value: string) => void} onSearch - Callback function that triggers the search with the input value.
+ *
+ * @returns {JSX.Element} A text input element with search functionality.
+ */
 const SearchInput = ({
   label,
   value,
@@ -72,6 +103,21 @@ interface SearchSelectProps {
   placeholder?: string;
 }
 
+/**
+ * The `SearchSelect` component provides a dropdown select element for users to choose an option.
+ * It displays the options passed as `props` and triggers an `onChange` callback with the selected value.
+ *
+ * @component
+ * @example
+ * <SearchSelect label="Status" options={statusOptions} onChange={handleStatusChange} />
+ *
+ * @param {string} label - The label for the select dropdown.
+ * @param {string[]} options - An array of options to display in the dropdown.
+ * @param {string} [placeholder="Select an option"] - Placeholder text for the select input.
+ * @param {(value: string) => void} onChange - Callback function that triggers when an option is selected.
+ *
+ * @returns {JSX.Element} A styled select dropdown element.
+ */
 const SearchSelect = ({
   label,
   options,

@@ -12,6 +12,14 @@ import {
 import { useFetchData } from "@/hooks/use-fetch-data";
 import type { Leaderboard } from "@/types/leaderboard";
 
+/**
+ * LeaderboardList component displays a table of leaderboards with filtering capabilities.
+ * It fetches leaderboard data from an API and allows users to filter the list based on
+ * leaderboard name and status. The component also handles loading and error states for
+ * data fetching.
+ *
+ * @returns {JSX.Element} The rendered LeaderboardList component.
+ */
 const LeaderboardList = () => {
   const [filters, setFilters] = useState({
     search: "",
@@ -52,6 +60,12 @@ const LeaderboardList = () => {
     return matchesStatus && matchesSearch;
   });
 
+  /**
+   * Handles filter changes for search and status.
+   *
+   * @param {string} name The name of the filter (either 'search' or 'status' or both).
+   * @param {string} value The value to set for the filter.
+   */
   const handleFilterChange = (name: string, value: string) => {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };

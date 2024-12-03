@@ -4,12 +4,44 @@ import React from "react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * The `Select` component provides a dropdown list of options for selecting a value.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/select} for more details.
+ *
+ * @example
+ * <Select>
+ *   <SelectTrigger>Select an option</SelectTrigger>
+ *   <SelectContent>
+ *     <SelectItem value="option1">Option 1</SelectItem>
+ *     <SelectItem value="option2">Option 2</SelectItem>
+ *   </SelectContent>
+ * </Select>
+ */
 const Select = SelectPrimitive.Root;
 
+/**
+ * The `SelectGroup` component groups options in the `Select` dropdown.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/select} for more details.
+ */
 const SelectGroup = SelectPrimitive.Group;
 
+/**
+ * The `SelectValue` component displays the selected value in the `Select` component.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/select} for more details.
+ */
 const SelectValue = SelectPrimitive.Value;
 
+/**
+ * The `SelectTrigger` component triggers the `Select` dropdown to open and close.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/select} for more details.
+ *
+ * @example
+ * <SelectTrigger>Select an option</SelectTrigger>
+ */
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
@@ -30,6 +62,11 @@ const SelectTrigger = React.forwardRef<
 ));
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
+/**
+ * The `SelectScrollUpButton` component renders a button to scroll up within the `SelectContent`.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/select} for more details.
+ */
 const SelectScrollUpButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
@@ -47,6 +84,11 @@ const SelectScrollUpButton = React.forwardRef<
 ));
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
 
+/**
+ * The `SelectScrollDownButton` component renders a button to scroll down within the `SelectContent`.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/select} for more details.
+ */
 const SelectScrollDownButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
@@ -65,6 +107,11 @@ const SelectScrollDownButton = React.forwardRef<
 SelectScrollDownButton.displayName =
   SelectPrimitive.ScrollDownButton.displayName;
 
+/**
+ * The `SelectContent` component renders the dropdown list of options in the `Select` component.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/select} for more details.
+ */
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
@@ -97,6 +144,11 @@ const SelectContent = React.forwardRef<
 ));
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
+/**
+ * The `SelectLabel` component renders a label for grouping or describing options in the `Select` dropdown.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/select} for more details.
+ */
 const SelectLabel = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
@@ -109,6 +161,14 @@ const SelectLabel = React.forwardRef<
 ));
 SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
+/**
+ * The `SelectItem` component represents an individual option in the `Select` dropdown.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/select} for more details.
+ *
+ * @example
+ * <SelectItem value="option1">Option 1</SelectItem>
+ */
 const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
@@ -132,6 +192,11 @@ const SelectItem = React.forwardRef<
 ));
 SelectItem.displayName = SelectPrimitive.Item.displayName;
 
+/**
+ * The `SelectSeparator` component renders a separator between items in the `Select` dropdown.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/select} for more details.
+ */
 const SelectSeparator = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>
