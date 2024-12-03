@@ -15,6 +15,7 @@
     "prepare": "cd .. && husky client/.husky"
   },
   "dependencies": {
+    "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.0",
     "@tanstack/react-query": "^5.51.23",
     "@tanstack/react-query-devtools": "^5.51.23",
