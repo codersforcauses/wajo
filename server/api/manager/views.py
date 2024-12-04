@@ -7,6 +7,18 @@ from .serializers import LeaderboardSerializer
 
 
 class LeaderboardView(APIView):
+    """
+    LeaderboardView API view to manage leaderboard data.
+
+    This view handles retrieving leaderboard data. It returns sample leaderboard data in response to GET requests.
+
+    Attributes:
+        permission_classes (list): Defines the permission class, allowing any user access to the view.
+        serializer_class (LeaderboardSerializer): Specifies the serializer used for serializing the leaderboard data.
+
+    Methods:
+        - get(request): Handles GET requests. Returns sample data for the leaderboard.
+    """
     permission_classes = [AllowAny]
     serializer_class = LeaderboardSerializer
 
