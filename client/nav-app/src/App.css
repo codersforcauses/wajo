@@ -1,0 +1,22 @@
+.app-container {
+  padding: 14px 52px;
+  background-color: #ffe9a2;
+  min-height: 100vh;
+}
+
+img {
+  width: 135px;
+  height: auto;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.loginArea-container {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}

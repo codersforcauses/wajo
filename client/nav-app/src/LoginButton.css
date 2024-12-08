@@ -1,0 +1,11 @@
+.LoginButton {
+  background-color: #fed600;
+  padding: 10px 20px;
+  font-size: 20px;
+  border-radius: px;
+  cursor: pointer;
+}
+
+.LoginButton:hover {
+  color: #0078d7; /* Change color on hover */
+}
