@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePings } from "@/hooks/pings";
 import { cn } from "@/lib/utils";
 
+import Layout from "../components/layout";
 import { Button } from "../components/ui/button";
 
 const fontSans = FontSans({
@@ -11,7 +12,7 @@ const fontSans = FontSans({
   variable: "--font-sans",
 });
 
-export default function Home() {
+const Home = () => {
   const [clicked, setClicked] = useState(false);
   const { data, isLoading } = usePings({
     enabled: clicked,
@@ -33,4 +34,10 @@ export default function Home() {
       </p>
     </main>
   );
-}
+};
+
+Home.getLayout = function getLayout(page: React.ReactElement) {
+  return <Layout>{page}</Layout>;
+};
+
+export default Home;
