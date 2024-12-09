@@ -72,9 +72,42 @@
   }
   body {
     @apply bg-background text-foreground font-urbanist;
+    font-size: 18px;
+    font-weight: medium;
+    line-height: 28px;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-roboto;
+  }
+  h1 {
+    font-size: 62px;
+    font-weight: bold;
+    line-height: 72px;
+  }
+  h2 {
+    font-size: 48px;
+    font-weight: bold;
+    line-height: 58px;
+  }
+  h3 {
+    font-size: 34px;
+    font-weight: bold;
+    line-height: 42px;
+  }
+  h4 {
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 32px;
+  }
+  h5 {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 28px;
+  }
+  h6 {
+    font-size: 14px;
+    font-weight: medium;
+    line-height: 16px;
   }
 }
 

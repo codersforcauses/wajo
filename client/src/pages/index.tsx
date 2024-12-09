@@ -31,7 +31,12 @@ export default function Home() {
         fontUrbanist.variable,
       )}
     >
-      <h1 className="font-roboto text-3xl text-primary">Test title</h1>
+      <h1>Test title</h1>
+      <h2>Test title</h2>
+      <h3>Test title</h3>
+      <h4>Test title</h4>
+      <h5>Test title</h5>
+      <h6>Test title</h6>
       <Button onClick={() => setClicked(true)}>
         {isLoading ? "Loading" : "Ping"}
       </Button>
