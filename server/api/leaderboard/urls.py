@@ -1,5 +1,5 @@
 """
-URL Configuration for the manager module.
+URL Configuration for the leaderboard module.
 
 This file defines routes for the leaderboard feature, including:
 - A route for the `LeaderboardView`, allowing interaction with the leaderboard data.
@@ -17,9 +17,9 @@ from django.urls import path, include
 
 router = DefaultRouter()
 
-app_name = "manager"
+app_name = "leaderboard"
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("leaderboard/", LeaderboardView.as_view(), name="leaderboard"),
+    path("list/", LeaderboardView.as_view(), name="list"),
 ]

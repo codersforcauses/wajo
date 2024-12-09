@@ -1,4 +1,4 @@
-import LeaderboardList from "@/components/ui/manager/leaderboard-list";
+import LeaderboardList from "@/components/ui/leaderboard/leaderboard-list";
 import type { NextPageWithLayout } from "@/pages/_app";
 
 /**

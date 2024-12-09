@@ -11,7 +11,7 @@ class LeaderboardSerializer(serializers.ModelSerializer):
 
     The leaderboard:
     - Tracks student details like name, school, email, scores, and status.
-    - Enables managers to add, delete, and update entries.
+    - Enables admin to add, delete, and update entries.
     - Supports data export to a CSV format for record-keeping.
 
     Fields:
