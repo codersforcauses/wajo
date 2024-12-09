@@ -71,6 +71,18 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-urbanist;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-roboto;
+  }
+}
+
+@layer utilities {
+  .font-urbanist {
+    font-family: var(--font-urbanist);
+  }
+  .font-roboto {
+    font-family: var(--font-roboto);
   }
 }
