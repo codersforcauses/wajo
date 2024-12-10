@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+from datetime import timedelta
 import os
 from pathlib import Path
 
@@ -53,7 +54,39 @@ INSTALLED_APPS = [
     "corsheaders",
     "api.healthcheck",
     "api.manager",
+    "rest_framework_simplejwt",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    )
+}
+
+SIMPLE_JWT = {
+    # Short-term access token lifetime
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=10),
+    # Long-term refresh token lifetime
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    # Rotate refresh tokens
+    "ROTATE_REFRESH_TOKENS": True,
+    # Blacklist old tokens after rotation
+    "BLACKLIST_AFTER_ROTATION": True,
+    # Signing algorithm
+    "ALGORITHM": "HS256",
+    # Secret key for signing tokens
+    "SIGNING_KEY": SECRET_KEY,
+    # Authentication header type
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    # Authentication header name
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    # # User ID field
+    # "USER_ID_FIELD": "user_id",
+    # # User ID claim in the token
+    # "USER_ID_CLAIM": "user_id",
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
