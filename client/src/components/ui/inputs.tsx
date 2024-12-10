@@ -1,19 +1,30 @@
 import axios from "axios";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
-import Image from "next/image";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-// example
-/** 
-Here is inline math: \(x^2 + y^2 = z^2\)
 
-Here is block math:
-$$
-E = mc^2
-$$
-
-**/
+/**
+ * @see {@link https://github.com/fast-reflexes/better-react-mathjax} for more details
+ *
+ * @example
+ * // Inline Math Example:
+ * // Render an inline mathematical expression using \( and \).
+ * <MathJax>
+ *   {"This is an inline equation: \\(x^2 + y^2 = z^2\\)"}
+ * </MathJax>
+ *
+ * // Block Math Example:
+ * // Render a block mathematical expression using $$.
+ * <MathJax>
+ *  {`
+ *    This is a block equation:
+ *      $$
+ *      E = mc^2
+ *      $$
+ *   `}
+ * </MathJax>
+ */
 export default function MathInput() {
   const [input, setInput] = useState("");
   const [preview, setPreview] = useState(false);
@@ -58,6 +69,36 @@ export default function MathInput() {
   );
 }
 
+/**
+ * For implementation details and examples, see the official repository:
+ * {@link https://github.com/prinsss/node-tikzjax}.
+ *
+ * @param {string} source - The TeX/TikZ source code to be rendered into SVG.
+ * @param {JSON} TeXOptions - The configuration options for rendering.
+ *
+ * @example
+ * // Basic Usage:
+ * import tex2svg from 'node-tikzjax';
+ *
+ * const source = `
+ * \begin{document}
+ * \begin{tikzpicture}
+ * \draw (0,0) circle (1in);
+ * \end{tikzpicture}
+ * \end{document}`;
+ *
+ * const svg = await tex2svg(source, TeXOptions);
+ *
+ * TeXOptions include:
+ * @property {boolean} showConsole - Print the TeX engine log to the console. Default: `false`.
+ * @property {Object} texPackages - Additional TeX packages to load. Default: `{}`.
+ * @property {string} tikzLibraries - Additional TikZ libraries to load. Default: `''`.
+ * @property {string} addToPreamble - Additional code to append to the preamble of the input. Default: `''`.
+ * @property {boolean} embedFontCss - Embed font CSS in the SVG. Useful for HTML embedding. Default: `false`.
+ * @property {string} fontCssUrl - URL of the font CSS file. Default: `'https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css'`.
+ * @property {boolean} disableOptimize - Disable SVG optimization with SVGO. Default: `false`.
+ *
+ */
 export function TikZInput() {
   const [tikzCode, setTikzCode] = useState("");
   const [svg, setSvg] = useState("");

@@ -1,6 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import tikzjax from "node-tikzjax";
 
+const TeXOptions = {
+  showConsole: true,
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -13,7 +17,7 @@ export default async function handler(
 
     try {
       // Use node-tikzjax to render the TikZ code into SVG
-      const svg = await tikzjax(tikzCode);
+      const svg = await tikzjax(tikzCode, TeXOptions);
       res.status(200).json({ svg });
     } catch (error) {
       console.error("Error rendering TikZ:", error);
