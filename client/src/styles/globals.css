@@ -123,4 +123,16 @@
   .font-roboto {
     font-family: var(--font-roboto);
   }
+  .body-2 {
+    @apply font-urbanist;
+    font-size: 14px;
+    font-weight: medium;
+    line-height: 24px;
+  }
+  .body-2-bold {
+    @apply font-urbanist;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 24px;
+  }
 }
