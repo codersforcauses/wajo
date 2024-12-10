@@ -1,4 +1,4 @@
-import MathInput, { TikZInput } from "@/components/ui/inputs";
+import { MathInput, TikZInput } from "@/components/ui/inputs";
 
 export default function Home() {
   return (
