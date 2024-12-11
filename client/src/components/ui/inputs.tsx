@@ -190,15 +190,15 @@ function MathInput({ input, onChange }: MathInputProps) {
               </p>
             </div>
             {showRules && (
-              <div className="rounded-md border-2 bg-white p-4 shadow-lg">
+              <div className="rounded-md border-2 bg-white p-2 shadow-lg">
                 <ul className="list-disc pl-5">
                   <li>
                     Separating inline mathematical expression using $ and $.
                     e.g. $e^+e^-$
                   </li>
                   <li>
-                    Separating mathematical expression using $$. e.g. $$ E =
-                    mc^2 $$
+                    Separating block mathematical expression using $$. e.g. $$ E
+                    = mc^2 $$
                   </li>
                   <li>
                     Tables using <b>{"\\begin{array}"}</b>. Separating table
