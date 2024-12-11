@@ -5,6 +5,9 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 import type { ReactElement, ReactNode } from "react";
+import { Toaster } from "sonner";
+
+import { AuthProvider } from "@/context/auth-provider";
 
 /**
  * Type definition for page with layout
@@ -24,8 +27,12 @@ const queryClient = new QueryClient();
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
-      <Component {...pageProps} />
+      <AuthProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+        <Component {...pageProps} />
+        {/* temporary include here, can add into Layout after */}
+        <Toaster position="bottom-center" richColors />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
