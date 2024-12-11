@@ -27,7 +27,7 @@ Table Student{
   user_id int [pk, unique, not null, ref: - User.id]
   // teacher_id int [ref: > Teacher.user_id]
   school int [ref: > School.id , not null]
-  birthday datetime
+  // birthday datetime []
 }
 
 Table School{
