@@ -48,7 +48,7 @@ export default async function handler(
       const wrappedCode = `\\begin{document}\n${tikzCode}\n\\end{document}`;
       // Use node-tikzjax to render the TikZ code into SVG
       console.log(wrappedCode);
-      const svg = await tikzjax(wrappedCode, TeXOptions);
+      const svg = await tikzjax(tikzCode, TeXOptions);
       res.status(200).json({ svg });
     } catch (error: any) {
       console.error("Error rendering TikZ:", error);
