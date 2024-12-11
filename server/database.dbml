@@ -57,6 +57,7 @@ table Quiz_slots{
   id int [pk]
   quiz int [ref: > Quiz.id]
   slot int [increment, note:'can set as `index`'] 
+  status enum [note: 'PROCESSING, SUBMITTED']
   questionid int [ref: > Question.id]
   block int 
   display_number varchar [default: null, note:'''Stores customised question number such as 1.2, A1, B12. If this is null, the default number is used.''']
@@ -124,9 +125,16 @@ Table Question{
 
 }
 table Question_image {
-  id int [pk]
+  id int [pk] 
   scale int
-  url varchar [unique]
+  jax_text longtext [default: null]
+  url varchar [unique] //maybe change to location
+}
+table Question_answer_image{
+  id int [pk]
+  jax_text longtext [default: null]
+  scale int
+  url varchar [unique] //maybe change to location
 }
 
 table Question_answers{
@@ -134,12 +142,13 @@ table Question_answers{
   question_id foreignkey [ref: > Question.id]
   answer longtext
   feedback longtext
+  image foreign [ref : > Question_answer_image.id]
 }
 
 table Question_attempts{
   id int [pk]
   quiz_attempt_id BIGINT [not null, ref: > Quiz_attempts.id] 
-  status enum [note: 'PROCESSING, ']
+  status enum [note: 'PROCESSING, SUBMITTED']
 
   question_id BIGINT [not null, ref: > Question.id] 
   score DECIMAL(10,2) [note: "score the student get for this question"] 
