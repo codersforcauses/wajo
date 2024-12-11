@@ -15,12 +15,14 @@ Table User {
   email varchar
   password varchar
   groups varchar
+  is_active bool
 }
 
 Table Teacher{
   user_id int [pk, ref: - User.id]
   school int [ref: > School.id, not null]
-  
+  fav_colour varchar
+  phone varchar
 }
 
 Table Student{
@@ -49,7 +51,6 @@ timeclose timestamp [default: 0]
 timelimit timestamp [default: 0]
 grade decimal
 is_comp bool [note: "check if this quiz is a competition", default: False]
-is_practice bool [default: False]
 visible bool [default: false]
 }
 
@@ -149,7 +150,6 @@ table Question_attempts{
   id int [pk]
   quiz_attempt_id BIGINT [not null, ref: > Quiz_attempts.id] 
   status enum [note: 'PROCESSING, SUBMITTED']
-
   question_id BIGINT [not null, ref: > Question.id] 
   score DECIMAL(10,2) [note: "score the student get for this question"] 
   flagged BOOLEAN [default: false] 
@@ -160,7 +160,7 @@ table Question_attempts{
   slot int [note: 'Used to number the questions in one attempt sequentially.', default: 0]
   // mark int [note: 'The grade this question is marked out of in this attempt.']
 }
-table question_attempts_user  {
+table Question_attempts_user  {
   int int [pk] 
   student foreignkey [ref: > Student.user_id]
   question_attemptid foreignky [ref: > Question_attempts.id]
@@ -176,6 +176,7 @@ Table Question_categories{
   name varchar[255]
   info longtext
   parent int [ref: > Question_categories.id, default: 0] 
+  is_comp bool
 }
 // table Question_statistics{
 //   id int
@@ -183,7 +184,7 @@ Table Question_categories{
 // }
 table Question_hints{
   id int
-  questionid int [ref: > Question.id]
+  questionid int [ref: - Question.id]
   hint longtext 
 
 }
