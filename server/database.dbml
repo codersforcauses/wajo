@@ -1,0 +1,183 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+
+Table User {
+  Note:'''
+    Django default user:
+    https://docs.djangoproject.com/en/5.1/ref/contrib/auth/#user-model
+  
+  '''
+  id int [pk]
+  username varchar[100] [not null]
+  first_name varchar[150]
+  last_name varchar[150]
+  email varchar
+  password varchar
+  groups varchar
+}
+
+Table Teacher{
+  user_id int [pk, ref: - User.id]
+  school int [ref: > School.id, not null]
+  
+}
+
+Table Student{
+  user_id int [pk, unique, not null, ref: - User.id]
+  // teacher_id int [ref: > Teacher.user_id]
+  school int [ref: > School.id , not null]
+  birthday datetime
+}
+
+Table School{
+  id int [pk]
+  name varchar
+  code varchar [unique]
+  
+} 
+
+Table Quiz{
+  note: '''
+    The settings for each quiz
+  '''
+id int [pk]
+name varchar[255] [note:"Quiz name.", not null]
+intro longtext [default: null, note:'Quiz introduction text.']
+timeopen timestamp [default: 0]
+timeclose timestamp [default: 0]
+timelimit timestamp [default: 0]
+grade decimal
+is_comp bool [note: "check if this quiz is a competition", default: False]
+is_practice bool [default: False]
+visible bool [default: false]
+}
+
+table Quiz_slots{
+  id int [pk]
+  quiz int [ref: > Quiz.id]
+  slot int [increment, note:'can set as `index`'] 
+  questionid int [ref: > Question.id]
+  block int 
+  display_number varchar [default: null, note:'''Stores customised question number such as 1.2, A1, B12. If this is null, the default number is used.''']
+  require_previous bool [default: False]
+}
+
+Table Quiz_attempts {
+    id bigint [pk] // Primary Key
+    student bigint [ref: > Student.user_id]
+    quiz bigint [ref: > Quiz.id]
+    attempt mediumint [note : "Sequentially numbers this student's attempts at this quiz."]
+    question_attempts bigint
+    currentpage bigint
+    state varchar(16)
+    timestart timestamp
+    timefinish timestamp
+    time_modified timestamp
+    time_modified_offline timestamp
+    // timecheckstate bigint
+    sum_grades decimal(10,5) [note:'Total marks for this attempt.']
+    // gradednotificationsenttime bigint
+}
+Table Quiz_grades {
+    id BIGINT [note: 'Primary key, unique identifier for each grade entry.']
+    quiz_attempt BIGINT [not null, default: 0, note: 'Foreign key references quiz.id. Represents the quiz associated with this grade.']
+    student BIGINT [not null, default: 0, note: 'Foreign key references user.id. Represents the user associated with this grade.']
+    grade DECIMAL(10,5) [not null, default: 0.0, note: 'The overall grade from the quiz. Not affected by overrides in the gradebook.']
+    time_modified BIGINT [not null, default: 0, note: 'The last time this grade was modified.']
+}
+Ref: Quiz_attempts.id < Quiz_grades.quiz_attempt [note: 'Defines the foreign key relationship between quiz_grades.quiz and quiz.id.']
+Ref: Student.user_id < Quiz_grades.student [note: 'Defines the foreign key relationship between quiz_grades.userid and user.id.']
+
+Table Team{
+  id int [pk]
+  quiz int [ref: > Quiz.id]
+  name varchar[254] [note:'Short human readable unique name for the group.']
+  team_members int 
+  school int [ref: > School.id]
+  description longtext
+  time_created timestamp
+  grades int 
+  
+}
+Table Team_members{
+  id int [pk]
+  student int [ref: > Student.user_id]
+  team int [ref: > Team.id] 
+  time_added timestamp
+}
+
+Table Question{
+  id int [pk]
+  parent int [ref: > Question.id, default: 0] 
+  name varchar[255]
+  question_text longtext [default: null] 
+  description longtext [note: 'store some info about the question']
+  category int [ref: > Question_categories.id ,default: 0]
+  created_by int [ref: > User.id]
+  modified_by int [ref: > User.id]
+  layout enum [note: 'the position of the uploaded picture']
+  image foreign [ref: - Question_image.id, default: null]
+  default_mark int
+  time_created timestamp
+  time_modified timestamp 
+
+}
+table Question_image {
+  id int [pk]
+  scale int
+  url varchar [unique]
+}
+
+table Question_answers{
+  id int [pk]
+  question_id foreignkey [ref: > Question.id]
+  answer longtext
+  feedback longtext
+}
+
+table Question_attempts{
+  id int [pk]
+  quiz_attempt_id BIGINT [not null, ref: > Quiz_attempts.id] 
+  status enum [note: 'PROCESSING, ']
+
+  question_id BIGINT [not null, ref: > Question.id] 
+  score DECIMAL(10,2) [note: "score the student get for this question"] 
+  flagged BOOLEAN [default: false] 
+  time_start timestamp [note: 'record the first time that the user strat answering this question']
+  time_answered timestamp
+  time_modified timestamp
+  Note: "Records each user's attempt for a specific question in a quiz."
+  slot int [note: 'Used to number the questions in one attempt sequentially.', default: 0]
+  // mark int [note: 'The grade this question is marked out of in this attempt.']
+}
+table question_attempts_user  {
+  int int [pk] 
+  student foreignkey [ref: > Student.user_id]
+  question_attemptid foreignky [ref: > Question_attempts.id]
+  answer varchar [default: null]
+  is_correct bool [default: null]
+
+}
+
+Table Question_categories{
+  note: 'Categories are for grouping questions'
+  id int [pk]
+  diff_level int [default: 1]
+  name varchar[255]
+  info longtext
+  parent int [ref: > Question_categories.id, default: 0] 
+}
+// table Question_statistics{
+//   id int
+//   question int [ref: > Question.id]
+// }
+table Question_hints{
+  id int
+  questionid int [ref: > Question.id]
+  hint longtext 
+
+}
+
+
+Ref: "Quiz_attempts"."id" < "Quiz_attempts"."student"
