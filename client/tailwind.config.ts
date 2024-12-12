@@ -33,8 +33,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-urbanist)", ...fontFamily.sans],
-        roboto: ["var(--font-roboto)", ...fontFamily.sans],
+        sans: ["var(--font-roboto)", ...fontFamily.sans],
+        body: ["var(--font-urbanist)", ...fontFamily.sans],
       },
       colors: {
         yellow: "#ffd700",

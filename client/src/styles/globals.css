@@ -4,6 +4,9 @@
 
 @layer base {
   :root {
+    --font-roboto: 'Roboto', sans-serif;
+    --font-urbanist: 'Urbanist', sans-serif;
+
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
@@ -73,10 +76,11 @@
     @apply border-border;
   }
   body {
-    @apply font-urbanist bg-background text-foreground;
+    @apply bg-background text-foreground;
+    /* font-family: var(--font-urbanist);
     font-size: 18px;
     font-weight: medium;
-    line-height: 28px;
+    line-height: 28px;  Currently causing clashes with the secondary font. Needs to be looked into before uncommenting.*/
   }
   h1,
   h2,
@@ -84,7 +88,7 @@
   h4,
   h5,
   h6 {
-    @apply font-roboto;
+    font-family: var(--font-roboto);
   }
   h1 {
     font-size: 62px;

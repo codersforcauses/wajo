@@ -9,7 +9,7 @@ const Navbar = () => {
   return (
     <nav className={`${styles.nav}`}>
       <div className="container mx-auto flex items-center justify-between">
-        <div>
+        <div className={styles.logo}>
           <Image
             src={logo}
             alt="WAJO logo with white background"
@@ -17,11 +17,11 @@ const Navbar = () => {
             height={105}
           />
         </div>
-        <div className="space-x-4">
+        <div className={`${styles.navLinks}`}>
           <Link href="/news">News</Link>
           <Link href="/awards">Awards</Link>
           <Link href="/resources">Resources</Link>
-          <Link href="/contact">Contact Us</Link>
+          <Link href="/contact">Contact us</Link>
         </div>
       </div>
     </nav>

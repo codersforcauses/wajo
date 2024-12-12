@@ -2,18 +2,15 @@
     background-color: var(--nav-background);
 }
 
-.navbar {
-    padding: 10px;
-  }
-  
-  .nav-links {
-    list-style-type: none;
+.logo {
+    padding: 3px 0;
+}
+
+.navLinks {
     display: flex;
-    justify-content: center; /*  Center the nav links */
-    gap: 20px; /* Add spacing between links */
-    /* margin: 0; Reset default margin */
-    /* padding: 0; Reset default padding */
-  }
+    justify-content: center;
+    gap: 20px;
+}
   
   .nav-links li a {
     text-decoration: none; /* Remove underline from links */
