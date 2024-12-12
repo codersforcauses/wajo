@@ -1,11 +1,22 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
+import logo from "../../public/wajo_white.svg";
+import styles from "../styles/modules/navbar.module.css";
+
 const Navbar = () => {
   return (
-    <nav className="bg-gray-800 p-4">
+    <nav className={`${styles.nav} p-4`}>
       <div className="container mx-auto flex items-center justify-between">
-        <div className="text-lg font-bold text-white">WAJO</div>
+        <div>
+          <Image
+            src={logo}
+            alt="WAJO logo with white background"
+            width={105}
+            height={105}
+          />
+        </div>
         <div className="space-x-4">
           <Link href="/news">News</Link>
           <Link href="/awards">Awards</Link>
