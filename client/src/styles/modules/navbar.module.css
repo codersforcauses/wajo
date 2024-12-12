@@ -11,15 +11,8 @@
     justify-content: center;
     gap: 20px;
 }
-  
-  .nav-links li a {
-    text-decoration: none; /* Remove underline from links */
-    color: #000000; /* Set text color */
-    font-size: 20px; /* Adjust font size */
-    font-weight: bold; /* Optional: Make text bold */
-  }
-  
-  .nav-links li a:hover {
-    color: #0078d7; /* Change color on hover */
-  }
+
+.navLinks a {
+    font-size: 20px;
+}
   
