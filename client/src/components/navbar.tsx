@@ -17,7 +17,7 @@ const Navbar = () => {
             height={105}
           />
         </div>
-        <div className={`${styles.navLinks} font-sans`}>
+        <div className={`${styles.navLinks}`}>
           <Link href="/news">News</Link>
           <Link href="/awards">Awards</Link>
           <Link href="/resources">Resources</Link>

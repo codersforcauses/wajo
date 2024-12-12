@@ -32,10 +32,6 @@ const config = {
       },
     },
     extend: {
-      fontFamily: {
-        sans: ["Roboto", ...fontFamily.sans],
-        body: ["Urbanist", ...fontFamily.sans],
-      },
       colors: {
         yellow: "#ffd700",
         grey: "#a9a9a9",

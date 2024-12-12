@@ -13,6 +13,8 @@
 }
 
 .navLinks a {
+    font-family: var(--font-roboto);
     font-size: 20px;
+    font-weight: 500;
 }
   

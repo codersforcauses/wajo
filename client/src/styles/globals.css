@@ -43,7 +43,8 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body;
+    @apply bg-background text-foreground;
+    font-family: var(--font-urbanist);
     font-size: 18px;
     font-weight: 500;
     line-height: 28px;
@@ -54,7 +55,7 @@
   h4,
   h5,
   h6 {
-    @apply font-sans;
+    font-family: var(--font-roboto);
   }
   h1 {
     font-size: 62px;
@@ -89,14 +90,20 @@
 }
 
 @layer utilities {
+  .font-urbanist {
+    font-family: var(--font-urbanist);
+  }
+  .font-roboto {
+    font-family: var(--font-roboto);
+  }
   .body-2 {
-    @apply font-body;
+    @apply font-urbanist;
     font-size: 14px;
     font-weight: 600;
     line-height: 24px;
   }
   .body-2-bold {
-    @apply font-body;
+    @apply font-urbanist;
     font-size: 14px;
     font-weight: 600;
     line-height: 24px;
