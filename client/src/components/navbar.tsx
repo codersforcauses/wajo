@@ -7,7 +7,7 @@ import styles from "../styles/modules/navbar.module.css";
 
 const Navbar = () => {
   return (
-    <nav className={`${styles.nav} p-4`}>
+    <nav className={`${styles.nav}`}>
       <div className="container mx-auto flex items-center justify-between">
         <div>
           <Image
