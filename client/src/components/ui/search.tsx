@@ -10,12 +10,12 @@ import {
 
 interface SearchProps {
   children: React.ReactNode;
-  title: string;
+  title?: string;
 }
 
 /**
- * The `Search` component is a container for various search-related input elements.
- * It provides a styled wrapper for the children components, typically input or select elements.
+ * The `Search` component serves as a container for various search-related input elements.
+ * It provides a styled wrapper for child components, such as input or select elements, with an optional title.
  *
  * @component
  * @example
@@ -25,20 +25,22 @@ interface SearchProps {
  * </Search>
  *
  * @param {React.ReactNode} children - The content to be rendered inside the search container.
- * @param {string} title - The title for the search section.
+ * @param {string} [title] - An optional title for the search section. If provided, it will be displayed above the content.
  *
- * @returns {JSX.Element} A styled search container with the title and children.
+ * @returns {JSX.Element} A styled search container with an optional title and child elements.
  */
-const Search = ({ children, title }: SearchProps) => {
+function Search({ children, title }: SearchProps): JSX.Element {
   return (
     <div className="mx-auto mb-6 rounded-lg border bg-white p-4 shadow-md">
-      <h2 className="mb-4 text-lg font-semibold text-gray-700">
-        Search {title}
-      </h2>
+      {title && (
+        <h2 className="mb-4 text-lg font-semibold text-gray-700">
+          Search {title}
+        </h2>
+      )}
       <div className="flex flex-wrap gap-x-4 gap-y-2">{children}</div>
     </div>
   );
-};
+}
 
 interface SearchInputProps {
   label: string;
@@ -62,12 +64,12 @@ interface SearchInputProps {
  *
  * @returns {JSX.Element} A text input element with search functionality.
  */
-const SearchInput = ({
+function SearchInput({
   label,
   value,
   placeholder,
   onSearch,
-}: SearchInputProps) => {
+}: SearchInputProps): JSX.Element {
   const [tempValue, setTempValue] = useState(value);
 
   const handleOnBlur = () => {
@@ -94,7 +96,7 @@ const SearchInput = ({
       />
     </div>
   );
-};
+}
 
 interface SearchSelectProps {
   label: string;
@@ -118,12 +120,12 @@ interface SearchSelectProps {
  *
  * @returns {JSX.Element} A styled select dropdown element.
  */
-const SearchSelect = ({
+function SearchSelect({
   label,
   options,
   placeholder = "Select an option",
   onChange,
-}: SearchSelectProps) => {
+}: SearchSelectProps): JSX.Element {
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium text-gray-600">{label}</label>
@@ -144,6 +146,6 @@ const SearchSelect = ({
       </Select>
     </div>
   );
-};
+}
 
 export { Search, SearchInput, SearchSelect };
