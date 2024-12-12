@@ -9,6 +9,14 @@ export interface UserLogin {
   password: string;
 }
 
+/**
+ * The `LoginPage` component renders a login form and handles user authentication.
+ * It utilizes the `useAuth` hook to call the `login` function for user authentication and displays a success or error toast message based on the login result.
+ *
+ * @component
+ * @example
+ * <LoginPage />
+ */
 const LoginPage: NextPageWithLayout = () => {
   const { login } = useAuth();
 

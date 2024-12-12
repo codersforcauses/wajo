@@ -3,6 +3,23 @@ import { Toaster as Sonner } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
+/**
+ * Toaster component for displaying toast notifications.
+ *
+ * This component utilizes the `sonner` library to display toast messages. It automatically
+ * adapts the theme based on the current theme from `next-themes` and provides custom
+ * styling for different toast states.
+ *
+ * @see {@link https://sonner.emilkowal.ski/} for more details.
+ *
+ * @component
+ * @example
+ *   <Toaster />
+ *
+ * @param {object} [toastOptions] - Options for customizing the toast appearance and behavior.
+ * @param {object} [toastOptions.classNames] - Custom class names for the toast notification elements.
+ *    - Includes `toast`, `description`, `actionButton`, `cancelButton`, `progressBar`, `toastWrapper`, `closeButton`.
+ */
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme();
 

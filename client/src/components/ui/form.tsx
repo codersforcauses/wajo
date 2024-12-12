@@ -13,6 +13,34 @@ import {
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
+/**
+ * Form components using `react-hook-form` for managing form state and validation, along with custom form field components.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/form} for more details.
+ *
+ * @component
+ * @example
+ * <Form {...formMethods}>
+ *   <form id="some_form_id" onSubmit={formMethods.handleSubmit(onSubmit)}>
+ *     <FormField
+ *       control={formMethods.control}
+ *       name="username"
+ *       render={({ field }) => (
+ *         <FormItem className="flex flex-col gap-2">
+ *           <FormLabel>Username</FormLabel>
+ *           <FormControl>
+ *             <Input {...field}/>
+ *           </FormControl>
+ *           <FormMessage />
+ *         </FormItem>
+ *       )}
+ *     />
+ *     <Button type="submit">
+ *       Submit
+ *     </Button>
+ *   </form>
+ * </Form>
+ */
 const Form = FormProvider;
 
 type FormFieldContextValue<
@@ -26,6 +54,14 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
   {} as FormFieldContextValue,
 );
 
+/**
+ * Form context provider for a specific field.
+ * Provides context for form fields to manage field-specific state and error handling.
+ *
+ * @component
+ * @example
+ * <FormField name="username" control={control} render={({ field }) => <input {...field} />} />
+ */
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -39,6 +75,23 @@ const FormField = <
   );
 };
 
+/**
+ * Custom hook to access form field information, including validation state, error messages, and field state.
+ * This hook provides the necessary field states like validity, touch state, and error messages.
+ *
+ * @hook
+ * @throws {Error} Throws an error if used outside of the `FormField` context.
+ * @property {boolean} invalid - Indicates whether the form field is invalid.
+ * @property {boolean} isDirty - Indicates whether the form field value has been modified.
+ * @property {boolean} isTouched - Indicates whether the form field has been interacted with.
+ * @property {boolean} isValidating - Indicates whether the form field is currently being validated.
+ * @property {FieldError | undefined} [error] - The error object for the form field, if any.
+ * @property {string} id - The unique ID of the form item.
+ * @property {string} name - The name of the form field.
+ * @property {string} formItemId - The ID of the form item associated with this field.
+ * @property {string} formDescriptionId - The ID of the description text for this form item.
+ * @property {string} formMessageId - The ID of the message text for this form item, typically error messages.
+ */
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
@@ -70,6 +123,19 @@ const FormItemContext = React.createContext<FormItemContextValue>(
   {} as FormItemContextValue,
 );
 
+/**
+ * FormItem component to wrap individual form elements.
+ * Provides context for each form item and renders the field.
+ *
+ * @component
+ * @example
+ * <FormItem className="space-y-2">
+ *   <FormLabel>Username</FormLabel>
+ *   <FormControl>
+ *     <input />
+ *   </FormControl>
+ * </FormItem>
+ */
 const FormItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -84,6 +150,15 @@ const FormItem = React.forwardRef<
 });
 FormItem.displayName = "FormItem";
 
+/**
+ * FormLabel component to render a label element for a form field.
+ * It links the label with the associated form control using `htmlFor` attribute.
+ * The label also reflects validation error states.
+ *
+ * @component
+ * @example
+ * <FormLabel>Username</FormLabel>
+ */
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
@@ -101,6 +176,16 @@ const FormLabel = React.forwardRef<
 });
 FormLabel.displayName = "FormLabel";
 
+/**
+ * FormControl component to render a form control with proper aria attributes.
+ * It associates the form control with description and error message IDs for accessibility.
+ *
+ * @component
+ * @example
+ * <FormControl>
+ *   <input />
+ * </FormControl>
+ */
 const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
@@ -124,6 +209,14 @@ const FormControl = React.forwardRef<
 });
 FormControl.displayName = "FormControl";
 
+/**
+ * FormDescription component to render description text below a form field.
+ * This component provides additional information about the form field.
+ *
+ * @component
+ * @example
+ * <FormDescription>Enter your username</FormDescription>
+ */
 const FormDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
@@ -141,6 +234,14 @@ const FormDescription = React.forwardRef<
 });
 FormDescription.displayName = "FormDescription";
 
+/**
+ * FormMessage component to display error messages associated with form fields.
+ * It renders an error message if the form field has an error.
+ *
+ * @component
+ * @example
+ * <FormMessage>Error message</FormMessage>
+ */
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>

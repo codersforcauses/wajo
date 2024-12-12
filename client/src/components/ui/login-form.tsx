@@ -21,6 +21,19 @@ interface LoginFormProps {
   onSubmit: (data: z.infer<typeof loginSchema>) => void;
 }
 
+/**
+ * The `LoginForm` component provides a form for users to log in with their username and password.
+ * It uses `react-hook-form` for form handling and validation with Zod schema, ensuring that the form fields
+ * meet specific requirements before submission. The component also includes a password visibility toggle.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/form} for more details.
+ *
+ * @component
+ * @example
+ * <LoginForm onSubmit={handleLoginSubmit} />
+ *
+ * @param {Function} props.onSubmit - The callback function to handle form submission with the login data.
+ */
 export function LoginForm({ onSubmit }: LoginFormProps) {
   const [passwordVisibility, setPasswordVisibility] = useState(false);
 
