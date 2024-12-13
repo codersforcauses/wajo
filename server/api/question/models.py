@@ -1,32 +1,39 @@
 from django.db import models
 
 
-# Enum for year level of students
-class YearLevel(models.IntegerChoices):
-    YEAR_7 = 7, 'Year 7'
-    YEAR_8 = 8, 'Year 8'
-    YEAR_9 = 9, 'Year 9'
+class Image(models.Model):
+    id = models.AutoField(primary_key=True)
+    scale = models.IntegerField()
+    jax_text = models.TextField(default="")
+    url = models.CharField(max_length=255)
 
 
 class Category(models.Model):
-    category_id = models.AutoField(primary_key=True)
-    category_name = models.CharField(max_length=50)
-    description = models.CharField(max_length=200)
+    id = models.AutoField(primary_key=True)
+    diff_level = models.IntegerField()
+    name = models.CharField(max_length=50)
+    info = models.TextField(default="")
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
+    is_comp = models.BooleanField()
 
     def __str__(self):
-        return f'{self.category_id} {self.category_name} {self.description}'
+        return f'{self.id} {self.name} {self.info}'
 
 
 class Question(models.Model):
-    question_id = models.AutoField(primary_key=True)
-    category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)  # Replace with enum if categories predefined?
-    year = models.IntegerField()  # year as 4 digit int
-    year_level = models.IntegerField(choices=YearLevel.choices)  # year level as int choice from enum YearLevel
-    question_content = models.CharField(max_length=200)
-    image = models.CharField(max_length=200, blank=True)  # Singe img field, placeholder for Images class
-    mark = models.IntegerField()
-    solution = models.IntegerField()
-    solution_explain = models.CharField(max_length=200, blank=True)
+    id = models.AutoField(primary_key=True)
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
+    name = models.CharField(max_length=255)
+    question_text = models.TextField(default="set question text...")
+    description = models.TextField(default="set question description...")
+    category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='question_created')
+    modified_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='question_modified')
+    layout = models.TextField(default="")  # Placeholder for layout enum
+    image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True, blank=True)
+    default_mark = models.IntegerField(default=0)
+    time_created = models.DateTimeField(null=True, blank=True)
+    time_modified = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.question_id} {self.question_content} {self.mark}'
+        return f'{self.id} {self.name} {self.description}'

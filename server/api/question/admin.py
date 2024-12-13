@@ -4,12 +4,12 @@ from .models import Question, Category
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('category_id', 'category_name', 'description')
-    search_fields = ('category_name',)
+    list_display = ('id', 'diff_level', 'name', 'is_comp')
+    list_filter = ('id', 'diff_level', 'name', 'is_comp')
 
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('question_id', 'year', 'year_level', 'mark')
-    list_filter = ('year', 'year_level', 'category_id')
-    search_fields = ('question_id',)
+    list_display = ('id', 'name', 'description', 'category_id')
+    list_filter = ('id', 'default_mark', 'parent', 'category_id')
+    search_fields = ('id',)

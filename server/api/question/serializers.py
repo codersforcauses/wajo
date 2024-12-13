@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Question, Category
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class QuestionCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
