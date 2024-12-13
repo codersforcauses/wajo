@@ -36,3 +36,10 @@ If you modify anything in the `docker` folder, you need to add the `--build` fla
 ### Changing env vars
 
 Edit the `.env` file in the respective directory (client or server).
+
+### Production mode
+
+Use code below to start **Production** mode after modify the `.env` to `PRODUCTION`
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
