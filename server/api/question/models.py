@@ -7,6 +7,9 @@ class Image(models.Model):
     jax_text = models.TextField(default="")
     url = models.CharField(max_length=255)
 
+    def __str__(self):
+        return f'{self.id} {self.url}'
+
 
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
