@@ -1,6 +1,7 @@
-"use client";
-
+import Image from "next/image";
 import { Drawer } from "vaul";
+
+import logo from "../../../public/wajo_white.svg";
 
 export default function MobileNav() {
   return (
@@ -9,7 +10,8 @@ export default function MobileNav() {
         Open Drawer
       </Drawer.Trigger>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+        <Drawer.Overlay className="fixed inset-0 bg-black/40" />{" "}
+        {/* Darkens the background */}
         <Drawer.Content
           className="fixed top-0 z-10 flex w-full outline-none"
           // The gap between the edge of the screen and the drawer is 8px in this case.
@@ -19,8 +21,14 @@ export default function MobileNav() {
         >
           <div className="flex h-full w-full grow flex-col bg-zinc-50 p-5">
             <div className="mx-auto max-w-md">
-              <Drawer.Title className="mb-2 font-medium text-zinc-900">
-                It supports all directions.
+              <Drawer.Title className="font- mb-2 flex justify-between text-base text-zinc-900">
+                <Image
+                  src={logo}
+                  alt="WAJO logo with white background"
+                  width={105}
+                  height={105}
+                />
+                <Drawer.Close>X</Drawer.Close>
               </Drawer.Title>
               <Drawer.Description className="mb-2 text-zinc-600">
                 This one specifically is not touching the edge of the screen,

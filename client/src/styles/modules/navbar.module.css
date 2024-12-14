@@ -1,5 +1,6 @@
 .nav {
     background-color: var(--nav-background);
+    height: 120px;
 }
 
 .logo {
