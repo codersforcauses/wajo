@@ -12,4 +12,4 @@ class Invoice(models.Model):
     number_of_teams = models.IntegerField()
 
     def __str__(self):
-        return f"Invoice {self.invoice_id}: ${self.amount}"
+        return f"{self.invoice_id} {self.amount}"
