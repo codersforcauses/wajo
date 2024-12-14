@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
+import { Button } from "@/components/ui/button";
+
 import logo from "../../public/wajo_white.svg";
 import styles from "../styles/modules/navbar.module.css";
 
@@ -22,6 +24,14 @@ const Navbar = () => {
           <Link href="/awards">Awards</Link>
           <Link href="/resources">Resources</Link>
           <Link href="/contact">Contact us</Link>
+        </div>
+        <div>
+          <Button
+            variant={"outline"}
+            className={`${styles.loginButton} font-roboto`}
+          >
+            Login
+          </Button>
         </div>
       </div>
     </nav>

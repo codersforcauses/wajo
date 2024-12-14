@@ -17,4 +17,10 @@
     font-size: 20px;
     font-weight: 500;
 }
-  
+
+.loginButton {
+    border-color: black;
+    border: 2px solid;
+    border-radius: var(--radius);
+    background-color: white;
+}
