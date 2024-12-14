@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 
 import logo from "../../public/wajo_white.svg";
 import styles from "../styles/modules/navbar.module.css";
+import MobileNav from "./ui/mobilenav";
 
 const Navbar = () => {
   return (
@@ -35,6 +36,7 @@ const Navbar = () => {
             Login
           </Button>
         </div>
+        <MobileNav></MobileNav>
       </div>
     </nav>
   );
