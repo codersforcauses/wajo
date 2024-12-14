@@ -1,41 +1,40 @@
+from django.contrib.auth.models import User
 from django.db import models
-from django.contrib.auth.models import User, Group
 
 
-class ExtendedUser(models.Model):
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, primary_key=True)
-
-    # add key when tables are added
-    # team_id = models.CharField(max_length=50, ke)
-    # school_id = models.CharField(max_length=50, blank=True)
-    # Automatically set when created
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class School(models.Model):
+    school_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, blank=True)
+    code = models.CharField(max_length=10)
 
     def __str__(self):
-        return f"{self.user.username} ({self.role})"
+        return f"School {self.name}"
 
-    @property
-    def role(self):
-        if self.user.groups.exists():
-            return self.user.groups.first().name
-        return None
 
-    def set_role(self, role_name):
-        self.user.groups.clear()
-        group = Group.objects.get(name=role_name)
-        self.user.groups.add(group)
+class Student(models.Model):
+    STATUS_CHOICES = (
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    school_id = models.ForeignKey(
+        School, on_delete=models.CASCADE, related_name="students")
+    attendent_year = models.IntegerField()
+    year_level = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default='active')
 
-    def is_admin(self):
-        return self.user.groups.filter(name='Admin').exists()
+    def __str__(self):
+        return f"Student: {self.user.username} - {self.school.name}"
 
-    def is_teacher(self):
-        return self.user.groups.filter(name='Teacher').exists()
 
-    def is_student(self):
-        return self.user.groups.filter(name='Student').exists()
+class Teacher(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    school_id = models.ForeignKey(
+        School, on_delete=models.CASCADE, related_name="teachers")
+    phone = models.CharField(max_length=15, blank=True)
 
-    @property
-    def last_login(self):
-        return self.user.last_login
+    def __str__(self):
+        return f"Teacher: {self.user.username} - {self.school.code}"
