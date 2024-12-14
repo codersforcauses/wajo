@@ -10,8 +10,8 @@ import styles from "../styles/modules/navbar.module.css";
 const Navbar = () => {
   return (
     <nav className={`${styles.nav}`}>
-      <div className="container mx-auto flex items-center justify-between">
-        <div className={styles.logo}>
+      <div className="container mx-auto flex items-center">
+        <div className={`${styles.logo} flex-auto`}>
           <Image
             src={logo}
             alt="WAJO logo with white background"
@@ -19,13 +19,15 @@ const Navbar = () => {
             height={105}
           />
         </div>
-        <div className={`${styles.navLinks}`}>
+        <div
+          className={`${styles.navLinks} flex flex-shrink justify-between max-md:hidden`}
+        >
           <Link href="/news">News</Link>
           <Link href="/awards">Awards</Link>
           <Link href="/resources">Resources</Link>
           <Link href="/contact">Contact us</Link>
         </div>
-        <div>
+        <div className="ml-24 flex-initial">
           <Button
             variant={"outline"}
             className={`${styles.loginButton} font-roboto`}

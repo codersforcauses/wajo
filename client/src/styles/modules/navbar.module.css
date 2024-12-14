@@ -7,8 +7,8 @@
 }
 
 .navLinks {
-    display: flex;
-    justify-content: center;
+    /* display: flex; */
+    /* justify-content: center; */
     gap: 20px;
 }
 
@@ -16,6 +16,7 @@
     font-family: var(--font-roboto);
     font-size: 20px;
     font-weight: 500;
+    margin-left: 3.8rem;
 }
 
 .loginButton {
@@ -23,4 +24,10 @@
     border: 2px solid;
     border-radius: var(--radius);
     background-color: white;
+}
+
+@media (max-width: 1024px) {
+    .navLinks a {
+        margin-left: 1rem;
+    }
 }
