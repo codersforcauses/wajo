@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     AxiosResponse<TokenResponse>,
     Error,
     { username: string; password: string }
-  >(["login"], "/auth/token/");
+  >(["login"], "/auth/token/", 2000);
 
   useEffect(() => {
     if (accessToken) {
@@ -80,8 +80,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * @throws {Error} If there is an error with the API request, a formatted error message is returned.
    */
   const login = async (username: string, password: string) => {
-    const formatErrorMsg = (status?: number, detail?: string) => {
-      return `[${status || "Error"}] ${detail || "An unexpected error occurred."}`;
+    const formatErrorMsg = (result: {
+      status?: number;
+      data?: { detail?: string };
+    }) => {
+      const status = result?.status || "Error";
+      const detail = result?.data?.detail || "An unexpected error occurred.";
+      return `[${status}] ${detail}`;
     };
 
     try {
@@ -89,17 +94,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (result.status !== 200) {
         return {
           success: false,
-          error: formatErrorMsg(result.status, result.data.detail),
+          error: formatErrorMsg(result),
         };
       }
 
       setTokens(result.data.access, result.data.refresh);
       return { success: true, error: null };
     } catch (error: any) {
-      const errorMessage = formatErrorMsg(
-        error.response?.status,
-        error.response?.data?.detail || error.message,
-      );
+      const errorMessage = formatErrorMsg(error.response);
       return { success: false, error: errorMessage };
     }
   };

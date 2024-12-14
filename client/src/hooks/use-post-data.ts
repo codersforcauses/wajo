@@ -20,6 +20,7 @@ import api from "@/lib/api";
  *
  * @param {string[]} mutationKey - A unique key for identifying the mutation in React Query.
  * @param {string} endpoint - The API endpoint to which the POST request is sent.
+ * @param {number} [timeout=10000] - The timeout for the POST request in milliseconds. Defaults to 10000ms (10 seconds).
  * @param {UseMutationOptions<TData, TError, TVariables>} [args] - Optional configuration options for the mutation. This can include callbacks like `onSuccess`, `onError`, etc.
  *
  * @returns {UseMutationResult<TData, TError, TVariables>} The result of the mutation, which includes properties like `mutate`, `isLoading`, `isError`, etc.
@@ -41,6 +42,7 @@ export const usePostMutation = <
 >(
   mutationKey: string[],
   endpoint: string,
+  timeout: number = 10000, // Default timeout of 10 seconds
   args?: Omit<
     UseMutationOptions<TData, TError, TVariables>,
     "mutationKey" | "mutationFn"
@@ -52,7 +54,7 @@ export const usePostMutation = <
     ...args,
     mutationKey,
     mutationFn: (variables: TVariables) => {
-      return api.post(endpoint, variables);
+      return api.post(endpoint, variables, { timeout });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [mutationKey] });

@@ -34,6 +34,7 @@ const LeaderboardList = () => {
   } = useFetchData<Leaderboard[]>({
     queryKey: ["manager.leaderboards"],
     endpoint: "manager/leaderboard/",
+    timeout: 5000,
   });
 
   if (isLeaderboardLoading) return <div>Loading...</div>;
