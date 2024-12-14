@@ -32,9 +32,8 @@ const LeaderboardList = () => {
     isError: isLeaderboardError,
     error: leaderboardError,
   } = useFetchData<Leaderboard[]>({
-    queryKey: ["manager.leaderboards"],
-    endpoint: "manager/leaderboard/",
-    timeout: 5000,
+    queryKey: ["leaderboards.list"],
+    endpoint: "leaderboard/list",
   });
 
   if (isLeaderboardLoading) return <div>Loading...</div>;
@@ -55,8 +54,7 @@ const LeaderboardList = () => {
       filters.status === "All" || leaderboard.status === filters.status;
 
     const matchesSearch =
-      !filters.search ||
-      leaderboard.name.toLowerCase().includes(filters.search.toLowerCase());
+      !filters.search || leaderboard.name.includes(filters.search);
 
     return matchesStatus && matchesSearch;
   });
