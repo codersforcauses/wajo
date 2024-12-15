@@ -52,7 +52,9 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "api.healthcheck",
+    "api.invoices",
     "api.leaderboard",
+
 ]
 
 MIDDLEWARE = [
