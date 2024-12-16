@@ -29,6 +29,7 @@ import tikzjax from "node-tikzjax";
  * @property {string} fontCssUrl - URL of the font CSS file. Default: `'https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css'`.
  * @property {boolean} disableOptimize - Disable SVG optimization with SVGO. Default: `false`.
  *
+ * @see {@link https://github.com/prinsss/node-tikzjax?tab=readme-ov-file#advanced-usage | Tikzjax Advanced Usage} for more details.
  */
 const TeXOptions = {
   showConsole: true,
@@ -50,6 +51,7 @@ export default async function handler(
       console.log(wrappedCode);
       const svg = await tikzjax(tikzCode, {
         showConsole: true,
+        embedFontCss: true,
       });
       res.status(200).json({ svg });
     } catch (error: any) {
