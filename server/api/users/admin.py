@@ -15,9 +15,9 @@ class TeacherInline(admin.StackedInline):
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
-    list_display = ('school_id', 'name', 'code')
+    list_display = ('id', 'name', 'code')
     search_fields = ('name', 'code')
-    ordering = ('school_id',)
+    ordering = ('id',)
 
 
 @admin.register(Student)

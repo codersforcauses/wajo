@@ -3,12 +3,12 @@ from django.db import models
 
 
 class School(models.Model):
-    school_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, blank=True)
     code = models.CharField(max_length=10)
 
     def __str__(self):
-        return f"School {self.name}"
+        return f"{self.name}"
 
 
 class Student(models.Model):
@@ -17,7 +17,7 @@ class Student(models.Model):
         ('inactive', 'Inactive'),
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    school_id = models.ForeignKey(
+    school = models.ForeignKey(
         School, on_delete=models.CASCADE, related_name="students")
     attendent_year = models.IntegerField()
     year_level = models.CharField(max_length=50)
@@ -27,14 +27,14 @@ class Student(models.Model):
         max_length=10, choices=STATUS_CHOICES, default='active')
 
     def __str__(self):
-        return f"Student: {self.user.username} - {self.school.name}"
+        return f"{self.user.username}"
 
 
 class Teacher(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    school_id = models.ForeignKey(
+    school = models.ForeignKey(
         School, on_delete=models.CASCADE, related_name="teachers")
     phone = models.CharField(max_length=15, blank=True)
 
     def __str__(self):
-        return f"Teacher: {self.user.username} - {self.school.code}"
+        return f"{self.user.username}"
