@@ -5,6 +5,13 @@ import { cn } from "@/lib/utils";
 
 const TooltipProvider = TooltipPrimitive.Provider;
 
+/**
+ * Tooltip component used to display additional information when hovering over or focusing on an element.
+ * It uses Radix UI for accessibility and provides customizable options such as positioning and offset.
+ *
+ * @see https://ui.shadcn.com/docs/components/tooltip
+ *
+ */
 const Tooltip = TooltipPrimitive.Root;
 
 const TooltipTrigger = TooltipPrimitive.Trigger;

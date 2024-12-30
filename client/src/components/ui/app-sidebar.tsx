@@ -28,6 +28,24 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   Role: Role;
 }
 
+/**
+ * Sidebar component for the application, rendering different navigation links based on user role.
+ *
+ * This component uses the Shadcn UI library to render a sidebar with collapsible menu items and role-specific navigation options.
+ * It is designed to be dynamic, displaying different navigation data based on the user's role (e.g., Admin, Staff, Student).
+ *
+ * The sidebar utilizes Shadcn's `Sidebar`, `Collapsible`, and other components for smooth transitions and collapsible menu items.
+ *
+ * For more information on the Shadcn UI Sidebar and Collapsible components:
+ * - [Sidebar Documentation](https://ui.shadcn.com/docs/components/sidebar)
+ * - [Collapsible Documentation](https://ui.shadcn.com/docs/components/collapsible)
+ *
+ * **Example Implementation:**
+ * - [Sidebar Block Example](https://ui.shadcn.com/blocks/sidebar)
+ *
+ * @param {AppSidebarProps} props - The properties for the sidebar component.
+ * @param {Role} props.Role - The role of the user (e.g., Admin, Staff, Student), used to determine the navigation items to display.
+ */
 export function AppSidebar({ Role, ...props }: AppSidebarProps) {
   const router = useRouter();
   const roleNavData = navData[Role];

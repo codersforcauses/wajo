@@ -162,6 +162,16 @@ const SidebarProvider = React.forwardRef<
 );
 SidebarProvider.displayName = "SidebarProvider";
 
+/**
+ * Sidebar component that provides a customizable and responsive sidebar for navigation.
+ * It supports various configurations including collapsible, floating, and inset variants.
+ * The sidebar can toggle between expanded and collapsed states, with mobile-specific behavior
+ * to provide a better user experience on smaller screens. The component can be controlled via
+ * a context, which allows for easier state management and synchronization with external components.
+ *
+ * @see https://ui.shadcn.com/docs/components/sidebar
+ *
+ */
 const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {

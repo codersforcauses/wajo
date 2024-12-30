@@ -6,13 +6,11 @@ import {
   UserRoundCog,
 } from "lucide-react";
 
-// Define the type for individual menu items
 interface MenuItem {
   title: string;
   url: string;
 }
 
-// Define the type for menu sections (e.g., admin, teacher)
 interface MenuSection {
   title: string;
   url: string;
@@ -20,14 +18,19 @@ interface MenuSection {
   items: MenuItem[];
 }
 
-// Define the overall structure of the data object
 interface NavigationData {
   admin: MenuSection[];
   teacher: MenuSection[];
   student: MenuSection[];
 }
 
-// Example usage of the type
+/**
+ * The navigation data for different user roles (admin, teacher, student).
+ * Each role has an array of sections, each section contains a title, URL,
+ * associated icon, and menu items with titles and URLs.
+ *
+ * @type {NavigationData}
+ */
 export const navData: NavigationData = {
   admin: [
     {

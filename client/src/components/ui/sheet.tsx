@@ -5,6 +5,15 @@ import React from "react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * The `Sheet` component and related components provide a flexible, animated modal-like overlay
+ * for displaying content on top of the page. The sheet can be positioned from any of the four sides
+ * (top, bottom, left, or right) and is customizable in terms of its content and appearance.
+ * This component uses `SheetPrimitive` from the Shadcn UI library to create a robust,
+ * responsive sheet interface that includes animations, overlays, and customizable content.
+ *
+ * @see https://ui.shadcn.com/docs/components/sheet
+ */
 const Sheet = SheetPrimitive.Root;
 
 const SheetTrigger = SheetPrimitive.Trigger;
