@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Pagination component acts as a container for the navigation structure.
- *
+ * @see {@link https://ui.shadcn.com/docs/components/pagination} for more details.
  * @param {string} className - Additional class names for styling.
  * @param {React.ComponentProps<"nav">} props - Additional props for the nav element.
  * @returns {JSX.Element} A navigation container for pagination.

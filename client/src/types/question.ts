@@ -7,5 +7,5 @@ interface Question {
 interface DatagridProps {
   datacontext: Question[];
   onDataChange: (updatedData: Question[]) => void;
-  ChangePage: number;
+  changePage: number;
 }

@@ -19,40 +19,62 @@ import {
 
 import { Button } from "../button";
 
+/**
+ * The Datagrid component is a flexible, paginated data table with sorting and navigation features.
+ *
+ * @param {DatagridProps} props - Props including datacontext (data array), onDataChange (callback for data update), and ChangePage (external control for current page).
+ */
 export function Datagrid({
   datacontext,
   onDataChange,
-  ChangePage,
+  changePage,
 }: DatagridProps) {
+  // State to track sorting direction
   const [isAscending, setIsAscending] = useState(true);
+  // State for the current page number
   const [currentPage, setCurrentPage] = useState(1);
+  // State to hold padded data for consistent rows
   const [paddedData, setPaddedData] = useState<Question[]>([]);
+  // Number of items displayed per page
   const itemsPerPage = 5;
+  // Calculate total pages based on the data length
   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
 
+  /**
+   * Handles sorting of the data based on a specified column.
+   * @param {keyof Question} column - Column key to sort by.
+   */
   const sortByColumn = (column: keyof Question) => {
     const sortedData = [...datacontext].sort((a, b) => {
       return isAscending
         ? a[column].localeCompare(b[column])
         : b[column].localeCompare(a[column]);
     });
-    setCurrentPage(1);
-    onDataChange(sortedData);
-    setIsAscending(!isAscending);
+    setCurrentPage(1); // Reset to the first page after sorting
+    onDataChange(sortedData); // Update the parent with sorted data
+    setIsAscending(!isAscending); // Toggle sorting direction
   };
 
+  /**
+   * Handles page change logic.
+   * @param {number} page - The new page number.
+   */
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
 
+  /**
+   * Updates the displayed data based on the current page.
+   * Pads the data to ensure consistent rows (e.g., always 5 rows).
+   */
   useEffect(() => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentData = datacontext.slice(indexOfFirstItem, indexOfLastItem);
 
-    // Fill empty rows if less than itemsPerPage
+    // Ensure paddedData always has 5 rows
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
       updatedPaddedData.push({ name: "", category: "", difficulty: "" });
@@ -61,8 +83,11 @@ export function Datagrid({
     setPaddedData(updatedPaddedData);
   }, [datacontext, currentPage]);
 
+  /**
+   * Make the default page always 1 when search button makes any change
+   */
   useEffect(() => {
-    setCurrentPage(ChangePage);
+    setCurrentPage(changePage);
   }, [datacontext]);
 
   return (

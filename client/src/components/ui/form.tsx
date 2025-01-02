@@ -12,9 +12,24 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-
+/**
+ * The `Form` component provides a context for managing form states and validations using `react-hook-form`.
+ * @see {@link https://ui.shadcn.com/docs/components/form} for more details.
+ * @example
+ * <Form {...form}>
+ *   <form onSubmit={form.handleSubmit(onSubmit)}>
+ *     <FormField name="fieldName" control={form.control} render={({ field }) => ... } />
+ *   </form>
+ * </Form>
+ */
 const Form = FormProvider;
 
+/**
+ * Context to store the field name for a specific form field.
+ *
+ * @template TFieldValues - The shape of the form values.
+ * @template TName - The name of the field in the form values.
+ */
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -26,6 +41,15 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
   {} as FormFieldContextValue,
 );
 
+/**
+ * The `FormField` component connects a specific form field to the form context and provides validation states.
+ *
+ * @template TFieldValues - The shape of the form values.
+ * @template TName - The name of the field in the form values.
+ *
+ * @example
+ * <FormField name="fieldName" control={form.control} render={({ field }) => <input {...field} />} />
+ */
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -39,6 +63,11 @@ const FormField = <
   );
 };
 
+/**
+ * Hook to access the current form field's context and validation states.
+ *
+ * @returns Object containing field metadata such as IDs and error states.
+ */
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
@@ -62,6 +91,9 @@ const useFormField = () => {
   };
 };
 
+/**
+ * Context to store metadata for a form item, such as the ID.
+ */
 type FormItemContextValue = {
   id: string;
 };
@@ -70,6 +102,16 @@ const FormItemContext = React.createContext<FormItemContextValue>(
   {} as FormItemContextValue,
 );
 
+/**
+ * The `FormItem` component wraps individual form fields and provides layout and context for error messages.
+ *
+ * @example
+ * <FormItem>
+ *   <FormLabel>Field Label</FormLabel>
+ *   <FormControl><input /></FormControl>
+ *   <FormMessage />
+ * </FormItem>
+ */
 const FormItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -84,6 +126,12 @@ const FormItem = React.forwardRef<
 });
 FormItem.displayName = "FormItem";
 
+/**
+ * The `FormLabel` component renders a label for a form field, dynamically linking it to the field's ID.
+ *
+ * @example
+ * <FormLabel>Field Label</FormLabel>
+ */
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
@@ -101,6 +149,12 @@ const FormLabel = React.forwardRef<
 });
 FormLabel.displayName = "FormLabel";
 
+/**
+ * The `FormControl` component wraps the actual form input elements and links them to the form's validation context.
+ *
+ * @example
+ * <FormControl><input /></FormControl>
+ */
 const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
@@ -124,6 +178,12 @@ const FormControl = React.forwardRef<
 });
 FormControl.displayName = "FormControl";
 
+/**
+ * The `FormDescription` component renders a description for the form field.
+ *
+ * @example
+ * <FormDescription>This is a required field.</FormDescription>
+ */
 const FormDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
@@ -141,6 +201,12 @@ const FormDescription = React.forwardRef<
 });
 FormDescription.displayName = "FormDescription";
 
+/**
+ * The `FormMessage` component renders an error or validation message for the form field.
+ *
+ * @example
+ * <FormMessage>Error: This field is required.</FormMessage>
+ */
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>

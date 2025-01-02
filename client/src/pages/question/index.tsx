@@ -68,10 +68,16 @@ export default function Index() {
       difficulty: "Difficult",
     },
   ]);
+
+  // when search bar state changes, make the page equals 1 and pass it to <Datagrid/>
   const [page, setPage] = useState<number>(1);
 
+  // State to hold the filtered data based on the search input
   const [filteredData, setFilteredData] = useState<Question[]>(data);
 
+  /**
+   * Handles changes in the search input and updates the filtered data.
+   */
   const handleFilterChange = (value: string) => {
     if (value.trim() === "") {
       setFilteredData(data);
@@ -81,12 +87,9 @@ export default function Index() {
       );
       setFilteredData(filtered);
     }
+    // Reset to the first page after a new search
     setPage(1);
   };
-
-  // const onSetPage = (pageNum: number) => {
-  //   setPage(pageNum);
-  // };
 
   return (
     <div className="m-4 space-y-4">
@@ -105,7 +108,7 @@ export default function Index() {
       <Datagrid
         datacontext={filteredData}
         onDataChange={setFilteredData}
-        ChangePage={page}
+        changePage={page}
       ></Datagrid>
     </div>
   );

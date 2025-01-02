@@ -2,6 +2,23 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * The `Input` component is a styled HTML `<input>` element, with utility classes for consistent design and responsive behavior.
+ *
+ * It supports various input types, custom styling, and accessibility features such as focus-visible rings and disabled states.
+ *
+ * @see {@link https://ui.shadcn.com/docs/components/input} for more details.
+ *
+ * @example
+ * <Input type="text" placeholder="Enter your name" />
+ *
+ * @param {React.ComponentProps<"input">} props - Props for the input element.
+ * @param {string} props.className - Optional additional CSS classes to customize the input styling.
+ * @param {string} props.type - The type of the input element (e.g., "text", "password").
+ * @param {React.Ref<HTMLInputElement>} ref - A forwarded reference to the input element.
+ *
+ * @returns {React.Element} A styled input element.
+ */
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
     return (
