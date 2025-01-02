@@ -83,17 +83,33 @@ function SearchInput({
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="relative flex flex-col">
       <label className="text-sm font-medium text-gray-600">{label}</label>
-      <input
-        type="text"
-        placeholder={placeholder || ""}
-        value={tempValue}
-        onChange={(e) => setTempValue(e.target.value)}
-        onBlur={handleOnBlur}
-        onKeyDown={handleOnKeyDown}
-        className="rounded border px-3 py-2 text-gray-700 focus:outline-none focus:ring focus:ring-blue-300"
-      />
+      <div className="relative">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1}
+          stroke="currentColor"
+          className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1 0 3 10.5a7.5 7.5 0 0 0 13.65 6.15z"
+          />
+        </svg>
+        <input
+          type="text"
+          placeholder={placeholder || ""}
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+          onBlur={handleOnBlur}
+          onKeyDown={handleOnKeyDown}
+          className="w-full rounded border border-gray-300 py-2 pl-10 pr-3 text-gray-700 focus:outline-none focus:ring focus:ring-blue-300"
+        />
+      </div>
     </div>
   );
 }
