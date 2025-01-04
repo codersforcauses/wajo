@@ -1,21 +1,9 @@
-import { Roboto, Urbanist } from "next/font/google";
+import { Urbanist } from "next/font/google";
 import { useState } from "react";
 
 import { usePings } from "@/hooks/pings";
-import { cn } from "@/lib/utils";
 
 import { Button } from "../components/ui/button";
-
-const fontRoboto = Roboto({
-  subsets: ["latin"],
-  variable: "--font-roboto",
-  weight: "400",
-});
-
-const fontUrbanist = Urbanist({
-  subsets: ["latin"],
-  variable: "--font-urbanist",
-});
 
 export default function Home() {
   const [clicked, setClicked] = useState(false);
@@ -24,13 +12,7 @@ export default function Home() {
   });
 
   return (
-    <main
-      className={cn(
-        "font-urbanist flex min-h-screen flex-col items-center gap-4 p-24",
-        fontRoboto.variable,
-        fontUrbanist.variable,
-      )}
-    >
+    <main className="font-urbanist flex min-h-screen flex-col items-center gap-4 p-24">
       <h1>Test title</h1>
       <h2>Test title</h2>
       <h3>Test title</h3>
