@@ -8,14 +8,16 @@ import {
 
 interface MenuItem {
   title: string;
-  url: string;
+  url: string; // need to be unique
+  isActive?: boolean;
 }
 
 interface MenuSection {
   title: string;
-  url: string;
+  // url: string;
   icon: LucideIcon;
   items: MenuItem[];
+  isActive?: boolean;
 }
 
 interface NavigationData {
@@ -35,7 +37,6 @@ export const navData: NavigationData = {
   admin: [
     {
       title: "Question Management",
-      url: "#",
       icon: FileJson,
       items: [
         { title: "Create Question", url: "#" },
@@ -44,7 +45,6 @@ export const navData: NavigationData = {
     },
     {
       title: "Test Management",
-      url: "#",
       icon: BookType,
       items: [
         { title: "Practice Test", url: "#" },
@@ -54,7 +54,6 @@ export const navData: NavigationData = {
     },
     {
       title: "User Management",
-      url: "#",
       icon: UserRoundCog,
       items: [
         { title: "Schools", url: "#" },
@@ -66,7 +65,6 @@ export const navData: NavigationData = {
   teacher: [
     {
       title: "Teacher Menu",
-      url: "#",
       icon: SquareDashedMousePointer,
       items: [
         { title: "Teacher Menu Items 1", url: "#" },
@@ -77,7 +75,6 @@ export const navData: NavigationData = {
   student: [
     {
       title: "Student Menu",
-      url: "#",
       icon: SquareDashedMousePointer,
       items: [
         { title: "Student Menu Items 1", url: "#" },

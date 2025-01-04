@@ -49,6 +49,17 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 export function AppSidebar({ Role, ...props }: AppSidebarProps) {
   const router = useRouter();
   const roleNavData = navData[Role];
+  roleNavData.forEach((section) => {
+    for (const item of section.items) {
+      item.isActive = new RegExp(item.url.replace(/\[.*?\]/g, ".*")).test(
+        router.pathname,
+      );
+      if (item.isActive) {
+        section.isActive = true;
+        break; // exit the loop
+      }
+    }
+  });
 
   return (
     <Sidebar {...props}>
@@ -59,12 +70,17 @@ export function AppSidebar({ Role, ...props }: AppSidebarProps) {
               <Collapsible
                 key={section.title}
                 asChild
-                defaultOpen // Make it open if it's active
+                defaultOpen // make it open if it's active
                 className="group/collapsible"
               >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton size="lg" tooltip={section.title}>
+                    <SidebarMenuButton
+                      size="lg"
+                      tooltip={section.title}
+                      isActive={section.isActive}
+                      className="data-[active=true]:bg-black data-[active=true]:text-white data-[active=true]:hover:bg-black data-[active=true]:hover:text-white"
+                    >
                       {section.icon && <section.icon />}
                       <span>{section.title}</span>
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -72,24 +88,19 @@ export function AppSidebar({ Role, ...props }: AppSidebarProps) {
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {section.items.map((item) => {
-                        const isActive = new RegExp(
-                          item.url.replace(/\[.*?\]/g, ".*"),
-                        ).test(router.pathname);
-                        return (
-                          <SidebarMenuSubItem key={item.title}>
-                            <SidebarMenuSubButton
-                              asChild
-                              isActive={isActive}
-                              className="data-[active=true]:bg-background"
-                            >
-                              <a href={item.url}>
-                                <span>{item.title}</span>
-                              </a>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        );
-                      })}
+                      {section.items.map((item) => (
+                        <SidebarMenuSubItem key={item.title}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={item.isActive}
+                            className="data-[active=true]:bg-background"
+                          >
+                            <a href={item.url}>
+                              <span>{item.title}</span>
+                            </a>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
