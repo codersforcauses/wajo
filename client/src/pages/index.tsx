@@ -1,6 +1,6 @@
-import { Urbanist } from "next/font/google";
 import { useState } from "react";
 
+import { LoginModal } from "@/components/ui/user/login-modal";
 import { usePings } from "@/hooks/pings";
 
 import { Button } from "../components/ui/button";
@@ -13,6 +13,9 @@ export default function Home() {
 
   return (
     <main className="font-urbanist flex min-h-screen flex-col items-center gap-4 p-24">
+      <LoginModal>
+        <Button>Login Modal</Button>
+      </LoginModal>
       <h1>Test title</h1>
       <h2>Test title</h2>
       <h3>Test title</h3>
