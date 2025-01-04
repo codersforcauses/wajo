@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     "api.healthcheck",
     "api.invoices",
     "api.leaderboard",
-    "api.users"
+    "api.users",
 ]
 
 MIDDLEWARE = [
