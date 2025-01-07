@@ -1,110 +1,81 @@
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Datagrid } from "@/components/ui/Question/data-grid";
 import { SearchInput } from "@/components/ui/search";
+import { useFetchData } from "@/hooks/use-fetch-data";
 
 export default function Index() {
-  const [data, setData] = useState<Question[]>([
-    {
-      name: "Question01_2024",
-      category: "Geometry Questions",
-      difficulty: "Difficult",
-    },
-    {
-      name: "Question02_2024",
-      category: "Algebra Questions",
-      difficulty: "Difficult",
-    },
-    {
-      name: "Question03_2024",
-      category: "Arithmetic Questions",
-      difficulty: "Easy",
-    },
-    {
-      name: "Question04_2024",
-      category: "Statistics Questions",
-      difficulty: "Medium",
-    },
-    {
-      name: "Question05_2024",
-      category: "Calculus Questions",
-      difficulty: "Difficult",
-    },
-    {
-      name: "Question06_2024",
-      category: "Calculus Questions",
-      difficulty: "Difficult",
-    },
-    {
-      name: "Question07_2024",
-      category: "Calculus Questions",
-      difficulty: "Easy",
-    },
-    {
-      name: "Question08_2024",
-      category: "Calculus Questions",
-      difficulty: "Difficult",
-    },
-    {
-      name: "Question09_2024",
-      category: "Calculus Questions",
-      difficulty: "Difficult",
-    },
-    {
-      name: "Question10_2024",
-      category: "Calculus Questions",
-      difficulty: "Easy",
-    },
-    {
-      name: "Question11_2024",
-      category: "Calculus Questions",
-      difficulty: "Medium",
-    },
-    {
-      name: "Question12_2024",
-      category: "Calculus Questions",
-      difficulty: "Difficult",
-    },
-  ]);
+  // Fetches the list of questions using the custom hook.
+  const {
+    data: questions,
+    isLoading: isQuestionLoading,
+    isError: isQuestionError,
+    error: QuestionError,
+  } = useFetchData<Question[]>({
+    queryKey: ["question.list"],
+    endpoint: "/question/list",
+  });
 
-  // when search bar state changes, make the page equals 1 and pass it to <Datagrid/>
+  // Tracks the current page number for pagination.
   const [page, setPage] = useState<number>(1);
 
-  // State to hold the filtered data based on the search input
-  const [filteredData, setFilteredData] = useState<Question[]>(data);
+  // Stores the filtered list of questions based on search input.
+  const [filteredData, setFilteredData] = useState<Question[]>([]);
 
-  /**
-   * Handles changes in the search input and updates the filtered data.
-   */
+  // Updates the filtered data when questions are loaded.
+  useEffect(() => {
+    if (questions) {
+      setFilteredData(questions);
+    }
+  }, [questions]);
+
+  // Filters questions based on the search input.
   const handleFilterChange = (value: string) => {
+    if (!questions) return;
+
     if (value.trim() === "") {
-      setFilteredData(data);
+      setFilteredData(questions);
     } else {
-      const filtered = data.filter((item) =>
+      const filtered = questions.filter((item) =>
         item.name.toLowerCase().includes(value.toLowerCase()),
       );
       setFilteredData(filtered);
     }
-    // Reset to the first page after a new search
+
+    // Resets to the first page after a search.
     setPage(1);
   };
 
+  // Displays a loading state while data is being fetched.
+  if (isQuestionLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Displays an error message if the API request fails.
+  if (isQuestionError) {
+    return <div>Error: {QuestionError?.message}</div>;
+  }
+
+  // Renders the main content, including the search bar and data grid.
   return (
     <div className="m-4 space-y-4">
       <div className="flex justify-between">
+        {/* Search bar to filter questions */}
         <SearchInput
           label=""
           value={""}
           placeholder="Search by name..."
           onSearch={handleFilterChange}
         />
+        {/* Button to navigate to the create quiz page */}
         <Button asChild className="mr-6">
           <Link href={"question/create"}>Create a Quiz</Link>
         </Button>
       </div>
 
+      {/* Data grid to display the list of questions */}
       <Datagrid
         datacontext={filteredData}
         onDataChange={setFilteredData}

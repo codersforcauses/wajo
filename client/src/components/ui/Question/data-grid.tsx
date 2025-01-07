@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import {
   Table,
   TableBody,
   TableCell,
@@ -18,6 +10,7 @@ import {
 } from "@/components/ui/table";
 
 import { Button } from "../button";
+import { Pagination } from "../pagination";
 
 /**
  * The Datagrid component is a flexible, paginated data table with sorting and navigation features.
@@ -172,42 +165,12 @@ export function Datagrid({
         </TableBody>
       </Table>
 
-      <Pagination className="mt-4">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                handlePageChange(currentPage - 1);
-              }}
-            />
-          </PaginationItem>
-          {[...Array(totalPages)].map((_, index) => (
-            <PaginationItem key={index}>
-              <PaginationLink
-                href="#"
-                isActive={currentPage === index + 1}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handlePageChange(index + 1);
-                }}
-              >
-                {index + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          <PaginationItem>
-            <PaginationNext
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                handlePageChange(currentPage + 1);
-              }}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <Pagination
+        totalPages={totalPages}
+        currentPage={currentPage}
+        onPageChange={(page) => handlePageChange(page)}
+        className="mr-20 mt-5 flex justify-end"
+      />
     </div>
   );
 }

@@ -1,171 +1,129 @@
-// Import necessary components and utilities
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
-import * as React from "react";
-
-import { ButtonProps, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-
-/**
- * Pagination component acts as a container for the navigation structure.
- * @see {@link https://ui.shadcn.com/docs/components/pagination} for more details.
- * @param {string} className - Additional class names for styling.
- * @param {React.ComponentProps<"nav">} props - Additional props for the nav element.
- * @returns {JSX.Element} A navigation container for pagination.
- */
-const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
-  <nav
-    role="navigation"
-    aria-label="pagination"
-    className={cn("mx-auto flex w-full justify-center", className)}
-    {...props}
-  />
-);
-Pagination.displayName = "Pagination";
-
-/**
- * PaginationContent component acts as a container for pagination items.
- *
- * @param {string} className - Additional class names for styling.
- * @param {React.ComponentProps<"ul">} props - Additional props for the ul element.
- * @returns {JSX.Element} A container for pagination items.
- */
-const PaginationContent = React.forwardRef<
-  HTMLUListElement,
-  React.ComponentProps<"ul">
->(({ className, ...props }, ref) => (
-  <ul
-    ref={ref}
-    className={cn("flex flex-row items-center gap-1", className)}
-    {...props}
-  />
-));
-PaginationContent.displayName = "PaginationContent";
-
-/**
- * PaginationItem represents an individual item in the pagination.
- *
- * @param {string} className - Additional class names for styling.
- * @param {React.ComponentProps<"li">} props - Additional props for the li element.
- * @returns {JSX.Element} A single pagination item.
- */
-const PaginationItem = React.forwardRef<
-  HTMLLIElement,
-  React.ComponentProps<"li">
->(({ className, ...props }, ref) => (
-  <li ref={ref} className={cn("", className)} {...props} />
-));
-PaginationItem.displayName = "PaginationItem";
-
-/**
- * PaginationLinkProps defines the props for the PaginationLink component.
- *
- * @typedef {Object} PaginationLinkProps
- * @property {boolean} [isActive] - Indicates if the link is active.
- * @property {string} size - Size of the link button.
- */
-type PaginationLinkProps = {
-  isActive?: boolean;
-} & Pick<ButtonProps, "size"> &
-  React.ComponentProps<"a">;
-
-/**
- * PaginationLink represents a clickable pagination link.
- *
- * @param {PaginationLinkProps} props - Props including isActive and size.
- * @returns {JSX.Element} A clickable pagination link.
- */
-const PaginationLink = ({
+export function Pagination({
+  totalPages,
+  currentPage,
+  onPageChange,
   className,
-  isActive,
-  size = "icon",
-  ...props
-}: PaginationLinkProps) => (
-  <a
-    aria-current={isActive ? "page" : undefined}
-    className={cn(
-      buttonVariants({
-        variant: isActive ? "outline" : "ghost",
-        size,
-      }),
-      className,
-    )}
-    {...props}
-  />
-);
-PaginationLink.displayName = "PaginationLink";
+}: PaginationProps) {
+  const siblings = 1;
 
-/**
- * PaginationPrevious represents the "Previous" button.
- *
- * @param {React.ComponentProps<typeof PaginationLink>} props - Props for the PaginationPrevious component.
- * @returns {JSX.Element} A button to navigate to the previous page.
- */
-const PaginationPrevious = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink
-    aria-label="Go to previous page"
-    size="default"
-    className={cn("gap-1 pl-2.5", className)}
-    {...props}
-  >
-    <ChevronLeft className="h-4 w-4" />
-    <span>Previous</span>
-  </PaginationLink>
-);
-PaginationPrevious.displayName = "PaginationPrevious";
+  const getPaginationItems = () => {
+    const items: (number | string)[] = [];
 
-/**
- * PaginationNext represents the "Next" button.
- *
- * @param {React.ComponentProps<typeof PaginationLink>} props - Props for the PaginationNext component.
- * @returns {JSX.Element} A button to navigate to the next page.
- */
-const PaginationNext = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink
-    aria-label="Go to next page"
-    size="default"
-    className={cn("gap-1 pr-2.5", className)}
-    {...props}
-  >
-    <span>Next</span>
-    <ChevronRight className="h-4 w-4" />
-  </PaginationLink>
-);
-PaginationNext.displayName = "PaginationNext";
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) {
+        items.push(i);
+      }
+    } else {
+      // Always show the first page
+      items.push(1);
 
-/**
- * PaginationEllipsis represents a visual indicator for more pages.
- *
- * @param {React.ComponentProps<"span">} props - Props for the PaginationEllipsis component.
- * @returns {JSX.Element} An ellipsis indicating more pages.
- */
-const PaginationEllipsis = ({
-  className,
-  ...props
-}: React.ComponentProps<"span">) => (
-  <span
-    aria-hidden
-    className={cn("flex h-9 w-9 items-center justify-center", className)}
-    {...props}
-  >
-    <MoreHorizontal className="h-4 w-4" />
-    <span className="sr-only">More pages</span>
-  </span>
-);
-PaginationEllipsis.displayName = "PaginationEllipsis";
+      // Case for the first page
+      if (currentPage === 1) {
+        items.push(2, 3, "...");
+        items.push(totalPages);
+      }
+      // Case for the last page
+      else if (currentPage === totalPages) {
+        items.push("...", totalPages - 2, totalPages - 1);
+        items.push(totalPages);
+      }
+      // Case for pages in between
+      else {
+        if (currentPage > siblings + 2) {
+          items.push("...");
+        }
 
-// Export all components for external use
-export {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-};
+        const start = Math.max(2, currentPage - siblings);
+        const end = Math.min(totalPages - 1, currentPage + siblings);
+
+        for (let i = start; i <= end; i++) {
+          items.push(i);
+        }
+
+        if (currentPage < totalPages - siblings - 1) {
+          items.push("...");
+        }
+
+        items.push(totalPages);
+      }
+    }
+
+    return items;
+  };
+
+  const paginationItems = getPaginationItems();
+
+  return (
+    <nav className={`${className}`} aria-label="Pagination">
+      <ul className="inline-flex space-x-1">
+        <li>
+          <button
+            disabled={currentPage === 1}
+            onClick={() => onPageChange(currentPage - 1)}
+            className={`flex h-7 w-24 items-center justify-center rounded-lg border bg-yellow ${
+              currentPage === 1
+                ? "cursor-not-allowed bg-gray-300 text-gray-400"
+                : "bg-yellow-400 hover:bg-yellow-500"
+            }`}
+          >
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 15 15"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M9 4L9 11L4.5 7.5L9 4Z" fill="currentColor"></path>
+            </svg>
+            <span>Previous</span>
+          </button>
+        </li>
+
+        {paginationItems.map((item, index) =>
+          typeof item === "number" ? (
+            <li key={index}>
+              <button
+                onClick={() => onPageChange(item)}
+                className={`flex h-7 w-7 items-center justify-center rounded-lg border ${
+                  currentPage === item
+                    ? "bg-yellow text-black"
+                    : "bg-white hover:bg-gray-100"
+                }`}
+              >
+                {item}
+              </button>
+            </li>
+          ) : (
+            <li
+              key={index}
+              className="flex items-center justify-center text-xs text-gray-500"
+            >
+              {item}
+            </li>
+          ),
+        )}
+
+        <li>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => onPageChange(currentPage + 1)}
+            className={`flex h-7 w-24 items-center justify-center rounded-lg border bg-yellow ${
+              currentPage === totalPages
+                ? "cursor-not-allowed bg-gray-300 text-gray-400"
+                : "bg-yellow-400 hover:bg-yellow-500"
+            }`}
+          >
+            <span>Next</span>
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 15 15"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M6 11L6 4L10.5 7.5L6 11Z" fill="currentColor"></path>
+            </svg>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  );
+}
