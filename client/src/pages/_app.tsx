@@ -4,7 +4,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
+import { Urbanist } from "next/font/google";
 import type { ReactElement, ReactNode } from "react";
+
+import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/context/auth-provider";
+
+const fontUrbanist = Urbanist({
+  subsets: ["latin"],
+  variable: "--font-urbanist",
+});
 
 /**
  * Type definition for page with layout
@@ -23,9 +32,19 @@ const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
-      <Component {...pageProps} />
-    </QueryClientProvider>
+    <>
+      <style
+        jsx
+        global
+      >{`:root { --font-urbanist: ${fontUrbanist.style.fontFamily};}}`}</style>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+          <Component {...pageProps} />
+          {/* temporary include here, can add into Layout after */}
+          <Toaster position="bottom-center" richColors />
+        </AuthProvider>
+      </QueryClientProvider>
+    </>
   );
 }
