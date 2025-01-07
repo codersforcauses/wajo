@@ -33,7 +33,7 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-urbanist)", ...fontFamily.sans],
+        urban: ["var(--font-urbanist)", ...fontFamily.sans],
         roboto: ["var(--font-roboto)", ...fontFamily.sans],
       },
       colors: {
@@ -44,7 +44,7 @@ const config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#ffe8a3",
+        background: "#ffffff",
         foreground: "hsl(var(--foreground))",
 
         primary: "#f8b400",
