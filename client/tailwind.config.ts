@@ -43,7 +43,7 @@ const config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#ffe8a3",
+        background: "#ffffff",
         foreground: "hsl(var(--foreground))",
         primary: "#f8b400",
         secondary: "#f9c732",
@@ -82,6 +82,8 @@ const config = {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
         },
       },
       borderRadius: {

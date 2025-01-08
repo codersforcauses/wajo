@@ -21,6 +21,7 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import { navData } from "@/types/app-sidebar";
 import { Role } from "@/types/user";
 
@@ -79,7 +80,11 @@ export function AppSidebar({ Role, ...props }: AppSidebarProps) {
                       size="lg"
                       tooltip={section.title}
                       isActive={section.isActive}
-                      className="data-[active=true]:bg-black data-[active=true]:text-white data-[active=true]:hover:bg-black data-[active=true]:hover:text-white"
+                      className={cn(
+                        "data-[active=true]:bg-black data-[active=true]:text-white",
+                        "data-[active=true]:hover:bg-black data-[active=true]:hover:text-white",
+                        "data-[state=open]:hover:bg-black data-[state=open]:hover:text-white",
+                      )}
                     >
                       {section.icon && <section.icon />}
                       <span>{section.title}</span>
@@ -93,7 +98,7 @@ export function AppSidebar({ Role, ...props }: AppSidebarProps) {
                           <SidebarMenuSubButton
                             asChild
                             isActive={item.isActive}
-                            className="data-[active=true]:bg-background"
+                            className="hover:bg-yellow data-[active=true]:bg-yellow"
                           >
                             <a href={item.url}>
                               <span>{item.title}</span>
