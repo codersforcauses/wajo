@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import TeacherDetails from "@/components/ui/teacherdashboard/teacher details";
 import { LoginModal } from "@/components/ui/user/login-modal";
 import { usePings } from "@/hooks/pings";
 
@@ -28,6 +29,7 @@ export default function Home() {
       <p>
         Response from server: <span>{data as string}</span>
       </p>
+      <TeacherDetails></TeacherDetails>
     </main>
   );
 }
