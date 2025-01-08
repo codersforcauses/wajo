@@ -221,6 +221,7 @@ const Sidebar = React.forwardRef<
               } as React.CSSProperties
             }
             side={side}
+            aria-label="Sidebar Sheet Content"
           >
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>
