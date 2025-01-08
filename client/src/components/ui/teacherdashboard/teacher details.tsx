@@ -9,6 +9,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 const TeacherDetails = () => {
   const formMethods = useForm();
@@ -30,14 +31,10 @@ const TeacherDetails = () => {
             control={formMethods.control}
             name="username"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username:</FormLabel>
+              <FormItem className="flex items-center space-x-4">
+                <FormLabel className="w-32 font-bold">Username:</FormLabel>
                 <FormControl>
-                  <input
-                    {...field}
-                    className="input"
-                    placeholder="Enter Username"
-                  />
+                  <Input {...field} placeholder="Enter Username" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -49,13 +46,12 @@ const TeacherDetails = () => {
             control={formMethods.control}
             name="password"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password:</FormLabel>
+              <FormItem className="flex items-center space-x-4">
+                <FormLabel className="w-32 font-bold">Password:</FormLabel>
                 <FormControl>
-                  <input
+                  <Input
                     {...field}
                     type="password"
-                    className="input"
                     placeholder="Enter Password"
                   />
                 </FormControl>
@@ -69,15 +65,10 @@ const TeacherDetails = () => {
             control={formMethods.control}
             name="email"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email:</FormLabel>
+              <FormItem className="flex items-center space-x-4">
+                <FormLabel className="w-32 font-bold">Email:</FormLabel>
                 <FormControl>
-                  <input
-                    {...field}
-                    type="email"
-                    className="input"
-                    placeholder="Enter Email"
-                  />
+                  <Input {...field} type="email" placeholder="Enter Email" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -89,14 +80,10 @@ const TeacherDetails = () => {
             control={formMethods.control}
             name="school"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>School:</FormLabel>
+              <FormItem className="flex items-center space-x-4">
+                <FormLabel className="w-32 font-bold">School:</FormLabel>
                 <FormControl>
-                  <input
-                    {...field}
-                    className="input"
-                    placeholder="Enter School"
-                  />
+                  <Input {...field} placeholder="Enter School" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
