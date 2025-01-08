@@ -1,4 +1,3 @@
-
 "use client"; // Ensures the component is treated as a client-side component in Next.js
 
 import * as LabelPrimitive from "@radix-ui/react-label";
@@ -6,7 +5,6 @@ import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-
 
 /**
  * Defines the base styles and variants for the `Label` component using `class-variance-authority`.

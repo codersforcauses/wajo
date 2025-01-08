@@ -13,7 +13,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
-
 /**
  * Form components using `react-hook-form` for managing form state and validation, along with custom form field components.
  *
@@ -43,7 +42,6 @@ import { cn } from "@/lib/utils";
  * </Form>
  */
 const Form = FormProvider;
-
 
 /**
  * Context to store the field name for a specific form field.
@@ -102,7 +100,7 @@ const FormField = <
  * @property {string} formDescriptionId - The ID of the description text for this form item.
  * @property {string} formMessageId - The ID of the message text for this form item, typically error messages.
  */
-        
+
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
@@ -125,7 +123,6 @@ const useFormField = () => {
     ...fieldState,
   };
 };
-
 
 /**
  * Context to store metadata for a form item, such as the ID.
@@ -152,7 +149,7 @@ const FormItemContext = React.createContext<FormItemContextValue>(
  *   </FormControl>
  * </FormItem>
  */
-        
+
 const FormItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -176,7 +173,7 @@ FormItem.displayName = "FormItem";
  * @example
  * <FormLabel>Username</FormLabel>
  */
-          
+
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
@@ -204,7 +201,7 @@ FormLabel.displayName = "FormLabel";
  *   <input />
  * </FormControl>
  */
-            
+
 const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
@@ -236,7 +233,7 @@ FormControl.displayName = "FormControl";
  * @example
  * <FormDescription>Enter your username</FormDescription>
  */
-             
+
 const FormDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
@@ -262,7 +259,7 @@ FormDescription.displayName = "FormDescription";
  * @example
  * <FormMessage>Error message</FormMessage>
  */
-                
+
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>

@@ -12,7 +12,9 @@
     "format": "prettier -w src",
     "format:check": "prettier -c src",
     "typecheck": "tsc --noEmit",
-    "prepare": "cd .. && husky client/.husky"
+    "prepare": "cd .. && husky client/.husky",
+    "check-all": "npm run lint && npm run format:check && npm run typecheck"
+
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -38,7 +40,7 @@
     "react-hook-form": "^7.54.2",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.24.1"
+    "zod": "^3.24.1",
     "sonner": "^1.7.1",
     "zustand": "^5.0.2"
   },
