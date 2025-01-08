@@ -1,3 +1,4 @@
+
 "use client"; // Ensures the component is treated as a client-side component in Next.js
 
 import * as LabelPrimitive from "@radix-ui/react-label";
@@ -6,6 +7,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+
 /**
  * Defines the base styles and variants for the `Label` component using `class-variance-authority`.
  *
@@ -13,25 +15,31 @@ import { cn } from "@/lib/utils";
  * - Base font size (`text-sm`), weight (`font-medium`), and line height (`leading-none`).
  * - Disabled state (`peer-disabled:cursor-not-allowed` and `peer-disabled:opacity-70`).
  */
+
 const labelVariants = cva(
   "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 );
 
 /**
- * The `Label` component is a styled wrapper around the `@radix-ui/react-label` component.
+
+ * The `Label` component is a styled label element that enhances accessibility and styling for form elements.
+ * It provides an easy way to associate form controls with their respective labels, offering customization
+ * via the `className` and `variant` props for different visual states.
  *
- * It provides a consistent style for form labels and supports variants for customization.
- * The component is accessible and responds to disabled states through the `peer-disabled` utility class.
  * @see {@link https://ui.shadcn.com/docs/components/label} for more details.
+ *
+ * @component
  * @example
- * <Label htmlFor="username">Username</Label>
- * <input id="username" type="text" />
+ * <Label htmlFor="username" className="text-blue-500">Username</Label>
  *
- * @param {React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>} props - The props for the label component.
- * @param {string} props.className - Additional classes to customize the label styling.
- * @param {React.Ref<React.ElementRef<typeof LabelPrimitive.Root>>} ref - A forwarded reference to the label element.
+ * @param {string} [className] - Additional class names for customizing the style of the label.
+ * @param {React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>} props - Props passed to the underlying `LabelPrimitive.Root` component, including `htmlFor`, `id`, etc.
+ * @param {VariantProps<typeof labelVariants>} variant - Variant props that apply different visual styles using `class-variance-authority`.
  *
- * @returns {React.Element} A styled label element.
+ * @property {React.Ref} ref - A ref object that can be used to access the label element directly.
+ *
+ * @returns {JSX.Element} A styled label element, customizable with class variants and additional props.
+
  */
 const Label = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
