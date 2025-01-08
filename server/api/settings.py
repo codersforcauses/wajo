@@ -53,7 +53,9 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "api.healthcheck",
-    "api.manager",
+    "api.leaderboard",
+    "api.question",
+    "api.users",
     "rest_framework_simplejwt",
 ]
 
@@ -164,7 +166,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Australia/Perth"
 
 USE_I18N = True
 
