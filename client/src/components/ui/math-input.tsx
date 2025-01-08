@@ -179,7 +179,7 @@ function MathInput({ input, onChange }: MathInputProps) {
               onChange={onChange}
               value={input}
               rows={5}
-              className="w-full rounded-md border-2 border-slate-400 bg-slate-200 p-2 focus:border-yellow-400 focus:outline-none"
+              className="focus:border-yellow-400 w-full rounded-md border-2 border-slate-400 bg-slate-200 p-2 focus:outline-none"
             />
             <div className="flex">
               <p
@@ -208,7 +208,7 @@ function MathInput({ input, onChange }: MathInputProps) {
                     Diagrams using TikzJax. See{" "}
                     <a
                       href="https://github.com/artisticat1/obsidian-tikzjax"
-                      className="cursor-pointer font-bold underline hover:text-yellow-500"
+                      className="hover:text-yellow-500 cursor-pointer font-bold underline"
                     >
                       usage and examples
                     </a>

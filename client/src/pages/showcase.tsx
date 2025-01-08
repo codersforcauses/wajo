@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { MathInput } from "@/components/ui/inputs";
+import { MathInput } from "@/components/ui/math-input";
 
 export default function Home() {
   const [input, setInput] = useState("");

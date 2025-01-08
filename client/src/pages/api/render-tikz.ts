@@ -31,9 +31,6 @@ import tikzjax from "node-tikzjax";
  *
  * @see {@link https://github.com/prinsss/node-tikzjax?tab=readme-ov-file#advanced-usage | Tikzjax Advanced Usage} for more details.
  */
-const TeXOptions = {
-  showConsole: true,
-};
 
 export default async function handler(
   req: NextApiRequest,
