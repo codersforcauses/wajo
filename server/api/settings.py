@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "api.healthcheck",
     "api.leaderboard",
+    "api.users"
 ]
 
 MIDDLEWARE = [
@@ -131,7 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Australia/Perth"
 
 USE_I18N = True
 

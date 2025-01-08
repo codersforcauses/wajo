@@ -1,22 +1,10 @@
-import { Roboto, Urbanist } from "next/font/google";
 import { useState } from "react";
 
+import { LoginModal } from "@/components/ui/user/login-modal";
 import { usePings } from "@/hooks/pings";
-import { cn } from "@/lib/utils";
 
 import Layout from "../components/layout";
 import { Button } from "../components/ui/button";
-
-const fontRoboto = Roboto({
-  subsets: ["latin"],
-  variable: "--font-roboto",
-  weight: "400",
-});
-
-const fontUrbanist = Urbanist({
-  subsets: ["latin"],
-  variable: "--font-urbanist",
-});
 
 const Home = () => {
   const [clicked, setClicked] = useState(false);
@@ -25,13 +13,10 @@ const Home = () => {
   });
 
   return (
-    <main
-      className={cn(
-        "font-urbanist flex min-h-screen flex-col items-center gap-4 p-24",
-        fontRoboto.variable,
-        fontUrbanist.variable,
-      )}
-    >
+    <main className="font-urbanist flex min-h-screen flex-col items-center gap-4 p-24">
+      <LoginModal>
+        <Button>Login Modal</Button>
+      </LoginModal>
       <h1>Test title</h1>
       <h2>Test title</h2>
       <h3>Test title</h3>

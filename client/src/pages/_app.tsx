@@ -7,8 +7,15 @@ import type { AppProps } from "next/app";
 import { Roboto, Urbanist } from "next/font/google";
 import type { ReactElement, ReactNode } from "react";
 
-const urbanist = Urbanist({ subsets: ["latin"], variable: "--font-urbanist" });
-const roboto = Roboto({
+import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/context/auth-provider";
+
+const fontUrbanist = Urbanist({
+  subsets: ["latin"],
+  variable: "--font-urbanist",
+});
+
+const fontRoboto = Roboto({
   subsets: ["latin"],
   variable: "--font-roboto",
   weight: ["400", "500", "700"],
@@ -28,11 +35,21 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
-      <div className={`${urbanist.variable} ${roboto.variable}`}>
-        {getLayout(<Component {...pageProps} />)}
-      </div>
-    </QueryClientProvider>
+    <>
+      <style jsx global>{`
+        :root {
+          --font-urbanist: ${fontUrbanist.style.fontFamily};
+          --font-roboto: ${fontRoboto.style.fontFamily};
+        }
+      `}</style>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+          <Component {...pageProps} />
+          {/* temporary include here, can add into Layout after */}
+          <Toaster position="bottom-center" richColors />
+        </AuthProvider>
+      </QueryClientProvider>
+    </>
   );
 }
