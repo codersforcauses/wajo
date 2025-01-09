@@ -9,7 +9,6 @@ import { NextPageWithLayout } from "../_app";
  * Each quiz is one of three categories: upcoming competition, past questions and solutions, and practice tests.
  */
 const QuizPage: NextPageWithLayout = () => {
-  let competitionStart = "00 Month 2025 14:00";
   // mock data
   let quizzes = [
     {
@@ -44,23 +43,29 @@ const QuizPage: NextPageWithLayout = () => {
     },
   ];
 
-  let upcomingCompetitions = quizzes.filter(
+  let upcomingCompetition = quizzes.filter(
     (quiz) => quiz.type === "competition",
   );
   let pastPapers = quizzes.filter((quiz) => quiz.type === "pastpaper");
   let practiceTests = quizzes.filter((quiz) => quiz.type === "practice");
   return (
     <div className="justify-centre mt-8 flex h-full w-full flex-col items-center border border-red-500 bg-white text-center">
-      <section className="mt-4 flex min-h-28 w-full flex-col items-center justify-center border border-blue-500 bg-[#FFD659] p-4">
+      <section className="my-4 flex min-h-32 w-full flex-col items-center justify-center border border-blue-500 bg-[#FFD659] p-4">
         <h2>Upcoming Competition</h2>
-        <h6 className="my-4">Competition will start at {competitionStart}</h6>
+        <h6 className="my-4">
+          Competition will start at {upcomingCompetition[0].startTime}{" "}
+        </h6>
         <div className="flex w-full flex-col items-center justify-center gap-4">
-          {upcomingCompetitions.map((quiz) => (
+          {/* {upcomingCompetitions.map((quiz) => (
             <HorizontalCard
               title={quiz.title}
               href={`quiz/competition/${quiz.id}`}
             />
-          ))}
+          ))} */}
+          <HorizontalCard
+            title="2025 Competition"
+            href={`quiz/competition/${upcomingCompetition[0].id}`}
+          />
         </div>
       </section>
       <section className="mb-2 flex w-full flex-col items-center justify-center border border-blue-500 p-4">

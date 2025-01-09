@@ -16,7 +16,7 @@ export default function GenericQuiz() {
 
   return (
     <div className="flex w-full items-center justify-center border-2 border-green-600">
-      <div className="min-h-64 w-3/4 rounded-lg border-2 border-blue-500 bg-[#FFE8A3] p-10">
+      <div className="min-h-64 w-3/4 rounded-lg border-8 border-[#FFE8A3] p-10">
         <div className="mb-2 flex items-center justify-between">
           <h2 className={headingStyle}>Question {questionNumber}</h2>
           {marks === 1 ? (
@@ -31,9 +31,7 @@ export default function GenericQuiz() {
           <h3 className="mt-8 text-lg text-slate-800 sm:text-xl md:text-2xl">
             Your Answer
           </h3>
-          <p className="text-amber-900">
-            Must be an integer from 0-999, use “,” to separate multiple answers
-          </p>
+          <p className="text-slate-700">Must be an integer from 1-999</p>
           <input
             type="text"
             placeholder="Please input your answer"
