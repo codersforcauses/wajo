@@ -29,7 +29,7 @@ class Student(models.Model):
         user (OneToOneField): A one-to-one relationship with the User model.
         school (ForeignKey): A many-to-one relationship with the School model.
         attendent_year (IntegerField): The year the student attended.
-        year_level (CharField): The level or grade of the student, up to 50 characters.
+        year (CharField): The level or grade of the student, up to 50 characters.
         created_at (DateTimeField): The timestamp when the student record was created.
         updated_at (DateTimeField): The timestamp when the student record was last updated.
         status (CharField): The current status of the student (active/inactive).

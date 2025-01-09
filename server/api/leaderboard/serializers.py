@@ -1,6 +1,21 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from ..users.models import Student, User
+# from ..quizzes.models import Quiz_attempts, Question_attempts 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email']
+
+# class QuizAttemptsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Quiz_attempts
+#         fields = ['timestart', 'timefinish', 'sum_grades']
+
+# class QuestionAttemptsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Question_attempts
+#         fields = ['score']
 
 class LeaderboardSerializer(serializers.ModelSerializer):
     """
@@ -25,10 +40,48 @@ class LeaderboardSerializer(serializers.ModelSerializer):
         - team_score (int): Total score of the team.
         - status (str): Participation status (e.g., Active, Inactive).
     """
-    class Meta:
-        model = get_user_model()
-        fields = "__all__"
+class LeaderboardSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    school_name = serializers.CharField(source='school.name')
+    email = serializers.CharField(source='user.email')
+    year_level = serializers.CharField()
+    # timestart = serializers.SerializerMethodField()
+    # timefinish = serializers.SerializerMethodField()
+    # sum_grades = serializers.SerializerMethodField()
+    # score = serializers.SerializerMethodField()
 
+    def get_name(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}".strip()
+
+    # def get_timestart(self, obj):
+    #     quiz_attempt = Quiz_attempts.objects.filter(student=obj).first()
+    #     return quiz_attempt.timestart if quiz_attempt else None
+
+    # def get_timefinish(self, obj):
+    #     quiz_attempt = Quiz_attempts.objects.filter(student=obj).first()
+    #     return quiz_attempt.timefinish if quiz_attempt else None
+
+    # def get_sum_grades(self, obj):
+    #     quiz_attempt = Quiz_attempts.objects.filter(student=obj).first()
+    #     return quiz_attempt.sum_grades if quiz_attempt else None
+
+    # def get_score(self, obj):
+    #     question_attempt = Question_attempts.objects.filter(student=obj).first()
+    #     return question_attempt.score if question_attempt else None
+
+    class Meta:
+        model = Student
+        fields = [
+            "name",
+            "school_name",
+            "email",
+            "year_level",
+            # "timestart",
+            # "timefinish",
+            # "sum_grades",
+            # "score",
+        ]
+    # TODO: find out if the below TODO is still relevant:
     # TODO: Add functionality to manage leaderboard entries and export data
     # - Implement a function to add a new student entry to the leaderboard.
     # - Implement a function to delete an existing student entry from the leaderboard.

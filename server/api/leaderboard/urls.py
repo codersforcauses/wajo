@@ -20,6 +20,6 @@ router = DefaultRouter()
 app_name = "leaderboard"
 
 urlpatterns = [
-    path("", include(router.urls)),
-    path("list/", LeaderboardView.as_view(), name="list"),
+    path("", LeaderboardView.as_view(), name="leaderboard"),
+    # path("", include(router.urls)), # do i need this?
 ]

@@ -2,8 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.response import Response
-
+from django.shortcuts import get_list_or_404
 from .serializers import LeaderboardSerializer
+from ..users.models import Student
 
 
 class LeaderboardView(APIView):
@@ -19,33 +20,14 @@ class LeaderboardView(APIView):
     Methods:
         - get(request): Handles GET requests. Returns sample data for the leaderboard.
     """
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny] # is this appropriate for this view?
     serializer_class = LeaderboardSerializer
 
     def get(self, request):
-        # sample data
-        data = [
-            {
-                "name": "Alice",
-                "school": "Green Valley High",
-                "school_email": "alice@greenvalley.edu",
-                "user_name": "alice123",
-                "password": "password123",
-                "individual_score": 95,
-                "team_name": "Team A",
-                "team_score": 290,
-                "status": "Active",
-            },
-            {
-                "name": "Charlie",
-                "school": "Riverstone Institute",
-                "school_email": "charlie@riverstone.edu",
-                "user_name": "charlie789",
-                "password": "charliepass",
-                "individual_score": 88,
-                "team_name": "Team A",
-                "team_score": 290,
-                "status": "Inactive",
-            },
-        ]
-        return Response(data, status=status.HTTP_200_OK)
+        students = get_list_or_404(Student.objects.select_related('user', 'school'))
+        print("DEBUG: Found students:", students)
+        serializer = self.serializer_class(students, many=True)
+        print("DEBUG: Serializer data:", serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    ## TODO: add pagination and possibly filters for leaderboard??
