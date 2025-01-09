@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 
 import { Button } from "../button";
-import { Pagination } from "../pagination";
+import Pagination from "../pagination";
 
 /**
  * The Datagrid component is a flexible, paginated data table with sorting and navigation features.

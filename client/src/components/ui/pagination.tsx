@@ -1,4 +1,4 @@
-export function Pagination({
+export default function Pagination({
   totalPages,
   currentPage,
   onPageChange,
