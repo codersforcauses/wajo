@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import GenericQuiz from "@/components/ui/generic-quiz";
 import Pagination from "@/components/ui/pagination";
+import { useFetchData } from "@/hooks/use-fetch-data";
 
 export default function CompetitionQuizPage(props: {
   searchParams?: Promise<{
@@ -24,6 +25,24 @@ export default function CompetitionQuizPage(props: {
   };
   // this value will be fetched from the database
   let competitionName = "Maths Competition";
+
+  // Fetches the list of questions using the custom hook.
+  const {
+    data: questions,
+    isLoading: isQuestionLoading,
+    isError: isQuestionError,
+    error: QuestionError,
+  } = useFetchData<Question[]>({
+    queryKey: ["question.list"],
+    endpoint: "/question/list",
+  });
+
+  if (isQuestionLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Tracks the current page number for pagination.
+  const [page, setPage] = useState<number>(1);
 
   return (
     <div className="flex flex-col items-center border-2 border-orange-600">

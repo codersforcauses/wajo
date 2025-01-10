@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Pagination from "@/components/ui/pagination";
 
 export default function GenericQuiz() {
   let headingStyle = `text-xl sm:text-2xl md:text-3xl text-slate-800 font-bold`;
@@ -33,7 +34,7 @@ export default function GenericQuiz() {
           </h3>
           <p className="text-slate-700">Must be an integer from 1-999</p>
           <input
-            type="text"
+            type="number"
             placeholder="Please input your answer"
             className="mt-4 h-10 min-w-64 rounded-sm border border-slate-500 px-2"
           />
