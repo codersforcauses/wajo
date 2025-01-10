@@ -1,3 +1,5 @@
+import { string, StringValidation } from "zod";
+
 /**
  * Represents a Question object with its properties.
  *
@@ -13,12 +15,21 @@
  *   difficulty: "Difficult"
  * };
  */
-interface Question {
+export interface Question {
+  id?: number;
   name: string;
-  category: string;
+  question_text: string;
+  description: string;
+  default_mark: number;
   difficulty: string;
+  category: number;
 }
 
+export interface Answer {
+  question: number;
+  answer: string;
+  feedback: string;
+}
 /**
  * Represents the properties for the Datagrid component.
  *

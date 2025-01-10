@@ -14,7 +14,6 @@ class Image(models.Model):
 
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
-    diff_level = models.IntegerField()
     name = models.CharField(max_length=50)
     info = models.TextField(default="")
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
@@ -30,6 +29,7 @@ class Question(models.Model):
     name = models.CharField(max_length=255)
     question_text = models.TextField(default="")
     description = models.TextField(default="")
+    difficulty = models.CharField(max_length=10, choices=[('EASY', 'Easy'), ('MEDIUM', 'Medium'), ('HARD', 'Hard')])
     category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     created_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='questions_created')
     modified_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='questions_modified')

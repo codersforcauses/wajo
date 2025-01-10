@@ -22,7 +22,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-
+import { useAnswerStore, useQuestionStore } from "@/store/question";
+import { Answer, Question } from "@/types/question";
 // Define the Zod schema for validation
 const formSchema = z.object({
   questionName: z.string().min(1, "Question Name is required"),
@@ -69,10 +70,46 @@ export default function Create() {
       genre: "",
     },
   });
-
+  /*
   const onSubmit = (data: FormValues) => {
     console.log("Form Data:", data);
     alert(JSON.stringify(data, null, 2));
+  };
+*/
+  const createQuestion = useQuestionStore((state) => state.createQuestion);
+  const createAnswer = useAnswerStore((state) => state.createAnswer); // New store for creating answers
+
+  const onSubmit = async (data: FormValues) => {
+    try {
+      // Prepare the Question payload
+      const newQuestion: Question = {
+        name: data.questionName,
+        question_text: data.question,
+        description: data.solution || "",
+        default_mark: parseInt(data.mark, 10),
+        difficulty: data.difficulty.toUpperCase(),
+        category: parseInt(data.genre, 10),
+      };
+
+      // Step 1: Create the Question and get its ID
+      const createdQuestion = await createQuestion(newQuestion); // Call to create the question
+      const questionId = createdQuestion.id as number; // Assume the response contains the created Question ID
+
+      // Prepare the Answer payload
+      const newAnswer: Answer = {
+        question: questionId,
+        answer: data.answer,
+        feedback: data.solution || "", // Optional feedback
+      };
+
+      // Step 2: Create the Answer using the Question ID
+      await createAnswer(newAnswer); // Pass questionId along with the answer payload
+
+      alert("Question and Answer created successfully!");
+    } catch (error) {
+      console.error("Error creating question or answer:", error);
+      alert("Failed to create question and answer");
+    }
   };
 
   return (
@@ -209,7 +246,7 @@ export default function Create() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Genre <span className="text-red-500">*</span>
+                    Category <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Select onValueChange={field.onChange} value={field.value}>
@@ -217,9 +254,9 @@ export default function Create() {
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent className="w-32">
-                        <SelectItem value="math">Arithmatic</SelectItem>
-                        <SelectItem value="science">Science</SelectItem>
-                        <SelectItem value="history">Algebra</SelectItem>
+                        <SelectItem value="1">Arithmatic</SelectItem>
+                        <SelectItem value="2">Multiplication</SelectItem>
+                        <SelectItem value="3">Algebra</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
