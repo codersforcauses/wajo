@@ -76,12 +76,13 @@ export default function Create() {
     alert(JSON.stringify(data, null, 2));
   };
 */
+  //Extract the relevant actions from the Question/Answer store to use
   const createQuestion = useQuestionStore((state) => state.createQuestion);
-  const createAnswer = useAnswerStore((state) => state.createAnswer); // New store for creating answers
+  const createAnswer = useAnswerStore((state) => state.createAnswer);
 
   const onSubmit = async (data: FormValues) => {
     try {
-      // Prepare the Question payload
+      //Prepare the Question payload with form data
       const newQuestion: Question = {
         name: data.questionName,
         question_text: data.question,
@@ -91,19 +92,19 @@ export default function Create() {
         category: parseInt(data.genre, 10),
       };
 
-      // Step 1: Create the Question and get its ID
-      const createdQuestion = await createQuestion(newQuestion); // Call to create the question
-      const questionId = createdQuestion.id as number; // Assume the response contains the created Question ID
+      //Create the Question and get its ID, needed to create associated answer
+      const createdQuestion = await createQuestion(newQuestion);
+      const questionId = createdQuestion.id as number;
 
-      // Prepare the Answer payload
+      //Prepare the Answer payload with form data and Question ID
       const newAnswer: Answer = {
         question: questionId,
         answer: data.answer,
-        feedback: data.solution || "", // Optional feedback
+        feedback: data.solution || "",
       };
 
-      // Step 2: Create the Answer using the Question ID
-      await createAnswer(newAnswer); // Pass questionId along with the answer payload
+      //Then create answer, no need to return anything
+      await createAnswer(newAnswer);
 
       alert("Question and Answer created successfully!");
     } catch (error) {

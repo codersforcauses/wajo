@@ -17,7 +17,7 @@ export default function Index() {
   } = useFetchData<Question[]>({
     queryKey: ["question.list"],
     //endpoint: "/question/list",
-    endpoint: "http://localhost:8000/api/question/get/",
+    endpoint: "http://localhost:8000/api/question/questions/",
   });
 
   // Tracks the current page number for pagination.

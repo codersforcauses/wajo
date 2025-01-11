@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Question, Category, Answer
 
 
-class QuestionCategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
@@ -17,9 +17,6 @@ class AnswerSerializer(serializers.ModelSerializer):
         model = Answer
         fields = ['id', 'question', 'answer', 'feedback']
 
-    def create(self, validated_data):
-        return Answer.objects.create(**validated_data)
-
 
 class QuestionSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(
@@ -33,6 +30,4 @@ class QuestionSerializer(serializers.ModelSerializer):
             'id', 'name', 'question_text', 'description',
             'default_mark', 'difficulty', 'category'
         ]
-
-    def create(self, validated_data):
-        return Question.objects.create(**validated_data)
+        

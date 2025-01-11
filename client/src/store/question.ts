@@ -1,3 +1,4 @@
+import axios from "axios";
 import { create } from "zustand";
 
 import type { Answer, Question } from "@/types/question.ts";
@@ -12,30 +13,37 @@ export const useQuestionStore = create<QuestionStore>((set) => ({
   questions: [],
 
   fetchQuestions: async () => {
-    const response = await fetch("http://localhost:8000/api/question/get/");
-    const data = await response.json();
-    set({ questions: data });
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/question/questions/",
+      );
+      set({ questions: response.data });
+    } catch (error) {
+      console.error("Failed to fetch questions:", error);
+    }
   },
 
   createQuestion: async (newQuestion) => {
-    const response = await fetch("http://localhost:8000/api/question/create/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newQuestion),
-    });
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/question/questions/",
+        newQuestion,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
 
-    if (!response.ok) {
+      set((state) => ({
+        questions: [...state.questions, response.data],
+      }));
+
+      return response.data;
+    } catch (error) {
+      console.error("Failed to create question:", error);
       throw new Error("Failed to create question");
     }
-
-    const createdQuestion = await response.json();
-    set((state) => ({
-      questions: [...state.questions, createdQuestion],
-    }));
-
-    return createdQuestion;
   },
 }));
 
@@ -45,20 +53,18 @@ interface AnswerStore {
 
 export const useAnswerStore = create<AnswerStore>((set) => ({
   createAnswer: async (newAnswer) => {
-    const response = await fetch(
-      "http://localhost:8000/api/question/answer/create/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    try {
+      await axios.post(
+        "http://localhost:8000/api/question/answers/",
+        newAnswer,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-        body: JSON.stringify(newAnswer),
-      },
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json(); // Parse error response
-      console.error("Backend Error:", errorData);
+      );
+    } catch (error) {
+      console.error("Failed to create answer:", error);
       throw new Error("Failed to create answer");
     }
   },
