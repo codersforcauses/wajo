@@ -55,8 +55,9 @@ INSTALLED_APPS = [
     "api.healthcheck",
     "api.leaderboard",
     "api.question",
-    "api.users",
     "rest_framework_simplejwt",
+    "api.users",
+    "api.team",
 ]
 
 REST_FRAMEWORK = {

@@ -14,7 +14,6 @@
     "typecheck": "tsc --noEmit",
     "prepare": "cd .. && husky client/.husky",
     "check-all": "npm run lint && npm run format:check && npm run typecheck"
-
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -33,11 +32,14 @@
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.427.0",
+    "mathjax": "^3.2.2",
     "next": "^14.2.5",
     "next-themes": "^0.4.4",
+    "node-tikzjax": "^1.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.2",
+    "react-latex-next": "^3.0.0",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.1",
