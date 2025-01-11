@@ -1,10 +1,10 @@
 /**
- * API Route Handler for fetching quiz question data.
+ * API Route Handler for fetching quiz data.
  *
- * This handler responds to API requests by returning a mock list of questions related to a quiz.
- * It is used to simulate the backend behavior and serve static quiz question data.
+ * This handler responds to API requests by returning mock quiz data.
+ * It is used to simulate the backend behavior and serve static quiz data.
  *
- * @fileoverview API endpoint located at `/api/quiz` for fetching mock quiz question data.
+ * @fileoverview API endpoint located at `/api/quiz` for fetching mock quiz data.
  *
  * @module /api/quiz
  * @see {@link https://nextjs.org/docs/pages/building-your-application/routing/api-routes | Next.js API Routes Documentation}
