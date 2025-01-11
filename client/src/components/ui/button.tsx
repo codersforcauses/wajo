@@ -18,6 +18,9 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        "tab-active": "bg-gray-200 text-black rounded-bl-none rounded-br-none", // to use in `MathInput` component
+        "tab-inactive":
+          "bg-gray-500 hover:bg-primary text-black rounded-bl-none rounded-br-none", // to use in `MathInput` component
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -44,7 +47,7 @@ export interface ButtonProps
  * It uses `class-variance-authority` (CVA) for managing multiple variants and sizes.
  *
  * ### Variants:
- * - `default`, `destructive`, `outline`, `secondary`, `ghost`, `link`
+ * - `default`, `destructive`, `outline`, `secondary`, `ghost`, `link`, `tab-active`, `tab-inactive`
  *
  * ### Sizes:
  * - `default`, `sm`, `lg`, `icon`
