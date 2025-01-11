@@ -1,9 +1,18 @@
 from django.db import models
-
+from api.users.models import Student
+from api.question.models import Question
 # Create your models here.
 
 
 class Quiz(models.Model):
+    """ Represents a Quiz in the System
+
+     Fields:
+        id: The primary key for the quiz.
+        name (CharField): The name of the quiz.
+        code (CharField): A unique code for the school, up to 10 characters.
+
+    """
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     intro = models.TextField()
@@ -23,8 +32,7 @@ class QuizSlots(models.Model):
 
     id = models.AutoField(primary_key=True)
     quiz_id = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    # add when question model is pushed
-    # question_id = models.ForeignKey('''Question''', on_delete=models.CASCADE)
+    question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
     slot = models.IntegerField()
     status = models.CharField(choices=STATUS_CHOICES)
     display_number = models.CharField()
@@ -53,8 +61,9 @@ class QuizAttemptUser(models.Model):
     id = models.AutoField(primary_key=True)
     quiz_attempt = models.ForeignKey(
         QuizAttempt, on_delete=models.CASCADE, related_name="quiz_attempts")
-    student = models.ForeignKey(
-        QuizAttempt, on_delete=models.CASCADE, related_name="student_attempts")
+    student_id = models.ForeignKey(
+        Student, on_delete=models.CASCADE, related_name="student_id")
+
     grade = models.DecimalField(max_digits=10, decimal_places=5, default=0)
     time_modified = models.DateTimeField(auto_now=True)
 

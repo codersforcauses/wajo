@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     "api.invoices",
     "api.leaderboard",
     "api.users",
-    "api.quiz"
+    "api.quiz",
+    "api.question"
 ]
 
 MIDDLEWARE = [
