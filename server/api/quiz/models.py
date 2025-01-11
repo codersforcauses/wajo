@@ -3,16 +3,16 @@ from django.db import models
 # Create your models here.
 
 
-class Quiz(models.Models):
+class Quiz(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     intro = models.TextField()
-    grade = models.DecimalField()
+    grade = models.DecimalField(max_digits=5, decimal_places=2)
     is_comp = models.BooleanField(default=False)
     visible = models.BooleanField(default=False)
     open_time_date = models.DateTimeField()
     close_time_date = models.DateTimeField()
-    timelimit = models.IntegerField(max=300)
+    timelimit = models.IntegerField()
 
 
 class QuizSlots(models.Model):
@@ -23,7 +23,8 @@ class QuizSlots(models.Model):
 
     id = models.AutoField(primary_key=True)
     quiz_id = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    question_id = models.ForeignKey('''Question''', on_delete=models.CASCADE)
+    # add when question model is pushed
+    # question_id = models.ForeignKey('''Question''', on_delete=models.CASCADE)
     slot = models.IntegerField()
     status = models.CharField(choices=STATUS_CHOICES)
     display_number = models.CharField()
@@ -33,7 +34,7 @@ class QuizSlots(models.Model):
 
 class QuizAttempt(models.Model):
     id = models.AutoField(primary_key=True)
-    quiz_id = models.ForeignKey("QuizSlots", on_delete=models.CASCADE)
+    quiz_id = models.ForeignKey(QuizSlots, on_delete=models.CASCADE)
     attempt = models.IntegerField()
     question_attempts = models.IntegerField()
     current_page = models.IntegerField()
@@ -50,10 +51,12 @@ class QuizAttempt(models.Model):
 
 class QuizAttemptUser(models.Model):
     id = models.AutoField(primary_key=True)
-    quiz_attempt = models.ForeignKey("QuizAttempt", on_delete=models.CASCADE, default=0)
-    student = models.ForeignKey("QuizAttempt", on_delete=models.CASCADE, default=0)
+    quiz_attempt = models.ForeignKey(
+        QuizAttempt, on_delete=models.CASCADE, related_name="quiz_attempts")
+    student = models.ForeignKey(
+        QuizAttempt, on_delete=models.CASCADE, related_name="student_attempts")
     grade = models.DecimalField(max_digits=10, decimal_places=5, default=0)
-    time_modified = models.DateTimeField(auto_now=True, default=0)
+    time_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.id} {self.quiz_attempt} {self.student}"
