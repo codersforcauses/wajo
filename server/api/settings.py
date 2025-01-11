@@ -53,7 +53,10 @@ INSTALLED_APPS = [
     "corsheaders",
     "api.healthcheck",
     "api.leaderboard",
-    "api.users"
+    "api.users",
+    "api.quiz",
+    "api.question",
+    "api.team",
 ]
 
 MIDDLEWARE = [

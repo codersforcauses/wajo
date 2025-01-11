@@ -43,6 +43,13 @@ import { cn } from "@/lib/utils";
  */
 const Form = FormProvider;
 
+/**
+ * Context to store the field name for a specific form field.
+ *
+ * @template TFieldValues - The shape of the form values.
+ * @template TName - The name of the field in the form values.
+ */
+
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -55,12 +62,13 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 );
 
 /**
- * Form context provider for a specific field.
- * Provides context for form fields to manage field-specific state and error handling.
+ * The `FormField` component connects a specific form field to the form context and provides validation states.
  *
- * @component
+ * @template TFieldValues - The shape of the form values.
+ * @template TName - The name of the field in the form values.
+ *
  * @example
- * <FormField name="username" control={control} render={({ field }) => <input {...field} />} />
+ * <FormField name="fieldName" control={form.control} render={({ field }) => <input {...field} />} />
  */
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
@@ -92,6 +100,7 @@ const FormField = <
  * @property {string} formDescriptionId - The ID of the description text for this form item.
  * @property {string} formMessageId - The ID of the message text for this form item, typically error messages.
  */
+
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
@@ -115,6 +124,10 @@ const useFormField = () => {
   };
 };
 
+/**
+ * Context to store metadata for a form item, such as the ID.
+ */
+
 type FormItemContextValue = {
   id: string;
 };
@@ -136,6 +149,7 @@ const FormItemContext = React.createContext<FormItemContextValue>(
  *   </FormControl>
  * </FormItem>
  */
+
 const FormItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -159,6 +173,7 @@ FormItem.displayName = "FormItem";
  * @example
  * <FormLabel>Username</FormLabel>
  */
+
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
@@ -186,6 +201,7 @@ FormLabel.displayName = "FormLabel";
  *   <input />
  * </FormControl>
  */
+
 const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
@@ -217,6 +233,7 @@ FormControl.displayName = "FormControl";
  * @example
  * <FormDescription>Enter your username</FormDescription>
  */
+
 const FormDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
@@ -242,6 +259,7 @@ FormDescription.displayName = "FormDescription";
  * @example
  * <FormMessage>Error message</FormMessage>
  */
+
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
