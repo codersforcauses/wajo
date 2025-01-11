@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     "api.healthcheck",
     "api.leaderboard",
     "api.users",
+    "api.quiz",
+    "api.question",
     "api.team",
 ]
 
