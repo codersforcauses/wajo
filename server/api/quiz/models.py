@@ -10,8 +10,13 @@ class Quiz(models.Model):
      Fields:
         id: The primary key for the quiz.
         name (CharField): The name of the quiz.
-        code (CharField): A unique code for the school, up to 10 characters.
-
+        intro (TextField): A text field introducing the quiz.
+        grade (DecimalField): The grade for each quiz.
+        is_comp (BooleanField): Notes whether the quiz is for competition or practice.
+        visible (BooleanField): Notes whether the quiz is visible.
+        open_time_date (DateTimeField): Notes when the quiz opens.
+        close_time_date (DateTimeField): Notes when the quiz closes.
+        timelimit (Integer): Denotes the time allotted for each quiz.
     """
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -25,6 +30,18 @@ class Quiz(models.Model):
 
 
 class QuizSlots(models.Model):
+    """ Represents a slot in the Quiz.
+
+     Fields:
+        id: The primary key for the quiz slots.
+        quiz_id (ForeignKey): relates to the Quiz model.
+        question_id (ForeignKey): relates to the Question model.
+        slot (IntegerField): relates to the slot number.
+        display_number (IntegerField): question number.
+        require_previous (BooleanField): check if it requires the previous slot
+        block (IntegerField): Each quiz is sectioned off into blocks, this number indicates the block number.
+    """
+
     STATUS_CHOICES = (
         ('processing', 'Processing'),
         ('submitted', 'Submitted'),
