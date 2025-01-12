@@ -1,14 +1,25 @@
+"use client"; // Ensures the component is treated as a client-side component in Next.js
+
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Defines the base styles and variants for the `Label` component using `class-variance-authority`.
+ *
+ * The `labelVariants` provides utility classes for styling the label, including:
+ * - Base font size (`text-sm`), weight (`font-medium`), and line height (`leading-none`).
+ * - Disabled state (`peer-disabled:cursor-not-allowed` and `peer-disabled:opacity-70`).
+ */
+
 const labelVariants = cva(
   "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 );
 
 /**
+
  * The `Label` component is a styled label element that enhances accessibility and styling for form elements.
  * It provides an easy way to associate form controls with their respective labels, offering customization
  * via the `className` and `variant` props for different visual states.
@@ -26,6 +37,7 @@ const labelVariants = cva(
  * @property {React.Ref} ref - A ref object that can be used to access the label element directly.
  *
  * @returns {JSX.Element} A styled label element, customizable with class variants and additional props.
+
  */
 const Label = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
