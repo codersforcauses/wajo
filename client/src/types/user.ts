@@ -4,9 +4,9 @@ import { z } from "zod";
  * Defines the possible user roles.
  *
  * @example
- * const role: Role = "Student";
+ * const role: Role = "student";
  */
-export type Role = "Admin" | "Staff" | "Student";
+export type Role = "admin" | "teacher" | "student";
 
 /**
  * Represents a user object.
@@ -16,7 +16,7 @@ export type Role = "Admin" | "Staff" | "Student";
  * @property {string} email - The email of the user.
  * @property {string} first_name - The first name of the user.
  * @property {string} last_name - The last name of the user.
- * @property {Role} role - The role of the user (Admin, Staff, or Student).
+ * @property {Role} role - The role of the user (admin, teacher, or student).
  */
 export interface User {
   id: number;
