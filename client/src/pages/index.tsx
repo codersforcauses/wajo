@@ -14,9 +14,6 @@ const Home = () => {
 
   return (
     <main className="font-urbanist flex min-h-screen flex-col items-center gap-4 p-24">
-      <LoginModal>
-        <Button>Login Modal</Button>
-      </LoginModal>
       <h1>Test title</h1>
       <h2>Test title</h2>
       <h3>Test title</h3>
