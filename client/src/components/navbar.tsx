@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import logo from "../../public/wajo_white.svg";
 import styles from "../styles/modules/navbar.module.css";
 import MobileNav from "./ui/mobilenav";
+import LoginModal from "./ui/user/login-modal";
 
 const Navbar = () => {
   return (
@@ -29,14 +30,21 @@ const Navbar = () => {
           <Link href="/contact">Contact us</Link>
         </div>
         <div className="ml-24 flex-initial">
-          <Button
+          {/* <Button
             variant={"outline"}
             className={`${styles.loginButton} font-roboto`}
           >
             Login
-          </Button>
+          </Button> */}
+          <LoginModal>
+            <Button variant={"outline"} className={`${styles.loginButton}`}>
+              Login
+            </Button>
+          </LoginModal>
         </div>
-        <MobileNav></MobileNav>
+        <div className="hidden max-md:flex">
+          <MobileNav />
+        </div>
       </div>
     </nav>
   );
