@@ -57,19 +57,8 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ReactQueryDevtools initialIsOpen={false} />
-          {/* temp layout, can move to <Layout> later */}
-          {/* <SidebarProvider> */}
-          {/* <AppSidebar Role="admin" />
-            <SidebarInset>
-              <header className="sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-              </header> */}
           {getLayout(<Component {...pageProps} />)}
-          {/* temporary include here, can add into Layout after */}
           <Toaster position="bottom-center" richColors />
-          {/* </SidebarInset>
-          </SidebarProvider> */}
         </AuthProvider>
       </QueryClientProvider>
     </>

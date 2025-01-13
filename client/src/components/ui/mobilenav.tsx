@@ -1,13 +1,18 @@
+import { AlignJustify, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { Drawer } from "vaul";
 
+import { Button } from "@/components/ui/button";
+
 import logo from "../../../public/wajo_white.svg";
+import LoginModal from "./user/login-modal";
 
 export default function MobileNav() {
   return (
     <Drawer.Root direction="top">
       <Drawer.Trigger className="relative flex h-10 flex-shrink-0 items-center justify-center gap-2 overflow-hidden rounded-full bg-white px-4 text-sm font-medium shadow-sm transition-all hover:bg-[#FAFAFA] dark:bg-[#161615] dark:text-white dark:hover:bg-[#1A1A19]">
-        Open Drawer
+        <AlignJustify />
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40" />{" "}
@@ -19,22 +24,35 @@ export default function MobileNav() {
             { "--initial-transform": "calc(100% + 8px)" } as React.CSSProperties
           }
         >
-          <div className="flex h-full w-full grow flex-col bg-zinc-50 p-5">
-            <div className="mx-auto max-w-md">
-              <Drawer.Title className="font- mb-2 flex justify-between text-base text-zinc-900">
-                <Image
-                  src={logo}
-                  alt="WAJO logo with white background"
-                  width={105}
-                  height={105}
-                />
-                <Drawer.Close>X</Drawer.Close>
-              </Drawer.Title>
-              <Drawer.Description className="mb-2 text-zinc-600">
-                This one specifically is not touching the edge of the screen,
-                but that&apos;s not required for a side drawer.
-              </Drawer.Description>
-            </div>
+          <div className="flex h-full w-full grow flex-col border border-red-500 bg-zinc-50 p-5">
+            {/* <div className="mx-auto"> */}
+            <Drawer.Title className="mx-5 flex justify-between border border-green-500 text-base text-zinc-900">
+              <Image
+                src={logo}
+                alt="WAJO logo with white background"
+                width={105}
+                height={105}
+              />
+              <Drawer.Close>
+                <X />
+              </Drawer.Close>
+            </Drawer.Title>
+            <Drawer.Description className="mb-2 flex flex-col items-center justify-center gap-4 text-zinc-600">
+              <Link href="/news">News</Link>
+              <Link href="/awards">Awards</Link>
+              <Link href="/resources">Resources</Link>
+              <Link href="/contact">Contact us</Link>
+              <LoginModal>
+                <Button
+                  variant={"outline"}
+                  size={"lg"}
+                  className="font-roboto border-2 border-black text-lg"
+                >
+                  Login
+                </Button>
+              </LoginModal>
+            </Drawer.Description>
+            {/* </div> */}
           </div>
         </Drawer.Content>
       </Drawer.Portal>
