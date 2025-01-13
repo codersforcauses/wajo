@@ -7,13 +7,6 @@ import type { AppProps } from "next/app";
 import { Roboto, Urbanist } from "next/font/google";
 import type { ReactElement, ReactNode } from "react";
 
-import { AppSidebar } from "@/components/ui/app-sidebar";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/auth-provider";
 
