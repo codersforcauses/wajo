@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
-import AdminLayout from "@/components/admin-layout";
+import SidebarLayout from "@/components/sidebar-layout";
 import { Button } from "@/components/ui/button";
 import { Datagrid } from "@/components/ui/Question/data-grid";
 import { SearchInput } from "@/components/ui/search";
@@ -87,7 +87,7 @@ const Index = () => {
 };
 
 Index.getLayout = function getLayout(page: React.ReactElement) {
-  return <AdminLayout>{page}</AdminLayout>;
+  return <SidebarLayout role="admin">{page}</SidebarLayout>;
 };
 
 export default Index;

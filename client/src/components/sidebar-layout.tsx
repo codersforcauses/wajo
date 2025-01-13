@@ -7,16 +7,18 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Role } from "@/types/user";
 
 interface LayoutProps {
   children: React.ReactNode;
+  role: Role;
 }
 
-export default function AdminLayout({ children }: LayoutProps) {
+export default function SidebarLayout({ children, role }: LayoutProps) {
   return (
     <div>
       <SidebarProvider>
-        <AppSidebar Role="admin" />
+        <AppSidebar Role={role} />
         <SidebarInset>
           <header className="sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
             <SidebarTrigger className="-ml-1" />
