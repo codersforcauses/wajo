@@ -10,7 +10,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class AnswerSerializer(serializers.ModelSerializer):
     question = serializers.PrimaryKeyRelatedField(
-        queryset=Question.objects.all()  # Expect a valid Question ID
+        queryset=Question.objects.all()
     )
 
     class Meta:
@@ -30,4 +30,3 @@ class QuestionSerializer(serializers.ModelSerializer):
             'id', 'name', 'question_text', 'description',
             'default_mark', 'difficulty', 'category'
         ]
-        
