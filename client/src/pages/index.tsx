@@ -1,9 +1,8 @@
 import { useState } from "react";
 
-import { LoginModal } from "@/components/ui/user/login-modal";
+import { Button } from "@/components/ui/button";
+import { LoginModal } from "@/components/ui/Users/login-modal";
 import { usePings } from "@/hooks/pings";
-
-import { Button } from "../components/ui/button";
 
 export default function Home() {
   const [clicked, setClicked] = useState(false);

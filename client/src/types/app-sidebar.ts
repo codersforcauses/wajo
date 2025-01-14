@@ -56,9 +56,9 @@ export const navData: NavigationData = {
       title: "User Management",
       icon: UserRoundCog,
       items: [
-        { title: "Schools", url: "#" },
-        { title: "Users", url: "#" },
-        { title: "Teams", url: "#" },
+        { title: "Schools", url: "/users/school" },
+        { title: "Users", url: "/users" },
+        { title: "Teams", url: "/users/team" },
       ],
     },
   ],

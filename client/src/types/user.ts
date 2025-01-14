@@ -6,7 +6,10 @@ import { z } from "zod";
  * @example
  * const role: Role = "student";
  */
-export type Role = "admin" | "teacher" | "student";
+export const RoleEnum = z.enum(["admin", "teacher", "student"], {
+  errorMap: () => ({ message: "Invalid User Role" }),
+});
+export type Role = z.infer<typeof RoleEnum>;
 
 /**
  * Represents a user object.
@@ -17,6 +20,7 @@ export type Role = "admin" | "teacher" | "student";
  * @property {string} first_name - The first name of the user.
  * @property {string} last_name - The last name of the user.
  * @property {Role} role - The role of the user (admin, teacher, or student).
+ * @property {string} school - The school name attached to the user.
  */
 export interface User {
   id: number;
@@ -25,6 +29,7 @@ export interface User {
   first_name: string;
   last_name: string;
   role: Role;
+  school: string;
 }
 
 /**
@@ -43,4 +48,10 @@ export const loginSchema = z.object({
     .regex(/[A-Za-z]/, "Password must contain letters")
     .regex(/[0-9]/, "Password must contain numbers")
     .regex(/[^A-Za-z0-9]/, "Password must contain symbols"),
+});
+
+export const createUserSchema = loginSchema.extend({
+  userRole: RoleEnum,
+  school_id: z.number({ message: "Required" }),
+  email: z.string().email("Invalid email address").optional(),
 });
