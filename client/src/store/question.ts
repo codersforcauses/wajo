@@ -51,7 +51,7 @@ interface AnswerStore {
   createAnswer: (answer: Answer) => Promise<void>;
 }
 
-export const useAnswerStore = create<AnswerStore>((set) => ({
+export const useAnswerStore = create<AnswerStore>(() => ({
   createAnswer: async (newAnswer) => {
     try {
       await axios.post(

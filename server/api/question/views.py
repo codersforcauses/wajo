@@ -19,7 +19,7 @@ class GenericView(APIView):
             serializer = self.serializer_class(obj)
         # if no ID, return all objects
         else:
-            queryset = model.objects.all()
+            queryset = model.objects.all().order_by("id")
             serializer = self.serializer_class(queryset, many=True)
 
         return Response(serializer.data)
@@ -29,6 +29,19 @@ class GenericView(APIView):
         if serializer.is_valid():
             obj = serializer.save()
             return Response(self.serializer_class(obj).data, status=200)
+        else:
+            return Response(serializer.errors, status=400)
+
+    def put(self, request, **kwargs):
+        model = apps.get_model(app_label="question", model_name=self.model_name)
+        obj_id = kwargs.get("id")
+
+        obj = get_object_or_404(model, id=obj_id)
+        serializer = self.serializer_class(obj, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
         else:
             return Response(serializer.errors, status=400)
 
