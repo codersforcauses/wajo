@@ -13,6 +13,17 @@ import {
 import { cn } from "@/lib/utils";
 import { Team } from "@/types/team";
 
+/**
+ * Renders a paginated data grid for displaying team information.
+ *
+ * The `TeamDataGrid` component provides a table-based UI for displaying team data
+ * with support for pagination. The behavior is similar to the `UserDataGrid`, but
+ * it is tailored to display team-specific fields such as `Team Id`, `Team Name`,
+ * `School`, `Description`, and `Created On`.
+ *
+ * Similar Implementation:
+ * @see [UserDataGrid](./data-grid.tsx) for reference.
+ */
 export function TeamDataGrid({
   datacontext,
   onDataChange,

@@ -15,6 +15,32 @@ type Props = {
   className?: string;
 };
 
+/**
+ * A form field for selecting a school from a dropdown list fetched from an API.
+ *
+ * @param {Object} props - The props for the component.
+ * @param {number | undefined} props.selectedId - The currently selected school ID.
+ * @param {Function} props.onChange - A callback function that handles the change in school ID.
+ * @param {string} [props.className] - An optional className to customize the component's styling.
+ *
+ * @example
+ * <FormField
+ *   control={formControl}
+ *   name="school_id"
+ *   render={({ field }) => (
+ *     <FormItem>
+ *       <FormControl>
+ *         <SelectSchool
+ *           selectedId={field.value}
+ *           onChange={field.onChange}
+ *           className="w-full"
+ *         />
+ *       </FormControl>
+ *       <FormMessage />
+ *     </FormItem>
+ *   )}
+ * />
+ */
 export function SelectSchool({ selectedId, onChange, className }: Props) {
   const {
     data: schools,

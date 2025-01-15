@@ -26,7 +26,18 @@ import { createTeamSchema } from "@/types/team";
 
 type Team = z.infer<typeof createTeamSchema>;
 
-export default function TeamDataTableForm() {
+/**
+ * Renders a data table form for managing team information with dynamic rows.
+ *
+ * @function TeamDataTableForm
+ *
+ * @description
+ * This component provides a table-based form for managing teams. It allows users to dynamically add, remove, and edit team entries.
+ *
+ * Similar Implementation:
+ * @see [UserDataTableForm](./data-table-form.tsx) for reference.
+ */
+export function TeamDataTableForm() {
   const defaultTeam = {
     name: "",
     description: "",

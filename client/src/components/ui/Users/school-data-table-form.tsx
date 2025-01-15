@@ -24,7 +24,18 @@ import { createSchoolSchema } from "@/types/school";
 
 type School = z.infer<typeof createSchoolSchema>;
 
-export default function SchoolDataTableForm() {
+/**
+ * Renders a data table form for managing school information with dynamic rows.
+ *
+ * @function SchoolDataTableForm
+ *
+ * @description
+ * This component provides a table-based form for managing schools. Users can add, remove, and edit school entries dynamically.
+ *
+ * Similar Implementation:
+ * @see [UserDataTableForm](./data-table-form.tsx) for reference.
+ */
+export function SchoolDataTableForm() {
   const defaultSchool = {
     name: "",
   } as School;

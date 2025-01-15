@@ -13,6 +13,16 @@ import {
 import { cn } from "@/lib/utils";
 import { School } from "@/types/school";
 
+/**
+ * Renders a paginated data grid for displaying school information.
+ *
+ * The `SchoolDataGrid` component provides a table-based UI for displaying school data
+ * with support for pagination. The behavior is similar to the `UserDataGrid`, but
+ * it is tailored to display school-specific fields such as `School Id`, `School Name`,
+ * and `Created On`.
+ *
+ * @see [UserDataGrid](./data-grid.tsx) for reference.
+ */
 export function SchoolDataGrid({
   datacontext,
   onDataChange,

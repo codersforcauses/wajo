@@ -27,7 +27,29 @@ import { createUserSchema } from "@/types/user";
 
 type User = z.infer<typeof createUserSchema>;
 
-export default function DataTableForm() {
+/**
+ * Renders a data table form for managing user information with a dynamic table structure.
+ *
+ * The `DataTableForm` component allows users to add, and delete rows of user data.
+ * It uses `react-hook-form` with Zod schema validation to manage and validate the form state.
+ * Each row includes fields for `Username`, `Password`, `Email`, `User Role`, and `School`.
+ *
+ * @function DataTableForm
+ *
+ * @description
+ * The component utilizes the following libraries and components:
+ * - `react-hook-form` for form state management.
+ * - `zod` for schema validation.
+ *
+ * Features:
+ * - Dynamically adds or removes rows with user data.
+ * - Provides validation for all input fields.
+ * - Submits the collected data as an array of users.
+ *
+ * Additional Reference:
+ * - {@link https://react-hook-form.com/docs/usefieldarray React Hook Form: useFieldArray}
+ */
+export function DataTableForm() {
   const defaultUser = {
     username: "",
     password: "",

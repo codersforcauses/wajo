@@ -99,7 +99,11 @@ export function AppSidebar({ Role, ...props }: AppSidebarProps) {
                             isActive={item.isActive}
                             className="hover:bg-yellow data-[active=true]:bg-yellow"
                           >
-                            <a href={item.url}>
+                            <a
+                              href={item.url}
+                              target={item.isNewTab ? "_blank" : "_self"}
+                              rel={item.isNewTab ? "noopener noreferrer" : ""} // add security for _blank only
+                            >
                               <span>{item.title}</span>
                             </a>
                           </SidebarMenuSubButton>

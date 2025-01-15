@@ -13,6 +13,37 @@ import {
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
 
+/**
+ * Renders a paginated data grid for displaying user information.
+ *
+ * The `DataGrid` component provides a table-based UI for displaying user data
+ * with support for pagination. It handles data slicing, empty cell padding,
+ * and provides callback handlers for changes in data and pagination.
+ *
+ * @function DataGrid
+ * @template T - The type of data being displayed in the data grid.
+ * @param {Object} props - The props object.
+ * @param {User[]} props.datacontext - The array of data items to be displayed in the grid.
+ * @param {function(User[]): void} props.onDataChange - Callback triggered when the data changes.
+ * @param {number} props.changePage - The page number to navigate to when the data changes.
+ *
+ * @example
+ * // Example usage
+ * const users = [
+ *   { id: 1, username: "admin", role: "admin", school: "Greenfield High" },
+ *   { id: 2, username: "teacher1", role: "teacher", school: "Westwood Academy" },
+ * ];
+ *
+ * const handleDataChange = (updatedData) => {
+ *   console.log(updatedData);
+ * };
+ *
+ * <DataGrid
+ *   datacontext={users}
+ *   onDataChange={handleDataChange}
+ *   changePage={1}
+ * />;
+ */
 export function DataGrid({
   datacontext,
   onDataChange,
