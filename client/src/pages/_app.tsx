@@ -37,6 +37,8 @@ type AppPropsWithLayout = AppProps & {
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
+  const getLayout = Component.getLayout ?? ((page) => page);
+
   return (
     <>
       <style jsx global>{`
@@ -48,8 +50,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ReactQueryDevtools initialIsOpen={false} />
-          <Component {...pageProps} />
-          {/* temporary include here, can add into Layout after */}
+          {getLayout(<Component {...pageProps} />)}
           <Toaster position="bottom-center" richColors />
         </AuthProvider>
       </QueryClientProvider>

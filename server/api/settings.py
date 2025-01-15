@@ -57,6 +57,8 @@ INSTALLED_APPS = [
     "api.question",
     "rest_framework_simplejwt",
     "api.users",
+    "api.quiz",
+    "api.question",
     "api.team",
 ]
 
