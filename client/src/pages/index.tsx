@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { LoginModal } from "@/components/ui/user/login-modal";
 import { usePings } from "@/hooks/pings";
 
 import Layout from "../components/layout";

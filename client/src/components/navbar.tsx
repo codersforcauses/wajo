@@ -4,7 +4,7 @@ import React from "react";
 
 import { Button } from "@/components/ui/button";
 import MobileNav from "@/components/ui/mobilenav";
-import LoginModal from "@/components/ui/user/login-modal";
+import { LoginModal } from "@/components/ui/Users/login-modal";
 
 import logo from "../../public/wajo_white.svg";
 import styles from "../styles/modules/navbar.module.css";

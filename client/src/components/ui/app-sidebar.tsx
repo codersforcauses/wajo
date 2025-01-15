@@ -52,12 +52,11 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
   const roleNavData = navData[Role];
   roleNavData.forEach((section) => {
     for (const item of section.items) {
-      item.isActive = new RegExp(item.url.replace(/\[.*?\]/g, ".*")).test(
-        router.pathname,
-      );
-      if (item.isActive) {
+      const regex = new RegExp(`^${item.url.replace(/\[.*?\]/g, ".*")}$`);
+      item.isActive = regex.test(router.pathname);
+
+      if (item.isActive && !section.isActive) {
         section.isActive = true;
-        break; // exit the loop
       }
     }
   });
@@ -100,7 +99,11 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
                             isActive={item.isActive}
                             className="hover:bg-yellow data-[active=true]:bg-yellow"
                           >
-                            <a href={item.url}>
+                            <a
+                              href={item.url}
+                              target={item.isNewTab ? "_blank" : "_self"}
+                              rel={item.isNewTab ? "noopener noreferrer" : ""} // add security for _blank only
+                            >
                               <span>{item.title}</span>
                             </a>
                           </SidebarMenuSubButton>
