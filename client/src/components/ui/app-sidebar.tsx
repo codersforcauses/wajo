@@ -47,7 +47,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
  * @param {AppSidebarProps} props - The properties for the sidebar component.
  * @param {Role} props.Role - The role of the user (e.g., Admin, Staff, Student), used to determine the navigation items to display.
  */
-export function AppSidebar({ Role, ...props }: AppSidebarProps) {
+export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
   const router = useRouter();
   const roleNavData = navData[Role];
   roleNavData.forEach((section) => {
