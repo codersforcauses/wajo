@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Datagrid } from "@/components/ui/Question/data-grid";
 import { SearchInput } from "@/components/ui/search";
 import { useFetchData } from "@/hooks/use-fetch-data";
+import { Question } from "@/types/question";
 
 export default function Index() {
   // Fetches the list of questions using the custom hook.

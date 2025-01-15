@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DatagridProps, Question } from "@/types/question";
 
 import { Button } from "../button";
 import { Pagination } from "../pagination";
@@ -168,7 +169,7 @@ export function Datagrid({
       <Pagination
         totalPages={totalPages}
         currentPage={currentPage}
-        onPageChange={(page) => handlePageChange(page)}
+        onPageChange={(page: number) => handlePageChange(page)}
         className="mr-20 mt-5 flex justify-end"
       />
     </div>
