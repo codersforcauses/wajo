@@ -42,7 +42,6 @@ class QuizSlot(models.Model):
        quiz_id (ForeignKey): relates to the Quiz model.
        question_id (ForeignKey): relates to the Question model.
        slot (IntegerField): relates to the slot number.
-       status (IntegerField): A number relating to the state. 1 is for pending, 2 is for completed.
        block (IntegerField): Each quiz is sectioned off into blocks, this number indicates the block number.
     """
 
