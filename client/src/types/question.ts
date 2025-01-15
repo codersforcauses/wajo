@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 /**
  * Represents a Question object with its properties.
  *
@@ -13,7 +15,7 @@
  *   difficulty: "Difficult"
  * };
  */
-interface Question {
+export interface Question {
   name: string;
   category: string;
   difficulty: string;
@@ -37,7 +39,7 @@ interface Question {
  *   changePage: 1
  * };
  */
-interface DatagridProps {
+export interface DatagridProps {
   datacontext: Question[];
   onDataChange: (updatedData: Question[]) => void;
   changePage: number;
@@ -60,9 +62,25 @@ interface DatagridProps {
  *   className: "flex text-lg"
  * };
  */
-interface PaginationProps {
+export interface PaginationProps {
   totalPages: number;
   currentPage: number;
   onPageChange: (page: number) => void;
   className?: string;
+}
+
+export interface PreviewModalDataContext {
+  questionName: string;
+  question: string;
+  answer: string;
+  solution: string;
+  mark: string;
+  difficulty: string;
+  genre: string;
+}
+
+export interface PreviewModalProps {
+  children: ReactNode;
+  dataContext: PreviewModalDataContext;
+  onClose: (question: string) => void;
 }
