@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class InvoicesConfig(AppConfig):
+class QuizConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "api.invoices"
+    name = "api.quiz"
