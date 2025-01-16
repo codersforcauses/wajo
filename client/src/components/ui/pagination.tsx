@@ -1,3 +1,5 @@
+import { PaginationProps } from "@/types/question";
+
 export function Pagination({
   totalPages,
   currentPage,
