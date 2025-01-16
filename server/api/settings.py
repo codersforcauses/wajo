@@ -60,8 +60,6 @@ INSTALLED_APPS = [
     "api.users",
     "api.quiz",
     "api.team",
-    "api.users"
-
 ]
 
 REST_FRAMEWORK = {
