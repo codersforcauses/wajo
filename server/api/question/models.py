@@ -90,7 +90,7 @@ class Question(models.Model):
     # detailed answer with explanation
     answer_text = models.TextField(default="")
     category_id = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True, blank=True,)
+        Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='questions')
     created_by = models.ForeignKey(
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='questions_created')
     modified_by = models.ForeignKey(
@@ -107,14 +107,24 @@ class Question(models.Model):
         super().save(*args, **kwargs)
 
     @classmethod
-    def filter_by_answer(self, answer):
+    def filter_by_answer(cls, answer):
         """
         Filter questions by the given answer.
 
         :param answer: The answer(an integer) to filter questions by.
         :return: QuerySet of questions with the given answer.
         """
-        return self.objects.filter(answer=answer)
+        return cls.objects.filter(answer=answer)
 
     def __str__(self):
         return f'{self.name} {self.question_text}'
+
+
+class QuestionAttempt(models.Model):
+    id = models.AutoField(primary_key=True)
+    question_id = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name="attempts")
+    student_id = models.ForeignKey(
+        'auth.User', on_delete=models.CASCADE, related_name="attempts")
+    answer_student = models.CharField(max_length=100)
+    is_correct = models.BooleanField(default=None)

@@ -17,7 +17,7 @@ class Quiz(models.Model):
        visible (BooleanField): Notes whether the quiz is visible.
        open_time_date (DateTimeField): Notes when the quiz opens.
        close_time_date (DateTimeField): Notes when the quiz closes.
-       timelimit (Integer): Denotes the time allotted for each quiz.
+       time_limit (Integer): Denotes the time allotted for each quiz.
     """
 
     id = models.AutoField(primary_key=True)
@@ -28,27 +28,27 @@ class Quiz(models.Model):
     visible = models.BooleanField(default=False)
     open_time_date = models.DateTimeField(default=None)
     close_time_date = models.DateTimeField(default=None)
-    timelimit = models.IntegerField(default=120)
+    time_limit = models.IntegerField(default=120)
 
     def __str__(self):
         return f"{self.name}"
 
 
 class QuizSlot(models.Model):
-    """Represents a slot in the Quiz.
+    """Represents a slot in the Quiz. A slot records the order of questions in a quiz.
 
     Fields:
        id: The primary key for the quiz slots.
        quiz_id (ForeignKey): relates to the Quiz model.
        question_id (ForeignKey): relates to the Question model.
-       slot (IntegerField): relates to the slot number.
+       slot (IntegerField): relates to the slot number. A slot records the order of questions in a quiz.
        block (IntegerField): Each quiz is sectioned off into blocks, this number indicates the block number.
     """
 
     id = models.AutoField(primary_key=True)
-    quiz_id = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    quiz_id = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="slots")
     question_id = models.ForeignKey(Question, on_delete=models.CASCADE, default=None)
-    slot = models.IntegerField()  # an index of the question in the quiz
+    slot = models.IntegerField(db_index=True)  # an index of the question in the quiz
     block = models.IntegerField()
 
     def __str__(self):
