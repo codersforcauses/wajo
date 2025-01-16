@@ -40,7 +40,7 @@ export default function PreviewModal({
       <Dialog>
         <DialogTrigger asChild>{children}</DialogTrigger>
         <DialogContent
-          className="flex h-full max-h-[750px] w-[95%] max-w-[750px] items-center rounded-[40px] border-0 bg-accent p-1 shadow-lg"
+          className="flex h-auto w-[95%] max-w-[750px] flex-col items-center rounded-[40px] border-0 bg-accent p-1 shadow-lg"
           style={{ borderRadius: "32px" }}
         >
           <VisuallyHidden.Root>
@@ -48,20 +48,19 @@ export default function PreviewModal({
             <DialogDescription></DialogDescription>
           </VisuallyHidden.Root>
 
-          <div className="h-full w-full space-y-6 overflow-y-auto rounded-[30px] border-accent bg-white px-10 py-4 text-xl">
+          <div className="flex h-full w-full flex-col space-y-6 rounded-[30px] border-accent bg-white px-10 py-4 text-xl">
             {/* Question */}
-            <div className="space-y-4">
+            <div className="flex-grow space-y-4">
               <div className="flex space-x-4 text-2xl font-semibold text-gray-600">
                 <span>{dataContext.questionName}</span>
                 <span>[{dataContext.mark} marks]</span>
               </div>
-              <p></p>
               <MathInput
                 input={question}
                 onChange={(e) => {
                   setQuestion(e.target.value);
                 }}
-              ></MathInput>
+              />
             </div>
             {/* Solution */}
             <div
@@ -77,8 +76,8 @@ export default function PreviewModal({
               </div>
             </div>
 
-            {/* Bottom buttons */}
-            <div className="flex justify-evenly">
+            {/* Buttons */}
+            <div className="mt-auto flex justify-evenly">
               <DialogTrigger asChild>
                 <Button
                   onClick={handleDialogClose}
