@@ -52,13 +52,13 @@ class Category(models.Model):
     diff_level: The difficulty level of the category.
     genre: The genre of the category.
     info: Additional information about the category.
-    is_competition: Indicates if the category is for competition.
+    is_comp: Indicates if the category is for competition.
     """
     id = models.AutoField(primary_key=True)
     diff_level = models.IntegerField()
     genre = models.CharField(max_length=50)
     info = models.TextField(default="")
-    is_competition = models.BooleanField()
+    is_comp = models.BooleanField()
 
     def __str__(self):
         return f'{self.id} {self.name} {self.info}'
@@ -105,6 +105,9 @@ class Question(models.Model):
     def save(self, *args, **kwargs):
         self.time_modified = now()
         super().save(*args, **kwargs)
+
+    def genre(self):
+        return self.category_id.genre
 
     @classmethod
     def filter_by_answer(cls, answer):

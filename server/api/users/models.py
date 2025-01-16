@@ -26,16 +26,12 @@ class Student(models.Model):
 
     Fields:
         user (OneToOneField): A one-to-one relationship with the User model.
-        first_name (CharField): The first name of the student, up to 50 characters.
-        last_name (CharField): The last name of the student, up to 50 characters.
         school (ForeignKey): A many-to-one relationship with the School model.
         year_level (CharField): The level or grade of the student, up to 50 characters.
         created_at (DateTimeField): The timestamp when the student record was created.
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
     school = models.ForeignKey(
         School, on_delete=models.CASCADE, related_name="students")
     year_level = models.CharField(max_length=50)

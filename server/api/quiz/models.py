@@ -80,7 +80,7 @@ class QuizAttempt(models.Model):
     time_start = models.DateTimeField(auto_now_add=True)
     time_finish = models.DateTimeField(auto_now_add=True)
     time_modified = models.DateTimeField(auto_now=True)
-    total_marks = models.IntegerField(max_digits=10, decimal_places=5)
+    total_marks = models.IntegerField()
 
     def __str__(self):
         return f"{self.id} {self.quiz_id} {self.attempt}"
