@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "api.healthcheck",
+    "api.invoices",
     "api.leaderboard",
     "api.question",
     "rest_framework_simplejwt",
