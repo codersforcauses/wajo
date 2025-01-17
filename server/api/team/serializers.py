@@ -1,10 +1,10 @@
-from .models import Team, Team_member
+from .models import Team, TeamMember
 from rest_framework import serializers
 
 
 class TeamMemberSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Team_member
+        model = TeamMember
         fields = '__all__'
         read_only_fields = ("id", "time_added")
 

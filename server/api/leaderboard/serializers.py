@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from api.team.models import Team
 from api.users.serializers import SchoolSerializer
 from ..users.models import Student, User
 from ..quiz.models import QuizAttempt
@@ -48,4 +49,34 @@ class IndividualLeaderboardSerializer(serializers.ModelSerializer):
             "school_type",
             "is_country",
             # "score",
+        ]
+
+class StudentSerializer(serializers.ModelSerializer):
+    name = serializers.StringRelatedField(source='user.username')
+
+    class Meta:
+        model = Student
+        fields = ['name', 'year_level']
+
+class TeamLeaderboardSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the leaderboard data.
+
+    This serializer is designed for handling team entries in the competition leaderboard. Each entry represents
+    a team, including their members, scores, and participation status.
+    """
+    school = serializers.StringRelatedField()
+    team_id = serializers.UUIDField(source='id')
+    # overall_schore = TODO
+    is_country = serializers.BooleanField(source='school.is_country')
+    students = StudentSerializer(many=True)
+
+    class Meta:
+        model = Team
+        fields = [
+            "school",
+            "team_id",
+            # "overall_score",
+            "is_country",
+            "students",
         ]

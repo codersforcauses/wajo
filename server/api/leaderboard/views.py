@@ -1,9 +1,8 @@
-from rest_framework.permissions import AllowAny
 from rest_framework import viewsets
-from django.shortcuts import get_list_or_404
-from django_filters import FilterSet, ChoiceFilter
-from .serializers import IndividualLeaderboardSerializer
+from django_filters import FilterSet, ChoiceFilter, NumberFilter
+from .serializers import IndividualLeaderboardSerializer, TeamLeaderboardSerializer
 from ..users.models import School, Student
+from ..team.models import Team
 
 class IndividualLeaderboardFilter(FilterSet):
     school__type = ChoiceFilter(field_name='school__type', choices=School.SchoolType.choices)
@@ -27,7 +26,22 @@ class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
         - get(request): Handles GET requests. Returns sample data for the leaderboard.
     """
     queryset = Student.objects.all()
-    permission_classes = [AllowAny] # is this appropriate for this view?
     serializer_class = IndividualLeaderboardSerializer
     filterset_class = IndividualLeaderboardFilter
     filterset_fields = ['attendent_year', 'year_level', 'school__type']
+
+
+class TeamLeaderboardFilter(FilterSet):
+    school__type = ChoiceFilter(field_name='school__type', choices=School.SchoolType.choices)
+    students__attendent_year = NumberFilter(field_name='students__attendent_year')
+
+    class Meta:
+        model = Team
+        fields = ['students__attendent_year', 'students__year_level', 'school__type']
+
+
+class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Team.objects.all()
+    serializer_class = TeamLeaderboardSerializer
+    filterset_class = TeamLeaderboardFilter
+    filterset_fields = ['students__attendent_year', 'students__year_level', 'school__type']

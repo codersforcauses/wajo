@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
-from .models import Team, Team_member
+from .models import Team, TeamMember
 from .serializers import TeamSerializer, TeamMemberSerializer
 
 
@@ -20,7 +20,7 @@ class TeamViewSet(viewsets.ModelViewSet):
 
 
 class TeamMemberViewSet(viewsets.ModelViewSet):
-    queryset = Team_member.objects.all()
+    queryset = TeamMember.objects.all()
     serializer_class = TeamMemberSerializer
 
 
@@ -54,7 +54,7 @@ def team_detail(request, pk):
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
 def team_member_detail(request, pk):
-    team_member = get_object_or_404(Team_member, pk=pk)
+    team_member = get_object_or_404(TeamMember, pk=pk)
 
     if request.method == "GET":
         serializer = TeamMemberSerializer(team_member)

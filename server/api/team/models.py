@@ -1,7 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
 # from api.quiz.models import Quiz
-from api.users.models import School
+from api.users.models import School, Student
 import uuid
 
 # Create your models here.
@@ -16,24 +15,20 @@ class Team(models.Model):
         School, on_delete=models.SET_NULL, null=True, blank=True, related_name="has")
     description = models.CharField(max_length=100)
     time_created = models.DateTimeField(auto_now_add=True)
-    grades = models.IntegerField()
+    students = models.ManyToManyField(Student, through="TeamMember")
 
     def __str__(self):
-        # Format when printed: Team ID (Name): Grade
-        return f"Team {self.id} ({self.name}): {self.grades}"
+        return f"{self.name} ({self.id})"
 
 
-class Team_member(models.Model):
+class TeamMember(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    student = models.ForeignKey(User, on_delete=models.SET_NULL,
-                                null=True, blank=True, related_name="isA")
-    team = models.ForeignKey("Team", on_delete=models.SET_NULL,
-                             null=True, blank=True, related_name="has")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
     time_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        # Format when printed: Team ID has member student
-        return f"Team {self.id} has member {self.student}"
+        return f"{self.team} - {self.student}"
 
     class Meta:
         constraints = [

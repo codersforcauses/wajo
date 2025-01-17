@@ -11,14 +11,14 @@ Note: The `DefaultRouter` is included for potential future API extensions.
 """
 
 from django.urls import include, path
-from .views import IndividualLeaderboardViewSet
+from .views import IndividualLeaderboardViewSet, TeamLeaderboardViewSet
 from rest_framework.routers import SimpleRouter
 
 app_name = "leaderboard"
 
 router = SimpleRouter()
 router.register("leaderboard/individual", IndividualLeaderboardViewSet, basename="individual")
-router.register("leaderboard/team", IndividualLeaderboardViewSet, basename="team")
+router.register("leaderboard/team", TeamLeaderboardViewSet, basename="team")
 
 urlpatterns = [
     path("", include(router.urls), name="leaderboard"),
