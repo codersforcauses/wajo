@@ -6,7 +6,7 @@ import { Drawer } from "vaul";
 import { Button } from "@/components/ui/button";
 
 import logo from "../../../public/wajo_white.svg";
-import LoginModal from "./user/login-modal";
+import { LoginModal } from "./Users/login-modal";
 
 export default function MobileNav() {
   return (

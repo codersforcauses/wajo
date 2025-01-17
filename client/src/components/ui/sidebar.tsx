@@ -6,7 +6,12 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -223,6 +228,18 @@ const Sidebar = React.forwardRef<
             side={side}
             aria-label="Sidebar Sheet Content"
           >
+            {/* 
+              Added SheetTitle, SheetDescription for accessibility to avoid console errors.
+              'sr-only' class only visible to screen readers, not visually to the user.
+              References:
+                https://stackoverflow.com/questions/78728076/shadcn-dialogcontent-requires-a-dialogtitle-for-the-component-to-be-accessib
+                https://stackoverflow.com/questions/78728117/shadcn-warning-missing-description-or-aria-describedby-undefined-for-dia
+                https://tailwindcss.com/docs/screen-readers
+            */}
+            <SheetTitle className="sr-only">Menu</SheetTitle>
+            <SheetDescription className="sr-only">
+              Description goes here
+            </SheetDescription>
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>
         </Sheet>

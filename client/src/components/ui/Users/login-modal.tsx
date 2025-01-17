@@ -182,5 +182,3 @@ export function LoginModal({ children }: LoginFormProps) {
     </Dialog>
   );
 }
-
-export default LoginModal;

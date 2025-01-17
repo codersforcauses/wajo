@@ -1,12 +1,10 @@
 import { useState } from "react";
 
-import { LoginModal } from "@/components/ui/user/login-modal";
 import { usePings } from "@/hooks/pings";
 
-import Layout from "../components/layout";
 import { Button } from "../components/ui/button";
 
-const Home = () => {
+export default function Home() {
   const [clicked, setClicked] = useState(false);
   const { data, isLoading } = usePings({
     enabled: clicked,
@@ -28,10 +26,4 @@ const Home = () => {
       </p>
     </main>
   );
-};
-
-Home.getLayout = function getLayout(page: React.ReactElement) {
-  return <Layout>{page}</Layout>;
-};
-
-export default Home;
+}

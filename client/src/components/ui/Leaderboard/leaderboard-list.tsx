@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { WaitingLoader } from "@/components/ui/loading";
 import { Search, SearchInput, SearchSelect } from "@/components/ui/search";
 import {
   Table,
@@ -17,10 +18,8 @@ import type { Leaderboard } from "@/types/leaderboard";
  * It fetches leaderboard data from an API and allows users to filter the list based on
  * leaderboard name and status. The component also handles loading and error states for
  * data fetching.
- *
- * @returns {JSX.Element} The rendered LeaderboardList component.
  */
-const LeaderboardList = () => {
+export function LeaderboardList() {
   const [filters, setFilters] = useState({
     search: "",
     status: "All",
@@ -36,7 +35,7 @@ const LeaderboardList = () => {
     endpoint: "leaderboard/list",
   });
 
-  if (isLeaderboardLoading) return <div>Loading...</div>;
+  if (isLeaderboardLoading) return <WaitingLoader />;
 
   if (isLeaderboardError) {
     console.error("Error fetching leaderboards:", leaderboardError);
@@ -165,6 +164,4 @@ const LeaderboardList = () => {
       </Table>
     </div>
   );
-};
-
-export default LeaderboardList;
+}

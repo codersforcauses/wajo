@@ -1,13 +1,13 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
-import SidebarLayout from "@/components/sidebar-layout";
 import { Button } from "@/components/ui/button";
+import { WaitingLoader } from "@/components/ui/loading";
 import { Datagrid } from "@/components/ui/Question/data-grid";
 import { SearchInput } from "@/components/ui/search";
 import { useFetchData } from "@/hooks/use-fetch-data";
 
-const Index = () => {
+export default function Index() {
   // Fetches the list of questions using the custom hook.
   const {
     data: questions,
@@ -50,9 +50,7 @@ const Index = () => {
   };
 
   // Displays a loading state while data is being fetched.
-  if (isQuestionLoading) {
-    return <div>Loading...</div>;
-  }
+  if (isQuestionLoading) return <WaitingLoader />;
 
   // Displays an error message if the API request fails.
   if (isQuestionError) {
@@ -84,10 +82,4 @@ const Index = () => {
       ></Datagrid>
     </div>
   );
-};
-
-Index.getLayout = function getLayout(page: React.ReactElement) {
-  return <SidebarLayout role="admin">{page}</SidebarLayout>;
-};
-
-export default Index;
+}
