@@ -25,5 +25,6 @@ urlpatterns = [
     path("api/question/", include("api.question.urls")),
     path("api/auth/", include("api.auth.urls")),
     path("api/team/", include("api.team.urls")),
+    path("api/users/", include("api.users.urls")),
 
 ]

@@ -39,16 +39,19 @@ class QuizSlot(models.Model):
 
     Fields:
        id: The primary key for the quiz slots.
-       quiz_id (ForeignKey): relates to the Quiz model.
-       question_id (ForeignKey): relates to the Question model.
+       quiz (ForeignKey): relates to the Quiz model.
+       question (ForeignKey): relates to the Question model.
        slot (IntegerField): relates to the slot number. A slot records the order of questions in a quiz.
        block (IntegerField): Each quiz is sectioned off into blocks, this number indicates the block number.
     """
 
     id = models.AutoField(primary_key=True)
-    quiz_id = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="slots")
-    question_id = models.ForeignKey(Question, on_delete=models.CASCADE, default=None)
-    slot = models.IntegerField(db_index=True)  # an index of the question in the quiz
+    quiz = models.ForeignKey(
+        Quiz, on_delete=models.CASCADE, related_name="slots")
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, default=None, related_name="slots")
+    # an index of the question in the quiz
+    slot = models.IntegerField(db_index=True)
     block = models.IntegerField()
 
     def __str__(self):
@@ -60,9 +63,9 @@ class QuizAttempt(models.Model):
 
     Fields:
         id: The primary id for the quiz
-        quiz_id (ForeginKey):The id of each particular quiz
+        quiz (ForeginKey):The id of each particular quiz
         current_page (Integer): This is the current page in the quiz
-        state (CharField): state of the attempts. 1 is for unattempted, 2 is for in progress and 3 is for completed.
+        state (CharField): state of the attempts. 1 is for unattempted, 2 is for in progress and 3 is for submitted, 4 for completed.
         time_start (DateTimeField): Start time of the attempt
         time_finish (DateTimeField): Finish time of the attempt
         time_modified (DateTimeField):  Last modified time of the quiz
@@ -71,9 +74,10 @@ class QuizAttempt(models.Model):
     """
 
     id = models.AutoField(primary_key=True)
-    quiz_id = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    student_id = models.ForeignKey(
-        Student, on_delete=models.CASCADE, related_name="student_id", default=None
+    quiz = models.ForeignKey(
+        Quiz, on_delete=models.CASCADE, related_name="attempts")
+    student = models.ForeignKey(
+        Student, on_delete=models.CASCADE, related_name="quiz_attempts", default=None, null=True
     )
     current_page = models.IntegerField()
     state = models.IntegerField()
@@ -84,3 +88,24 @@ class QuizAttempt(models.Model):
 
     def __str__(self):
         return f"{self.id} {self.quiz_id} {self.attempt}"
+
+    def check_all_answer(self):
+        for question_attempt in self.question_attempts.all():
+            question_attempt.check_answer()
+            question_attempt.save()
+
+
+class QuestionAttempt(models.Model):
+    id = models.AutoField(primary_key=True)
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name="attempts")
+    quiz_attempt = models.ForeignKey(
+        QuizAttempt, on_delete=models.CASCADE, related_name="question_attempts")
+    answer_student = models.CharField(max_length=100)
+    is_correct = models.BooleanField(default=None)
+
+    def check_answer(self):
+        if self.answer_student == self.question.answer:
+            self.is_correct = True
+        else:
+            self.is_correct = False

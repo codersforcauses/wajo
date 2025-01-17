@@ -13,8 +13,8 @@ class School(models.Model):
     """
 
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    code = models.CharField(max_length=10)
+    name = models.CharField(max_length=100, null=True, blank=True)
+    code = models.CharField(max_length=10, null=True, blank=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -31,9 +31,10 @@ class Student(models.Model):
         created_at (DateTimeField): The timestamp when the student record was created.
     """
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="student",)
     school = models.ForeignKey(
-        School, on_delete=models.CASCADE, related_name="students")
+        School, on_delete=models.CASCADE, related_name="students", blank=True, null=True)
     year_level = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -53,7 +54,8 @@ class Teacher(models.Model):
         created_at (DateTimeField): The timestamp when the teacher record was created.
     """
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="teacher")
     school = models.ForeignKey(
         School, on_delete=models.CASCADE, related_name="teachers")
     phone = models.CharField(max_length=15, blank=True)

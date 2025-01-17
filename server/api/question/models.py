@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from django.utils.timezone import now
 import os
 import uuid
@@ -86,9 +87,8 @@ class Question(models.Model):
     name = models.CharField(max_length=255, unique=True)
     question_text = models.TextField(default="")
     note = models.TextField(default="")
-    answer = models.CharField(max_length=100)   # answer to the question
-    # detailed answer with explanation
-    answer_text = models.TextField(default="")
+    answer = ArrayField(models.IntegerField(), default=list)  # answer to the question
+    answer_text = models.TextField(default="")  # detailed answer with explanation
     category_id = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='questions')
     created_by = models.ForeignKey(
@@ -121,13 +121,3 @@ class Question(models.Model):
 
     def __str__(self):
         return f'{self.name} {self.question_text}'
-
-
-class QuestionAttempt(models.Model):
-    id = models.AutoField(primary_key=True)
-    question_id = models.ForeignKey(
-        Question, on_delete=models.CASCADE, related_name="attempts")
-    student_id = models.ForeignKey(
-        'auth.User', on_delete=models.CASCADE, related_name="attempts")
-    answer_student = models.CharField(max_length=100)
-    is_correct = models.BooleanField(default=None)

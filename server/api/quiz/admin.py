@@ -6,7 +6,7 @@ from .models import QuizAttempt, Quiz, QuizSlot
 
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ("name",)
+    list_display = ("name", "intro")
 
 
 @admin.register(QuizSlot)
