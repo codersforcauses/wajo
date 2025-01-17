@@ -13,8 +13,13 @@ class Image(models.Model):
 
 
 class Category(models.Model):
+    class DifficultyLevel(models.TextChoices):
+        EASY = 'Easy'
+        MEDIUM = 'Medium'
+        DIFFICULT = 'Difficult'
+
     id = models.AutoField(primary_key=True)
-    diff_level = models.IntegerField()
+    diff_level = models.TextField(default=DifficultyLevel.MEDIUM, choices=DifficultyLevel.choices)
     name = models.CharField(max_length=50)
     info = models.TextField(default="")
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)

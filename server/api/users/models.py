@@ -12,10 +12,16 @@ class School(models.Model):
         code (CharField): A unique code for the school, up to 10 characters.
 
     """
+    class SchoolType(models.TextChoices):
+        PUBLIC = 'Public'
+        INDEPENDENT = 'Independent'
+        CATHOLIC = 'Catholic'
 
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=10)
+    type = models.TextField(choices=SchoolType.choices)
+    is_country = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name}"

@@ -1,13 +1,19 @@
-from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
-from rest_framework import status
-from rest_framework.response import Response
+from rest_framework import viewsets
 from django.shortcuts import get_list_or_404
-from .serializers import LeaderboardSerializer
-from ..users.models import Student
+from django_filters import FilterSet, ChoiceFilter
+from .serializers import IndividualLeaderboardSerializer
+from ..users.models import School, Student
+
+class IndividualLeaderboardFilter(FilterSet):
+    school__type = ChoiceFilter(field_name='school__type', choices=School.SchoolType.choices)
+
+    class Meta:
+        model = Student
+        fields = ['attendent_year', 'year_level', 'school__type']
 
 
-class LeaderboardView(APIView):
+class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     """
     LeaderboardView API view to manage leaderboard data.
 
@@ -20,14 +26,8 @@ class LeaderboardView(APIView):
     Methods:
         - get(request): Handles GET requests. Returns sample data for the leaderboard.
     """
+    queryset = Student.objects.all()
     permission_classes = [AllowAny] # is this appropriate for this view?
-    serializer_class = LeaderboardSerializer
-
-    def get(self, request):
-        students = get_list_or_404(Student.objects.select_related('user', 'school'))
-        print("DEBUG: Found students:", students)
-        serializer = self.serializer_class(students, many=True)
-        print("DEBUG: Serializer data:", serializer.data)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    ## TODO: add pagination and possibly filters for leaderboard??
+    serializer_class = IndividualLeaderboardSerializer
+    filterset_class = IndividualLeaderboardFilter
+    filterset_fields = ['attendent_year', 'year_level', 'school__type']

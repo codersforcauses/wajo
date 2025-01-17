@@ -10,16 +10,16 @@ Routes:
 Note: The `DefaultRouter` is included for potential future API extensions.
 """
 
-from .views import LeaderboardView
-from rest_framework.routers import DefaultRouter
-from django.urls import path, include
-
-
-router = DefaultRouter()
+from django.urls import include, path
+from .views import IndividualLeaderboardViewSet
+from rest_framework.routers import SimpleRouter
 
 app_name = "leaderboard"
 
+router = SimpleRouter()
+router.register("leaderboard/individual", IndividualLeaderboardViewSet, basename="individual")
+router.register("leaderboard/team", IndividualLeaderboardViewSet, basename="team")
+
 urlpatterns = [
-    path("", LeaderboardView.as_view(), name="leaderboard"),
-    # path("", include(router.urls)), # do i need this?
+    path("", include(router.urls), name="leaderboard"),
 ]
