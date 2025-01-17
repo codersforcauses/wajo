@@ -25,18 +25,16 @@ class TeamMemberViewSet(viewsets.ModelViewSet):
 
 
 @api_view(["GET", "POST"])
-def team_list(request):
+def member_list(request):
     if request.method == "GET":
         # Handle GET request: list all teams with pagination
-        queryset = Team.objects.all()
-        paginator = TeamPagination()
-        paginated_queryset = paginator.paginate_queryset(queryset, request)
-        serializer = TeamSerializer(paginated_queryset, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        queryset = Team_member.objects.all()
+        serializer = TeamMemberSerializer(queryset, many=True)
+        return Response(serializer.data)
 
     elif request.method == "POST":
         # Handle POST request: create a new team
-        serializer = TeamSerializer(data=request.data)
+        serializer = TeamMemberSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -79,22 +77,3 @@ def team_member_detail(request, pk):
     elif request.method == "DELETE":
         team_member.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-@api_view(["GET", "POST"])
-def team_members_by_team(request, team_id):
-    team = get_object_or_404(Team, id=team_id)
-
-    if request.method == "GET":
-        # Handle GET request: list all team members for a specific team
-        team_members = Team_member.objects.filter(team=team)
-        serializer = TeamMemberSerializer(team_members, many=True)
-        return Response(serializer.data)
-
-    elif request.method == "POST":
-        # Handle POST request: add a new team member to the team
-        serializer = TeamMemberSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(team=team)  # Automatically associate the team
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

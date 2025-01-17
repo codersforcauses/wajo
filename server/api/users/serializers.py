@@ -11,7 +11,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+        fields = ['id', 'username', 'password',
+                  'email', 'first_name', 'last_name']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -32,12 +38,20 @@ class StudentSerializer(serializers.ModelSerializer):
     Converts student model instances into JSON and validates incoming data for students.
     """
     user = UserSerializer()
-    school = SchoolSerializer()
+    school = SchoolSerializer(read_only=True)
+    school_id = serializers.PrimaryKeyRelatedField(
+        queryset=School.objects.all(), write_only=True, source='school'
+    )
 
     class Meta:
         model = Student
-        fields = ['id', 'user', 'school',
-                  'attendent_year', 'year_level', 'status']
+        fields = '__all__'
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user = User.objects.create_user(**user_data)
+        student = Student.objects.create(user=user, **validated_data)
+        return student
 
 
 class TeacherSerializer(serializers.ModelSerializer):
@@ -47,8 +61,17 @@ class TeacherSerializer(serializers.ModelSerializer):
     Converts teacher model instances into JSON and validates incoming data for teachers.
     """
     user = UserSerializer()
-    school = SchoolSerializer()
+    school = SchoolSerializer(read_only=True)
+    school_id = serializers.PrimaryKeyRelatedField(
+        queryset=School.objects.all(), write_only=True, source='school'
+    )
 
     class Meta:
         model = Teacher
         fields = ['id', 'user', 'school', 'phone']
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user = User.objects.create_user(**user_data)
+        teacher = Teacher.objects.create(user=user, **validated_data)
+        return teacher

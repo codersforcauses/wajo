@@ -5,15 +5,15 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'', TeamViewSet)
-router.register(r'members', TeamMemberViewSet)
+router.register(r'member', TeamMemberViewSet)
 
 urlpatterns = [
     # Handles all basic CRUD for teams and team members
     path('', include(router.urls)),
-    path('<int:team_id>/member/', views.team_members_by_team,
-         name='team-members-by-team'),  # For members of a specific team
+
     # For specific team details
     path('<int:pk>/', views.team_detail, name='team-detail'),
+    #     path('member/', views.member_list, name='member-list'),
     path('member/<int:pk>/', views.team_member_detail,
          name='team-member-detail'),  # For specific team member details
 ]
