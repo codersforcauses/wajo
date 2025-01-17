@@ -2,6 +2,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
 import { SchoolDataGrid } from "@/components/ui/Users/school-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
@@ -47,7 +48,7 @@ export default function SchoolList() {
     setPage(1);
   };
 
-  if (isSchoolLoading) return <div>Loading...</div>;
+  if (isSchoolLoading) return <WaitingLoader />;
   if (isSchoolError) return <div>Error: {schoolError?.message}</div>;
 
   return (

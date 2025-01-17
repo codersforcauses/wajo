@@ -2,6 +2,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
 import { TeamDataGrid } from "@/components/ui/Users/team-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
@@ -47,7 +48,7 @@ export default function TeamList() {
     setPage(1);
   };
 
-  if (isTeamLoading) return <div>Loading...</div>;
+  if (isTeamLoading) return <WaitingLoader />;
   if (isTeamError) return <div>Error: {TeamError?.message}</div>;
 
   return (

@@ -2,6 +2,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
 import { DataGrid } from "@/components/ui/Users/data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
@@ -47,7 +48,7 @@ export default function UserList() {
     setPage(1);
   };
 
-  if (isUserLoading) return <div>Loading...</div>;
+  if (isUserLoading) return <WaitingLoader />;
   if (isUserError) return <div>Error: {UserError?.message}</div>;
 
   return (

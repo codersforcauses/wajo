@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { WaitingLoader } from "@/components/ui/loading";
 import { Search, SearchInput, SearchSelect } from "@/components/ui/search";
 import {
   Table,
@@ -34,7 +35,7 @@ export function LeaderboardList() {
     endpoint: "leaderboard/list",
   });
 
-  if (isLeaderboardLoading) return <div>Loading...</div>;
+  if (isLeaderboardLoading) return <WaitingLoader />;
 
   if (isLeaderboardError) {
     console.error("Error fetching leaderboards:", leaderboardError);
