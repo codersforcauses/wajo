@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "api.quiz",
     "api.question",
     "api.team",
+    "rest_framework_simplejwt"
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+}
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
