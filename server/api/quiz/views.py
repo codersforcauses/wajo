@@ -4,12 +4,15 @@ from rest_framework import status
 from .models import Quiz, QuizAttempt, QuizAttemptUser
 from .serializers import QuizSerializer, QuizAttemptSerializer, QuizAttemptUserSerializer
 from django.http import Http404
+from rest_framework import permissions
 
 
 class QuizListView(APIView):
     """
     RETRIEVE ALL THE QUIZES OR CREATE A QUIZ
     """
+
+    serializer_class = QuizSerializer
 
     def get(self, request, format=None):
         quizzes = Quiz.objects.all()
@@ -21,7 +24,21 @@ class QuizListView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class QuizList(APIView):
+
+    serialiser_class = QuizSerializer
+    permission_classes = (permissions.AllowAny,)
+    http_method_names = ['get', 'head', 'post']
+
+    def get_object(self, pk):
+        try:
+            return Quiz.objects.get(pk=pk)
+        except Quiz.DoesNotExist:
+            raise Http404
 
 
 class QuizAttemptList(APIView):
