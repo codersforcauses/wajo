@@ -1,10 +1,7 @@
-from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from django.contrib.auth.models import User
 from .models import School, Student
 from .serializers import UserSerializer, SchoolSerializer, StudentSerializer
-
-# dont push this, just testing out the tests
 
 
 class UserAPITest(APITestCase):
