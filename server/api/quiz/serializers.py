@@ -3,19 +3,10 @@ from .models import Quiz, QuizAttempt, QuizAttemptUser
 
 
 class QuizSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Quiz
-        fields = [
-            'id',
-            'name',
-            'intro',
-            'total_marks',
-            'is_comp',
-            'visible',
-            'open_time_date',
-            'close_time_date',
-            'timelimit'
-        ]
+        fields = "__all__"
 
 
 class QuizAttemptSerializer(serializers.ModelSerializer):
