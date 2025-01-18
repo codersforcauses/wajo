@@ -1,24 +1,12 @@
 from rest_framework import serializers
 
 from api.team.models import Team
-from api.users.serializers import SchoolSerializer
 from ..users.models import Student, User
-from ..quiz.models import QuizAttempt
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email']
-
-# class QuizAttemptsSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = QuizAttempt
-#         fields = ['time_start', 'time_finish', 'sum_grades']
-
-# class QuestionAttemptsSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Question_attempts
-#         fields = ['score']
 
 class IndividualLeaderboardSerializer(serializers.ModelSerializer):
     """
