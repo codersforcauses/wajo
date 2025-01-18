@@ -9,7 +9,7 @@ from .serializers import TeamSerializer, TeamMemberSerializer
 
 class TeamPagination(PageNumberPagination):
     page_size = 5
-    page_size_query_param = 'page_size'
+    page_size_query_param = "page_size"
     max_page_size = 100
 
 
@@ -42,7 +42,8 @@ def team_detail(request, pk):
         return Response(serializer.data)
     elif request.method in ["PUT", "PATCH"]:
         serializer = TeamSerializer(
-            team, data=request.data, partial=(request.method == "PATCH"))
+            team, data=request.data, partial=(request.method == "PATCH")
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -61,7 +62,8 @@ def team_member_detail(request, pk):
         return Response(serializer.data)
     elif request.method in ["PUT", "PATCH"]:
         serializer = TeamMemberSerializer(
-            team_member, data=request.data, partial=(request.method == "PATCH"))
+            team_member, data=request.data, partial=(request.method == "PATCH")
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

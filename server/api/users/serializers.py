@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+        fields = ["id", "username", "email", "first_name", "last_name"]
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class SchoolSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = School
-        fields = ['id', 'name', 'code']
+        fields = ["id", "name", "code"]
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -31,13 +31,13 @@ class StudentSerializer(serializers.ModelSerializer):
     Includes nested serializers for the related User and School models.
     Converts student model instances into JSON and validates incoming data for students.
     """
+
     user = UserSerializer()
     school = SchoolSerializer()
 
     class Meta:
         model = Student
-        fields = ['id', 'user', 'school',
-                  'attendent_year', 'year_level', 'status']
+        fields = ["id", "user", "school", "attendent_year", "year_level", "status"]
 
 
 class TeacherSerializer(serializers.ModelSerializer):
@@ -46,9 +46,10 @@ class TeacherSerializer(serializers.ModelSerializer):
     Includes nested serializers for the related User and School models.
     Converts teacher model instances into JSON and validates incoming data for teachers.
     """
+
     user = UserSerializer()
     school = SchoolSerializer()
 
     class Meta:
         model = Teacher
-        fields = ['id', 'user', 'school', 'phone']
+        fields = ["id", "user", "school", "phone"]

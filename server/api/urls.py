@@ -24,10 +24,10 @@ router = DefaultRouter()
 router.registry.extend(leaderboard_urls.router.registry)
 
 api_urls = [
-    path('healthcheck/', include('api.healthcheck.urls')),
-    path('question/', include('api.question.urls')),
-    path('auth/', include('api.auth.urls')),
-    path('team/', include('api.team.urls')),
+    path("healthcheck/", include("api.healthcheck.urls")),
+    path("question/", include("api.question.urls")),
+    path("auth/", include("api.auth.urls")),
+    path("team/", include("api.team.urls")),
 ]
 
 urlpatterns = [

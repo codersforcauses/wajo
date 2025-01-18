@@ -6,14 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0003_school_is_country'),
+        ("users", "0003_school_is_country"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='school',
-            name='type',
-            field=models.TextField(choices=[('Public', 'Public'), ('Independent', 'Independent'), ('Catholic', 'Catholic')], default='Public'),
+            model_name="school",
+            name="type",
+            field=models.TextField(
+                choices=[
+                    ("Public", "Public"),
+                    ("Independent", "Independent"),
+                    ("Catholic", "Catholic"),
+                ],
+                default="Public",
+            ),
             preserve_default=False,
         ),
     ]

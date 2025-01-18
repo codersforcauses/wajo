@@ -6,13 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('question', '0002_remove_question_difficulty_category_diff_level'),
+        ("question", "0002_remove_question_difficulty_category_diff_level"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='category',
-            name='diff_level',
-            field=models.TextField(choices=[('Easy', 'Easy'), ('Medium', 'Medium'), ('Difficult', 'Difficult')], default='Medium'),
+            model_name="category",
+            name="diff_level",
+            field=models.TextField(
+                choices=[
+                    ("Easy", "Easy"),
+                    ("Medium", "Medium"),
+                    ("Difficult", "Difficult"),
+                ],
+                default="Medium",
+            ),
         ),
     ]

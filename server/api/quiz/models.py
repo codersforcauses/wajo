@@ -2,20 +2,22 @@ from django.db import models
 from api.users.models import Student
 from api.question.models import Question
 
-class Quiz(models.Model):
-    """ Represents a Quiz in the System
 
-     Fields:
-        id: The primary key for the quiz.
-        name (CharField): The name of the quiz.
-        intro (TextField): A text field introducing the quiz.
-        total_marks (DecimalField): The total marks for each quiz.
-        is_comp (BooleanField): Notes whether the quiz is for competition or practice.
-        visible (BooleanField): Notes whether the quiz is visible.
-        open_time_date (DateTimeField): Notes when the quiz opens.
-        close_time_date (DateTimeField): Notes when the quiz closes.
-        timelimit (Integer): Denotes the time allotted for each quiz.
+class Quiz(models.Model):
+    """Represents a Quiz in the System
+
+    Fields:
+       id: The primary key for the quiz.
+       name (CharField): The name of the quiz.
+       intro (TextField): A text field introducing the quiz.
+       total_marks (DecimalField): The total marks for each quiz.
+       is_comp (BooleanField): Notes whether the quiz is for competition or practice.
+       visible (BooleanField): Notes whether the quiz is visible.
+       open_time_date (DateTimeField): Notes when the quiz opens.
+       close_time_date (DateTimeField): Notes when the quiz closes.
+       timelimit (Integer): Denotes the time allotted for each quiz.
     """
+
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     intro = models.TextField()
@@ -31,23 +33,22 @@ class Quiz(models.Model):
 
 
 class QuizSlot(models.Model):
-    """ Represents a slot in the Quiz.
+    """Represents a slot in the Quiz.
 
-     Fields:
-        id: The primary key for the quiz slots.
-        quiz_id (ForeignKey): relates to the Quiz model.
-        question_id (ForeignKey): relates to the Question model.
-        slot (IntegerField): relates to the slot number.
-        status (IntegerField): A number relating to the state. 1 is for pending, 2 is for completed.
-        display_number (IntegerField): question number.
-        require_previous (BooleanField): check if it requires the previous slot
-        block (IntegerField): Each quiz is sectioned off into blocks, this number indicates the block number.
+    Fields:
+       id: The primary key for the quiz slots.
+       quiz_id (ForeignKey): relates to the Quiz model.
+       question_id (ForeignKey): relates to the Question model.
+       slot (IntegerField): relates to the slot number.
+       status (IntegerField): A number relating to the state. 1 is for pending, 2 is for completed.
+       display_number (IntegerField): question number.
+       require_previous (BooleanField): check if it requires the previous slot
+       block (IntegerField): Each quiz is sectioned off into blocks, this number indicates the block number.
     """
 
     id = models.AutoField(primary_key=True)
     quiz_id = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    question_id = models.ForeignKey(
-        Question, on_delete=models.CASCADE, default=None)
+    question_id = models.ForeignKey(Question, on_delete=models.CASCADE, default=None)
     slot = models.IntegerField()
     status = models.IntegerField()
     display_number = models.CharField()
@@ -60,7 +61,7 @@ class QuizSlot(models.Model):
 
 class QuizAttempt(models.Model):
 
-    """ Represents a quiz attempt in the system
+    """Represents a quiz attempt in the system
 
     Fields:
         id: The primary id for the quiz
@@ -75,6 +76,7 @@ class QuizAttempt(models.Model):
         time_modified_offline (DateTimeField): Last modified time of the quiz when offline
         sum_grades (DecimalField): Total marks for a particular quiz attempt
     """
+
     id = models.AutoField(primary_key=True)
     quiz_id = models.ForeignKey(QuizSlot, on_delete=models.CASCADE)
     attempt = models.IntegerField()
@@ -87,7 +89,7 @@ class QuizAttempt(models.Model):
 
     def __str__(self):
         return f"{self.id} {self.quiz_id} {self.attempt}"
-    
+
     # def get_sum_grades(self):
     #     # TODO
     #     return self.question_attempt_set. ...
@@ -105,11 +107,14 @@ class QuizAttemptUser(models.Model):
         time_modified (DateTimeField) : This represents the last time the grade was modified
 
     """
+
     id = models.AutoField(primary_key=True)
     quiz_attempt = models.ForeignKey(
-        QuizAttempt, on_delete=models.CASCADE, related_name="quiz_attempts")
+        QuizAttempt, on_delete=models.CASCADE, related_name="quiz_attempts"
+    )
     student_id = models.ForeignKey(
-        Student, on_delete=models.CASCADE, related_name="student_id", default=None)
+        Student, on_delete=models.CASCADE, related_name="student_id", default=None
+    )
     grade = models.DecimalField(max_digits=10, decimal_places=5, default=0)
     time_modified = models.DateTimeField(auto_now=True)
 

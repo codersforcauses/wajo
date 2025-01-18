@@ -6,12 +6,16 @@ from .serializers import UserSerializer, SchoolSerializer, StudentSerializer
 
 # dont push this, just testing out the tests
 
+
 class UserAPITest(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="joe", password="pass",
-            first_name="Joe", last_name="Tester", email="joe@example.com"
+            username="joe",
+            password="pass",
+            first_name="Joe",
+            last_name="Tester",
+            email="joe@example.com",
         )
 
     def test_user_serialization(self):
@@ -20,6 +24,7 @@ class UserAPITest(APITestCase):
         self.assertEqual(data["email"], "joe@example.com")
         self.assertEqual(data["first_name"], "Joe")
         self.assertEqual(data["last_name"], "Tester")
+
 
 class SchoolAPITest(APITestCase):
     def setUp(self):
@@ -31,17 +36,20 @@ class SchoolAPITest(APITestCase):
         self.assertEqual(data["name"], "School A")
         self.assertEqual(data["code"], "SCH-A")
 
+
 class StudentAPITest(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="sally", password="pass123",
-            first_name="Sally", last_name="Tester"
+            username="sally", password="pass123", first_name="Sally", last_name="Tester"
         )
         self.school = School.objects.create(name="School B", code="SCH-B")
         self.student = Student.objects.create(
-            user=self.user, school=self.school,
-            attendent_year=2023, year_level="12", status="active"
+            user=self.user,
+            school=self.school,
+            attendent_year=2023,
+            year_level="12",
+            status="active",
         )
 
     def test_student_serialization(self):
