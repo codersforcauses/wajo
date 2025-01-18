@@ -3,7 +3,8 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from api.quiz import views
 
 urlpatterns = [
-    path('quizList/', views.QuizListView.as_view())
-]
+    path('quizList/', views.QuizListView.as_view()),
+    path('quizList/<int:pk>/', views.QuizList.as_view())
 
+]
 urlpatterns = format_suffix_patterns(urlpatterns)
