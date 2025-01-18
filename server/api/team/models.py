@@ -1,4 +1,5 @@
 from django.db import models
+
 # from api.quiz.models import Quiz
 from api.users.models import School, Student
 import uuid
@@ -12,7 +13,8 @@ class Team(models.Model):
     #                          null=True, blank=True, related_name="isAssessedBy")
     name = models.CharField(max_length=100)
     school = models.ForeignKey(
-        School, on_delete=models.SET_NULL, null=True, blank=True, related_name="has")
+        School, on_delete=models.SET_NULL, null=True, blank=True, related_name="has"
+    )
     description = models.CharField(max_length=100)
     time_created = models.DateTimeField(auto_now_add=True)
     students = models.ManyToManyField(Student, through="TeamMember")
@@ -33,5 +35,6 @@ class TeamMember(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["student", "team"], name="unique_student_team")
+                fields=["student", "team"], name="unique_student_team"
+            )
         ]

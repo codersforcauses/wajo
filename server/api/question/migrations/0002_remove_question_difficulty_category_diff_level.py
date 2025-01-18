@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('question', '0001_initial'),
+        ("question", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='question',
-            name='difficulty',
+            model_name="question",
+            name="difficulty",
         ),
         migrations.AddField(
-            model_name='category',
-            name='diff_level',
+            model_name="category",
+            name="diff_level",
             field=models.IntegerField(default=0),
         ),
     ]

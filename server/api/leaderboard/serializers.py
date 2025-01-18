@@ -3,10 +3,12 @@ from rest_framework import serializers
 from api.team.models import Team
 from ..users.models import Student, User
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email']
+        fields = ["email"]
+
 
 class IndividualLeaderboardSerializer(serializers.ModelSerializer):
     """
@@ -15,11 +17,12 @@ class IndividualLeaderboardSerializer(serializers.ModelSerializer):
     This serializer is designed for handling student entries in the competition leaderboard. Each entry represents
     an individual student, including their personal information, scores, and participation status.
     """
+
     name = serializers.SerializerMethodField()
     year_level = serializers.CharField()
     school = serializers.StringRelatedField()
-    school_type = serializers.CharField(source='school.type')
-    is_country = serializers.BooleanField(source='school.is_country')
+    school_type = serializers.CharField(source="school.type")
+    is_country = serializers.BooleanField(source="school.is_country")
     # score = TODO
 
     def get_name(self, obj):
@@ -39,12 +42,14 @@ class IndividualLeaderboardSerializer(serializers.ModelSerializer):
             # "score",
         ]
 
+
 class StudentSerializer(serializers.ModelSerializer):
-    name = serializers.StringRelatedField(source='user.username')
+    name = serializers.StringRelatedField(source="user.username")
 
     class Meta:
         model = Student
-        fields = ['name', 'year_level']
+        fields = ["name", "year_level"]
+
 
 class TeamLeaderboardSerializer(serializers.ModelSerializer):
     """
@@ -53,10 +58,11 @@ class TeamLeaderboardSerializer(serializers.ModelSerializer):
     This serializer is designed for handling team entries in the competition leaderboard. Each entry represents
     a team, including their members, scores, and participation status.
     """
+
     school = serializers.StringRelatedField()
-    team_id = serializers.UUIDField(source='id')
+    team_id = serializers.UUIDField(source="id")
     # overall_schore = TODO
-    is_country = serializers.BooleanField(source='school.is_country')
+    is_country = serializers.BooleanField(source="school.is_country")
     students = StudentSerializer(many=True)
 
     class Meta:

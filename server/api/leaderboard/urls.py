@@ -17,7 +17,9 @@ from rest_framework.routers import SimpleRouter
 app_name = "leaderboard"
 
 router = SimpleRouter()
-router.register("leaderboard/individual", IndividualLeaderboardViewSet, basename="individual")
+router.register(
+    "leaderboard/individual", IndividualLeaderboardViewSet, basename="individual"
+)
 router.register("leaderboard/team", TeamLeaderboardViewSet, basename="team")
 
 urlpatterns = [
