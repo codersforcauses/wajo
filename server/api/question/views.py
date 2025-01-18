@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .serializers import QuestionSerializer, QuestionCategorySerializer
+from .serializers import QuestionSerializer, CategorySerializer
 from django.apps import apps
 
 
@@ -65,4 +65,17 @@ class QuestionView(GenericView):
 
 class CategoryView(GenericView):
     model_name = "Category"
-    serializer_class = QuestionCategorySerializer
+    serializer_class = CategorySerializer
+
+
+class QuestionCategoryView(GenericView):
+    serializer_class = QuestionSerializer
+
+    def get(self, request, **kwargs):
+        model = apps.get_model(app_label="question", model_name="Question")
+        id = kwargs.get("id")
+
+        queryset = model.objects.filter(category_id=id)
+        serializer = self.serializer_class(queryset, many=True)
+
+        return Response(serializer.data)
