@@ -3,13 +3,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
-from .models import Team, Team_member
+from .models import Team, TeamMember
 from .serializers import TeamSerializer, TeamMemberSerializer
 
 
 class TeamPagination(PageNumberPagination):
     page_size = 5
-    page_size_query_param = 'page_size'
+    page_size_query_param = "page_size"
     max_page_size = 100
 
 
@@ -20,7 +20,7 @@ class TeamViewSet(viewsets.ModelViewSet):
 
 
 class TeamMemberViewSet(viewsets.ModelViewSet):
-    queryset = Team_member.objects.all()
+    queryset = TeamMember.objects.all()
     serializer_class = TeamMemberSerializer
 
 
@@ -42,7 +42,8 @@ def team_detail(request, pk):
         return Response(serializer.data)
     elif request.method in ["PUT", "PATCH"]:
         serializer = TeamSerializer(
-            team, data=request.data, partial=(request.method == "PATCH"))
+            team, data=request.data, partial=(request.method == "PATCH")
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -54,14 +55,15 @@ def team_detail(request, pk):
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
 def team_member_detail(request, pk):
-    team_member = get_object_or_404(Team_member, pk=pk)
+    team_member = get_object_or_404(TeamMember, pk=pk)
 
     if request.method == "GET":
         serializer = TeamMemberSerializer(team_member)
         return Response(serializer.data)
     elif request.method in ["PUT", "PATCH"]:
         serializer = TeamMemberSerializer(
-            team_member, data=request.data, partial=(request.method == "PATCH"))
+            team_member, data=request.data, partial=(request.method == "PATCH")
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

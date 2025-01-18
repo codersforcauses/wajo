@@ -1,12 +1,21 @@
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
-from rest_framework import status
-from rest_framework.response import Response
+from rest_framework import viewsets
+from django_filters import FilterSet, ChoiceFilter, NumberFilter
+from .serializers import IndividualLeaderboardSerializer, TeamLeaderboardSerializer
+from ..users.models import School, Student
+from ..team.models import Team
 
-from .serializers import LeaderboardSerializer
+
+class IndividualLeaderboardFilter(FilterSet):
+    school__type = ChoiceFilter(
+        field_name="school__type", choices=School.SchoolType.choices
+    )
+
+    class Meta:
+        model = Student
+        fields = ["attendent_year", "year_level", "school__type"]
 
 
-class LeaderboardView(APIView):
+class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     """
     LeaderboardView API view to manage leaderboard data.
 
@@ -19,33 +28,30 @@ class LeaderboardView(APIView):
     Methods:
         - get(request): Handles GET requests. Returns sample data for the leaderboard.
     """
-    permission_classes = [AllowAny]
-    serializer_class = LeaderboardSerializer
 
-    def get(self, request):
-        # sample data
-        data = [
-            {
-                "name": "Alice",
-                "school": "Green Valley High",
-                "school_email": "alice@greenvalley.edu",
-                "user_name": "alice123",
-                "password": "password123",
-                "individual_score": 95,
-                "team_name": "Team A",
-                "team_score": 290,
-                "status": "Active",
-            },
-            {
-                "name": "Charlie",
-                "school": "Riverstone Institute",
-                "school_email": "charlie@riverstone.edu",
-                "user_name": "charlie789",
-                "password": "charliepass",
-                "individual_score": 88,
-                "team_name": "Team A",
-                "team_score": 290,
-                "status": "Inactive",
-            },
-        ]
-        return Response(data, status=status.HTTP_200_OK)
+    queryset = Student.objects.all()
+    serializer_class = IndividualLeaderboardSerializer
+    filterset_class = IndividualLeaderboardFilter
+    filterset_fields = ["attendent_year", "year_level", "school__type"]
+
+
+class TeamLeaderboardFilter(FilterSet):
+    school__type = ChoiceFilter(
+        field_name="school__type", choices=School.SchoolType.choices
+    )
+    students__attendent_year = NumberFilter(field_name="students__attendent_year")
+
+    class Meta:
+        model = Team
+        fields = ["students__attendent_year", "students__year_level", "school__type"]
+
+
+class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Team.objects.all()
+    serializer_class = TeamLeaderboardSerializer
+    filterset_class = TeamLeaderboardFilter
+    filterset_fields = [
+        "students__attendent_year",
+        "students__year_level",
+        "school__type",
+    ]
