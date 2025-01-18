@@ -62,7 +62,7 @@ class Category(models.Model):
     is_comp = models.BooleanField()
 
     def __str__(self):
-        return f'{self.id} {self.name} {self.info}'
+        return f'{self.id} {self.genre} {self.info}'
 
 
 class Question(models.Model):
