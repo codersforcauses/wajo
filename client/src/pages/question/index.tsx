@@ -1,13 +1,14 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+import SidebarLayout from "@/components/sidebar-layout";
 import { Button } from "@/components/ui/button";
 import { Datagrid } from "@/components/ui/Question/data-grid";
 import { SearchInput } from "@/components/ui/search";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { Question } from "@/types/question";
 
-export default function Index() {
+const Index = () => {
   // Fetches the list of questions using the custom hook.
   const {
     data: questions,
@@ -85,4 +86,10 @@ export default function Index() {
       ></Datagrid>
     </div>
   );
-}
+};
+
+Index.getLayout = function getLayout(page: React.ReactElement) {
+  return <SidebarLayout role="admin">{page}</SidebarLayout>;
+};
+
+export default Index;
