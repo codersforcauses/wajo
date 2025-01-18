@@ -1,36 +1,76 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+
+from api.team.models import Team
+from ..users.models import Student, User
 
 
-class LeaderboardSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["email"]
+
+
+class IndividualLeaderboardSerializer(serializers.ModelSerializer):
     """
     Serializer for the leaderboard data.
 
     This serializer is designed for handling student entries in the competition leaderboard. Each entry represents
     an individual student, including their personal information, scores, and participation status.
-
-    The leaderboard:
-    - Tracks student details like name, school, email, scores, and status.
-    - Enables admin to add, delete, and update entries.
-    - Supports data export to a CSV format for record-keeping.
-
-    Fields:
-        - student_name (str): Name of the student.
-        - school (str): Student's affiliated school.
-        - school_email (str): School's contact email.
-        - username (str): Unique student identifier.
-        - password (str): Student's authentication password.
-        - individual_score (int): Score in individual events.
-        - team_name (str): Team the student belongs to.
-        - team_score (int): Total score of the team.
-        - status (str): Participation status (e.g., Active, Inactive).
     """
-    class Meta:
-        model = get_user_model()
-        fields = "__all__"
 
-    # TODO: Add functionality to manage leaderboard entries and export data
-    # - Implement a function to add a new student entry to the leaderboard.
-    # - Implement a function to delete an existing student entry from the leaderboard.
-    # - Implement a function to save/modify entries in the leaderboard.
-    # - Implement a function to export all entries to a CSV file for record-keeping.
+    name = serializers.SerializerMethodField()
+    year_level = serializers.CharField()
+    school = serializers.StringRelatedField()
+    school_type = serializers.CharField(source="school.type")
+    is_country = serializers.BooleanField(source="school.is_country")
+    # score = TODO
+
+    def get_name(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}".strip()
+
+    # def get_score(self, obj):
+    #     pass
+
+    class Meta:
+        model = Student
+        fields = [
+            "name",
+            "year_level",
+            "school",
+            "school_type",
+            "is_country",
+            # "score",
+        ]
+
+
+class StudentSerializer(serializers.ModelSerializer):
+    name = serializers.StringRelatedField(source="user.username")
+
+    class Meta:
+        model = Student
+        fields = ["name", "year_level"]
+
+
+class TeamLeaderboardSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the leaderboard data.
+
+    This serializer is designed for handling team entries in the competition leaderboard. Each entry represents
+    a team, including their members, scores, and participation status.
+    """
+
+    school = serializers.StringRelatedField()
+    team_id = serializers.UUIDField(source="id")
+    # overall_schore = TODO
+    is_country = serializers.BooleanField(source="school.is_country")
+    students = StudentSerializer(many=True)
+
+    class Meta:
+        model = Team
+        fields = [
+            "school",
+            "team_id",
+            # "overall_score",
+            "is_country",
+            "students",
+        ]
