@@ -5,43 +5,24 @@ from rest_framework.exceptions import PermissionDenied
 
 
 class UserSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    username = serializers.CharField(read_only=True)
+    password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'password']
-        read_only_fields = ['id']
+        fields = ['first_name', 'last_name', 'password', 'username']
 
     def create(self, data):
-        number = data.pop('phone')
-        city = data.pop('city')
         fullname = data['first_name'] + data['last_name']
         user = User.objects.create_user(
             first_name=data['first_name'],
             last_name=data['last_name'],
             username=fullname,
-            email=data['email'],
             password=data['password'],
         )
-
-        extended_user = Teacher.objects.create(user=user)
-        extended_user.phone = number
-        extended_user.branch = city
-        extended_user.save()
         return user
-
-
-def get_role(self):
-    """
-    Returns the role of the user.
-
-    Returns:
-        str: The role of the user.
-    """
-    if hasattr(self, "student"):
-        return "student"
-    elif hasattr(self, "teacher"):
-        return "teacher"
-    return "user"
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -49,47 +30,50 @@ class SchoolSerializer(serializers.ModelSerializer):
     Serializer for the School model.
     Converts school model instances into JSON and validates incoming data for schools.
     """
-    name = serializers.CharField(allow_null=True, required=False)
-    code = serializers.CharField(allow_null=True, required=False)
+    name = serializers.CharField(required=True)
+
     class Meta:
         model = School
-        fields = ['id', 'name', 'code']
-        read_only_fields = ['id']
+        fields = ['id', 'name']
 
 
 class StudentSerializer(serializers.ModelSerializer):
     """
     Serializer for the Student model.
     Includes nested serializers for the related User and School models.
-    Converts student model instances into JSON and validates incoming data for students.
+    Converts student model instances into JSON and validates incoming data for students
     """
-    user = UserSerializer()
-    school = SchoolSerializer()
+    first_name = serializers.CharField(required=True, source='user.first_name')
+    last_name = serializers.CharField(required=True, source='user.last_name')
+    password = serializers.CharField(
+        required=True, source='user.password', write_only=True)
+    year_level = serializers.CharField(required=True)
+    school_name = serializers.CharField(required=False, source='school.name')
 
     def create(self, validated_data):
         request_user = self.context['request'].user
-        if (not hasattr(request_user, 'teacher') and (not request_user.is_staff)):
-            raise PermissionDenied('You are not allowed to create a student')
         user_data = validated_data.pop('user')
-        username = user_data['first_name'] + user_data['last_name']
-        user = User.objects.create_user(username=username, **user_data)
-        if hasattr(request_user, 'teacher'):
-            user_school = request_user.teacher.school
-            # user_school = SchoolSerializer(user_school).data
-            validated_data['school'] = user_school
-        else:
-            school_data = validated_data.pop('school')
-            school, created = School.objects.get_or_create(**school_data)
+
+        if request_user.is_staff:  # if the user is a staff
+            school_name = validated_data['school'].get('name')
+            school = School.objects.get(name=school_name)
             validated_data['school'] = school
-        # school_ins = validated_data.pop('school')
-        # school_ins = School.objects.create(**school_ins)
-        user.save()
-        student = Student.objects.create(user=user, **validated_data)
-        return student
+
+        else:  # if the user is a teacher
+            user_school = request_user.teacher.school
+            validated_data['school'] = user_school
+
+        user_serializer = UserSerializer(data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+        validated_data['user'] = user
+
+        return super().create(validated_data)
 
     class Meta:
         model = Student
-        fields = ['id', 'user', 'school', 'year_level']
+        fields = ['id', 'first_name', 'last_name',
+                  'password', 'year_level', 'school_name']
         read_only_fields = ['id']
 
 
@@ -99,9 +83,27 @@ class TeacherSerializer(serializers.ModelSerializer):
     Includes nested serializers for the related User and School models.
     Converts teacher model instances into JSON and validates incoming data for teachers.
     """
-    user = UserSerializer()
-    school = SchoolSerializer()
+    first_name = serializers.CharField(required=True, source='user.first_name')
+    last_name = serializers.CharField(required=True, source='user.last_name')
+    password = serializers.CharField(
+        required=True, source='user.password', write_only=True)
+
+    school_name = serializers.CharField(required=True, source='school.name')
+    email = serializers.EmailField(required=True)
+    phone = serializers.CharField(required=False)
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        school_name = validated_data.pop('school').get('name')
+        school = School.objects.get(name=school_name)
+        validated_data['school'] = school
+        user_serializer = UserSerializer(data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+        validated_data['user'] = user
+        return super().create(validated_data)
 
     class Meta:
         model = Teacher
-        fields = ['id', 'user', 'school', 'phone']
+        fields = ['id', 'first_name', 'last_name',
+                  'school_name', 'phone', 'email', 'password', 'created_at']
