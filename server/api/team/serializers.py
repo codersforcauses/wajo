@@ -7,7 +7,7 @@ from api.users.models import School, Student
 class TeamMemberSerializer(serializers.ModelSerializer):
     student = StudentSerializer(read_only=True)
     student_id = serializers.PrimaryKeyRelatedField(
-        queryset=Student.objects.all(), write_only=True, source='school')
+        queryset=Student.objects.all(), write_only=True, source='student')
 
     class Meta:
         model = Team_member

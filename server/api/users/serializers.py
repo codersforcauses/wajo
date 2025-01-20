@@ -68,7 +68,7 @@ class TeacherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Teacher
-        fields = ['id', 'user', 'school', 'phone']
+        fields = '__all__'
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
