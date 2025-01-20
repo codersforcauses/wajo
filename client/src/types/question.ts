@@ -130,5 +130,4 @@ export interface PreviewModalDataContext {
 export interface PreviewModalProps {
   children: ReactNode;
   dataContext: PreviewModalDataContext;
-  onClose: (question: string) => void;
 }

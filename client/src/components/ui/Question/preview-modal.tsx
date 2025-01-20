@@ -1,5 +1,8 @@
+import "katex/dist/katex.min.css";
+
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useEffect, useState } from "react";
+import Latex from "react-latex-next";
 
 import {
   Dialog,
@@ -11,24 +14,12 @@ import {
 import { PreviewModalProps } from "@/types/question";
 
 import { Button } from "../button";
-import { MathInput } from "../math-input";
 
 export default function PreviewModal({
   children,
   dataContext,
-  onClose,
 }: PreviewModalProps) {
   const [question, setQuestion] = useState<string>(dataContext.question);
-  const [isSolutionVisible, setIsSolutionVisible] = useState<boolean>(true);
-
-  const handleSolutionVisible = () => {
-    setIsSolutionVisible(!isSolutionVisible);
-  };
-
-  // When close button is clicked, bring the modified question data back to Create page
-  const handleDialogClose = () => {
-    onClose(question);
-  };
 
   useEffect(() => {
     if (dataContext?.question) {
@@ -48,24 +39,17 @@ export default function PreviewModal({
             <DialogDescription></DialogDescription>
           </VisuallyHidden.Root>
 
-          <div className="flex h-full w-full flex-col space-y-6 rounded-[30px] border-accent bg-white px-10 py-4 text-xl">
+          <div className="flex h-full w-full flex-col space-y-4 rounded-[30px] bg-white px-10 py-4 text-xl">
             {/* Question */}
             <div className="flex-grow space-y-4">
               <div className="flex space-x-4 text-2xl font-semibold text-gray-600">
                 <span>{dataContext.questionName}</span>
                 <span>[{dataContext.mark} marks]</span>
               </div>
-              <MathInput
-                input={question}
-                onChange={(e) => {
-                  setQuestion(e.target.value);
-                }}
-              />
+              <Latex>{question}</Latex>
             </div>
             {/* Solution */}
-            <div
-              className={`space-y-2 ${isSolutionVisible ? "" : "invisible"}`}
-            >
+            <div>
               <p className="text-2xl font-semibold text-gray-600">Solution</p>
               <div>
                 <p>
@@ -76,20 +60,13 @@ export default function PreviewModal({
               </div>
             </div>
 
-            {/* Buttons */}
-            <div className="mt-auto flex justify-evenly">
+            {/* Close Button */}
+            <div className="mt-auto flex justify-center">
               <DialogTrigger asChild>
-                <Button
-                  onClick={handleDialogClose}
-                  variant={"ghost"}
-                  className="w-36 border border-black"
-                >
+                <Button variant={"ghost"} className="w-36 border border-black">
                   Close
                 </Button>
               </DialogTrigger>
-              <Button onClick={handleSolutionVisible} className="w-36">
-                Hide Solution
-              </Button>
             </div>
           </div>
         </DialogContent>

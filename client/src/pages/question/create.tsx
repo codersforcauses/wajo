@@ -80,10 +80,6 @@ export default function Create() {
     alert(JSON.stringify(data, null, 2));
   };
 
-  const handlePreviewClose = (updatedQuestion: string) => {
-    form.setValue("question", updatedQuestion);
-  };
-
   return (
     <div className="mx-auto my-4 max-w-3xl rounded-lg bg-gray-50 p-4 shadow-lg">
       <h1 className="mb-6 text-center text-xl font-bold">Create Question</h1>
@@ -269,7 +265,6 @@ export default function Create() {
                 difficulty: watchedValues.difficulty || "",
                 genre: watchedValues.genre || "",
               }}
-              onClose={handlePreviewClose}
             >
               <Button type="button" variant={"ghost"} className="bg-gray-200">
                 Preview
