@@ -12,6 +12,8 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { Question } from "@/types/question";
+
 // Mock data representing question entries
 const mockQuestions: Question[] = [
   {

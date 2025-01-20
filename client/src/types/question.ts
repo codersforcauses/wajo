@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 /**
  * Represents a Question object with its properties.
  *
@@ -13,7 +15,7 @@
  *   difficulty: "Difficult"
  * };
  */
-interface Question {
+export interface Question {
   name: string;
   category: string;
   difficulty: string;
@@ -37,7 +39,7 @@ interface Question {
  *   changePage: 1
  * };
  */
-interface DatagridProps {
+export interface DatagridProps {
   datacontext: Question[];
   onDataChange: (updatedData: Question[]) => void;
   changePage: number;
@@ -60,9 +62,72 @@ interface DatagridProps {
  *   className: "flex text-lg"
  * };
  */
-interface PaginationProps {
+export interface PaginationProps {
   totalPages: number;
   currentPage: number;
   onPageChange: (page: number) => void;
   className?: string;
+}
+
+/**
+ * Represents the data context used within the PreviewModal component.
+ *
+ * @interface PreviewModalDataContext
+ * @property {string} questionName - The name or title of the question.
+ * @property {string} question - The detailed content of the question.
+ * @property {string} answer - The correct answer(s) to the question.
+ * @property {string} solution - A detailed explanation or solution for the question.
+ * @property {string} mark - The number of marks assigned to the question.
+ * @property {string} difficulty - The difficulty level of the question (e.g., Easy, Medium, Hard).
+ * @property {string} genre - The category or type of the question (e.g., Math, Science).
+ *
+ * @example
+ * const exampleContext: PreviewModalDataContext = {
+ *   questionName: "Question01_2024",
+ *   question: "What is the sum of 2 and 3?",
+ *   answer: "5",
+ *   solution: "Adding 2 and 3 gives 5.",
+ *   mark: "5",
+ *   difficulty: "Easy",
+ *   genre: "Arithmetic"
+ * };
+ */
+export interface PreviewModalDataContext {
+  questionName: string;
+  question: string;
+  answer: string;
+  solution: string;
+  mark: string;
+  difficulty: string;
+  genre: string;
+}
+
+/**
+ * Represents the properties for the PreviewModal component.
+ *
+ * @interface PreviewModalProps
+ * @property {ReactNode} children - The child components to render inside the modal (e.g., buttons or triggers).
+ * @property {PreviewModalDataContext} dataContext - The context containing the data to display in the modal.
+ * @property {(question: string) => void} onClose - Callback function triggered when the modal is closed. It returns the updated question as a string.
+ *
+ * @see {@link https://github.com/codersforcauses/wajo/pull/29} for more details.
+ *
+ * @example
+ * const exampleProps: PreviewModalProps = {
+ *   children: <button>Preview</button>,
+ *   dataContext: {
+ *     questionName: "Question01_2024",
+ *     question: "What is the capital of France?",
+ *     answer: "Paris",
+ *     solution: "The capital of France is Paris.",
+ *     mark: "10",
+ *     difficulty: "Medium",
+ *     genre: "Geography"
+ *   },
+ *   onClose: (updatedQuestion) => console.log("Modal closed with updated question:", updatedQuestion)
+ * };
+ */
+export interface PreviewModalProps {
+  children: ReactNode;
+  dataContext: PreviewModalDataContext;
 }
