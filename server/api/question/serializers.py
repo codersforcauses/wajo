@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Question, Category
 from api.users.serializers import UserSerializer
 
+
 class CategorySerializer(serializers.ModelSerializer):
     """
     Serializer for the Category model.

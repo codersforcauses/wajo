@@ -1,10 +1,6 @@
 from django.db import models
 from api.users.models import Student
 from api.question.models import Question
-from django.core.exceptions import ValidationError
-from django.utils.timezone import now
-
-# Create your models here.
 
 
 class Quiz(models.Model):
@@ -31,41 +27,9 @@ class Quiz(models.Model):
     open_time_date = models.DateTimeField(default=None)
     close_time_date = models.DateTimeField(default=None)
     time_limit = models.IntegerField(default=120)
-    # status of the quiz
-    STATUS_CHOICES = [
-        ('upcoming', 'Upcoming'),
-        ('ongoing', 'Ongoing'),
-        ('finished', 'Finished'),
-    ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='upcoming')
 
-    # Helper methods
-    def is_opening(self):
-        return now() >= self.open_time_date
-
-    def is_closing(self):
-        return now() >= self.close_time_date
-
-    # Add validation logic
-    def clean(self):
-        """
-        Custom validation logic for the Quiz model.
-        """
-        if self.open_time_date < now():
-            raise ValidationError({'open_time_date': 'The open time cannot be in the past.'})
-
-        if self.close_time_date <= self.open_time_date:
-            raise ValidationError({'close_time_date': 'The close time must be after the open time.'})
-
-        if self.time_limit <= 0:
-            raise ValidationError({'time_limit': 'Time limit must be a positive integer.'})
-
-    def save(self, *args, **kwargs):
-        """
-        Override save method to ensure clean is called before saving.
-        """
-        self.full_clean()  # Calls clean() and clean_fields()
-        super().save(*args, **kwargs)
+    # 0 for normal practice, 1 for upcoming, 2 for ongoing, 3 for finished
+    status = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.name}"

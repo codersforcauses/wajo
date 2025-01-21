@@ -1,14 +1,17 @@
 from rest_framework import viewsets
 from .models import Quiz, QuizSlot, QuizAttempt, QuestionAttempt
-from rest_framework.decorators import action
-from .serializers import QuizSerializer, QuizSlotSerializer, QuizAttemptSerializer, QuestionAttemptSerializer
+from rest_framework.decorators import action, permission_classes
+from rest_framework.permissions import IsAdminUser, AllowAny
+from .serializers import QuizSerializer, QuizSlotSerializer, QuizAttemptSerializer, QuestionAttemptSerializer, AdminQuizSerializer
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, serializers
 
 
-class QuizViewSet(viewsets.ModelViewSet):
+@permission_classes([IsAdminUser])
+class AdminQuizViewSet(viewsets.ModelViewSet):
     queryset = Quiz.objects.all()
-    serializer_class = QuizSerializer
+    serializer_class = AdminQuizSerializer
+    status = serializers.IntegerField(default=0, required=False)
 
     @action(detail=True, methods=['get', 'post'])
     def slots(self, request, pk=None):
@@ -23,15 +26,11 @@ class QuizViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-            # instance = QuizSlot.objects.filter(quiz_id=pk)
 
-            # get the slot index of the quiz
-            # slot_indexes = [slot.slot_index for slot in instance]
-            # slot_index = int(data.get('slot_index'))
-
-            # check if the slot index already exists
-            # if slot_index in slot_indexes:
-            #     return Response({"error": "slot_index already exists"}, status=status.HTTP_400_BAD_REQUEST)
+@permission_classes([AllowAny])
+class QuizViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Quiz.objects.filter(status=0, visible=True)
+    serializer_class = QuizSerializer
 
 
 class QuizSlotViewSet(viewsets.ModelViewSet):
