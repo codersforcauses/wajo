@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAdminUser, AllowAny
 from .serializers import QuizSerializer, QuizSlotSerializer, QuizAttemptSerializer, QuestionAttemptSerializer, AdminQuizSerializer
 from rest_framework.response import Response
 from rest_framework import status, serializers
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.utils.timezone import now
 
 
@@ -141,6 +141,31 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
     queryset = QuizAttempt.objects.all()
     serializer_class = QuizAttemptSerializer
 
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new quiz attempt. Ensure that a user can only have one active attempt per quiz.
+        """
+        quiz_id = request.data.get('quiz')
+        student_id = request.data.get('student')
+        existing_attempt = QuizAttempt.objects.filter(
+            quiz_id=quiz_id, student_id=student_id, state=1).first()
+
+        if existing_attempt:
+            return Response({'error': 'You already have an active attempt for this quiz.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return super().create(request, *args, **kwargs)
+
+    @action(detail=True, methods=['patch'])
+    def submit(self, request, pk=None):
+        """
+        Submit the quiz attempt, changing its state to 2 (submitted).
+        """
+        attempt = self.get_object()
+        attempt.state = 2
+        attempt.time_finish = now()
+        attempt.save()
+        return Response({'status': 'Quiz attempt submitted successfully.'})
+
 
 class QuestionAttemptViewSet(viewsets.ModelViewSet):
     """
@@ -148,3 +173,38 @@ class QuestionAttemptViewSet(viewsets.ModelViewSet):
     """
     queryset = QuestionAttempt.objects.all()
     serializer_class = QuestionAttemptSerializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new question attempt. Ensure that a user can continue answering questions upon re-login.
+        """
+        quiz_attempt_id = request.data.get('quiz_attempt')
+        question_id = request.data.get('question')
+        student_id = request.data.get('student')
+        # TODO: Uncomment this line when using JWT authentication
+        # student_id = request.user.id
+        existing_attempt = QuestionAttempt.objects.filter(
+            quiz_attempt_id=quiz_attempt_id,
+            question_id=question_id,
+            student_id=student_id
+        ).first()
+
+        if existing_attempt:
+            return Response(
+                {'error': 'You already have an attempt for this question in the current quiz attempt.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        return super().create(request, *args, **kwargs)
+
+    @action(detail=True, methods=['patch'])
+    def answer(self, request, pk=None):
+        """
+        Record the answer for a question attempt.
+        """
+        # TODO: Uncomment this line when using JWT authentication
+        # student_id = request.user.id
+        question_attempt = self.get_object()
+        question_attempt.answer_student = request.data.get('answer_student')
+        question_attempt.check_answer()
+        question_attempt.save()
+        return Response({'status': 'Answer recorded successfully.'})

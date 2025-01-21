@@ -97,6 +97,8 @@ class StudentSerializer(serializers.ModelSerializer):
     school_id = serializers.PrimaryKeyRelatedField(
         queryset=School.objects.all(), write_only=True, source='school')
     school = SchoolSerializer(read_only=True)
+    quiz_attempts = serializers.PrimaryKeyRelatedField(
+        many=True, read_only=True)
 
     def create(self, validated_data) -> Student:
         """

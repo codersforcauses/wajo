@@ -40,7 +40,7 @@ class QuizSlotSerializer(serializers.ModelSerializer):
 
 
 class QuizSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Quiz
         fields = ['id', 'name', 'intro', 'total_marks']
@@ -59,6 +59,9 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
 
 
 class QuestionAttemptSerializer(serializers.ModelSerializer):
+    answer_student = serializers.IntegerField(
+        default=None, allow_null=True, min_value=0, max_value=999)
+
     class Meta:
         model = QuestionAttempt
         fields = '__all__'

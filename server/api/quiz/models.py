@@ -87,7 +87,7 @@ class QuizAttempt(models.Model):
     total_marks = models.IntegerField()
 
     def __str__(self):
-        return f"{self.id} {self.quiz_id} {self.attempt}"
+        return f"{self.id} {self.quiz} "
 
     def check_all_answer(self):
         for question_attempt in self.question_attempts.all():
@@ -97,11 +97,13 @@ class QuizAttempt(models.Model):
 
 class QuestionAttempt(models.Model):
     id = models.AutoField(primary_key=True)
+    student = models.ForeignKey(
+        Student, on_delete=models.CASCADE, related_name="question_attempts")
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, related_name="attempts")
     quiz_attempt = models.ForeignKey(
         QuizAttempt, on_delete=models.CASCADE, related_name="question_attempts")
-    answer_student = models.CharField(max_length=100)
+    answer_student = models.IntegerField(default=None)
     is_correct = models.BooleanField(default=None)
 
     def __str__(self):
