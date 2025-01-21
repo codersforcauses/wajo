@@ -22,7 +22,9 @@ const Home = () => {
         }}
       >
         <h3>WAJO Olympiads will be back next year!</h3>
-        <Button>Start Quiz</Button>
+        <Button>
+          <p className="body-1">Start Quiz</p>
+        </Button>
       </div>
       <div className="flex flex-col items-center gap-4 px-32">
         <h4>What is WAJO and what are the Olympiads?</h4>
@@ -37,12 +39,64 @@ const Home = () => {
           paper, held in person.
         </div>
       </div>
+
+      <div className="mx-10 flex flex-col items-center gap-4 rounded-3xl border bg-background1 p-10">
+        <h1>Updates</h1>
+        <div className="body-2">
+          WAJO is over for 2024, but we'll be back again in 2025, with similar
+          dates to below! 2024 format: combination of online and paper-based
+          formats. Confirmed Dates: Individual paper: Tuesday, 15 October, 2024
+          for 100 minutes starting between 2:30pm and 4pm, online at your school
+          Team paper: Saturday, 19 October, 2024 for 50 minutes. Registration at
+          9:00am. Prize Ceremony finishes 12:30pm. At two venues: Perth: UWA, in
+          Arts Building centred around Alexander Lecture Theatre (Search for:
+          Alex). Bunbury: Building 6, Edith Cowan University – Bunbury Campus
+          (Grid Reference: E4), 585 Robertson Drive, Bunbury WA 6230. You need:
+          Pens, pencils, and if you wish, ruler and compass. Special conditions:
+          No calculators. Brains only. Prize Ceremony (Perth): Date: Saturday,
+          19 October 2024 Time: 11:30am – 12:30pm Venue: Social Sciences Lecture
+          Theatre, near Hackett Entrance No. 1 (see campus map - in SEARCH
+          enter: Social Sciences Lecture T One selection will come up. Click on
+          it, and a balloon will highlight its location below Car park 3, a good
+          place to park.) Future news to come, In the meantime, feel free to
+          look at past papers and try a practice test here!
+        </div>
+        <Button>
+          <p className="body-1">Start Practice</p>
+        </Button>
+      </div>
+      <div>
+        <h1>Major Prizes </h1>
+        <ul>
+          <li>UWA Mathematics & Statistics Prize – Best Year 9 student</li>
+          <li>MAWA "Jack Bana Award" – Best Year 9 team</li>
+          <li>Curtin Mathematics & Statistics Prize – Best Year 8 student</li>
+          <li>ECU "David McDougall Award" – Best Year 8 team</li>
+          <li>
+            Department of Education Gifted & Talented Awards – Top public school
+            individual & team
+          </li>
+          <li>
+            Awards of Excellence – Sponsored by New Edition Bookshop, Data
+            Analysis Australia, Murdoch University, Dept. of Education, and
+            Optiver
+          </li>
+        </ul>
+      </div>
+      <div className="mx-10 flex flex-col items-center gap-4 rounded-3xl border bg-background1 p-10">
+        Prizes also include second and third place awards in the first four
+        categories, plus numerous merit prizes. See our awards section for
+        details and past winners.
+      </div>
       <h1>Test title</h1>
       <h2>Test title</h2>
       <h3>Test title</h3>
       <h4>Test title</h4>
       <h5>Test title</h5>
       <h6>Test title</h6>
+      <p className="body-1">body-1</p>
+      <p className="body-2">body-2</p>
+
       <Button onClick={() => setClicked(true)}>
         {isLoading ? "Loading" : "Ping"}
       </Button>

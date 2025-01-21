@@ -150,6 +150,18 @@
   .font-roboto {
     font-family: var(--font-roboto);
   }
+  .body-1 {
+    @apply font-urbanist;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 28px;
+  }
+  .body-1-bold {
+    @apply font-urbanist;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 28px;
+  }
   .body-2 {
     @apply font-urbanist;
     font-size: 14px;

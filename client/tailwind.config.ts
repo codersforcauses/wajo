@@ -39,6 +39,8 @@ const config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        background1: "#FFE8A3",
+        background2: "#FFD659",
         background: "#ffffff",
         foreground: "hsl(var(--foreground))",
         primary: "#f8b400",
