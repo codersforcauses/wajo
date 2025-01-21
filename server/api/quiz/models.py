@@ -14,7 +14,6 @@ class Quiz(models.Model):
        is_comp (BooleanField): Notes whether the quiz is for competition or practice.
        visible (BooleanField): Notes whether the quiz is visible.
        open_time_date (DateTimeField): Notes when the quiz opens.
-       close_time_date (DateTimeField): Notes when the quiz closes.
        time_limit (Integer): Denotes the time allotted for each quiz.
     """
 
@@ -25,8 +24,8 @@ class Quiz(models.Model):
     is_comp = models.BooleanField(default=False)
     visible = models.BooleanField(default=False)
     open_time_date = models.DateTimeField(default=None)
-    close_time_date = models.DateTimeField(default=None)
     time_limit = models.IntegerField(default=120)
+    time_window = models.IntegerField(default=10)
 
     # 0 for normal practice, 1 for upcoming, 2 for ongoing, 3 for finished
     status = models.IntegerField(default=0)

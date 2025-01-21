@@ -40,6 +40,7 @@ class QuizSlotSerializer(serializers.ModelSerializer):
 
 
 class QuizSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Quiz
         fields = ['id', 'name', 'intro', 'total_marks']
