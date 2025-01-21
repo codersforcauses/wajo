@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django.utils.timezone import now
 
+
 @permission_classes([IsAdminUser])
 class QuestionViewSet(viewsets.ModelViewSet):
     """

@@ -26,7 +26,7 @@
 
 # def schedule_tasks():
 #     try:
-#         Quiz = apps.get_model('quiz', 'Quiz')  
+#         Quiz = apps.get_model('quiz', 'Quiz')
 #         quizzes = Quiz.objects.all()
 
 #         for quiz in quizzes:
