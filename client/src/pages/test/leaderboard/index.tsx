@@ -57,12 +57,9 @@ export default function Index() {
         <SearchInput
           label=""
           value={""}
-          placeholder="Search Practice"
+          placeholder="Search Leaderboard"
           onSearch={handleFilterChange}
         />
-        <Button asChild className="mr-6 h-auto">
-          <Link href={"practice/create"}>Create a Practice</Link>
-        </Button>
       </div>
 
       <LeaderboardDataGrid
