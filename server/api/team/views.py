@@ -24,13 +24,21 @@ class TeamMemberViewSet(viewsets.ModelViewSet):
     serializer_class = TeamMemberSerializer
 
 
-@api_view(["GET"])
-def team_list(request):
-    queryset = Team.objects.all()
-    paginator = TeamPagination()
-    paginated_queryset = paginator.paginate_queryset(queryset, request)
-    serializer = TeamSerializer(paginated_queryset, many=True)
-    return paginator.get_paginated_response(serializer.data)
+@api_view(["GET", "POST"])
+def member_list(request):
+    if request.method == "GET":
+        # Handle GET request: list all teams with pagination
+        queryset = Team_member.objects.all()
+        serializer = TeamMemberSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    elif request.method == "POST":
+        # Handle POST request: create a new team
+        serializer = TeamMemberSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
