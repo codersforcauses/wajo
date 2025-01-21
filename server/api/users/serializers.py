@@ -1,107 +1,226 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Student, Teacher, School
-from rest_framework.exceptions import PermissionDenied
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    UserSerializer is a ModelSerializer for the User model.
+    It handles the serialization and deserialization of User instances.
+
+    Fields:
+        - first_name: CharField, required
+        - last_name: CharField, required
+        - username: CharField, read-only
+        - password: CharField, write-only
+
+    Meta:
+        - model: User
+        - exclude: ['is_active', 'date_joined']
+        - read_only_fields: [ 'last_login', 'user_permissions']
+    """
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    username = serializers.CharField(read_only=True)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'password']
-        read_only_fields = ['id']
+        exclude = ['is_active', 'groups', 'user_permissions']
+        read_only_fields = ['last_login', 'date_joined']
 
-    def create(self, data):
-        number = data.pop('phone')
-        city = data.pop('city')
-        fullname = data['first_name'] + data['last_name']
-        user = User.objects.create_user(
-            first_name=data['first_name'],
-            last_name=data['last_name'],
-            username=fullname,
-            email=data['email'],
-            password=data['password'],
-        )
+    def create(self, validated_data):
+        """
+        Creates a new User instance.
 
-        extended_user = Teacher.objects.create(user=user)
-        extended_user.phone = number
-        extended_user.branch = city
-        extended_user.save()
-        return user
+        Args:
+            validated_data (dict): The validated data for creating a User instance.
+                - first_name (str): The first name of the user.
+                - last_name (str): The last name of the user.
+                - password (str): The password for the user.
 
-
-def get_role(self):
-    """
-    Returns the role of the user.
-
-    Returns:
-        str: The role of the user.
-    """
-    if hasattr(self, "student"):
-        return "student"
-    elif hasattr(self, "teacher"):
-        return "teacher"
-    return "user"
+        Returns:
+            User: The created User instance.
+        """
+        fullname = validated_data['first_name'] + validated_data['last_name']
+        validated_data['username'] = fullname
+        return super().create(validated_data)
 
 
 class SchoolSerializer(serializers.ModelSerializer):
     """
-    Serializer for the School model.
-    Converts school model instances into JSON and validates incoming data for schools.
+    SchoolSerializer is a ModelSerializer for the School model.
+    It handles the serialization and deserialization of School instances.
+
+    Fields:
+        - name: CharField, required
+
+    Meta:
+        - model: School
+        - exclude: ['id', 'code']
     """
-    name = serializers.CharField(allow_null=True, required=False)
-    code = serializers.CharField(allow_null=True, required=False)
+    name = serializers.CharField(required=True)
+
     class Meta:
         model = School
-        fields = ['id', 'name', 'code']
-        read_only_fields = ['id']
+        exclude = ['code']
 
 
 class StudentSerializer(serializers.ModelSerializer):
     """
-    Serializer for the Student model.
-    Includes nested serializers for the related User and School models.
-    Converts student model instances into JSON and validates incoming data for students.
-    """
-    user = UserSerializer()
-    school = SchoolSerializer()
+    StudentSerializer is a ModelSerializer for the Student model.
+    It handles the serialization and deserialization of Student instances, including nested user data.
 
-    def create(self, validated_data):
-        request_user = self.context['request'].user
-        if (not hasattr(request_user, 'teacher') and (not request_user.is_staff)):
-            raise PermissionDenied('You are not allowed to create a student')
-        user_data = validated_data.pop('user')
-        username = user_data['first_name'] + user_data['last_name']
-        user = User.objects.create_user(username=username, **user_data)
-        if hasattr(request_user, 'teacher'):
-            user_school = request_user.teacher.school
-            # user_school = SchoolSerializer(user_school).data
-            validated_data['school'] = user_school
-        else:
-            school_data = validated_data.pop('school')
-            school, created = School.objects.get_or_create(**school_data)
-            validated_data['school'] = school
-        # school_ins = validated_data.pop('school')
-        # school_ins = School.objects.create(**school_ins)
-        user.save()
-        student = Student.objects.create(user=user, **validated_data)
-        return student
+    Fields:
+        - first_name: CharField, required, maps to user.first_name
+        - last_name: CharField, required, maps to user.last_name
+        - password: CharField, required, write-only, maps to user.password
+        - year_level: IntegerField, required, min_value=0, max_value=12
+        - school_id: PrimaryKeyRelatedField, write-only, maps to school
+        - school: CharField, read-only, maps to school.name
+
+    Methods:
+        - create(validated_data): Creates a new Student instance along with the associated User instance.
+        - update(instance, validated_data): Updates an existing Student instance along with the associated User instance.
+
+    Meta:
+        - model: Student
+        - exclude: ['user']
+    """
+    first_name = serializers.CharField(required=True, source='user.first_name')
+    last_name = serializers.CharField(required=True, source='user.last_name')
+    full_name = serializers.CharField(source='user.username', read_only=True)
+    password = serializers.CharField(
+        required=True, source='user.password', write_only=True)
+    year_level = serializers.IntegerField(
+        required=True, min_value=0, max_value=12)
+    school_id = serializers.PrimaryKeyRelatedField(
+        queryset=School.objects.all(), write_only=True, source='school')
+    school = SchoolSerializer(read_only=True)
+
+    def create(self, validated_data) -> Student:
+        """
+        Creates a new Student instance along with the associated User instance.
+
+        Args:
+            validated_data (dict): The validated data for creating a Student instance.
+
+        Returns:
+            Student: The created Student instance.
+
+        Raises:
+            PermissionDenied: If the request user does not have permission to create a student.
+        """
+        # Extract and create the nested User instance
+        user = validated_data.pop('user')
+        user_serializer = UserSerializer(data=user)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+        validated_data['user'] = user
+
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Updates an existing Student instance along with the associated User instance.
+
+        Args:
+            instance (Student): The existing Student instance to update.
+            validated_data (dict): The validated data for updating the Student instance.
+
+        Returns:
+            Student: The updated Student instance.
+        """
+        # Extract and update the nested User instance
+        user_data = validated_data.pop('user', None)
+        if user_data:
+            user_serializer = UserSerializer(
+                instance.user, data=user_data, partial=True)
+            user_serializer.is_valid(raise_exception=True)
+            user_serializer.save()
+
+        # Update the Student instance
+        instance = super().update(instance, validated_data)
+        return instance
 
     class Meta:
         model = Student
-        fields = ['id', 'user', 'school', 'year_level']
-        read_only_fields = ['id']
+        exclude = ['user']
 
 
 class TeacherSerializer(serializers.ModelSerializer):
     """
-    Serializer for the Teacher model.
-    Includes nested serializers for the related User and School models.
-    Converts teacher model instances into JSON and validates incoming data for teachers.
+    TeacherSerializer is a ModelSerializer for the Teacher model.
+    It handles the serialization and deserialization of Teacher instances, including nested user data.
+
+    Fields:
+        - first_name: CharField, required, maps to user.first_name
+        - last_name: CharField, required, maps to user.last_name
+        - password: CharField, required, write-only, maps to user.password
+        - school_id: PrimaryKeyRelatedField, write-only, maps to school
+        - school: CharField, read-only, maps to school.name
+        - email: EmailField, required
+        - phone: CharField, optional
+
+    Methods:
+        - create(validated_data): Creates a new Teacher instance along with the associated User instance.
+        - update(instance, validated_data): Updates an existing Teacher instance along with the associated User instance.
+
+    Meta:
+        - model: Teacher
+        - exclude: ['user']
     """
-    user = UserSerializer()
-    school = SchoolSerializer()
+    first_name = serializers.CharField(required=True, source='user.first_name')
+    last_name = serializers.CharField(required=True, source='user.last_name')
+    password = serializers.CharField(
+        required=True, source='user.password', write_only=True)
+    school_id = serializers.PrimaryKeyRelatedField(
+        queryset=School.objects.all(), write_only=True, source='school')
+    school = SchoolSerializer(read_only=True)
+    email = serializers.EmailField(required=True)
+    phone = serializers.CharField(required=False)
+
+    def create(self, validated_data):
+        """
+        Creates a new Teacher instance along with the associated User instance.
+
+        Args:
+            validated_data (dict): The validated data for creating a Teacher instance.
+
+        Returns:
+            Teacher: The created Teacher instance.
+        """
+        # Extract and create the nested User instance
+        user_data = validated_data.pop('user')
+        user_serializer = UserSerializer(data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+        validated_data['user'] = user
+
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Updates an existing Teacher instance along with the associated User instance.
+
+        Args:
+            instance (Teacher): The existing Teacher instance to update.
+            validated_data (dict): The validated data for updating the Teacher instance.
+
+        Returns:
+            Teacher: The updated Teacher instance.
+        """
+        # Extract and update the nested User instance
+        user_data = validated_data.pop('user', None)
+        if user_data:
+            user_serializer = UserSerializer(
+                instance.user, data=user_data, partial=True)
+            user_serializer.is_valid(raise_exception=True)
+            user_serializer.save()
+
+        # Update the Teacher instance and return it
+        return super().update(instance, validated_data)
 
     class Meta:
         model = Teacher
-        fields = ['id', 'user', 'school', 'phone']
+        exclude = ['user']
