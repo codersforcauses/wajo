@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import {
   Table,
@@ -12,25 +11,36 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
-import { School } from "@/types/school";
+import { Ranking } from "@/types/leaderboard";
 
 /**
- * Renders a paginated data grid for displaying school information.
+ * Renders a paginated data grid for displaying ranking data.
  *
- * The `SchoolDataGrid` component provides a table-based UI for displaying school data
- * with support for pagination. The behavior is similar to the `UserDataGrid`, but
- * it is tailored to display school-specific fields such as `School Id`, `School Name`,
- * and `Created On`.
+ * The `RankingDataGrid` component displays a table with columns for student name, team, school, marks,
+ * and response time. The data is paginated, and pagination controls are provided to navigate through
+ * the data.
  *
- * @see [UserDataGrid](./data-grid.tsx) for reference.
+ * @function RankingDataGrid
+ * @template T - The type of data being displayed in the grid, in this case, `Ranking`.
+ * @param {Object} props - The props object.
+ * @param {Ranking[]} props.datacontext - The array of ranking data to be displayed in the grid.
+ * @param {function(Ranking[]): void} props.onDataChange - Callback triggered when the data changes.
+ * @param {number} props.changePage - The page number to navigate to when the data changes.
+ *
+ * @example
+ * <RankingDataGrid
+ *   datacontext={rankingData}
+ *   onDataChange={handleRankingDataChange}
+ *   changePage={currentPage}
+ * />
  */
-export function SchoolDataGrid({
+export function RankingDataGrid({
   datacontext,
   onDataChange,
   changePage,
-}: DatagridProps<School>) {
+}: DatagridProps<Ranking>) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<School[]>([]);
+  const [paddedData, setPaddedData] = useState<Ranking[]>([]);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
 
@@ -47,7 +57,7 @@ export function SchoolDataGrid({
 
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as School);
+      updatedPaddedData.push({} as Ranking);
     }
 
     setPaddedData(updatedPaddedData);
@@ -64,14 +74,15 @@ export function SchoolDataGrid({
         <TableHeader className="bg-black text-lg font-semibold">
           <TableRow className="hover:bg-muted/0">
             <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
-              School Id
+              Student Name
             </TableHead>
-            <TableHead className={commonTableHeadClasses}>
-              School Name
+            <TableHead className={cn(commonTableHeadClasses)}>Team</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>School</TableHead>
+            <TableHead className={cn(commonTableHeadClasses, "text-center")}>
+              Marks
             </TableHead>
-            <TableHead className={commonTableHeadClasses}>Created On</TableHead>
             <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
-              Actions
+              Response Time
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -81,26 +92,11 @@ export function SchoolDataGrid({
               key={index}
               className={"divide-gray-200 border-gray-50 text-sm text-black"}
             >
-              <TableCell className="w-1/4">{item.id}</TableCell>
-              <TableCell className="w-1/4">{item.name}</TableCell>
-              <TableCell className="w-1/4">
-                {item.time_created ? (
-                  <>
-                    <div className="text-nowrap">
-                      {new Date(item.time_created).toLocaleDateString()}
-                    </div>
-                    <div className="text-nowrap">
-                      {new Date(item.time_created).toLocaleTimeString()}
-                    </div>
-                  </>
-                ) : null}
-              </TableCell>
-              <TableCell className="flex py-4">
-                <div className={cn("flex", { invisible: !item.id })}>
-                  <Button className="me-2">View</Button>
-                  <Button variant={"destructive"}>Delete</Button>
-                </div>
-              </TableCell>
+              <TableCell className="w-1/4">{item.student_name}</TableCell>
+              <TableCell className="w-1/4">{item.team}</TableCell>
+              <TableCell className="w-1/5">{item.school}</TableCell>
+              <TableCell className="w-1/6 text-center">{item.marks}</TableCell>
+              <TableCell className="">{item.response_time}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -109,7 +105,7 @@ export function SchoolDataGrid({
       <Pagination
         totalPages={totalPages}
         currentPage={currentPage}
-        onPageChange={(page) => handlePageChange(page)}
+        onPageChange={(page: number) => handlePageChange(page)}
         className="mr-20 mt-5 flex justify-end"
       />
     </div>
