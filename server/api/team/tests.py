@@ -78,7 +78,6 @@ class TeamMemberAPITestCase(APITestCase):
             'student_id': self.student.id,
             'team': self.team.id
         }
-        print(self.team_member_data)
 
     def test_create_team_member(self):
         response = self.client.post(
