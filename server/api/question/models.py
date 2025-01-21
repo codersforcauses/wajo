@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
-from django.utils.timezone import now
 import os
 import uuid
 from django.conf import settings
 import base64
+from django.utils.timezone import now
 
 
 class Image(models.Model):
@@ -56,10 +56,9 @@ class Category(models.Model):
     is_comp: Indicates if the category is for competition.
     """
     id = models.AutoField(primary_key=True)
-    diff_level = models.IntegerField()
-    genre = models.CharField(max_length=50)
+
+    genre = models.CharField(max_length=50, unique=True)
     info = models.TextField(default="")
-    is_comp = models.BooleanField()
 
     def __str__(self):
         return f'{self.id} {self.genre} {self.info}'
@@ -87,37 +86,29 @@ class Question(models.Model):
     name = models.CharField(max_length=255, unique=True)
     question_text = models.TextField(default="")
     note = models.TextField(default="")
-    answer = ArrayField(models.IntegerField(), default=list)  # answer to the question
-    answer_text = models.TextField(default="")  # detailed answer with explanation
-    category_id = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='questions')
+    # answer to the question
+    answer = ArrayField(models.IntegerField(), default=list)
+    # detailed answer with explanation
+    answer_text = models.TextField(default="")
+    categories = models.ManyToManyField(Category, related_name='questions', blank=True)
     created_by = models.ForeignKey(
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='questions_created')
     modified_by = models.ForeignKey(
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='questions_modified')
+    is_comp = models.BooleanField()
+    diff_level = models.IntegerField()
     layout = models.TextField(default="")  # Placeholder for layout enum
     image = models.ForeignKey(
         Image, on_delete=models.SET_NULL, null=True, blank=True, related_name='questions', default=None)
     mark = models.IntegerField(default=0)
-    time_created = models.DateField(auto_now=True)
-    time_modified = models.DateField(auto_now=True)
+    time_created = models.DateTimeField(auto_now_add=True)
+    time_modified = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
+        if not self.pk:
+            self.time_created = now()
         self.time_modified = now()
         super().save(*args, **kwargs)
-
-    def genre(self):
-        return self.category_id.genre
-
-    @classmethod
-    def filter_by_answer(cls, answer):
-        """
-        Filter questions by the given answer.
-
-        :param answer: The answer(an integer) to filter questions by.
-        :return: QuerySet of questions with the given answer.
-        """
-        return cls.objects.filter(answer=answer)
 
     def __str__(self):
         return f'{self.name} {self.question_text}'

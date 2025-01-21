@@ -4,7 +4,8 @@ from .models import Question, Category
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser  # ,all
+from rest_framework.permissions import IsAdminUser
+from django.utils.timezone import now
 
 
 @permission_classes([IsAdminUser])
@@ -16,22 +17,16 @@ class QuestionViewSet(viewsets.ModelViewSet):
     filterset_fields = ['mark']
 
     def create(self, request, *args, **kwargs):
-        user = request.user
-        data = request.data
-        data['created_by'] = user.id
-        data['modified_by'] = user.id
+        # validate integrity of name
+        name = request.data.get('name')
+        if Question.objects.filter(name=name).exists():
+            return Response({'error': 'Question with this name already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        return super().create(request, *args, **kwargs)
 
-        try:
-            serializer = self.get_serializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            print(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Exception as error:
-            return Response(
-                {"error": str(error)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+    def perform_update(self, serializer):
+        instance = serializer.save(modified_by=self.request.user)
+        instance.time_modified = now()
+        instance.save()
 
     @action(detail=False, methods=['get'])
     def search_by_answer(self, request):
@@ -50,3 +45,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['name']
+
+    def create(self, request, *args, **kwargs):
+        # validate integrity of genre
+        genre = request.data.get('genre')
+        if Category.objects.filter(genre=genre).exists():
+            return Response({'error': 'Category with this genre already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        return super().create(request, *args, **kwargs)
