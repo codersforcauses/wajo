@@ -84,15 +84,15 @@ class QuizSlot(models.Model):
 
     id = models.AutoField(primary_key=True)
     quiz = models.ForeignKey(
-        Quiz, on_delete=models.CASCADE, related_name="slots")
+        Quiz, on_delete=models.CASCADE, related_name="quiz_slots")
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, default=None, related_name="slots")
     # an index of the question in the quiz
-    slot = models.IntegerField(db_index=True)
+    slot_index = models.IntegerField(db_index=True)
     block = models.IntegerField()
 
     def __str__(self):
-        return f"{self.id} {self.quiz_id} {self.status}"
+        return f"{self.id} {self.quiz} {self.question} {self.slot_index}"
 
 
 class QuizAttempt(models.Model):
@@ -140,6 +140,9 @@ class QuestionAttempt(models.Model):
         QuizAttempt, on_delete=models.CASCADE, related_name="question_attempts")
     answer_student = models.CharField(max_length=100)
     is_correct = models.BooleanField(default=None)
+
+    def __str__(self):
+        return f"{self.id} {self.question_id} {self.quiz_attempt_id}"
 
     def check_answer(self):
         if self.answer_student == self.question.answer:
