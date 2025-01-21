@@ -1,81 +1,52 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, filters, status
 from .serializers import QuestionSerializer, CategorySerializer
-from django.apps import apps
+from .models import Question, Category
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser  # ,all
 
 
-class GenericView(APIView):
-    model_name = None  # defined in subclass, specifies model to use
-    serializer_class = None  # defined in subclass, specifies the serializer for the model
-
-    def get(self, request, **kwargs):
-        model = apps.get_model(app_label="question", model_name=self.model_name)  # load model based on its name
-        obj_id = kwargs.get("id")  # get "id" from url if present
-
-        # if ID exists, get object matching that ID
-        if obj_id:
-            obj = get_object_or_404(model, id=obj_id)
-            serializer = self.serializer_class(obj)
-        # if no ID, return all objects
-        else:
-            queryset = model.objects.all().order_by("id")
-            serializer = self.serializer_class(queryset, many=True)
-
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            obj = serializer.save()
-            return Response(self.serializer_class(obj).data, status=200)
-        else:
-            return Response(serializer.errors, status=400)
-
-    def put(self, request, **kwargs):
-        model = apps.get_model(app_label="question", model_name=self.model_name)
-        obj_id = kwargs.get("id")
-
-        obj = get_object_or_404(model, id=obj_id)
-        serializer = self.serializer_class(obj, data=request.data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=200)
-        else:
-            return Response(serializer.errors, status=400)
-
-    def delete(self, request, **kwargs):
-        model = apps.get_model(app_label="question", model_name=self.model_name)
-        obj_id = kwargs.get('id')
-
-        if obj_id:
-            obj = get_object_or_404(model, id=obj_id)
-            obj.delete()
-            return Response({"Success": f"{self.model_name} with ID {obj_id} deleted."}, status=200)
-        else:
-            model.objects.all().delete()
-            return Response({"Success": f"All {self.model_name} objects deleted."}, status=200)
-
-
-class QuestionView(GenericView):
-    model_name = "Question"
+@permission_classes([IsAdminUser])
+class QuestionViewSet(viewsets.ModelViewSet):
+    queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ['name']
+    filterset_fields = ['mark']
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        data = request.data
+        data['created_by'] = user.id
+        data['modified_by'] = user.id
+
+        try:
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            print(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as error:
+            return Response(
+                {"error": str(error)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(detail=False, methods=['get'])
+    def search_by_answer(self, request):
+        self.search_fields = ['answer']
+        return self.list(request)
+
+    # @action(detail=False, methods=['get'])
+    # def get_random_question(self, request):
+    #     question = Question.objects.order_by("?").first()
+    #     serializer = self.get_serializer(question)
+    #     return Response(serializer.data)
 
 
-class CategoryView(GenericView):
-    model_name = "Category"
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all().order_by("id")
     serializer_class = CategorySerializer
-
-
-class QuestionCategoryView(GenericView):
-    serializer_class = QuestionSerializer
-
-    def get(self, request, **kwargs):
-        model = apps.get_model(app_label="question", model_name="Question")
-        id = kwargs.get("id")
-
-        queryset = model.objects.filter(category_id=id)
-        serializer = self.serializer_class(queryset, many=True)
-
-        return Response(serializer.data)
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ['name']

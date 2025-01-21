@@ -22,7 +22,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/healthcheck/", include("api.healthcheck.urls")),
     path("api/leaderboard/", include("api.leaderboard.urls")),
-    path("api/question/", include("api.question.urls")),
+    path("api/questions/", include("api.question.urls")),
     path("api/auth/", include("api.auth.urls")),
     path("api/team/", include("api.team.urls")),
     path("api/users/", include("api.users.urls")),
