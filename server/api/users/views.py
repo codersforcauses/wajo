@@ -1,145 +1,161 @@
-from rest_framework import viewsets, status
-from rest_framework.decorators import api_view
+from django.db import IntegrityError
+from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from .models import School, Student, Teacher
-from .serializers import SchoolSerializer, StudentSerializer, TeacherSerializer
-from rest_framework.pagination import PageNumberPagination
+from rest_framework import status, viewsets, filters
+from rest_framework.permissions import IsAuthenticated, IsAdminUser  # ,allowAny
+from django.contrib.auth.models import User
+from .models import Student, Teacher, School
+from .serializers import StudentSerializer, SchoolSerializer, TeacherSerializer, UserSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 
 
-class Pagination(PageNumberPagination):
-    page_size = 5
-    page_size_query_param = 'page_size'
-    max_page_size = 100
+@permission_classes([IsAdminUser])
+class AdminUserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.filter(is_staff=True)
+    serializer_class = UserSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError as error:
+            return Response(
+                {"error": str(
+                    error), "message": "A user with this username already exists."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except IntegrityError as error:
+            return Response(
+                {"error": str(
+                    error), "message": "A user with this username already exists."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
-class SchoolViewSet(viewsets.ModelViewSet):
-    queryset = School.objects.all()
-    serializer_class = SchoolSerializer
-    pagination_class = Pagination
-
-
+@permission_classes([IsAuthenticated])
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
-    pagination_class = Pagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['school', 'year_level']
+    search_fields = ['user__username']
+
+    def get_queryset(self):
+        if hasattr(self.request.user, "teacher"):
+            teacher_school = self.request.user.teacher.school
+            return self.queryset.filter(school=teacher_school)
+        elif self.request.user.is_staff:
+            return self.queryset.all()
+        else:
+            return self.queryset.all()
+
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()  # Create a mutable copy of request.data
+        if hasattr(self.request.user, "teacher"):
+            data["school"] = self.request.user.teacher.school.id
+        try:
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except IntegrityError as error:
+            return Response(
+                {"error": str(
+                    error), "message": "A student with this username already exists."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def update(self, request, *args, **kwargs):
+        data = request.data.copy()  # Create a mutable copy of request.data
+        if hasattr(self.request.user, "teacher"):
+            data["school"] = self.request.user.teacher.school.id
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            serializer = self.get_serializer(
+                instance, data=data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data)
+        except IntegrityError as error:
+            return Response(
+                {"error": str(
+                    error), "message": "A student with this username already exists."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
+@permission_classes([IsAdminUser])
 class TeacherViewSet(viewsets.ModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
-    pagination_class = Pagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['school']
+    search_fields = ['user__username']
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError as error:
+            return Response(
+                {"error": str(error)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except IntegrityError as error:
+            return Response(
+                {"error": str(error)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
-@api_view(["GET", "POST"])
-def school_list(request):
-    if request.method == "GET":
-        # Handle GET request: list all schools with pagination
-        queryset = School.objects.all()
-        paginator = Pagination()
-        paginated_queryset = paginator.paginate_queryset(queryset, request)
-        serializer = SchoolSerializer(paginated_queryset, many=True)
-        return paginator.get_paginated_response(serializer.data)
+@permission_classes([IsAdminUser])
+class SchoolViewSet(viewsets.ModelViewSet):
+    queryset = School.objects.all()
+    serializer_class = SchoolSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
 
-    elif request.method == "POST":
-        # Handle POST request: create a new school
-        serializer = SchoolSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError as error:
+            return Response(
+                {
+                    "error": "A school with this name already exists.",
+                    "message": str(error)
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-
-@api_view(["GET", "PUT", "PATCH", "DELETE"])
-def school_detail(request, pk):
-    school = get_object_or_404(School, pk=pk)
-
-    if request.method == "GET":
-        serializer = SchoolSerializer(school)
-        return Response(serializer.data)
-    elif request.method in ["PUT", "PATCH"]:
-        serializer = SchoolSerializer(
-            school, data=request.data, partial=(request.method == "PATCH"))
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == "DELETE":
-        school.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except IntegrityError as error:
+            return Response(
+                {
+                    "error": "A school with this name already exists.",
+                    "message": str(error)
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
-@api_view(["GET", "POST"])
-def student_list(request):
-    if request.method == "GET":
-        # Handle GET request: list all students with pagination
-        queryset = Student.objects.all()
-        paginator = Pagination()
-        paginated_queryset = paginator.paginate_queryset(queryset, request)
-        serializer = StudentSerializer(paginated_queryset, many=True)
-        return paginator.get_paginated_response(serializer.data)
+# def get_role(self):
+#     """
+#     Returns the role of the user.
 
-    elif request.method == "POST":
-        # Handle POST request: create a new student
-        serializer = StudentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(["GET", "PUT", "PATCH", "DELETE"])
-def student_detail(request, pk):
-    student = get_object_or_404(Student, pk=pk)
-
-    if request.method == "GET":
-        serializer = StudentSerializer(student)
-        return Response(serializer.data)
-    elif request.method in ["PUT", "PATCH"]:
-        serializer = StudentSerializer(
-            student, data=request.data, partial=(request.method == "PATCH"))
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == "DELETE":
-        student.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-@api_view(["GET", "POST"])
-def teacher_list(request):
-    if request.method == "GET":
-        # Handle GET request: list all teachers with pagination
-        queryset = Teacher.objects.all()
-        paginator = Pagination()
-        paginated_queryset = paginator.paginate_queryset(queryset, request)
-        serializer = TeacherSerializer(paginated_queryset, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
-    elif request.method == "POST":
-        # Handle POST request: create a new teacher
-        serializer = TeacherSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(["GET", "PUT", "PATCH", "DELETE"])
-def teacher_detail(request, pk):
-    teacher = get_object_or_404(Teacher, pk=pk)
-
-    if request.method == "GET":
-        serializer = TeacherSerializer(teacher)
-        return Response(serializer.data)
-    elif request.method in ["PUT", "PATCH"]:
-        serializer = TeacherSerializer(
-            teacher, data=request.data, partial=(request.method == "PATCH"))
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == "DELETE":
-        teacher.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+#     Returns:
+#         str: The role of the user.
+#     """
+#     if hasattr(self, "student"):
+#         return "student"
+#     elif hasattr(self, "teacher"):
+#         return "teacher"
+#     return "user"
