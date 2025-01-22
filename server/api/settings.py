@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "rest_framework",
     "corsheaders",
+    'django_filters',
     "api.healthcheck",
     "api.leaderboard",
     "api.question",
@@ -70,7 +71,8 @@ REST_FRAMEWORK = {
     ),
 
 
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 SIMPLE_JWT = {
