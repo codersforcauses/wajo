@@ -44,7 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
         """
         fullname = validated_data['first_name'] + validated_data['last_name']
         validated_data['username'] = fullname
-        return super().create(validated_data)
+        return User.objects.create_user(**validated_data)
 
 
 class SchoolSerializer(serializers.ModelSerializer):

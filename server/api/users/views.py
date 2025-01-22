@@ -46,16 +46,16 @@ class StudentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if hasattr(self.request.user, "teacher"):
             teacher_school = self.request.user.teacher.school
-            return self.queryset.filter(school=teacher_school)
+            return self.queryset.filter(school=teacher_school.id)
         elif self.request.user.is_staff:
             return self.queryset.all()
         else:
-            return self.queryset.all()
+            return Response(status=status.HTTP_403)
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()  # Create a mutable copy of request.data
         if hasattr(self.request.user, "teacher"):
-            data["school"] = self.request.user.teacher.school.id
+            data["school_id"] = self.request.user.teacher.school.id
         try:
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
