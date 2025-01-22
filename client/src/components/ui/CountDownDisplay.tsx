@@ -5,9 +5,10 @@ interface CountdownDisplayProps {
 }
 
 const formatTime = (timeLeft: number) => {
-  const minutes = Math.floor(timeLeft / 60);
+  const hours = Math.floor(timeLeft / 3600);
+  const minutes = Math.floor((timeLeft - hours * 3600) / 60);
   const secs = timeLeft % 60;
-  return `${minutes}:${secs.toString().padStart(2, "0")}`;
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 };
 
 const CountdownDisplay: React.FC<CountdownDisplayProps> = ({ timeLeft }) => {
