@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import Pagination from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -9,19 +11,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { Button } from "../button";
-import Pagination from "../pagination";
-
 /**
  * The Datagrid component is a flexible, paginated data table with sorting and navigation features.
  *
- * @param {DatagridProps} props - Props including datacontext (data array), onDataChange (callback for data update), and ChangePage (external control for current page).
+ * @param {DatagridProps<Question>} props - Props including datacontext (data array), onDataChange (callback for data update), and ChangePage (external control for current page).
  */
 export function Datagrid({
   datacontext,
   onDataChange,
   changePage,
-}: DatagridProps) {
+}: DatagridProps<Question>) {
   // State to track sorting direction
   const [isAscending, setIsAscending] = useState(true);
   // State for the current page number
