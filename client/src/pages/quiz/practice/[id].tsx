@@ -42,6 +42,7 @@ export default function PracticeQuizPage() {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         totalQuestions={questionNumbers}
+        questions={[]}
       />
       <SubmissionPopup
         popUpStyle="showScore"
