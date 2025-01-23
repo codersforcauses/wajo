@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+import LeaderboardList from "@/components/ui/leaderboard/leaderboard-list";
+import StudentManagement from "@/components/ui/teacherdashboard/student management";
+import TeacherDetails from "@/components/ui/teacherdashboard/teacher details";
 import { LoginModal } from "@/components/ui/user/login-modal";
 import { usePings } from "@/hooks/pings";
 
