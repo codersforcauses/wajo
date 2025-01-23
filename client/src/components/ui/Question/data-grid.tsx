@@ -69,7 +69,14 @@ export function Datagrid({
     // Ensure paddedData always has 5 rows
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({ name: "", category: "", difficulty: "" });
+      updatedPaddedData.push({
+        name: "",
+        genre: "",
+        difficulty: "",
+        question: "",
+        answer: "",
+        solution: "",
+      });
     }
 
     setPaddedData(updatedPaddedData);
@@ -92,10 +99,10 @@ export function Datagrid({
             </TableHead>
             <TableHead className="w-1/4">
               <div className="flex items-center text-white">
-                <span>Category</span>
+                <span>Genre</span>
                 <span
                   className="ml-2 cursor-pointer"
-                  onClick={() => sortByColumn("category")}
+                  onClick={() => sortByColumn("genre")}
                 >
                   <svg
                     width="10"
@@ -140,9 +147,7 @@ export function Datagrid({
               className={"divide-gray-200 border-gray-50 text-sm text-black"}
             >
               <TableCell className="w-1/4">{item.name || "\u00A0"}</TableCell>
-              <TableCell className="w-1/4">
-                {item.category || "\u00A0"}
-              </TableCell>
+              <TableCell className="w-1/4">{item.genre || "\u00A0"}</TableCell>
               <TableCell className="w-1/4">
                 {item.difficulty || "\u00A0"}
               </TableCell>
