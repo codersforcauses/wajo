@@ -113,7 +113,7 @@ export function TeamDataGrid({
       <Pagination
         totalPages={totalPages}
         currentPage={currentPage}
-        onPageChange={(page) => handlePageChange(page)}
+        onPageChange={(page: number) => handlePageChange(page)}
         className="mr-20 mt-5 flex justify-end"
       />
     </div>
