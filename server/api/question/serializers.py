@@ -61,3 +61,20 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = '__all__'
+
+
+class CategoryQuestionsSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Category model.
+
+    Attributes:
+        genre (CharField): The genre of the category.
+        info (CharField): Additional information about the category.
+    """
+    genre = serializers.CharField(max_length=50, required=True)
+    info = serializers.CharField(required=False)
+    questions = QuestionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Category
+        fields = '__all__'

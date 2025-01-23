@@ -1,5 +1,5 @@
 from rest_framework import viewsets, filters, status
-from .serializers import QuestionSerializer, CategorySerializer
+from .serializers import QuestionSerializer, CategorySerializer, CategoryQuestionsSerializer
 from .models import Question, Category
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action, permission_classes
@@ -24,7 +24,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['name']
-    filterset_fields = ['mark']
+    filterset_fields = ['mark', 'id']
 
     def create(self, request, *args, **kwargs):
         """
@@ -54,7 +54,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
         instance.save()
 
     @action(detail=False, methods=['get'])
-    def search_by_answer(self, request):
+    def answers(self, request):
         """
         Search questions by answer.
 
@@ -65,6 +65,20 @@ class QuestionViewSet(viewsets.ModelViewSet):
             Response: The response object.
         """
         self.search_fields = ['answer']
+        return self.list(request)
+
+    @action(detail=False, methods=['get'])
+    def tags(self, request):
+        """
+        Search questions by category.
+
+        Args:
+            request (Request): The request object.
+
+        Returns:
+            Response: The response object.
+        """
+        self.search_fields = ['categories']
         return self.list(request)
 
     # @action(detail=False, methods=['get'])
@@ -113,3 +127,19 @@ class CategoryViewSet(viewsets.ModelViewSet):
         if Category.objects.filter(genre=genre).exists():
             return Response({'error': 'Category with this genre already exists'}, status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
+
+    @action(detail=True, methods=['get'])
+    def questions(self, request, pk=None):
+        """
+        Get questions by category.
+
+        Args:
+            request (Request): The request object.
+            pk (int): The primary key of the category.
+
+        Returns:
+            Response: The response object.
+        """
+        category = Category.objects.get(pk=pk)
+        serializer = CategoryQuestionsSerializer(category)
+        return Response(serializer.data)
