@@ -21,11 +21,12 @@
  *   startTime: "2024-10-01T00:00:00Z",
  *   duration: 100,
  *   questions: [
- *    { name: "Question01_2024", category: "Geometry Questions", difficulty: "Difficult" },
- *    { name: "Question02_2024", category: "Algebra Questions", difficulty: "Easy" }
+ *    { name: "Question01_2024", genre: "Geometry Questions", difficulty: "Difficult", marks: 1, block: "A" },
+ *    { name: "Question02_2024", genre: "Algebra Questions", difficulty: "Easy", marks: 1, block: "B"  },
  *  ],
  *  totalQuestions: 2,
  *  totalMarks: 100,
+ *  blocks: ["A", "B"],
  *  quizInstructions: "Answer all questions within the given time.",
  *  quizType: "Competition",
  *  isPublished: true
@@ -35,12 +36,18 @@ interface Quiz {
   name: string;
   startTime: Date;
   duration: number;
-  questions: Question[];
+  questions: QuizQuestion[];
   totalQuestions: number;
   totalMarks: number;
+  blocks: string[];
   quizInstructions: string;
   quizType: "Competition" | "Practice";
   isPublished: boolean;
+}
+
+interface QuizQuestion extends Question {
+  marks: number;
+  block: string;
 }
 
 /**
@@ -58,8 +65,8 @@ interface Quiz {
  *     startTime: "2024-10-01T00:00:00Z",
  *     duration: 100,
  *     questions: [
- *      { name: "Question01_2024", category: "Geometry Questions", difficulty: "Difficult" },
- *      { name: "Question02_2024", category: "Algebra Questions", difficulty: "Easy" }
+ *      { name: "Question01_2024", genre: "Geometry Questions", difficulty: "Difficult" },
+ *      { name: "Question02_2024", genre: "Algebra Questions", difficulty: "Easy" }
  *    ],
  *    totalQuestions: 2,
  *    totalMarks: 100,

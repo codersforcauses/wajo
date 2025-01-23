@@ -9,12 +9,15 @@
  * @example
  * const exampleQuestion: Question = {
  *   name: "Question01_2024",
- *   category: "Geometry Questions",
+ *   genre: "Geometry",
  *   difficulty: "Difficult"
  * };
  */
 interface Question {
   name: string;
-  category: string;
+  question: string;
+  answer: string;
+  solution: string;
+  genre: string;
   difficulty: string;
 }

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import ButtonList from "@/components/ui/buttonList";
 import CountdownDisplay from "@/components/ui/CountDownDisplay";
 import GenericQuiz from "@/components/ui/generic-quiz";
-import Pagination from "@/components/ui/pagination";
 import QuizStartPage from "@/components/ui/quiz-start-page";
 import SubmissionPopup from "@/components/ui/submissionPopup";
 import { useFetchData } from "@/hooks/use-fetch-data";
@@ -16,10 +15,13 @@ export default function CompetitionQuizPage() {
     isLoading: isQuizDataLoading,
     isError: isQuizDataError,
     error: QuizDataError,
-  } = useFetchData<Quiz>({
+  } = useFetchData<Quiz[]>({
     queryKey: ["quiz.list"],
     endpoint: "/quiz/list",
   });
+
+  // console.log("Quiz Data: ", quizData);
+  // console.log("2024 Quiz Data: ", quizData ? quizData[0] : "No data available");
 
   /**
    * Handles page change logic.
@@ -30,12 +32,24 @@ export default function CompetitionQuizPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const quizTitle = quizData?.name || "Math Competition";
-  const questionNumbers = 16;
+  let quizTitle = "Math Competition";
+  let quizStartTime = "2021-09-01T00:00:00.000Z";
+  let quizDuration = 100;
+  let numberOfQuestions = 16;
+
+  const id = 0;
+
+  if (quizData) {
+    quizTitle = quizData[id]?.name;
+    quizStartTime = quizData[id]?.startTime.toString();
+    quizDuration = quizData[id]?.duration;
+    numberOfQuestions = quizData[id]?.questions?.length;
+  }
 
   const handleStartQuiz = () => {
     console.log("Start Quiz");
     setDisplayQuiz(true);
+    // setTimeLeft(quizDuration * 60 * 1000)
     setTimeLeft(6000); // Set the countdown to 60 seconds (you can change this)
     setIsRunning(true);
   };
@@ -79,7 +93,13 @@ export default function CompetitionQuizPage() {
       ) : !displayQuiz ? (
         <div className="flex flex-col items-center border-2 border-orange-600">
           <h1 className="my-4 text-center">{quizTitle}</h1>
-          <QuizStartPage onStart={handleStartQuiz} />
+          <QuizStartPage
+            numberOfQuestions={numberOfQuestions}
+            quizDuration={quizDuration}
+            startTime={quizStartTime}
+            quizName={quizTitle}
+            onStart={handleStartQuiz}
+          />
         </div>
       ) : (
         <div className="border-2 border-orange-600">
@@ -90,12 +110,12 @@ export default function CompetitionQuizPage() {
               <CountdownDisplay timeLeft={timeLeft} />
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center justify-center space-x-2">
             <p>Question Navigation:</p>
             <ButtonList
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
-              totalQuestions={questionNumbers}
+              totalQuestions={numberOfQuestions}
             />
             <Button variant="secondary" onClick={() => setIsSubmitted(true)}>
               Submit
@@ -104,7 +124,8 @@ export default function CompetitionQuizPage() {
           <GenericQuiz
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
-            totalQuestions={questionNumbers}
+            totalQuestions={numberOfQuestions}
+            questions={quizData ? quizData[id].questions : []}
           />
           {isSubmitted && (
             <SubmissionPopup
