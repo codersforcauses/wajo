@@ -4,13 +4,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import Sponsor from "@/components/ui/sponsor";
-import { LoginModal } from "@/components/ui/user/login-modal";
 import { usePings } from "@/hooks/pings";
 
-import Layout from "../components/layout";
 import { Button } from "../components/ui/button";
 
-const Home = () => {
+export default function Home() {
   const [Loading, setLoading] = useState(true);
   const [clicked, setClicked] = useState(false);
   const { data, isLoading } = usePings({
@@ -150,7 +148,7 @@ const Home = () => {
           </div>
         </div>
         <Button onClick={() => router.push("/practice")}>
-          <p className="body-1">Start Practice</p>
+          <p className="body-1 px-10">Start Practice</p>
         </Button>
       </div>
       <div className="m-4 flex flex-col items-center gap-8 text-center md:w-3/4 lg:w-1/2">
@@ -184,10 +182,4 @@ const Home = () => {
       </div>
     </main>
   );
-};
-
-Home.getLayout = function getLayout(page: React.ReactElement) {
-  return <Layout>{page}</Layout>;
-};
-
-export default Home;
+}

@@ -1,9 +1,9 @@
+# from django.urls import path
+from rest_framework.routers import DefaultRouter
+from .views import QuestionViewSet, CategoryViewSet
 
-from django.urls import path
-from api.question import views
+router = DefaultRouter()
+router.register(r'question-bank', QuestionViewSet, basename='question-bank')
+router.register(r'categories', CategoryViewSet, basename='categories')
 
-
-app_name = "question"
-urlpatterns = [
-    path("get/", views.question_list, name="question-list"),
-]
+urlpatterns = router.urls
