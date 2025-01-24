@@ -21,8 +21,6 @@ const buttonVariants = cva(
         "tab-active": "bg-gray-200 text-black rounded-bl-none rounded-br-none", // to use in `MathInput` component
         "tab-inactive":
           "bg-gray-500 hover:bg-primary text-black rounded-bl-none rounded-br-none", // to use in `MathInput` component
-        inactive:
-          "bg-background text-grey border border-grey hover:bg-grey hover:text-black",
       },
       size: {
         default: "h-10 px-4 py-2",
