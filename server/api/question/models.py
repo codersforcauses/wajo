@@ -33,7 +33,7 @@ class Image(models.Model):
         if not filename:
             filename = f'{uuid.uuid4()}.png'
 
-        # Define the path to save the image
+        # Define the path to save the image （Setting.MEIDA_ROOT to configure the path)
         file_path = os.path.join(settings.MEDIA_ROOT, filename)
 
         # Save the image to the file
@@ -50,10 +50,8 @@ class Category(models.Model):
     Represents a category in the system.
 
     id: The primary key for the category.
-    diff_level: The difficulty level of the category.
     genre: The genre of the category.
     info: Additional information about the category.
-    is_comp: Indicates if the category is for competition.
     """
     id = models.AutoField(primary_key=True)
 
@@ -76,6 +74,8 @@ class Question(models.Model):
     category_id: The category of the question.
     created_by: The user who created the question.
     modified_by: The user who modified the question.
+    is_comp: If the question is used in the competition.
+    diff_level: Level of difficulty.
     layout: Placeholder for layout enum.
     image: The image associated with the question.
     mark: The mark for the question.
@@ -86,7 +86,7 @@ class Question(models.Model):
     name = models.CharField(max_length=255, unique=True)
     question_text = models.TextField(default="")
     note = models.TextField(default="")
-    # answer to the question
+    # answer to the question, can be multiple
     answer = ArrayField(models.IntegerField(), default=list)
     # detailed answer with explanation
     answer_text = models.TextField(default="")
