@@ -7,6 +7,8 @@
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
+    --nav-background: #ffd659;
+
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
 
@@ -95,9 +97,10 @@
     @apply border-border;
   }
   body {
-    @apply font-urbanist bg-background text-foreground;
+    @apply bg-background text-foreground;
+    font-family: var(--font-urbanist);
     font-size: 18px;
-    font-weight: medium;
+    font-weight: 500;
     line-height: 28px;
   }
   h1,
@@ -106,7 +109,7 @@
   h4,
   h5,
   h6 {
-    @apply font-roboto;
+    font-family: var(--font-roboto);
   }
   h1 {
     font-size: 62px;
@@ -150,7 +153,7 @@
   .body-2 {
     @apply font-urbanist;
     font-size: 14px;
-    font-weight: medium;
+    font-weight: 600;
     line-height: 24px;
   }
   .body-2-bold {
@@ -158,6 +161,15 @@
     font-size: 14px;
     font-weight: 600;
     line-height: 24px;
+  }
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 }
 

@@ -1,6 +1,8 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, LogOut } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useMemo, useState } from "react";
 
 import {
   Collapsible,
@@ -19,14 +21,14 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/context/auth-provider";
 import { cn } from "@/lib/utils";
 import { navData } from "@/types/app-sidebar";
 import { Role } from "@/types/user";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  Role: Role;
+  Role: Role | null;
 }
 
 /**
@@ -47,31 +49,65 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
  * @param {AppSidebarProps} props - The properties for the sidebar component.
  * @param {Role} props.Role - The role of the user (e.g., Admin, Staff, Student), used to determine the navigation items to display.
  */
-export function AppSidebar({ Role, ...props }: AppSidebarProps) {
+export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
+  const { logout } = useAuth();
   const router = useRouter();
-  const roleNavData = navData[Role];
-  roleNavData.forEach((section) => {
-    for (const item of section.items) {
-      item.isActive = new RegExp(item.url.replace(/\[.*?\]/g, ".*")).test(
-        router.pathname,
-      );
-      if (item.isActive) {
-        section.isActive = true;
-        break; // exit the loop
-      }
-    }
-  });
+
+  const [openSection, setOpenSection] = useState<string | null>(null);
+
+  // Memoize role-based navigation data to avoid recalculating on every render.
+  const roleNavData = useMemo(() => {
+    if (!Role) return [];
+
+    const isPathActive = (path: string) => {
+      const regex = new RegExp(`^${path.replace(/\[.*?\]/g, ".*")}$`);
+      return regex.test(router.pathname);
+    };
+
+    return navData[Role].map((section) => ({
+      ...section,
+      isActive: section.items.some((item) => isPathActive(item.url)),
+      items: section.items.map((item) => ({
+        ...item,
+        isActive: isPathActive(item.url),
+      })),
+    }));
+  }, [Role, router.pathname]);
+
+  const handleMenuToggle = (sectionTitle: string | null) => {
+    setOpenSection((prev) => (prev === sectionTitle ? null : sectionTitle));
+  };
+
+  const handleLogout = () => {
+    router.push("/");
+    logout();
+  };
 
   return (
     <Sidebar {...props}>
-      <SidebarContent className="gap-0">
+      <SidebarContent className="no-scrollbar gap-0 overflow-y-scroll">
+        <div className="flex items-center justify-center pt-2">
+          <Link href="/">
+            <Image
+              src="/wajo_white.svg"
+              alt="logo with white background"
+              width={100}
+              height={100}
+              className="cursor-pointer"
+            />
+          </Link>
+        </div>
         {roleNavData.map((section) => (
-          <SidebarGroup key={section.title}>
+          <SidebarGroup key={section.title} className="p-1.5 pb-0">
             <SidebarMenu>
               <Collapsible
-                key={section.title}
                 asChild
-                defaultOpen // make it open if it's active
+                key={section.title}
+                title={section.title}
+                open={openSection === section.title || section.isActive}
+                onOpenChange={(isOpen) =>
+                  handleMenuToggle(isOpen ? section.title : null)
+                }
                 className="group/collapsible"
               >
                 <SidebarMenuItem>
@@ -99,10 +135,15 @@ export function AppSidebar({ Role, ...props }: AppSidebarProps) {
                             asChild
                             isActive={item.isActive}
                             className="hover:bg-yellow data-[active=true]:bg-yellow"
+                            onClick={() => handleMenuToggle(section.title)}
                           >
-                            <a href={item.url}>
+                            <Link
+                              href={item.url}
+                              target={item.isNewTab ? "_blank" : "_self"}
+                              rel={item.isNewTab ? "noopener noreferrer" : ""} // add security for _blank only
+                            >
                               <span>{item.title}</span>
-                            </a>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
@@ -114,10 +155,17 @@ export function AppSidebar({ Role, ...props }: AppSidebarProps) {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="gap-0">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleLogout} aria-label="Logout">
+              <LogOut /> Logout
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
         <SidebarGroupLabel>Ctrl/Cmd + b to hide me</SidebarGroupLabel>
       </SidebarFooter>
-      <SidebarRail />
+      {/* <SidebarRail /> */}
     </Sidebar>
   );
 }

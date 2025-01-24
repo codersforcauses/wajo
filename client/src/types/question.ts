@@ -108,7 +108,6 @@ export interface PreviewModalDataContext {
  * @interface PreviewModalProps
  * @property {ReactNode} children - The child components to render inside the modal (e.g., buttons or triggers).
  * @property {PreviewModalDataContext} dataContext - The context containing the data to display in the modal.
- * @property {(question: string) => void} onClose - Callback function triggered when the modal is closed. It returns the updated question as a string.
  *
  * @see {@link https://github.com/codersforcauses/wajo/pull/29} for more details.
  *
@@ -124,7 +123,6 @@ export interface PreviewModalDataContext {
  *     difficulty: "Medium",
  *     genre: "Geography"
  *   },
- *   onClose: (updatedQuestion) => console.log("Modal closed with updated question:", updatedQuestion)
  * };
  */
 export interface PreviewModalProps {
