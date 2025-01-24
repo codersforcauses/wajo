@@ -39,9 +39,9 @@ export interface Question {
  *   changePage: 1
  * };
  */
-export interface DatagridProps {
-  datacontext: Question[];
-  onDataChange: (updatedData: Question[]) => void;
+export interface DatagridProps<T> {
+  datacontext: T[];
+  onDataChange: (updatedData: T[]) => void;
   changePage: number;
 }
 
