@@ -112,14 +112,3 @@ class Question(models.Model):
 
     def __str__(self):
         return f"{self.name} {self.question_text}"
-
-
-class Answer(models.Model):
-    id = models.AutoField(primary_key=True)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    answer = models.CharField(max_length=100)
-    feedback = models.TextField(default="")
-    image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.id} {self.question} {self.answer}"

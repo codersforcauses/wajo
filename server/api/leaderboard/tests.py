@@ -41,21 +41,18 @@ class LeaderboardAPITest(APITestCase):
             school=school1,
             attendent_year=2023,
             year_level="10",
-            status="active",
         )
         student2 = Student.objects.create(
             user=user2,
             school=school2,
             attendent_year=2023,
             year_level="11",
-            status="active",
         )
         student3 = Student.objects.create(
             user=user3,
             school=school1,
             attendent_year=2022,
             year_level="12",
-            status="inactive",
         )
 
         self.team1 = Team.objects.create(name="Team A", school=school1)
