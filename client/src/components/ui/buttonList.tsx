@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -17,25 +17,39 @@ const ButtonList: React.FC<ButtonListProps> = ({
   const [endIndex, setEndIndex] = useState(10);
   const buttonsPerPage = 10;
 
-  const handleClick = (num: number) => {
-    setCurrentPage(num);
-
+  const updateIndexes = () => {
+    // if (currentPage > endIndex) {
+    //   setStartIndex(currentPage - 1);
+    //   setEndIndex(currentPage + 9);
+    // } else if (currentPage < startIndex) {
+    //   setStartIndex(currentPage - 1);
+    //   setEndIndex(currentPage + 9);
+    // }
     if (startIndex === 0) {
-      if (num < 10) {
+      if (currentPage < 10) {
         setStartIndex(0);
         setEndIndex(10);
-      } else if (num >= 10) {
+      } else if (currentPage >= 10) {
         setStartIndex(6);
         setEndIndex(16);
       }
-    } else if (num === 7) {
+    } else if (currentPage === 7) {
       setStartIndex(0);
       setEndIndex(10);
     }
+  };
+
+  const handleClick = (num: number) => {
+    setCurrentPage(num);
+    updateIndexes();
 
     console.log(startIndex);
     console.log(endIndex);
   };
+
+  useEffect(() => {
+    updateIndexes();
+  }, [currentPage]);
 
   return (
     <div>
