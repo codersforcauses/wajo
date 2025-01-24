@@ -32,7 +32,12 @@ api_urls = [
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/healthcheck/", include("api.healthcheck.urls")),
+    path("api/questions/", include("api.question.urls")),
+    path("api/quiz/", include("api.quiz.urls")),
+    path("api/auth/", include("api.auth.urls")),
+    path("api/team/", include("api.team.urls")),
+    path("api/users/", include("api.users.urls")),
     path("api/", include(leaderboard_urls)),
-    path(r"api/", include(api_urls)),
     path(r"api/", include(router.urls)),
 ]
