@@ -44,6 +44,16 @@ export default function Layout({ children }: LayoutProps) {
     );
   }
 
-  if (!role) return <div>Failed to get user role.</div>;
+  if (!role) {
+    return (
+      <div>
+        <Navbar />
+        <main>
+          <div>Failed to get user role.</div>
+        </main>
+      </div>
+    );
+  }
+
   return <Sidebar role={role.toLowerCase() as Role}>{children}</Sidebar>;
 }
