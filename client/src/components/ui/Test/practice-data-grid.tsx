@@ -12,26 +12,36 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
-import { Team } from "@/types/team";
+import { Practice } from "@/types/practice";
 
 /**
- * Renders a paginated data grid for displaying team information.
+ * Renders a paginated data grid for displaying practice data.
  *
- * The `TeamDataGrid` component provides a table-based UI for displaying team data
- * with support for pagination. The behavior is similar to the `UserDataGrid`, but
- * it is tailored to display team-specific fields such as `Team Id`, `Team Name`,
- * `School`, `Description`, and `Created On`.
+ * The `PracticeDataGrid` component displays a table with columns for name, status, and action buttons
+ * for publishing, withdrawing, and deleting practice items. The data is paginated, and pagination
+ * controls are provided to navigate through the data.
  *
- * Similar Implementation:
- * @see [UserDataGrid](./data-grid.tsx) for reference.
+ * @function PracticeDataGrid
+ * @template T - The type of data being displayed in the grid, in this case, `Practice`.
+ * @param {Object} props - The props object.
+ * @param {Practice[]} props.datacontext - The array of practice data to be displayed in the grid.
+ * @param {function(Practice[]): void} props.onDataChange - Callback triggered when the data changes.
+ * @param {number} props.changePage - The page number to navigate to when the data changes.
+ *
+ * @example
+ * <PracticeDataGrid
+ *   datacontext={practiceData}
+ *   onDataChange={handlePracticeDataChange}
+ *   changePage={currentPage}
+ * />
  */
-export function TeamDataGrid({
+export function PracticeDataGrid({
   datacontext,
   onDataChange,
   changePage,
-}: DatagridProps<Team>) {
+}: DatagridProps<Practice>) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<Team[]>([]);
+  const [paddedData, setPaddedData] = useState<Practice[]>([]);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
 
@@ -48,7 +58,7 @@ export function TeamDataGrid({
 
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as Team);
+      updatedPaddedData.push({} as Practice);
     }
 
     setPaddedData(updatedPaddedData);
@@ -65,14 +75,9 @@ export function TeamDataGrid({
         <TableHeader className="bg-black text-lg font-semibold">
           <TableRow className="hover:bg-muted/0">
             <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
-              Team Id
+              Name
             </TableHead>
-            <TableHead className={commonTableHeadClasses}>Team Name</TableHead>
-            <TableHead className={commonTableHeadClasses}>School</TableHead>
-            <TableHead className={commonTableHeadClasses}>
-              Description
-            </TableHead>
-            <TableHead className={commonTableHeadClasses}>Created On</TableHead>
+            <TableHead className={commonTableHeadClasses}>Status</TableHead>
             <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
               Actions
             </TableHead>
@@ -84,25 +89,22 @@ export function TeamDataGrid({
               key={index}
               className={"divide-gray-200 border-gray-50 text-sm text-black"}
             >
-              <TableCell className="w-1/4">{item.id}</TableCell>
-              <TableCell className="w-1/4">{item.name}</TableCell>
-              <TableCell className="w-1/4">{item.school}</TableCell>
-              <TableCell className="w-1/4">{item.description}</TableCell>
-              <TableCell className="w-1/4">
-                {item.time_created ? (
-                  <>
-                    <div className="text-nowrap">
-                      {new Date(item.time_created).toLocaleDateString()}
-                    </div>
-                    <div className="text-nowrap">
-                      {new Date(item.time_created).toLocaleTimeString()}
-                    </div>
-                  </>
-                ) : null}
-              </TableCell>
+              <TableCell className="w-1/2">{item.name}</TableCell>
+              <TableCell className="w-1/2">{item.status}</TableCell>
               <TableCell className="flex py-4">
-                <div className={cn("flex", { invisible: !item.id })}>
+                <div
+                  className={cn("flex w-full justify-between", {
+                    invisible: !item.name,
+                  })}
+                >
                   <Button className="me-2">View</Button>
+                  <Button className="me-2">
+                    {item.status === "Published" ? (
+                      <a href="/withdraw">Withdraw</a>
+                    ) : (
+                      <a href="/publish">Publish</a>
+                    )}
+                  </Button>
                   <Button variant={"destructive"}>Delete</Button>
                 </div>
               </TableCell>
@@ -114,7 +116,7 @@ export function TeamDataGrid({
       <Pagination
         totalPages={totalPages}
         currentPage={currentPage}
-        onPageChange={(page) => handlePageChange(page)}
+        onPageChange={(page: number) => handlePageChange(page)}
         className="mr-20 mt-5 flex justify-end"
       />
     </div>
