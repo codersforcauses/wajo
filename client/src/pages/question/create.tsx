@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import PreviewModal from "@/components/ui/Question/preview-modal";
 import {
   Select,
   SelectContent,
@@ -42,7 +43,7 @@ const formSchema = z.object({
           ),
       {
         message:
-          "Answers must be integers between 0-999, separated by commas without spaces.",
+          "Must be an integer from 0-999, use “,” to separate multiple answers",
       },
     ),
   solution: z.string().optional(),
@@ -70,7 +71,11 @@ export default function Create() {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
+  const watchedValues = useWatch<FormValues>({
+    control: form.control,
+  });
+
+  const handleSubmit = (data: FormValues) => {
     console.log("Form Data:", data);
     alert(JSON.stringify(data, null, 2));
   };
@@ -80,18 +85,22 @@ export default function Create() {
       <h1 className="mb-6 text-center text-xl font-bold">Create Question</h1>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           {/* Question Name */}
           <FormField
             name="questionName"
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
+                <FormLabel htmlFor="questionName">
                   Question Name <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Please input question name" {...field} />
+                  <Input
+                    id="questionName"
+                    placeholder="Please input question name"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -104,11 +113,12 @@ export default function Create() {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
+                <FormLabel htmlFor="question">
                   Question <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <Textarea
+                    id="question"
                     placeholder="Please input question detail"
                     {...field}
                   />
@@ -124,7 +134,7 @@ export default function Create() {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
+                <FormLabel htmlFor="answer">
                   Answer <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormDescription>
@@ -132,7 +142,11 @@ export default function Create() {
                   answers
                 </FormDescription>
                 <FormControl>
-                  <Input placeholder="Please input answer" {...field} />
+                  <Input
+                    id="answer"
+                    placeholder="Please input answer"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -145,9 +159,13 @@ export default function Create() {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Solution</FormLabel>
+                <FormLabel htmlFor="solution">Solution</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Please input solution" {...field} />
+                  <Textarea
+                    id="solution"
+                    placeholder="Please input solution"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -160,11 +178,12 @@ export default function Create() {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
+                <FormLabel htmlFor="mark">
                   Mark <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
+                    id="mark"
                     placeholder="Please input marks to this question"
                     {...field}
                   />
@@ -182,12 +201,15 @@ export default function Create() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
+                  <FormLabel htmlFor="difficulty-select">
                     Difficulty <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="bg-yellow-400 w-24">
+                      <SelectTrigger
+                        id="difficulty-select"
+                        className="bg-yellow-400 w-24"
+                      >
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent className="w-24">
@@ -208,12 +230,15 @@ export default function Create() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
+                  <FormLabel htmlFor="genre-select">
                     Genre <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="bg-yellow-400 w-32">
+                      <SelectTrigger
+                        id="genre-select"
+                        className="bg-yellow-400 w-32"
+                      >
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent className="w-32">
@@ -230,9 +255,22 @@ export default function Create() {
           </div>
 
           <div className="flex justify-end gap-4">
-            <Button type="button" variant={"ghost"} className="bg-gray-200">
-              Preview
-            </Button>
+            <PreviewModal
+              dataContext={{
+                questionName: watchedValues.questionName || "",
+                question: watchedValues.question || "",
+                answer: watchedValues.answer || "",
+                solution: watchedValues.solution || "",
+                mark: watchedValues.mark || "",
+                difficulty: watchedValues.difficulty || "",
+                genre: watchedValues.genre || "",
+              }}
+            >
+              <Button type="button" variant={"ghost"} className="bg-gray-200">
+                Preview
+              </Button>
+            </PreviewModal>
+
             <Button type="submit" variant={"outline"}>
               Save
             </Button>
