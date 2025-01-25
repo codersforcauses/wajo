@@ -11,7 +11,7 @@ from django.utils.timezone import now
 @permission_classes([IsAdminUser])
 class QuestionViewSet(viewsets.ModelViewSet):
     """
-    A viewset for viewing and editing Question instances.
+    A viewset for viewing and editing Question instances.Not supported for PATCH requests.
 
     Attributes:
         queryset (QuerySet): The queryset of Question instances.
@@ -26,39 +26,52 @@ class QuestionViewSet(viewsets.ModelViewSet):
     search_fields = ['name']
     filterset_fields = ['mark', 'answers__value']
 
+    # override the create method
     def create(self, request, *args, **kwargs):
-        """
-        Create a new Question instance.
-
-        Args:
-            request (Request): The request object.
-
-        Returns:
-            Response: The response object.
-        """
         # validate integrity of name
         name = request.data.get('name')
-        answers_list = request.data.get('answers')
-        answers = []
-
         if Question.objects.filter(name=name).exists():
             return Response({'error': 'Question with this name already exists'}, status=status.HTTP_400_BAD_REQUEST)
-        for answer in answers_list:
-            answer = {'value': answer}
-            answers.append(answer)
-        request.data['answers'] = answers
-        return super().create(request, *args, **kwargs)
+        response = self.handle_answers(request, True)
+        return response
 
+    # override the update method
+    def update(self, request, *args, **kwargs):
+        response = self.handle_answers(request, False)
+        return response
+
+    # override the partial_update method to disable PATCH requests
+    def partial_update(self, request, *args, **kwargs):
+        return Response({'error': 'PATCH method is not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    # override the perform_update method
     def perform_update(self, serializer):
-        """
-        Update an existing Question instance.
-
-        Args:
-            serializer (Serializer): The serializer object.
-        """
         instance = serializer.save(modified_by=self.request.user)
         instance.time_modified = now()
         instance.save()
+
+    def handle_answers(self, request, is_create, *args, **kwargs):
+        answers = request.data.get('answers')
+        if is_create:
+            if not answers or len(answers) == 0:
+                return Response({'error': 'Answers field is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if isinstance(answers[0], dict):
+            if is_create:
+                return super().create(request, *args, **kwargs)
+            else:
+                return super().update(request, *args, **kwargs)
+        else:
+            answers_list = [{'value': int(answer)} for answer in answers]
+            data = request.data.copy()
+            data['answers'] = answers_list
+            if is_create:
+                serializer = self.get_serializer(data=data)
+            else:
+                instance = self.get_object()
+                serializer = self.get_serializer(instance, data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     # @action(detail=False, methods=['get'])
     # def get_random_question(self, request):
@@ -92,15 +105,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
     search_fields = ['name']
 
     def create(self, request, *args, **kwargs):
-        """
-        Create a new Category instance.
-
-        Args:
-            request (Request): The request object.
-
-        Returns:
-            Response: The response object.
-        """
         # validate integrity of genre
         genre = request.data.get('genre')
         if Category.objects.filter(genre=genre).exists():
@@ -111,4 +115,3 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class AnswerViewSet(viewsets.ModelViewSet):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
-    filterset_fields = ['question']
