@@ -2,7 +2,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
 from api.users.models import School, Student
-from .models import Team, Team_member
+from .models import Team, TeamMember
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -116,7 +116,7 @@ class TeamMemberAPITestCase(APITestCase):
     def test_get_team_member_detail(self):
         self.client.credentials(
             HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
-        team_member = Team_member.objects.create(
+        team_member = TeamMember.objects.create(
             student=self.student, team=self.team)
         response = self.client.get(f'/api/team/team-members/{team_member.id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -124,7 +124,7 @@ class TeamMemberAPITestCase(APITestCase):
     def test_update_team_member(self):
         self.client.credentials(
             HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
-        team_member = Team_member.objects.create(
+        team_member = TeamMember.objects.create(
             student=self.student, team=self.team)
         updated_data = {'student_id': self.student.id}
         response = self.client.patch(
@@ -134,7 +134,7 @@ class TeamMemberAPITestCase(APITestCase):
     def test_delete_team_member(self):
         self.client.credentials(
             HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
-        team_member = Team_member.objects.create(
+        team_member = TeamMember.objects.create(
             student=self.student, team=self.team)
         response = self.client.delete(
             f'/api/team/team-members/{team_member.id}/')

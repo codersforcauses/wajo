@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 # from api.quiz.models import Quiz
 from api.users.models import School, Student
 import uuid
@@ -22,7 +21,7 @@ class Team(models.Model):
         return f"{self.name} ({self.id})"
 
 
-class Team_member(models.Model):
+class TeamMember(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE,
                                 related_name="isA")
