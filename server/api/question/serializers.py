@@ -45,8 +45,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(), write_only=True, required=False, allow_null=True, many=True, source='categories')
     categories = CategorySerializer(read_only=True, many=True)
     is_comp = serializers.BooleanField(required=False, default=False)
-    # answers = AnswerSerializer(required=True, many=True)
-    answers = AnswerSerializer(many=True)
+    answers = AnswerSerializer(required=False, many=True)
 
     def create(self, validated_data):
         """
@@ -73,9 +72,4 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-<<<<<<< HEAD
-        fields = "__all__"
-=======
         fields = '__all__'
-
->>>>>>> f10305d (add nested answer creation)

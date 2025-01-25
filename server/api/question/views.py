@@ -38,8 +38,15 @@ class QuestionViewSet(viewsets.ModelViewSet):
         """
         # validate integrity of name
         name = request.data.get('name')
+        answers_list = request.data.get('answers')
+        answers = []
+
         if Question.objects.filter(name=name).exists():
             return Response({'error': 'Question with this name already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        for answer in answers_list:
+            answer = {'value': answer}
+            answers.append(answer)
+        request.data['answers'] = answers
         return super().create(request, *args, **kwargs)
 
     def perform_update(self, serializer):
