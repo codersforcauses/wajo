@@ -1,3 +1,5 @@
+import { Question } from "./question";
+
 /**
  * Represents a Quiz object with its properties.
  *
@@ -32,7 +34,7 @@
  *  isPublished: true
  * };
  */
-interface Quiz {
+export interface Quiz {
   id: number;
   name: string;
   startTime: Date;

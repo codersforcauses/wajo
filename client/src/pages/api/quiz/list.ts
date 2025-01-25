@@ -9,8 +9,9 @@
  * @module /api/quiz
  * @see {@link https://nextjs.org/docs/pages/building-your-application/routing/api-routes | Next.js API Routes Documentation}
  */
-
 import { NextApiRequest, NextApiResponse } from "next";
+
+import { Quiz } from "@/types/quiz";
 
 // Mock data representing question entries
 const mockQuizzes: Quiz[] = [

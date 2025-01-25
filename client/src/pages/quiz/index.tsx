@@ -1,5 +1,6 @@
 import HorizontalCard from "@/components/ui/horizontal-card";
 import { useFetchData } from "@/hooks/use-fetch-data";
+import { Quiz } from "@/types/quiz";
 
 import { NextPageWithLayout } from "../_app";
 
