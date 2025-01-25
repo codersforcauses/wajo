@@ -11,15 +11,13 @@ class TeamModelTest(TestCase):
     def setUp(self):
         # Setup a sample Team object
         self.team = Team.objects.create(
-            name="Test Team", description="Test Description", grades=90)
+            name="Test Team", description="Test Description")
 
     def test_team_creation(self):
         self.assertEqual(self.team.name, "Test Team")
-        self.assertEqual(self.team.grades, 90)
 
     def test_team_string_representation(self):
-        self.assertEqual(str(self.team), f"Team {self.team.id} ({
-                         self.team.name}): {self.team.grades}")
+        self.assertEqual(str(self.team), f"{self.team.name} ({self.team.id})")
 
 
 class TeamAPITestCase(APITestCase):
@@ -33,8 +31,7 @@ class TeamAPITestCase(APITestCase):
         self.team_data = {
             'name': 'Test Team',
             'school_id': self.school.id,
-            'description': 'A test team',
-            'grades': 90
+            'description': 'A test team'
         }
         # Generate JWT token
         refresh = RefreshToken.for_user(self.user)
@@ -89,7 +86,7 @@ class TeamMemberAPITestCase(APITestCase):
             user=self.user, school=self.school, year_level='12')
         # Create a team
         self.team = Team.objects.create(
-            name="Test Team", school=self.school, description="A test team", grades=90)
+            name="Test Team", school=self.school, description="A test team")
         # Team member data
         self.team_member_data = {
             'student_id': self.student.id,
