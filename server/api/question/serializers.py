@@ -46,7 +46,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     categories = CategorySerializer(read_only=True, many=True)
     is_comp = serializers.BooleanField(required=False, default=False)
     answers = AnswerSerializer(required=False, many=True)
-    
+
     def create(self, validated_data):
         """
         Override the default create method to set the created_by and modified_by fields
