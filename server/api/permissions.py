@@ -23,7 +23,7 @@ class SchoolViewSet(viewsets.ModelViewSet):
 def get_user_role(user):
     """
     Determine the role of a user based on their related model.
-    
+
     Args:
         user: The User object to check.
 
@@ -32,7 +32,7 @@ def get_user_role(user):
     """
     if not user.is_authenticated:
         return 'unknown'
-    
+
     try:
         # Check if the user is a Student
         if user.student:
