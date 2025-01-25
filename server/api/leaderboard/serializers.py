@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from api.quiz.models import QuizAttempt
 from api.team.models import Team
 from ..users.models import Student, User
 
@@ -19,27 +20,23 @@ class IndividualLeaderboardSerializer(serializers.ModelSerializer):
     """
 
     name = serializers.SerializerMethodField()
-    year_level = serializers.CharField()
-    school = serializers.StringRelatedField()
-    school_type = serializers.CharField(source="school.type")
-    is_country = serializers.BooleanField(source="school.is_country")
-    # score = TODO
+    year_level = serializers.IntegerField(source="student.year_level")
+    school = serializers.StringRelatedField(source="student.school")
+    school_type = serializers.CharField(source="student.school.type")
+    is_country = serializers.BooleanField(source="student.school.is_country")
 
     def get_name(self, obj):
-        return f"{obj.user.first_name} {obj.user.last_name}".strip()
-
-    # def get_score(self, obj):
-    #     pass
+        return f"{obj.student.user.first_name} {obj.student.user.last_name}".strip()
 
     class Meta:
-        model = Student
+        model = QuizAttempt
         fields = [
             "name",
             "year_level",
             "school",
             "school_type",
             "is_country",
-            # "score",
+            "total_marks",
         ]
 
 

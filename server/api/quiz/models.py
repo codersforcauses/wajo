@@ -73,6 +73,12 @@ class QuizAttempt(models.Model):
 
     """
 
+    class State(models.IntegerChoices):
+        UNATTEMPTED = 1
+        IN_PROGRESS = 2
+        SUBMITTED = 3
+        COMPLETED = 4
+
     id = models.AutoField(primary_key=True)
     quiz = models.ForeignKey(
         Quiz, on_delete=models.CASCADE, related_name="attempts")
@@ -80,9 +86,9 @@ class QuizAttempt(models.Model):
         Student, on_delete=models.CASCADE, related_name="quiz_attempts", default=None, null=True
     )
     current_page = models.IntegerField()
-    state = models.IntegerField()
+    state = models.IntegerField(choices=State.choices, default=State.UNATTEMPTED)
     time_start = models.DateTimeField(auto_now_add=True)
-    time_finish = models.DateTimeField()
+    time_finish = models.DateTimeField(null=True)
     time_modified = models.DateTimeField(auto_now=True)
     total_marks = models.IntegerField()
 

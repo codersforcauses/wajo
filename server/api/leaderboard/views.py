@@ -1,18 +1,37 @@
 from rest_framework import viewsets
-from django_filters import FilterSet, ChoiceFilter, NumberFilter
+from django_filters import FilterSet, ChoiceFilter, NumberFilter, ModelChoiceFilter
+
+from ..quiz.models import Quiz, QuizAttempt
 from .serializers import IndividualLeaderboardSerializer, TeamLeaderboardSerializer
 from ..users.models import School, Student
 from ..team.models import Team
 
 
 class IndividualLeaderboardFilter(FilterSet):
-    school__type = ChoiceFilter(
-        field_name="school__type", choices=School.SchoolType.choices
+
+    quiz_name = ModelChoiceFilter(
+        field_name="quiz__name",
+        queryset=Quiz.objects.all(),
+        label="Quiz Name",
+        to_field_name="name"
+    )
+    quiz_id = ModelChoiceFilter(
+        queryset=Quiz.objects.all().values_list('id', flat=True),
+        label="Quiz ID",
+    )
+    year_level = ModelChoiceFilter(
+        field_name='student__year_level',
+        queryset=Student.objects.distinct("year_level").values_list('year_level', flat=True),
+        label="Year Level",
+        to_field_name="year_level"
+    )
+    school_type = ChoiceFilter(
+        field_name="student__school__type", choices=School.SchoolType.choices
     )
 
     class Meta:
-        model = Student
-        fields = ["attendent_year", "year_level", "school__type"]
+        model = QuizAttempt
+        fields = ["quiz_name", "quiz_id", "year_level", "school_type"]
 
 
 class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
@@ -29,7 +48,7 @@ class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
         - get(request): Handles GET requests. Returns sample data for the leaderboard.
     """
 
-    queryset = Student.objects.all()
+    queryset = QuizAttempt.objects.all()
     serializer_class = IndividualLeaderboardSerializer
     filterset_class = IndividualLeaderboardFilter
     filterset_fields = ["attendent_year", "year_level", "school__type"]
