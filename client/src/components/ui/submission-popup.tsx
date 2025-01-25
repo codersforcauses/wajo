@@ -18,8 +18,14 @@ const SubmissionPopup: React.FC<SubmissionPopupProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="flex h-64 w-96 flex-col items-center justify-center rounded-lg bg-[#FFE8A3] p-6 text-center shadow-lg">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="flex h-64 w-96 flex-col items-center justify-center rounded-lg bg-[#FFE8A3] p-6 text-center shadow-lg"
+      >
         {popUpStyle === "showSubmit" ? (
           <>
             <h2 className="text-xl font-semibold">Submission Successful!</h2>

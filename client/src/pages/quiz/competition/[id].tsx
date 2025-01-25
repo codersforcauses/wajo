@@ -130,7 +130,7 @@ export default function CompetitionQuizPage() {
           />
           {isSubmitted && (
             <SubmissionPopup
-              popUpStyle="showScore"
+              popUpStyle="showSubmit"
               isOpen={isSubmitted}
               onClose={() => setIsSubmitted(false)}
               onTry={() => setDisplayQuiz(false)}
