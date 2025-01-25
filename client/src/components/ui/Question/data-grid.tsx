@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DatagridProps, Question } from "@/types/question";
 
 /**
  * The Datagrid component is a flexible, paginated data table with sorting and navigation features.
@@ -172,7 +173,7 @@ export function Datagrid({
       <Pagination
         totalPages={totalPages}
         currentPage={currentPage}
-        onPageChange={(page) => handlePageChange(page)}
+        onPageChange={(page: number) => handlePageChange(page)}
         className="mr-20 mt-5 flex justify-end"
       />
     </div>
