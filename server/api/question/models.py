@@ -92,6 +92,7 @@ class Question(models.Model):
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='questions_modified')
     is_comp = models.BooleanField()
     diff_level = models.IntegerField()
+    solution_text = models.TextField(default="")
     layout = models.TextField(default="")  # Placeholder for layout enum
     image = models.ForeignKey(
         Image, on_delete=models.SET_NULL, null=True, blank=True, related_name='questions', default=None)
@@ -113,7 +114,6 @@ class Answer(models.Model):
     id = models.AutoField(primary_key=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers")
     value = models.IntegerField()
-    text = models.TextField(default="")
 
     def __str__(self):
-        return f'{self.question} {self.value} {self.text}'
+        return f'{self.question} {self.value}'
