@@ -15,6 +15,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 // Mock data representing question entries
 const mockQuizzes: Quiz[] = [
   {
+    id: 1,
     name: "Quiz_2024",
     startTime: new Date("2024-10-01T00:00:00Z"),
     duration: 100,
@@ -238,6 +239,7 @@ What is the radius of the small circle?`,
     isPublished: true,
   },
   {
+    id: 2,
     name: "Quiz_2023",
     startTime: new Date("2023-10-01T00:00:00Z"),
     duration: 100,
@@ -271,6 +273,7 @@ What is the radius of the small circle?`,
     isPublished: true,
   },
   {
+    id: 3,
     name: "Quiz_2022",
     startTime: new Date("2022-10-01T00:00:00Z"),
     duration: 90,

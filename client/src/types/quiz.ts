@@ -33,6 +33,7 @@
  * };
  */
 interface Quiz {
+  id: number;
   name: string;
   startTime: Date;
   duration: number;
@@ -41,7 +42,7 @@ interface Quiz {
   totalMarks: number;
   blocks: string[];
   quizInstructions: string;
-  quizType: "Competition" | "Practice";
+  quizType: "Competition" | "Practice" | "PastPaper";
   isPublished: boolean;
 }
 

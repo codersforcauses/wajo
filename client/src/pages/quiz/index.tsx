@@ -1,4 +1,5 @@
 import HorizontalCard from "@/components/ui/horizontal-card";
+import { useFetchData } from "@/hooks/use-fetch-data";
 
 import { NextPageWithLayout } from "../_app";
 
@@ -10,50 +11,30 @@ import { NextPageWithLayout } from "../_app";
  */
 const QuizPage: NextPageWithLayout = () => {
   // mock data
-  let quizzes = [
-    {
-      title: "2025 Competition",
-      id: "1",
-      startTime: "03 June 2025 14:00",
-      type: "competition",
-    },
-    {
-      title: "2024 Competition",
-      id: "2",
-      startTime: "03 June 2024 14:00",
-      type: "pastpaper",
-    },
-    {
-      title: "2023 Competition",
-      id: "3",
-      startTime: "03 June 2024 14:00",
-      type: "pastpaper",
-    },
-    {
-      title: "2022 Competition",
-      id: "4",
-      startTime: "03 June 2024 14:00",
-      type: "pastpaper",
-    },
-    {
-      title: "2024 Practice Quiz 1",
-      id: "5",
-      startTime: "N/A",
-      type: "practice",
-    },
-  ];
+  const {
+    data: quizData,
+    isLoading: isQuizDataLoading,
+    isError: isQuizDataError,
+    error: QuizDataError,
+  } = useFetchData<Quiz[]>({
+    queryKey: ["quiz.list"],
+    endpoint: "/quiz/list",
+  });
 
-  let upcomingCompetition = quizzes.filter(
-    (quiz) => quiz.type === "competition",
+  let upcomingCompetition = quizData?.filter(
+    (quiz) => quiz.quizType === "Competition",
   );
-  let pastPapers = quizzes.filter((quiz) => quiz.type === "pastpaper");
-  let practiceTests = quizzes.filter((quiz) => quiz.type === "practice");
+  let pastPapers = quizData?.filter((quiz) => quiz.quizType === "PastPaper");
+  let practiceTests = quizData?.filter((quiz) => quiz.quizType === "Practice");
   return (
-    <div className="justify-centre mt-8 flex h-full w-full flex-col items-center border border-red-500 bg-white text-center">
-      <section className="my-4 flex min-h-32 w-full flex-col items-center justify-center border border-blue-500 bg-[#FFD659] p-4">
+    <div className="justify-centre mt-8 flex h-full w-full flex-col items-center bg-white text-center">
+      <section className="my-4 flex min-h-32 w-full flex-col items-center justify-center bg-[#FFD659] p-4">
         <h2>Upcoming Competition</h2>
         <h6 className="my-4">
-          Competition will start at {upcomingCompetition[0].startTime}{" "}
+          Competition will start at{" "}
+          {upcomingCompetition
+            ? upcomingCompetition[0].startTime.toString()
+            : "[TBD]"}{" "}
         </h6>
         <div className="flex w-full flex-col items-center justify-center gap-4">
           {/* {upcomingCompetitions.map((quiz) => (
@@ -64,27 +45,27 @@ const QuizPage: NextPageWithLayout = () => {
           ))} */}
           <HorizontalCard
             title="2025 Competition"
-            href={`quiz/competition/${upcomingCompetition[0].id}`}
+            href={`quiz/competition/${upcomingCompetition ? upcomingCompetition[0].id : "[TBD]"}`}
           />
         </div>
       </section>
-      <section className="mb-2 flex w-full flex-col items-center justify-center border border-blue-500 p-4">
+      <section className="mb-2 flex w-full flex-col items-center justify-center p-4">
         <h2 className="mb-4">Past Questions and Solutions</h2>
         <div className="flex w-full flex-col items-center justify-center gap-4">
-          {pastPapers.map((quiz) => (
+          {pastPapers?.map((quiz) => (
             <HorizontalCard
-              title={quiz.title}
+              title={quiz.name}
               href={`quiz/pastpaper/${quiz.id}`}
             />
           ))}
         </div>
       </section>
-      <section className="mb-2 flex w-full flex-col items-center justify-center border border-blue-500 p-4">
+      <section className="mb-2 flex w-full flex-col items-center justify-center p-4">
         <h2 className="mb-4">Practice Tests</h2>
         <div className="flex w-full flex-col items-center justify-center gap-4">
-          {practiceTests.map((quiz) => (
+          {practiceTests?.map((quiz) => (
             <HorizontalCard
-              title={quiz.title}
+              title={quiz.name}
               href={`quiz/practice/${quiz.id}`}
             />
           ))}
