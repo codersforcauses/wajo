@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # from api.quiz.models import Quiz
 from api.users.models import School, Student
 import uuid
@@ -8,7 +8,6 @@ import uuid
 
 
 class Team(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # quiz = models.ForeignKey(Quiz, on_delete=models.SET_NULL,
     #                          null=True, blank=True, related_name="isAssessedBy")
     name = models.CharField(max_length=100)
@@ -23,10 +22,12 @@ class Team(models.Model):
         return f"{self.name} ({self.id})"
 
 
-class TeamMember(models.Model):
+class Team_member(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE,
+                                related_name="isA")
+    team = models.ForeignKey("Team", on_delete=models.CASCADE,
+                             related_name="has")
     time_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

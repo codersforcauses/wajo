@@ -10,6 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DatagridProps, sortData } from "@/types/data-grid";
+import { Question } from "@/types/question";
 
 /**
  * The Datagrid component is a flexible, paginated data table with sorting and navigation features.
@@ -37,11 +39,7 @@ export function Datagrid({
    * @param {keyof Question} column - Column key to sort by.
    */
   const sortByColumn = (column: keyof Question) => {
-    const sortedData = [...datacontext].sort((a, b) => {
-      return isAscending
-        ? a[column].localeCompare(b[column])
-        : b[column].localeCompare(a[column]);
-    });
+    const sortedData = sortData(datacontext, column, isAscending);
     setCurrentPage(1); // Reset to the first page after sorting
     onDataChange(sortedData); // Update the parent with sorted data
     setIsAscending(!isAscending); // Toggle sorting direction
@@ -69,7 +67,7 @@ export function Datagrid({
     // Ensure paddedData always has 5 rows
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({ name: "", category: "", difficulty: "" });
+      updatedPaddedData.push({} as Question);
     }
 
     setPaddedData(updatedPaddedData);
@@ -167,7 +165,7 @@ export function Datagrid({
       <Pagination
         totalPages={totalPages}
         currentPage={currentPage}
-        onPageChange={(page) => handlePageChange(page)}
+        onPageChange={(page: number) => handlePageChange(page)}
         className="mr-20 mt-5 flex justify-end"
       />
     </div>

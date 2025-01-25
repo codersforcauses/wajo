@@ -41,6 +41,11 @@ class TeacherAdmin(admin.ModelAdmin):
 class CustomUserAdmin(admin.ModelAdmin):
     inlines = [StudentInline, TeacherInline]
 
+    def save_model(self, request, obj, form, change):
+        if form.cleaned_data["password"]:
+            obj.set_password(form.cleaned_data["password"])
+        super().save_model(request, obj, form, change)
+
 
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
