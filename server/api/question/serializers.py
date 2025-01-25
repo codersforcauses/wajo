@@ -23,7 +23,7 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = '__all__'
+        fields = ['value']
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -45,7 +45,8 @@ class QuestionSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(), write_only=True, required=False, allow_null=True, many=True, source='categories')
     categories = CategorySerializer(read_only=True, many=True)
     is_comp = serializers.BooleanField(required=False, default=False)
-    answers = AnswerSerializer(many=True, required=False)
+    # answers = AnswerSerializer(required=True, many=True)
+    answers = AnswerSerializer(many=True)
 
     def create(self, validated_data):
         """
@@ -61,8 +62,16 @@ class QuestionSerializer(serializers.ModelSerializer):
         validated_data['created_by'] = request.user
         validated_data['modified_by'] = request.user
 
-        return super().create(validated_data)
+        answers_data = validated_data.pop('answers', [])
+
+        question = super().create(validated_data)
+
+        for answer_data in answers_data:
+            Answer.objects.create(question=question, **answer_data)
+
+        return question
 
     class Meta:
         model = Question
         fields = '__all__'
+
