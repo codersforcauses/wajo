@@ -39,6 +39,8 @@ const config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        background1: "#FFE8A3",
+        background2: "#FFD659",
         background: "#ffffff",
         foreground: "hsl(var(--foreground))",
         primary: "#f8b400",
@@ -102,10 +104,19 @@ const config = {
             height: "0",
           },
         },
+        slide: {
+          from: {
+            transform: `translateX(0)`,
+          },
+          to: {
+            transform: `translateX(-100%)`,
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        slide: "slide 20s linear infinite",
       },
     },
   },
