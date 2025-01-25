@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Question, Category
+from .models import Question, Category, Answer
 from api.users.serializers import UserSerializer
 
 
@@ -19,6 +19,13 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class AnswerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Answer
+        fields = '__all__'
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     """
     Serializer for the Question model.
@@ -30,7 +37,6 @@ class QuestionSerializer(serializers.ModelSerializer):
         category_ids (PrimaryKeyRelatedField): The categories associated with the question.
         categories (CategorySerializer): The categories associated with the question.
         is_comp (BooleanField): Indicates if the question is for competition.
-        answer (ListField): The correct answer to the question.
     """
     name = serializers.CharField(max_length=255, required=True)
     created_by = UserSerializer(read_only=True).fields['username']
@@ -39,8 +45,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(), write_only=True, required=False, allow_null=True, many=True, source='categories')
     categories = CategorySerializer(read_only=True, many=True)
     is_comp = serializers.BooleanField(required=False, default=False)
-    answer = serializers.ListField(
-        child=serializers.IntegerField(), default=[1])
+    answers = AnswerSerializer(many=True, required=False)
 
     def create(self, validated_data):
         """
