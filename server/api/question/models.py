@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 import os
 import uuid
 from django.conf import settings
@@ -86,10 +85,6 @@ class Question(models.Model):
     name = models.CharField(max_length=255, unique=True)
     question_text = models.TextField(default="")
     note = models.TextField(default="")
-    # answer to the question
-    answer = ArrayField(models.IntegerField(), default=list)
-    # detailed answer with explanation
-    answer_text = models.TextField(default="")
     categories = models.ManyToManyField(Category, related_name='questions', blank=True)
     created_by = models.ForeignKey(
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='questions_created')
@@ -112,3 +107,13 @@ class Question(models.Model):
 
     def __str__(self):
         return f'{self.name} {self.question_text}'
+
+
+class Answer(models.Model):
+    id = models.AutoField(primary_key=True)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers")
+    value = models.IntegerField()
+    text = models.TextField(default="")
+
+    def __str__(self):
+        return f'{self.question} {self.value} {self.text}'

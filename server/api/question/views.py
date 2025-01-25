@@ -1,8 +1,8 @@
 from rest_framework import viewsets, filters, status
-from .serializers import QuestionSerializer, CategorySerializer
-from .models import Question, Category
+from .serializers import QuestionSerializer, CategorySerializer, AnswerSerializer
+from .models import Question, Category, Answer
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.decorators import action, permission_classes
+from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django.utils.timezone import now
@@ -24,7 +24,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['name']
-    filterset_fields = ['mark']
+    filterset_fields = ['mark', 'answers__value']
 
     def create(self, request, *args, **kwargs):
         """
@@ -52,20 +52,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
         instance = serializer.save(modified_by=self.request.user)
         instance.time_modified = now()
         instance.save()
-
-    @action(detail=False, methods=['get'])
-    def search_by_answer(self, request):
-        """
-        Search questions by answer.
-
-        Args:
-            request (Request): The request object.
-
-        Returns:
-            Response: The response object.
-        """
-        self.search_fields = ['answer']
-        return self.list(request)
 
     # @action(detail=False, methods=['get'])
     # def get_random_question(self, request):
@@ -113,3 +99,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
         if Category.objects.filter(genre=genre).exists():
             return Response({'error': 'Category with this genre already exists'}, status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
+
+
+class AnswerViewSet(viewsets.ModelViewSet):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerSerializer
+    filterset_fields = ['question']
