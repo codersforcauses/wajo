@@ -17,7 +17,7 @@ class Image(models.Model):
     url = models.CharField(max_length=255)
 
     def __str__(self):
-        return f'{self.id} {self.url}'
+        return f"{self.id} {self.url}"
 
     def save_image_to_local(self, image_data, filename=None):
         """
@@ -111,4 +111,4 @@ class Question(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.name} {self.question_text}'
+        return f"{self.name} {self.question_text}"

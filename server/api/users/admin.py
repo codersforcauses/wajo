@@ -15,9 +15,9 @@ class TeacherInline(admin.StackedInline):
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'code')
-    search_fields = ('name', 'code')
-    ordering = ('id',)
+    list_display = ("id", "name", "code")
+    search_fields = ("name", "code")
+    ordering = ("id",)
 
 
 @admin.register(Student)
@@ -32,10 +32,10 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    list_display = ('user', 'school', 'phone')
-    list_filter = ('school',)
-    search_fields = ('user__username', 'school__name', 'phone')
-    ordering = ('user',)
+    list_display = ("user", "school", "phone")
+    list_filter = ("school",)
+    search_fields = ("user__username", "school__name", "phone")
+    ordering = ("user",)
 
 
 class CustomUserAdmin(admin.ModelAdmin):
