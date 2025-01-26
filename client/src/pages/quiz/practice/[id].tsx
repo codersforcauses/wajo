@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import ButtonList from "@/components/ui/buttonList";
 import GenericQuiz from "@/components/ui/generic-quiz";
-import SubmissionPopup from "@/components/ui/submissionPopup";
+import SubmissionPopup from "@/components/ui/submission-popup";
 
 export default function PracticeQuizPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);

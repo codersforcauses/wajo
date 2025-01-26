@@ -3,6 +3,8 @@ import { set } from "zod";
 
 import { Button } from "@/components/ui/button";
 
+import AutoSavingAnswer from "./auto-saving";
+
 interface GenericQuizProps {
   currentPage: number;
   setCurrentPage: (page: number) => void;
@@ -80,6 +82,23 @@ export default function GenericQuiz({
     }
   };
 
+  const [answer, setAnswer] = useState(
+    () => localStorage.getItem("answer") || "",
+  );
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      localStorage.setItem("answer", answer);
+      setSaved(true);
+    }, 2000); // Auto-save after 2 seconds
+
+    return () => {
+      clearTimeout(timer);
+      setSaved(false);
+    }; // Cleanup previous timer
+  }, [answer]); // Runs when `answer` changes
+
   return (
     <div className="flex w-full items-center justify-center border-2 border-green-600">
       <div className="min-h-64 w-3/4 rounded-lg border-8 border-[#FFE8A3] p-10">
@@ -100,11 +119,10 @@ export default function GenericQuiz({
         <p className="text-slate-400">
           Must be an integer from 1-999, use "," to seperate multiple answers
         </p>
-        <input
-          type="text"
-          placeholder="Please input your answer"
-          className="mt-4 h-10 w-full min-w-64 rounded-sm border border-slate-500 px-2"
-        />
+        <div>
+          <AutoSavingAnswer answer={answer} setAnswer={setAnswer} />{" "}
+          {saved && <p className="text-gray-500">✅ Saved!</p>}
+        </div>
         <div className="mt-6 flex flex-col items-center justify-center">
           <br />
           <div className="flex space-x-2">

@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import ButtonList from "@/components/ui/buttonList";
-import CountdownDisplay from "@/components/ui/CountDownDisplay";
+import CountdownDisplay from "@/components/ui/countdown-display";
 import GenericQuiz from "@/components/ui/generic-quiz";
 import QuizStartPage from "@/components/ui/quiz-start-page";
-import SubmissionPopup from "@/components/ui/submissionPopup";
+import SubmissionPopup from "@/components/ui/submission-popup";
 import { useFetchData } from "@/hooks/use-fetch-data";
+import { Quiz } from "@/types/quiz";
 
 export default function CompetitionQuizPage() {
   // Fetches the quiz data using the custom hook.
@@ -129,7 +130,7 @@ export default function CompetitionQuizPage() {
           />
           {isSubmitted && (
             <SubmissionPopup
-              popUpStyle="showScore"
+              popUpStyle="showSubmit"
               isOpen={isSubmitted}
               onClose={() => setIsSubmitted(false)}
               onTry={() => setDisplayQuiz(false)}
