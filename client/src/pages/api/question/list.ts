@@ -17,6 +17,7 @@ import { Question } from "@/types/question";
 // Mock data representing question entries
 const mockQuestions: Question[] = [
   {
+    id: 1,
     name: "Question01_2024",
     genre: "Geometry Questions",
     difficulty: "Difficult",
@@ -25,6 +26,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 2,
     name: "Question02_2024",
     genre: "Algebra Questions",
     difficulty: "Difficult",
@@ -33,6 +35,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 3,
     name: "Question03_2024",
     genre: "Arithmetic Questions",
     difficulty: "Easy",
@@ -41,6 +44,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 4,
     name: "Question04_2024",
     genre: "Statistics Questions",
     difficulty: "Medium",
@@ -49,6 +53,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 5,
     name: "Question05_2024",
     genre: "Calculus Questions",
     difficulty: "Difficult",
@@ -57,6 +62,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 6,
     name: "Question06_2024",
     genre: "Calculus Questions",
     difficulty: "Difficult",
@@ -65,6 +71,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 7,
     name: "Question07_2024",
     genre: "Calculus Questions",
     difficulty: "Easy",
@@ -73,6 +80,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 8,
     name: "Question08_2024",
     genre: "Calculus Questions",
     difficulty: "Difficult",
@@ -81,6 +89,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 9,
     name: "Question09_2024",
     genre: "Calculus Questions",
     difficulty: "Difficult",
@@ -89,6 +98,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 10,
     name: "Question10_2024",
     genre: "Calculus Questions",
     difficulty: "Easy",
@@ -97,6 +107,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 11,
     name: "Question11_2024",
     genre: "Calculus Questions",
     difficulty: "Medium",
@@ -105,6 +116,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 12,
     name: "Question12_2024",
     genre: "Calculus Questions",
     difficulty: "Difficult",
@@ -113,6 +125,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 13,
     name: "Question13_2024",
     genre: "Probability Questions",
     difficulty: "Medium",
@@ -121,6 +134,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 14,
     name: "Question14_2024",
     genre: "Trigonometry Questions",
     difficulty: "Easy",
@@ -129,6 +143,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 15,
     name: "Question15_2024",
     genre: "Geometry Questions",
     difficulty: "Difficult",
@@ -137,6 +152,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 16,
     name: "Question16_2024",
     genre: "Algebra Questions",
     difficulty: "Medium",
@@ -145,6 +161,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 17,
     name: "Question17_2024",
     genre: "Arithmetic Questions",
     difficulty: "Easy",
@@ -153,6 +170,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 18,
     name: "Question18_2024",
     genre: "Statistics Questions",
     difficulty: "Medium",
@@ -161,6 +179,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 19,
     name: "Question19_2024",
     genre: "Calculus Questions",
     difficulty: "Difficult",
@@ -169,6 +188,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 20,
     name: "Question20_2024",
     genre: "Trigonometry Questions",
     difficulty: "Easy",
@@ -177,6 +197,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 21,
     name: "Question21_2024",
     genre: "Algebra Questions",
     difficulty: "Difficult",
@@ -185,6 +206,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 22,
     name: "Question22_2024",
     genre: "Geometry Questions",
     difficulty: "Medium",
@@ -193,6 +215,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 23,
     name: "Question23_2024",
     genre: "Arithmetic Questions",
     difficulty: "Easy",
@@ -201,6 +224,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 24,
     name: "Question24_2024",
     genre: "Statistics Questions",
     difficulty: "Medium",
@@ -209,6 +233,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 25,
     name: "Question25_2024",
     genre: "Probability Questions",
     difficulty: "Difficult",
@@ -217,6 +242,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 26,
     name: "Question26_2024",
     genre: "Trigonometry Questions",
     difficulty: "Medium",
@@ -225,6 +251,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 27,
     name: "Question27_2024",
     genre: "Algebra Questions",
     difficulty: "Easy",
@@ -233,6 +260,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 28,
     name: "Question28_2024",
     genre: "Geometry Questions",
     difficulty: "Difficult",
@@ -241,6 +269,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 29,
     name: "Question29_2024",
     genre: "Arithmetic Questions",
     difficulty: "Medium",
@@ -249,6 +278,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 30,
     name: "Question30_2024",
     genre: "Probability Questions",
     difficulty: "Easy",
@@ -257,6 +287,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 31,
     name: "Question31_2024",
     genre: "Trigonometry Questions",
     difficulty: "Difficult",
@@ -265,6 +296,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 32,
     name: "Question32_2024",
     genre: "Statistics Questions",
     difficulty: "Medium",
@@ -273,6 +305,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 33,
     name: "Question33_2024",
     genre: "Geometry Questions",
     difficulty: "Easy",
@@ -281,6 +314,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 34,
     name: "Question34_2024",
     genre: "Algebra Questions",
     difficulty: "Medium",
@@ -289,6 +323,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 35,
     name: "Question35_2024",
     genre: "Arithmetic Questions",
     difficulty: "Difficult",
@@ -297,6 +332,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 36,
     name: "Question36_2024",
     genre: "Statistics Questions",
     difficulty: "Easy",
@@ -305,6 +341,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 37,
     name: "Question37_2024",
     genre: "Calculus Questions",
     difficulty: "Medium",
@@ -313,6 +350,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 38,
     name: "Question38_2024",
     genre: "Probability Questions",
     difficulty: "Difficult",
@@ -321,6 +359,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 39,
     name: "Question39_2024",
     genre: "Trigonometry Questions",
     difficulty: "Medium",
@@ -329,6 +368,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 40,
     name: "Question40_2024",
     genre: "Algebra Questions",
     difficulty: "Easy",
@@ -337,6 +377,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 41,
     name: "Question41_2024",
     genre: "Geometry Questions",
     difficulty: "Medium",
@@ -345,6 +386,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 42,
     name: "Question42_2024",
     genre: "Arithmetic Questions",
     difficulty: "Easy",
@@ -353,6 +395,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 43,
     name: "Question43_2024",
     genre: "Statistics Questions",
     difficulty: "Medium",
@@ -361,6 +404,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 44,
     name: "Question44_2024",
     genre: "Probability Questions",
     difficulty: "Difficult",
@@ -369,6 +413,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 45,
     name: "Question45_2024",
     genre: "Trigonometry Questions",
     difficulty: "Easy",
@@ -377,6 +422,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 46,
     name: "Question46_2024",
     genre: "Algebra Questions",
     difficulty: "Medium",
@@ -385,6 +431,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 47,
     name: "Question47_2024",
     genre: "Geometry Questions",
     difficulty: "Difficult",
@@ -393,6 +440,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 48,
     name: "Question48_2024",
     genre: "Arithmetic Questions",
     difficulty: "Easy",
@@ -401,6 +449,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 49,
     name: "Question49_2024",
     genre: "Statistics Questions",
     difficulty: "Medium",
@@ -409,6 +458,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 50,
     name: "Question50_2024",
     genre: "Calculus Questions",
     difficulty: "Difficult",
@@ -417,6 +467,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 51,
     name: "Question51_2024",
     genre: "Probability Questions",
     difficulty: "Medium",
@@ -425,6 +476,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 52,
     name: "Question52_2024",
     genre: "Trigonometry Questions",
     difficulty: "Difficult",
@@ -433,6 +485,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 53,
     name: "Question53_2024",
     genre: "Algebra Questions",
     difficulty: "Easy",
@@ -441,6 +494,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 54,
     name: "Question54_2024",
     genre: "Geometry Questions",
     difficulty: "Medium",
@@ -449,6 +503,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 55,
     name: "Question55_2024",
     genre: "Arithmetic Questions",
     difficulty: "Difficult",
@@ -457,6 +512,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 56,
     name: "Question56_2024",
     genre: "Statistics Questions",
     difficulty: "Easy",
@@ -465,6 +521,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 57,
     name: "Question57_2024",
     genre: "Calculus Questions",
     difficulty: "Medium",
@@ -473,6 +530,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 58,
     name: "Question58_2024",
     genre: "Probability Questions",
     difficulty: "Easy",
@@ -481,6 +539,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 59,
     name: "Question59_2024",
     genre: "Trigonometry Questions",
     difficulty: "Difficult",
@@ -489,6 +548,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 60,
     name: "Question60_2024",
     genre: "Statistics Questions",
     difficulty: "Medium",
@@ -497,6 +557,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 61,
     name: "Question61_2024",
     genre: "Geometry Questions",
     difficulty: "Easy",
@@ -505,6 +566,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 62,
     name: "Question62_2024",
     genre: "Algebra Questions",
     difficulty: "Medium",
@@ -513,6 +575,7 @@ const mockQuestions: Question[] = [
     solution: "A = πr² = π(5)² = 78.54",
   },
   {
+    id: 63,
     name: "Question63_2024",
     genre: "Arithmetic Questions",
     difficulty: "Difficult",

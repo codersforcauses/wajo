@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { DatagridProps } from "@/types/data-grid";
 import { School } from "@/types/school";
 
 /**
