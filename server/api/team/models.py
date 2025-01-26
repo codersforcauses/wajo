@@ -11,6 +11,8 @@ class Team(models.Model):
     # quiz = models.ForeignKey(Quiz, on_delete=models.SET_NULL,
     #                          null=True, blank=True, related_name="isAssessedBy")
     name = models.CharField(max_length=100)
+
+    # not sure if this school can work becasue we have school related to student
     school = models.ForeignKey(
         School, on_delete=models.SET_NULL, null=True, blank=True, related_name="has")
     description = models.CharField(max_length=100)

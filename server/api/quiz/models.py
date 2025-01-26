@@ -64,6 +64,7 @@ class QuizAttempt(models.Model):
     Fields:
         id: The primary id for the quiz
         quiz (ForeginKey):The id of each particular quiz
+        student (Foreiginkey): THe student doing the quiz
         current_page (Integer): This is the current page in the quiz
         state (CharField): state of the attempts. 1 is for unattempted, 2 is for in progress and 3 is for submitted, 4 for completed.
         time_start (DateTimeField): Start time of the attempt
@@ -96,6 +97,8 @@ class QuizAttempt(models.Model):
 
 
 class QuestionAttempt(models.Model):
+    # This model is used to store the answer of the student for each question
+    # mainly for checking the answer of the student
     id = models.AutoField(primary_key=True)
     student = models.ForeignKey(
         Student, on_delete=models.CASCADE, related_name="question_attempts")
