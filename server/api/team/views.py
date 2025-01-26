@@ -18,7 +18,7 @@ class TeamPagination(PageNumberPagination):
 
 @permission_classes([IsAdminUser])
 class TeamViewSet(viewsets.ModelViewSet):
-    queryset = Team.objects.all()
+    queryset = Team.objects.all().order_by("id")
     serializer_class = TeamSerializer
     pagination_class = TeamPagination
 

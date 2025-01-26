@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from django_filters import FilterSet, ChoiceFilter, NumberFilter, ModelChoiceFilter
-
+from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
+from django.db.models import Sum
 from ..quiz.models import Quiz, QuizAttempt
 from .serializers import IndividualLeaderboardSerializer, TeamLeaderboardSerializer
 from ..users.models import School, Student
@@ -8,7 +8,6 @@ from ..team.models import Team
 
 
 class IndividualLeaderboardFilter(FilterSet):
-
     quiz_name = ModelChoiceFilter(
         field_name="quiz__name",
         queryset=Quiz.objects.all(),
@@ -51,26 +50,37 @@ class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = QuizAttempt.objects.all()
     serializer_class = IndividualLeaderboardSerializer
     filterset_class = IndividualLeaderboardFilter
-    filterset_fields = ["attendent_year", "year_level", "school__type"]
 
 
 class TeamLeaderboardFilter(FilterSet):
-    school__type = ChoiceFilter(
-        field_name="school__type", choices=School.SchoolType.choices
+    quiz_name = ModelChoiceFilter(
+        field_name="quiz_attempt__quiz__name",
+        queryset=Quiz.objects.all(),
+        label="Quiz Name",
+        to_field_name="name"
     )
-    students__attendent_year = NumberFilter(field_name="students__attendent_year")
+    quiz_id = ModelChoiceFilter(
+        queryset=Quiz.objects.all().values_list('id', flat=True),
+        label="Quiz ID",
+    )
+    year_level = ModelChoiceFilter(
+        field_name="students__year_level",
+        queryset=Student.objects.distinct("year_level").values_list('year_level', flat=True),
+        label="Year Level",
+        to_field_name="year_level"
+    )
+    school_type = ChoiceFilter(
+        field_name="students__school__type",
+        choices=School.SchoolType.choices,
+        label="School Type",
+    )
 
     class Meta:
         model = Team
-        fields = ["students__attendent_year", "students__year_level", "school__type"]
+        fields = ["quiz_name", "quiz_id", "year_level", "school_type"]
 
 
 class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Team.objects.all()
+    queryset = Team.objects.annotate(total_marks=Sum('quiz_attempts__total_marks')).order_by('id')
     serializer_class = TeamLeaderboardSerializer
     filterset_class = TeamLeaderboardFilter
-    filterset_fields = [
-        "students__attendent_year",
-        "students__year_level",
-        "school__type",
-    ]

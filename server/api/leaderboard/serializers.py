@@ -45,7 +45,7 @@ class StudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Student
-        fields = ["name", "year_level"]
+        fields = ["id", "name", "year_level"]
 
 
 class TeamLeaderboardSerializer(serializers.ModelSerializer):
@@ -57,17 +57,22 @@ class TeamLeaderboardSerializer(serializers.ModelSerializer):
     """
 
     school = serializers.StringRelatedField()
-    team_id = serializers.UUIDField(source="id")
-    # overall_schore = TODO
     is_country = serializers.BooleanField(source="school.is_country")
     students = StudentSerializer(many=True)
+    total_marks = serializers.IntegerField()
 
     class Meta:
         model = Team
         fields = [
             "school",
-            "team_id",
-            # "overall_score",
+            "id",
+            "total_marks",
             "is_country",
             "students",
         ]
+
+    def to_representation(self, instance):
+        """Sort students by ID before returning the response."""
+        response = super().to_representation(instance)
+        response["students"] = sorted(response["students"], key=lambda x: x["id"])
+        return response

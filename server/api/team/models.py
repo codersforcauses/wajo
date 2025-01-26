@@ -7,8 +7,6 @@ import uuid
 
 
 class Team(models.Model):
-    # quiz = models.ForeignKey(Quiz, on_delete=models.SET_NULL,
-    #                          null=True, blank=True, related_name="isAssessedBy")
     name = models.CharField(max_length=100)
     school = models.ForeignKey(
         School, on_delete=models.SET_NULL, null=True, blank=True, related_name="has"

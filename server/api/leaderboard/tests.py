@@ -16,10 +16,10 @@ class LeaderboardAPITest(APITestCase):
         self.client = APIClient()
 
         # Arrange
-        school1 = School.objects.create(
+        city_high_school = School.objects.create(
             name="City High", code="TEST1", type="Public", is_country=False
         )
-        school2 = School.objects.create(
+        outback_school = School.objects.create(
             name="Outback School", code="SAMPLE", type="Independent", is_country=True
         )
 
@@ -42,20 +42,20 @@ class LeaderboardAPITest(APITestCase):
             last_name="User",
         )
 
-        student1 = Student.objects.create(
+        self.student1 = Student.objects.create(
             user=user1,
-            school=school1,
+            school=city_high_school,
             year_level="10",
         )
-        student2 = Student.objects.create(
+        self.student2 = Student.objects.create(
             user=user2,
-            school=school2,
+            school=outback_school,
             year_level="11",
         )
-        student3 = Student.objects.create(
+        self.student3 = Student.objects.create(
             user=user3,
-            school=school1,
-            year_level="12",
+            school=city_high_school,
+            year_level="10",
         )
 
         quiz1 = Quiz.objects.create(name="Test Quiz 1", total_marks=100, open_time_date=datetime.now(tz=awst))
@@ -63,29 +63,29 @@ class LeaderboardAPITest(APITestCase):
 
         QuizAttempt.objects.create(
             quiz=quiz1,
-            student=student1,
+            student=self.student1,
             total_marks=100,
             current_page=1,
         )
         QuizAttempt.objects.create(
             quiz=quiz2,
-            student=student2,
+            student=self.student2,
             total_marks=85,
             current_page=2,
         )
         QuizAttempt.objects.create(
             quiz=quiz1,
-            student=student3,
+            student=self.student3,
             total_marks=40,
             current_page=3,
         )
 
-        self.team1 = Team.objects.create(name="Team A", school=school1)
-        self.team2 = Team.objects.create(name="Team B", school=school2)
+        self.team1 = Team.objects.create(name="Team A", school=city_high_school)
+        self.team2 = Team.objects.create(name="Team B", school=outback_school)
 
-        TeamMember.objects.create(student=student1, team=self.team1)
-        TeamMember.objects.create(student=student2, team=self.team2)
-        TeamMember.objects.create(student=student3, team=self.team1)
+        TeamMember.objects.create(student=self.student1, team=self.team1)
+        TeamMember.objects.create(student=self.student2, team=self.team2)
+        TeamMember.objects.create(student=self.student3, team=self.team1)
 
     def test_individual_leaderboard_should_list_results(self):
         # Act
@@ -126,7 +126,7 @@ class LeaderboardAPITest(APITestCase):
         # Assert
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertEqual(len(data), 1)
+        self.assertEqual(len(data), 2)
 
     def test_team_leaderboard_should_list_results(self):
         # Act
@@ -137,23 +137,21 @@ class LeaderboardAPITest(APITestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(len(data), 2)
-        self.assertDictEqual(
-            data[0],
-            {
-                "school": "City High",
-                "team_id": str(self.team1.id),
-                "is_country": False,
-                "students": [
-                    {"name": "testuser1", "year_level": "10"},
-                    {"name": "inactiveuser", "year_level": "12"},
-                ],
-            },
-        )
+        self.assertEqual(data[0]["id"], self.team1.id)
+        self.assertEqual(data[0]["school"], "City High")
+        self.assertEqual(data[0]["is_country"], False)
+        self.assertEqual(len(data[0]["students"]), 2)
+        self.assertEqual(data[0]["students"][0]["id"], self.student1.id)
+        self.assertEqual(data[0]["students"][0]["name"], "testuser1")
+        self.assertEqual(data[0]["students"][0]["year_level"], "10")
+        self.assertEqual(data[0]["students"][1]["id"], self.student3.id)
+        self.assertEqual(data[0]["students"][1]["name"], "inactiveuser")
+        self.assertEqual(data[0]["students"][1]["year_level"], "10")
 
     def test_team_leaderboard_should_filter_by_type(self):
         # Act
         url = reverse("leaderboard:team-list")
-        response = self.client.get(url, {"school__type": "Independent"})
+        response = self.client.get(url, {"school_type": "Independent"})
 
         # Assert
         self.assertEqual(response.status_code, 200)

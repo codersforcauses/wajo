@@ -1,4 +1,5 @@
 from django.db import models
+from api.team.models import Team
 from api.users.models import Student
 from api.question.models import Question
 
@@ -91,6 +92,9 @@ class QuizAttempt(models.Model):
     time_finish = models.DateTimeField(null=True)
     time_modified = models.DateTimeField(auto_now=True)
     total_marks = models.IntegerField()
+    team = models.ForeignKey(
+        Team, on_delete=models.CASCADE, related_name="quiz_attempts", default=None, null=True
+    )
 
     def __str__(self):
         return f"{self.id} {self.quiz} "
