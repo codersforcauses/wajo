@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Pagination } from "@/components/ui/pagination";
+import Pagination from "@/components/ui/pagination";
 import {
   Table,
   TableBody,

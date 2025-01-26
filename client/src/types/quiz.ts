@@ -48,7 +48,7 @@ export interface Quiz {
   isPublished: boolean;
 }
 
-interface QuizQuestion extends Question {
+export interface QuizQuestion extends Question {
   marks: number;
   block: string;
 }

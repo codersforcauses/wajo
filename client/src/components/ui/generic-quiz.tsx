@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { set } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { QuizQuestion } from "@/types/quiz";
 
 import AutoSavingAnswer from "./auto-saving";
 
