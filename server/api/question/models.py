@@ -16,7 +16,7 @@ class Image(models.Model):
     url = models.CharField(max_length=255)
 
     def __str__(self):
-        return f'{self.id} {self.url}'
+        return f"{self.id} {self.url}"
 
     def save_image_to_local(self, image_data, filename=None):
         """

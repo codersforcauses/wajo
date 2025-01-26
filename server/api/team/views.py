@@ -6,19 +6,19 @@ from rest_framework.pagination import PageNumberPagination
 from django.db import IntegrityError
 from rest_framework.decorators import permission_classes
 
-from .models import Team, Team_member
+from .models import Team, TeamMember
 from .serializers import TeamSerializer, TeamMemberSerializer
 
 
 class TeamPagination(PageNumberPagination):
     page_size = 5
-    page_size_query_param = 'page_size'
+    page_size_query_param = "page_size"
     max_page_size = 100
 
 
 @permission_classes([IsAdminUser])
 class TeamViewSet(viewsets.ModelViewSet):
-    queryset = Team.objects.all()
+    queryset = Team.objects.all().order_by("id")
     serializer_class = TeamSerializer
     pagination_class = TeamPagination
 
@@ -49,7 +49,7 @@ class TeamViewSet(viewsets.ModelViewSet):
 
 @permission_classes([IsAdminUser])
 class TeamMemberViewSet(viewsets.ModelViewSet):
-    queryset = Team_member.objects.all()
+    queryset = TeamMember.objects.all()
     serializer_class = TeamMemberSerializer
 
     def create(self, request, *args, **kwargs):
