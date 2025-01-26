@@ -54,12 +54,15 @@ class SchoolSerializer(serializers.ModelSerializer):
 
     Fields:
         - name: CharField, required
-
-    Meta:
-        - model: School
-        - exclude: ['id', 'code']
+        - type: ChoiceField, optional, mapped to TYPE_CHOICES
+        - is_country: BooleanField
+        - note: CharField, optional
     """
+
     name = serializers.CharField(required=True)
+    type = serializers.ChoiceField(choices=School.TYPE_CHOICES, required=False, allow_blank=True)
+    is_country = serializers.BooleanField(default=False)
+    note = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = School
