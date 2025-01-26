@@ -80,7 +80,7 @@ export default function Index() {
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
-      ></Datagrid>
+      />
     </div>
   );
 }

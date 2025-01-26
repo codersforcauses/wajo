@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -12,46 +14,37 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
-import { User } from "@/types/user";
+import { Leaderboard } from "@/types/leaderboard";
 
 /**
- * Renders a paginated data grid for displaying user information.
+ * Renders a paginated data grid for displaying leaderboard data.
  *
- * The `DataGrid` component provides a table-based UI for displaying user data
- * with support for pagination. It handles data slicing, empty cell padding,
- * and provides callback handlers for changes in data and pagination.
+ * The `LeaderboardDataGrid` component displays a table with columns for name, participant students,
+ * participant teams, and action buttons (ranking and insights). The data is paginated, and pagination
+ * controls are provided to navigate through the data.
  *
- * @function DataGrid
- * @template T - The type of data being displayed in the data grid.
+ * @function LeaderboardDataGrid
+ * @template T - The type of data being displayed in the grid, in this case, `Leaderboard`.
  * @param {Object} props - The props object.
- * @param {User[]} props.datacontext - The array of data items to be displayed in the grid.
- * @param {function(User[]): void} props.onDataChange - Callback triggered when the data changes.
+ * @param {Leaderboard[]} props.datacontext - The array of leaderboard data to be displayed in the grid.
+ * @param {function(Leaderboard[]): void} props.onDataChange - Callback triggered when the data changes.
  * @param {number} props.changePage - The page number to navigate to when the data changes.
  *
  * @example
- * // Example usage
- * const users = [
- *   { id: 1, username: "admin", role: "admin", school: "Greenfield High" },
- *   { id: 2, username: "teacher1", role: "teacher", school: "Westwood Academy" },
- * ];
- *
- * const handleDataChange = (updatedData) => {
- *   console.log(updatedData);
- * };
- *
- * <DataGrid
- *   datacontext={users}
- *   onDataChange={handleDataChange}
- *   changePage={1}
- * />;
+ * <LeaderboardDataGrid
+ *   datacontext={leaderboardData}
+ *   onDataChange={handleLeaderboardDataChange}
+ *   changePage={currentPage}
+ * />
  */
-export function DataGrid({
+export function LeaderboardDataGrid({
   datacontext,
   onDataChange,
   changePage,
-}: DatagridProps<User>) {
+}: DatagridProps<Leaderboard>) {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<User[]>([]);
+  const [paddedData, setPaddedData] = useState<Leaderboard[]>([]);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
 
@@ -68,7 +61,7 @@ export function DataGrid({
 
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as User);
+      updatedPaddedData.push({} as Leaderboard);
     }
 
     setPaddedData(updatedPaddedData);
@@ -85,11 +78,14 @@ export function DataGrid({
         <TableHeader className="bg-black text-lg font-semibold">
           <TableRow className="hover:bg-muted/0">
             <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
-              User Id
+              Name
             </TableHead>
-            <TableHead className={commonTableHeadClasses}>User Name</TableHead>
-            <TableHead className={commonTableHeadClasses}>User Role</TableHead>
-            <TableHead className={commonTableHeadClasses}>School</TableHead>
+            <TableHead className={cn(commonTableHeadClasses, "text-center")}>
+              Participant Students
+            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses, "text-center")}>
+              Participant Teams
+            </TableHead>
             <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
               Actions
             </TableHead>
@@ -101,14 +97,25 @@ export function DataGrid({
               key={index}
               className={"divide-gray-200 border-gray-50 text-sm text-black"}
             >
-              <TableCell className="w-1/4">{item.id}</TableCell>
-              <TableCell className="w-1/4">{item.username}</TableCell>
-              <TableCell className="w-1/4">{item.role}</TableCell>
-              <TableCell className="w-1/4">{item.school}</TableCell>
+              <TableCell className="w-2/5">{item.name}</TableCell>
+              <TableCell className="w-1/5 text-center">
+                {item.participant_students}
+              </TableCell>
+              <TableCell className="w-2/5 text-center">
+                {item.participant_teams}
+              </TableCell>
               <TableCell className="flex py-4">
-                <div className={cn("flex", { invisible: !item.username })}>
-                  <Button className="me-2">View</Button>
-                  <Button variant={"destructive"}>Delete</Button>
+                <div
+                  className={cn("flex w-full justify-between", {
+                    invisible: !item.name,
+                  })}
+                >
+                  <Button className="me-2">
+                    <Link href={`${router.pathname}/ranking`}>Ranking</Link>
+                  </Button>
+                  <Button className="me-2">
+                    <Link href={`${router.pathname}/insight`}>Insight</Link>
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
@@ -119,7 +126,7 @@ export function DataGrid({
       <Pagination
         totalPages={totalPages}
         currentPage={currentPage}
-        onPageChange={(page) => handlePageChange(page)}
+        onPageChange={(page: number) => handlePageChange(page)}
         className="mr-20 mt-5 flex justify-end"
       />
     </div>
