@@ -17,6 +17,8 @@
  *   competitionPeriod: "2024"
  * };
  */
+import { z } from "zod";
+
 interface Team {
   teamId: string;
   name: string;
@@ -72,3 +74,17 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
   className?: string;
 }
+
+/**
+ * A Zod schema for validating the creation of a team.
+ *
+ * @example
+ * // Example usage of createTeamSchema to validate team data
+ * const teamData = { name: "Team A", school_id: 1, description: "A great team" };
+ * const parsedData = createTeamSchema.parse(teamData);
+ */
+export const createTeamSchema = z.object({
+  name: z.string().min(1, "Required"),
+  school_id: z.number({ message: "Required" }),
+  description: z.string().min(1, "Required"),
+});

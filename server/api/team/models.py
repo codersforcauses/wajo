@@ -1,14 +1,13 @@
 from django.db import models
-from django.contrib.auth.models import User
+
 # from api.quiz.models import Quiz
-from api.users.models import School
-import uuid
+from api.users.models import School, Student
+
 
 # Create your models here.
 
 
 class Team(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # quiz = models.ForeignKey(Quiz, on_delete=models.SET_NULL,
     #                          null=True, blank=True, related_name="isAssessedBy")
     name = models.CharField(max_length=100)
@@ -24,11 +23,10 @@ class Team(models.Model):
 
 
 class Team_member(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    student = models.ForeignKey(User, on_delete=models.SET_NULL,
-                                null=True, blank=True, related_name="isA")
-    team = models.ForeignKey("Team", on_delete=models.SET_NULL,
-                             null=True, blank=True, related_name="has")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE,
+                                related_name="isA")
+    team = models.ForeignKey("Team", on_delete=models.CASCADE,
+                             related_name="has")
     time_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

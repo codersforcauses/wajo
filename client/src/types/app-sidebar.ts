@@ -6,10 +6,13 @@ import {
   UserRoundCog,
 } from "lucide-react";
 
+import { backendURL } from "@/lib/api";
+
 interface MenuItem {
   title: string;
   url: string; // need to be unique
   isActive?: boolean;
+  isNewTab?: boolean;
 }
 
 interface MenuSection {
@@ -47,18 +50,19 @@ export const navData: NavigationData = {
       title: "Test Management",
       icon: BookType,
       items: [
-        { title: "Practice Test", url: "#" },
-        { title: "Competitions", url: "#" },
-        { title: "Results & Rankings", url: "/leaderboard" },
+        { title: "Practice Test", url: "/test" },
+        { title: "Competitions", url: "/test/competition" },
+        { title: "Results & Rankings", url: "/test/leaderboard" },
       ],
     },
     {
       title: "User Management",
       icon: UserRoundCog,
       items: [
-        { title: "Schools", url: "#" },
-        { title: "Users", url: "#" },
-        { title: "Teams", url: "#" },
+        { title: "Schools", url: "/users/school" },
+        { title: "Users", url: "/users" },
+        { title: "Teams", url: "/users/team" },
+        { title: "Admin Portal", url: `${backendURL}admin`, isNewTab: true },
       ],
     },
   ],
