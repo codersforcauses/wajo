@@ -12,9 +12,16 @@ class School(models.Model):
         code (CharField): A unique code for the school, up to 10 characters.
     """
 
+    class SchoolType(models.TextChoices):
+        PUBLIC = "Public"
+        INDEPENDENT = "Independent"
+        CATHOLIC = "Catholic"
+
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, unique=True)
     code = models.CharField(max_length=10)
+    type = models.TextField(choices=SchoolType.choices, default=SchoolType.PUBLIC)
+    is_country = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name}"
@@ -35,6 +42,7 @@ class Student(models.Model):
         User, on_delete=models.CASCADE, related_name="student",)
     school = models.ForeignKey(
         School, on_delete=models.CASCADE, related_name="students", blank=True, null=True)
+    attendent_year = models.IntegerField(default=2025)
     year_level = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -57,7 +65,8 @@ class Teacher(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="teacher")
     school = models.ForeignKey(
-        School, on_delete=models.CASCADE, related_name="teachers")
+        School, on_delete=models.CASCADE, related_name="teachers"
+    )
     phone = models.CharField(max_length=15, blank=True)
     email = models.EmailField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
