@@ -53,6 +53,9 @@ class AdminQuizSerializer(serializers.ModelSerializer):
 
 
 class QuizAttemptSerializer(serializers.ModelSerializer):
+    current_page = serializers.IntegerField(default=0, required=False)
+    total_marks = serializers.IntegerField(default=0, required=False)
+
     class Meta:
         model = QuizAttempt
         fields = '__all__'

@@ -30,21 +30,26 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['last_login', 'date_joined']
 
     def create(self, validated_data):
-        """
-        Creates a new User instance.
-
-        Args:
-            validated_data (dict): The validated data for creating a User instance.
-                - first_name (str): The first name of the user.
-                - last_name (str): The last name of the user.
-                - password (str): The password for the user.
-
-        Returns:
-            User: The created User instance.
-        """
         fullname = validated_data['first_name'] + validated_data['last_name']
         validated_data['username'] = fullname
-        return super().create(validated_data)
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        print(user.password)
+        return user
+
+    def update(self, instance, validated_data):
+        print(validated_data)
+        fullname = validated_data['first_name'] + validated_data['last_name']
+        validated_data['username'] = fullname
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+            instance.set_password(password)
+            instance.save()
+            validated_data['password'] = instance.password
+            print(instance.password, validated_data['password'])
+        return super().update(instance, validated_data)
 
 
 class SchoolSerializer(serializers.ModelSerializer):
