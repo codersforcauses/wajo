@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/router";
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +25,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { usePostMutation } from "@/hooks/use-post-data";
+import { Question } from "@/types/question";
 
 // Define the Zod schema for validation
 const formSchema = z.object({
@@ -75,9 +79,29 @@ export default function Create() {
     control: form.control,
   });
 
+  const router = useRouter();
+  const { mutate: createQuestion, isPending: isCreatePending } =
+    usePostMutation<Question>(["question"], "/questions/question-bank/", 1000, {
+      onSuccess: () => {
+        toast.success("Question created successfully!");
+        router.push("/question/");
+      },
+    });
+
   const handleSubmit = (data: FormValues) => {
-    console.log("Form Data:", data);
-    alert(JSON.stringify(data, null, 2));
+    createQuestion({
+      name: data.questionName,
+      category_ids: [1],
+      is_comp: false,
+      answer: data.answer.split(",").map((num) => Number(num.trim())), // list of numbers
+      question_text: data.question,
+      note: "note",
+      answer_text: data.solution,
+      diff_level: 1,
+      layout: "layout",
+      mark: parseInt(data.mark, 0),
+      image: null,
+    });
   };
 
   return (
@@ -271,7 +295,11 @@ export default function Create() {
               </Button>
             </PreviewModal>
 
-            <Button type="submit" variant={"outline"}>
+            <Button
+              type="submit"
+              variant={"outline"}
+              disabled={isCreatePending}
+            >
               Save
             </Button>
           </div>

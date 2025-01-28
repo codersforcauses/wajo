@@ -4,7 +4,8 @@ import {
   UseMutationResult,
   useQueryClient,
 } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
+import { toast } from "sonner";
 
 import api from "@/lib/api";
 
@@ -37,8 +38,8 @@ import api from "@/lib/api";
  */
 export const usePostMutation = <
   TData,
-  TError = AxiosError,
   TVariables = unknown,
+  TError = AxiosError<{ error: string; message: string }>,
 >(
   mutationKey: string[],
   endpoint: string,
@@ -56,8 +57,16 @@ export const usePostMutation = <
     mutationFn: (variables: TVariables) => {
       return api.post(endpoint, variables, { timeout });
     },
-    onSuccess: () => {
+    onError: (error: TError) => {
+      // extract error message from BE response
+      if (axios.isAxiosError(error) && error.response?.data) {
+        const { message, error: detailedError } = error.response.data;
+        toast.error(message || detailedError || "Something went wrong");
+      }
+    },
+    onSuccess: (data, details, context) => {
       queryClient.invalidateQueries({ queryKey: [mutationKey] });
+      if (args?.onSuccess) args.onSuccess(data, details, context);
     },
   });
 };
