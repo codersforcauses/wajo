@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+import { School, Student } from "@/types/user";
+
+export interface TeamMember {
+  id: number;
+  student: Student;
+  time_added: Date;
+  team: number;
+}
+
 /**
  * Represents a team with its id, name, associated school, description, and creation date.
  *
@@ -12,10 +21,12 @@ import { z } from "zod";
  */
 export interface Team {
   id: number;
+  members: TeamMember[];
+  school: School;
   name: string;
-  school: string;
   description: string;
   time_created: Date;
+  students: Student[];
 }
 
 /**

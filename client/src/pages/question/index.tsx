@@ -16,7 +16,7 @@ export default function Index() {
     isError: isQuestionError,
     error: QuestionError,
   } = useFetchData<Question[]>({
-    queryKey: ["question.list"],
+    queryKey: ["questions.question-bank"],
     endpoint: "/questions/question-bank/",
   });
 

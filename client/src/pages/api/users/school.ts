@@ -12,7 +12,7 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { School } from "@/types/school";
+import { School } from "@/types/user";
 
 /**
  * Mock data representing school entries.
@@ -25,17 +25,17 @@ for (let i = 0; i < 11; i++) {
     {
       id: i * 3 + 1,
       name: `School Alpha ${i + 1}`,
-      time_created: new Date(`2025-01-01T12:00:00Z`),
+      created_at: new Date(`2025-01-01T12:00:00Z`),
     },
     {
       id: i * 3 + 2,
       name: `School Beta ${i + 1}`,
-      time_created: new Date(`2025-01-01T13:00:00Z`),
+      created_at: new Date(`2025-01-01T13:00:00Z`),
     },
     {
       id: i * 3 + 3,
       name: `School Gamma ${i + 1}`,
-      time_created: new Date(`2025-01-01T14:00:00Z`),
+      created_at: new Date(`2025-01-01T14:00:00Z`),
     },
   );
 }

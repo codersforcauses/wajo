@@ -15,8 +15,8 @@ export default function Index() {
     isError: isLeaderboardError,
     error: leaderboardError,
   } = useFetchData<Leaderboard[]>({
-    queryKey: ["leaderboard.list"],
-    endpoint: "/test/leaderboards",
+    queryKey: ["leaderboard.individual"],
+    endpoint: "/leaderboard/individual/",
   });
 
   const [page, setPage] = useState<number>(1);
