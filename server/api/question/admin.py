@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, Category
+from .models import Question, Category, Answer
 
 
 @admin.register(Category)
@@ -13,3 +13,8 @@ class QuestionAdmin(admin.ModelAdmin):
     list_display = ('name', 'question_text')
     list_filter = ('id', 'mark', 'created_by', 'modified_by')
     search_fields = ('id',)
+
+
+@admin.register(Answer)
+class AnswerAdmin(admin.ModelAdmin):
+    list_display = ('id', 'question', 'value')
