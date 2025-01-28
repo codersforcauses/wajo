@@ -116,6 +116,10 @@ class QuizAttempt(models.Model):
             timedelta(minutes=self.quiz.time_window)
         end_time = min(end_time, self.time_start +
                        timedelta(minutes=self.quiz.time_limit))
+        if self.student.extenstion_time:
+            end_time = now() + \
+                timedelta(minutes=self.student.extenstion_time)
+
         is_available = self.quiz.open_time_date <= current_time <= end_time
         if not is_available:
             self.state = QuizAttempt.State.COMPLETED

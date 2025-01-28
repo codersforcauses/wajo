@@ -9,6 +9,15 @@ class QuestionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CompQuestionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Question model with no answer field.
+    """
+    class Meta:
+        model = Question
+        fields = ['id', 'name', 'question_text', 'layout', 'image', 'mark']
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -37,6 +46,14 @@ class QuizSlotSerializer(serializers.ModelSerializer):
         model = QuizSlot
         fields = '__all__'
         read_only_fields = ['quiz']
+
+
+class CompQuizSlotSerializer(serializers.ModelSerializer):
+    question = CompQuestionSerializer(read_only=True)
+
+    class Meta:
+        model = QuizSlot
+        fields = '__all__'
 
 
 class QuizSerializer(serializers.ModelSerializer):

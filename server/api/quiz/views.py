@@ -3,7 +3,8 @@ from .models import Quiz, QuizSlot, QuizAttempt, QuestionAttempt
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated
-from .serializers import QuizSerializer, QuizSlotSerializer, QuizAttemptSerializer, QuestionAttemptSerializer, AdminQuizSerializer
+from .serializers import (QuizSerializer,
+                          QuizSlotSerializer, QuizAttemptSerializer, QuestionAttemptSerializer, AdminQuizSerializer, CompQuizSlotSerializer)
 from rest_framework.response import Response
 from rest_framework import status, serializers
 from datetime import timedelta
@@ -26,13 +27,27 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     def slots(self, request, pk=None):
         """
         Retrieve or create slots for a specific quiz.
+        The payload data is a list of dictionaries containing the following:
+        The slot_index is the order of the question in the quiz.
+        The block is the section of the quiz.
+        In a competition quiz, the order of the questions is randomized within each block.
 
-        Args:
-            request (Request): The request object.
-            pk (int): The primary key of the quiz.
+        payload data example:
 
-        Returns:
-            Response: The response object containing the slots data.
+        [
+            {
+                "question_id": 2,
+                "slot_index": 1,
+                "quiz_id": 12,
+                "block": 1
+            },
+            {
+                "question_id": 2,
+                "slot_index": 1,
+                "quiz_id": 12,
+                "block": 2
+            }
+        ]
         """
         if request.method == 'GET':
             self.serializer_class = QuizSlotSerializer
@@ -69,15 +84,17 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
         Returns:
             Response: The response object containing the slots data.
         """
-        if request.method == 'GET':
-            quiz_instance = Quiz.objects.get(pk=pk)
-            if quiz_instance.visible and quiz_instance.status == 0:
-                self.serializer_class = QuizSlotSerializer
-                instance = QuizSlot.objects.filter(quiz_id=pk)
-                serializer = QuizSlotSerializer(instance, many=True)
-                return Response(serializer.data)
-            else:
-                return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            quiz = Quiz.objects.get(pk=pk)
+        except Quiz.DoesNotExist:
+            return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
+        if quiz.visible and quiz.status == 0:
+            self.serializer_class = QuizSlotSerializer
+            instance = QuizSlot.objects.filter(quiz_id=pk)
+            serializer = QuizSlotSerializer(instance, many=True)
+            return Response(serializer.data)
+        else:
+            return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @permission_classes([IsAuthenticated])
@@ -104,22 +121,25 @@ class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         Returns:
             Response: The response object containing the slots data.
         """
+        try:
+            quiz_instance = Quiz.objects.get(pk=pk)
+        except Quiz.DoesNotExist:
+            return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
         user = request.user
         student_id = user.student.id
         existing_attempt = QuizAttempt.objects.filter(
             quiz_id=pk, student_id=student_id, state=2).first()
-
-        quiz_instance = Quiz.objects.get(pk=pk)
-        if quiz_instance.status == 3:
-            return Response({'error': 'Quiz has finished'}, status=status.HTTP_404_NOT_FOUND)
-
+        # if attempt after the quiz has finished:
         is_available = self._is_available(quiz_instance, existing_attempt)
-        if is_available is True:
+        if quiz_instance.status == 3 and existing_attempt is None:
+            return Response({'error': 'Quiz has finished'}, status=status.HTTP_404_NOT_FOUND)
+        # check the attemt is available or not
+        elif is_available is True:
             return self._get_slots_response(pk, existing_attempt, user)
         else:
             return is_available
 
-    def _is_available(self, quiz_instance, attempt):
+    def _is_available(self, quiz, attempt):
         """
         Check if the quiz is available for the user.
 
@@ -130,58 +150,35 @@ class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         Returns:
             bool or Response: True if available, otherwise a Response with an error message.
         """
-        if quiz_instance.visible:
+        # check if the quiz has been withdrawn by the admin
+        if quiz.visible:
             current_time = now()
-            start_time = quiz_instance.open_time_date
+            start_time = quiz.open_time_date
             end_time = start_time + \
-                timedelta(minutes=quiz_instance.time_limit) + \
-                timedelta(minutes=quiz_instance.time_window)
+                timedelta(minutes=quiz.time_limit) + \
+                timedelta(minutes=quiz.time_window)
 
+            # if never attempt before
             if attempt is None:
                 if start_time <= current_time <= end_time:
                     return True
                 elif current_time < start_time:
                     return Response({'error': 'Quiz has not started yet'}, status=status.HTTP_403_FORBIDDEN)
                 elif current_time > end_time:
-                    return Response({'error': 'Quiz has finished'}, status=status.HTTP_403_FORBIDDEN)
+                    return Response({'error': 'Quiz has ended'}, status=status.HTTP_403_FORBIDDEN)
             else:
-                return self._check_attempt_state(attempt, start_time, end_time)
+                if attempt.is_available:
+                    return True
+                else:
+                    return Response({'error': 'Quiz has finished'}, status=status.HTTP_403_FORBIDDEN)
+        # if the quiz has been withdrawn by the admin
         else:
             return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-    def _check_attempt_state(self, attempt, start_time, end_time):
-        """
-        Check the state of the existing quiz attempt.
-
-        Args:
-            attempt (QuizAttempt): The existing quiz attempt.
-            start_time (datetime): The start time of the quiz.
-            end_time (datetime): The end time of the quiz.
-
-        Returns:
-            bool or Response: True if available, otherwise a Response with an error message.
-        """
-        current_time = now()
-        if attempt.state == 2:
-            start_time = attempt.time_start
-            end_time = min(
-                start_time + timedelta(minutes=attempt.quiz.time_limit), end_time)
-            if start_time <= current_time <= end_time:
-                return True
-            elif current_time < start_time:
-                return Response({'error': 'Quiz has not started yet'}, status=status.HTTP_403_FORBIDDEN)
-            elif current_time > end_time:
-                attempt.state = 3
-                attempt.save()
-                return Response({'error': 'Quiz has finished'}, status=status.HTTP_403_FORBIDDEN)
-        else:
-            attempt.state = 3
-            attempt.save()
-            return Response({'error': 'Quiz has finished'}, status=status.HTTP_403_FORBIDDEN)
-
     def _get_slots_response(self, quiz_id, existing_attempt, user):
         """
-        Get the response containing the slots data.
+        Get the response containing the slosts data.
+        The slots are corresponding sorted questions of the quiz.
 
         Args:
             quiz_id (int): The primary key of the quiz.
@@ -191,6 +188,7 @@ class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         Returns:
             Response: The response object containing the slots data.
         """
+
         if existing_attempt is None:
             quiz_attempt_serializer = QuizAttemptSerializer(data={
                 'quiz': quiz_id,
@@ -199,9 +197,8 @@ class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
             })
             quiz_attempt_serializer.is_valid(raise_exception=True)
             quiz_attempt_serializer.save()
-        self.serializer_class = QuizSlotSerializer
         instances = QuizSlot.objects.filter(quiz_id=quiz_id)
-        serializer = QuizSlotSerializer(instances, many=True)
+        serializer = CompQuizSlotSerializer(instances, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -246,11 +243,13 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
         quiz_id = request.data.get('quiz')
         student_id = request.data.get('student')
         existing_attempt = QuizAttempt.objects.filter(
-            quiz_id=quiz_id, student_id=student_id, state=2).first()
+            quiz_id=quiz_id, student_id=student_id).first()
 
         if existing_attempt:
             serializer = self.get_serializer(existing_attempt)
             data = serializer.data
+            if not data.is_available:
+                return Response({'error': 'Quiz has finished3'}, status=status.HTTP_403_FORBIDDEN)
 
             # switch cases by state
             match existing_attempt.state:
@@ -259,10 +258,12 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
                     return Response({'message': 'You already have an active attempt for this quiz.', 'data': data}, status=status.HTTP_200_OK)
                 case 3:  # submitted
                     # prevent the user from creating a new attempt
-                    return Response({'error': 'You have already submitted this quiz.'}, status=status.HTTP_403_FORBIDDEN)
+                    return Response({'message': 'You have already submitted this quiz.'}, status=status.HTTP_403_FORBIDDEN)
                 case 4:  # completed
                     # prevent the user from creating a new attempt
-                    return Response({'error': 'The competition has ended.'}, status=status.HTTP_403_FORBIDDEN)
+                    return Response({'message': 'The competition has ended.'}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -331,9 +332,9 @@ class QuestionAttemptViewSet(mixins.CreateModelMixin,
         quiz_attempt_id = request.data.get('quiz_attempt')
         comp_attempt = QuizAttempt.objects.get(
             pk=quiz_attempt_id, student_id=request.user.student.id)
-
+        print("@@")
         # check if the quiz is available for the user
-        if comp_attempt.is_available:
+        if not comp_attempt.is_available:
             return Response({'error': 'Quiz has finished'}, status=status.HTTP_403_FORBIDDEN)
 
         question_id = request.data.get('question')
