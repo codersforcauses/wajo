@@ -19,7 +19,7 @@ export default function GenericQuiz({
   totalQuestions,
   questions,
 }: GenericQuizProps) {
-  let headingStyle = `text-xl sm:text-2xl md:text-3xl text-slate-800 font-bold`;
+  const headingStyle = `text-xl sm:text-2xl md:text-3xl text-slate-800 font-bold`;
   // these values will be fetched from the database
   // let questionNumber = 1;
   // let marks = 2;
@@ -59,9 +59,6 @@ export default function GenericQuiz({
   useEffect(() => {
     setQuestionNumber(currentPage);
     setCurrentQuestion(questions[currentPage - 1]);
-    console.log("Current Page: ", currentPage);
-    console.log("Questions: ", questions);
-    console.log("CurrentQuestion:", currentQuestion);
   }, [currentPage]);
 
   const handlePrevious = () => {
@@ -73,7 +70,7 @@ export default function GenericQuiz({
 
   function onSave() {
     // save the answer
-    console.log("Answer saved");
+    console.log("Answer saved", answer);
   }
 
   const handleNext = () => {
@@ -86,30 +83,30 @@ export default function GenericQuiz({
   const [answer, setAnswer] = useState(
     () => localStorage.getItem("answer") || "",
   );
+
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
+    console.log("saved: ", saved);
     const timer = setTimeout(() => {
       localStorage.setItem("answer", answer);
       setSaved(true);
     }, 2000); // Auto-save after 2 seconds
-
     return () => {
       clearTimeout(timer);
       setSaved(false);
     }; // Cleanup previous timer
-  }, [answer]); // Runs when `answer` changes
+  }, [answer]); // Runs when `answers` changes
 
   return (
-    <div className="flex w-full items-center justify-center border-2 border-green-600">
+    <div className="flex w-full items-center justify-center">
       <div className="min-h-64 w-3/4 rounded-lg border-8 border-[#FFE8A3] p-10">
         <div className="mb-2 flex items-center justify-between">
           <h2 className={headingStyle}>Question {questionNumber}</h2>
-          {currentQuestion.marks === 1 ? (
-            <h2 className={headingStyle}>[{currentQuestion.marks} Mark]</h2>
-          ) : (
-            <h2 className={headingStyle}>[{currentQuestion.marks} Marks]</h2>
-          )}
+          <h2 className={headingStyle}>
+            [{currentQuestion.marks}{" "}
+            {currentQuestion.marks === 1 ? "Mark" : "Marks"}]
+          </h2>
         </div>
         <p>{currentQuestion.question}</p>
         {/* <p className="mb-6 mt-4">{currentQuestion.mathJax}</p> */}
@@ -122,7 +119,7 @@ export default function GenericQuiz({
         </p>
         <div>
           <AutoSavingAnswer answer={answer} setAnswer={setAnswer} />{" "}
-          {saved && <p className="text-gray-500">✅ Saved!</p>}
+          {saved == true && <p className="text-gray-500">✅ Saved!</p>}
         </div>
         <div className="mt-6 flex flex-col items-center justify-center">
           <br />

@@ -2,15 +2,13 @@ import HorizontalCard from "@/components/ui/horizontal-card";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { Quiz } from "@/types/quiz";
 
-import { NextPageWithLayout } from "../_app";
-
 /**
  * The `QuizPage` component is the page that displays the lists of all quizzes admins have published.
  * It renders the `HorizontalCard` component, which shows the list of quizzes.
  * The list of quizzes are fetched from the database as an array of JSONs.
  * Each quiz is one of three categories: upcoming competition, past questions and solutions, and practice tests.
  */
-const QuizPage: NextPageWithLayout = () => {
+export default function QuizPage() {
   // mock data
   const {
     data: quizData,
@@ -74,6 +72,4 @@ const QuizPage: NextPageWithLayout = () => {
       </section>
     </div>
   );
-};
-
-export default QuizPage;
+}

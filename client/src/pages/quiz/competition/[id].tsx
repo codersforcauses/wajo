@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -11,14 +12,16 @@ import { Quiz } from "@/types/quiz";
 
 export default function CompetitionQuizPage() {
   // Fetches the quiz data using the custom hook.
+  const router = useRouter();
+  let { id }: { id?: string | string[] | undefined | Number } = router.query;
   const {
     data: quizData,
     isLoading: isQuizDataLoading,
     isError: isQuizDataError,
     error: QuizDataError,
-  } = useFetchData<Quiz[]>({
-    queryKey: ["quiz.list"],
-    endpoint: "/quiz/list",
+  } = useFetchData<Quiz>({
+    queryKey: [`quiz.${id}`],
+    endpoint: `/quiz/${id}`,
   });
 
   // console.log("Quiz Data: ", quizData);
@@ -38,13 +41,13 @@ export default function CompetitionQuizPage() {
   let quizDuration = 100;
   let numberOfQuestions = 16;
 
-  const id = 0;
+  const quizIndex = Number(id);
 
-  if (quizData) {
-    quizTitle = quizData[id]?.name;
-    quizStartTime = quizData[id]?.startTime.toString();
-    quizDuration = quizData[id]?.duration;
-    numberOfQuestions = quizData[id]?.questions?.length;
+  if (quizData && !isNaN(quizIndex)) {
+    quizTitle = quizData?.name;
+    quizStartTime = quizData?.startTime.toString();
+    quizDuration = quizData?.duration;
+    numberOfQuestions = quizData?.questions?.length;
   }
 
   const handleStartQuiz = () => {
@@ -92,7 +95,7 @@ export default function CompetitionQuizPage() {
       ) : isQuizDataError ? (
         <div>Error: {QuizDataError?.message}</div>
       ) : !displayQuiz ? (
-        <div className="flex flex-col items-center border-2 border-orange-600">
+        <div className="flex flex-col items-center">
           <h1 className="my-4 text-center">{quizTitle}</h1>
           <QuizStartPage
             numberOfQuestions={numberOfQuestions}
@@ -103,7 +106,7 @@ export default function CompetitionQuizPage() {
           />
         </div>
       ) : (
-        <div className="border-2 border-orange-600">
+        <div className="">
           <h1 className="my-4 text-center">{quizTitle}</h1>
 
           <div className="my-4 flex justify-center">
@@ -126,7 +129,7 @@ export default function CompetitionQuizPage() {
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             totalQuestions={numberOfQuestions}
-            questions={quizData ? quizData[id].questions : []}
+            questions={quizData ? quizData?.questions : []}
           />
           {isSubmitted && (
             <SubmissionPopup

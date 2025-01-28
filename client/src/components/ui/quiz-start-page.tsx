@@ -23,7 +23,7 @@ export default function QuizStartPage({
   // let quizDuration = 100;
   // let numberOfQuestions = 16;
   return (
-    <div className="flex w-full items-center justify-center border-2 border-green-600">
+    <div className="flex w-full items-center justify-center">
       <div className="min-h-64 w-3/4 rounded-lg border-8 border-[#FFE8A3] bg-[#FFE8A3] p-10">
         <h2 className={headingStyle}>{quizName}</h2>
         <h5 className="my-4">

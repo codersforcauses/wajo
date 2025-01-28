@@ -85,27 +85,3 @@ interface GenericQuizProps {
   onDataChange: (updatedData: Quiz) => void;
   changePage: number;
 }
-
-/**
- * Represents the properties for the Pagination component.
- *
- * @interface PaginationProps
- * @property {number} totalPages - The total number of pages available.
- * @property {number} currentPage - The currently active page.
- * @property {(page: number) => void} onPageChange - Callback function triggered when the page is changed.
- * @property {string} [className] - Optional CSS class names for styling the component.
- *
- * @example
- * const examplePaginationProps: PaginationProps = {
- *   totalPages: 10,
- *   currentPage: 1,
- *   onPageChange: (page) => console.log("Page changed to:", page),
- *   className: "flex text-lg"
- * };
- */
-interface PaginationProps {
-  totalPages: number;
-  currentPage: number;
-  onPageChange: (page: number) => void;
-  className?: string;
-}
