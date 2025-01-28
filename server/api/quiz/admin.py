@@ -1,27 +1,19 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import QuizAttempt, QuizAttemptUser, Quiz, QuizSlot
+from .models import QuizAttempt, Quiz, QuizSlot
 
 
+@admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ("name",)
+    list_display = ("name", "intro")
 
 
+@admin.register(QuizSlot)
 class QuizSlotsAdmin(admin.ModelAdmin):
-    list_display = ("id", "quiz_id", "status")
+    list_display = ("id", "quiz_id")
 
 
+@admin.register(QuizAttempt)
 class QuizAttemptAdmin(admin.ModelAdmin):
-    list_display = ("id", "quiz_id", "attempt")
-
-
-class QuizAttemptUserAdmin(admin.ModelAdmin):
-    list_display = ("id", "quiz_attempt", "student_id")
-
-
-admin.site.register(Quiz, QuizAdmin)
-admin.site.register(QuizSlot, QuizSlotsAdmin)
-
-admin.site.register(QuizAttempt, QuizAttemptAdmin)
-admin.site.register(QuizAttemptUser, QuizAttemptUserAdmin)
+    list_display = ("id", "quiz_id",)

@@ -7,6 +7,7 @@ import type { AppProps } from "next/app";
 import { Roboto, Urbanist } from "next/font/google";
 import type { ReactElement, ReactNode } from "react";
 
+import Layout from "@/components/layout";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/auth-provider";
 
@@ -37,6 +38,14 @@ type AppPropsWithLayout = AppProps & {
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
+  const myLayout = Component.getLayout ? (
+    Component.getLayout(<Component {...pageProps} />)
+  ) : (
+    <Layout>
+      <Component {...pageProps} />
+    </Layout>
+  );
+
   return (
     <>
       <style jsx global>{`
@@ -48,8 +57,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ReactQueryDevtools initialIsOpen={false} />
-          <Component {...pageProps} />
-          {/* temporary include here, can add into Layout after */}
+          {myLayout}
           <Toaster position="bottom-center" richColors />
         </AuthProvider>
       </QueryClientProvider>

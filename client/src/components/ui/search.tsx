@@ -1,3 +1,4 @@
+import { Search as SearchIcon } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -86,20 +87,7 @@ function SearchInput({
     <div className="relative flex flex-col">
       <label className="text-sm font-medium text-gray-600">{label}</label>
       <div className="relative">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1}
-          stroke="currentColor"
-          className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1 0 3 10.5a7.5 7.5 0 0 0 13.65 6.15z"
-          />
-        </svg>
+        <SearchIcon className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
         <input
           type="text"
           placeholder={placeholder || ""}

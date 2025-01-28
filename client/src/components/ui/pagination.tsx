@@ -1,3 +1,5 @@
+import { PaginationProps } from "@/types/data-grid";
+
 export function Pagination({
   totalPages,
   currentPage,

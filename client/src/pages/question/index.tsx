@@ -2,9 +2,11 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { WaitingLoader } from "@/components/ui/loading";
 import { Datagrid } from "@/components/ui/Question/data-grid";
 import { SearchInput } from "@/components/ui/search";
 import { useFetchData } from "@/hooks/use-fetch-data";
+import { Question } from "@/types/question";
 
 export default function Index() {
   // Fetches the list of questions using the custom hook.
@@ -15,7 +17,7 @@ export default function Index() {
     error: QuestionError,
   } = useFetchData<Question[]>({
     queryKey: ["question.list"],
-    endpoint: "/question/list",
+    endpoint: "/questions/question-bank/",
   });
 
   // Tracks the current page number for pagination.
@@ -49,9 +51,7 @@ export default function Index() {
   };
 
   // Displays a loading state while data is being fetched.
-  if (isQuestionLoading) {
-    return <div>Loading...</div>;
-  }
+  if (isQuestionLoading) return <WaitingLoader />;
 
   // Displays an error message if the API request fails.
   if (isQuestionError) {
@@ -80,7 +80,7 @@ export default function Index() {
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
-      ></Datagrid>
+      />
     </div>
   );
 }
