@@ -281,7 +281,6 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
             case 3:
-                print(now())
                 return Response({'error': 'You have already submitted this quiz.'}, status=status.HTTP_403_FORBIDDEN)
             case 4:
                 return Response({'error': 'The competition has ended.'}, status=status.HTTP_403_FORBIDDEN)
@@ -332,7 +331,7 @@ class QuestionAttemptViewSet(mixins.CreateModelMixin,
         quiz_attempt_id = request.data.get('quiz_attempt')
         comp_attempt = QuizAttempt.objects.get(
             pk=quiz_attempt_id, student_id=request.user.student.id)
-        print("@@")
+
         # check if the quiz is available for the user
         if not comp_attempt.is_available:
             return Response({'error': 'Quiz has finished'}, status=status.HTTP_403_FORBIDDEN)

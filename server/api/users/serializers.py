@@ -34,13 +34,12 @@ class UserSerializer(serializers.ModelSerializer):
         validated_data['username'] = fullname
         password = validated_data.pop('password')
         user = User(**validated_data)
+        print(user)
         user.set_password(password)
         user.save()
-        print(user.password)
         return user
 
     def update(self, instance, validated_data):
-        print(validated_data)
         fullname = validated_data['first_name'] + validated_data['last_name']
         validated_data['username'] = fullname
         if 'password' in validated_data:
@@ -48,7 +47,6 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
             instance.save()
             validated_data['password'] = instance.password
-            print(instance.password, validated_data['password'])
         return super().update(instance, validated_data)
 
 
