@@ -116,11 +116,17 @@ class QuizAttempt(models.Model):
             timedelta(minutes=self.quiz.time_window)
         end_time = min(end_time, self.time_start +
                        timedelta(minutes=self.quiz.time_limit))
-        if self.student.extenstion_time:
+        if int(self.student.extenstion_time) > 0:
+            print("extenstion time")
             end_time = now() + \
                 timedelta(minutes=self.student.extenstion_time)
             self.student.extenstion_time = 0
-        self.dead_line = end_time
+            self.student.save()
+        if self.dead_line is None:
+            self.dead_line = end_time
+            self.save()
+        else:
+            self.dead_line = max(self.dead_line, end_time)
 
         is_available = self.quiz.open_time_date <= current_time <= self.dead_line
         if not is_available:

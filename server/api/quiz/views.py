@@ -135,7 +135,6 @@ class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'error': 'Quiz has finished'}, status=status.HTTP_404_NOT_FOUND)
         # check the attemt is available or not
         elif is_available is True:
-            print(existing_attempt)
             return self._get_slots_response(pk, existing_attempt, user)
         else:
             return is_available
@@ -198,11 +197,16 @@ class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
                 'state': 2,
             })
             quiz_attempt_serializer.is_valid(raise_exception=True)
-            quiz_attempt_serializer.save()
+            attempt = quiz_attempt_serializer.save()
+            attempt.is_available
+            end_time = attempt.dead_line
+        else:
+            end_time = existing_attempt.dead_line
+        # wrap the end_time into the response
         instances = QuizSlot.objects.filter(quiz_id=quiz_id)
         serializer = CompQuizSlotSerializer(instances, many=True)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'data': serializer.data, 'end_time': end_time}, status=status.HTTP_200_OK)
 
 
 class QuizSlotViewSet(viewsets.ModelViewSet):
