@@ -98,7 +98,7 @@ class QuizAttempt(models.Model):
     team = models.ForeignKey(
         Team, on_delete=models.CASCADE, related_name="quiz_attempts", default=None, null=True, blank=True
     )
-    # dead_line = models.DateTimeField(default=None, null=True, blank=True)
+    dead_line = models.DateTimeField(default=None, null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} {self.quiz} "
@@ -119,10 +119,15 @@ class QuizAttempt(models.Model):
         if self.student.extenstion_time:
             end_time = now() + \
                 timedelta(minutes=self.student.extenstion_time)
+            self.student.extenstion_time = 0
+        self.dead_line = end_time
 
-        is_available = self.quiz.open_time_date <= current_time <= end_time
+        is_available = self.quiz.open_time_date <= current_time <= self.dead_line
         if not is_available:
             self.state = QuizAttempt.State.COMPLETED
+            self.save()
+        else:
+            self.state = QuizAttempt.State.IN_PROGRESS
             self.save()
         return is_available
 
