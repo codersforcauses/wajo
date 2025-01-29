@@ -57,7 +57,7 @@ class StudentViewSet(viewsets.ModelViewSet):
         if hasattr(self.request.user, "teacher"):
             data["school"] = self.request.user.teacher.school.id
         try:
-            serializer = self.get_serializer(data=data)
+            serializer = self.get_serializer(data=data, many=True)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

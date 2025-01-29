@@ -84,9 +84,9 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
             question_attempts = attempt.question_attempts.all()
             total_marks = 0
             for question_attempt in question_attempts:
-                question = question_attempt.question.all()
-                answers = [
-                    question.answer.value.all() for question.answer in question.answers]
+                question = question_attempt.question
+                answers_list = question.answers.all()
+                answers = [answer.value for answer in answers_list]
                 if question_attempt.answer_student in answers:
                     total_marks += question.mark
                     question_attempt.is_correct = True
