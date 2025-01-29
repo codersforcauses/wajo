@@ -4,7 +4,12 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated
 from .serializers import (QuizSerializer,
-                          QuizSlotSerializer, QuizAttemptSerializer, QuestionAttemptSerializer, AdminQuizSerializer, CompQuizSlotSerializer)
+                          QuizSlotSerializer,
+                          QuizAttemptSerializer,
+                          QuestionAttemptSerializer,
+                          AdminQuizSerializer,
+                          CompQuizSlotSerializer,
+                          UserQuizSerializer)
 from rest_framework.response import Response
 from rest_framework import status, serializers
 from datetime import timedelta
@@ -107,19 +112,34 @@ class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         slots: Retrieve slots for a specific competition quiz.
     """
     queryset = Quiz.objects.filter(status=1, visible=True)
-    serializer_class = QuizSerializer
+    serializer_class = UserQuizSerializer
 
     @action(detail=True, methods=['get'])
     def slots(self, request, pk=None):
         """
-        Retrieve slots for a specific competition quiz.
+        Only allow the user to access the slots(competition questions) if the quiz is available.
+        api:
+        /api/quiz/competition/1/slots/
+        data shape: {"data":[ ], "end_time": "2025-01-29T00:49:17.015606Z"}
 
-        Args:
-            request (Request): The request object.
-            pk (int): The primary key of the quiz.
+    {"data": [
+        {
+            "id": 1,
+            "question": {
+                "id": 12,
+                "name": "question_1",
+                "question_text": "question_text_1",
+                "layout": "left",
+                "image": null,
+                "mark": 2
+            },
+            "slot_index": 1,
+            "block": 1,
+            "quiz": 2
+        }
+    ],
+    "end_time": "2025-01-29T00:49:17.015606Z"}
 
-        Returns:
-            Response: The response object containing the slots data.
         """
         try:
             quiz_instance = Quiz.objects.get(pk=pk)

@@ -60,7 +60,16 @@ class QuizSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Quiz
-        fields = ['id', 'name', 'intro', 'total_marks']
+        fields = '__all__'
+
+
+class UserQuizSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Quiz model with no is_comp, visible, and status fields.
+    """
+    class Meta:
+        model = Quiz
+        exclude = ['is_comp', 'visible', 'status']
 
 
 class AdminQuizSerializer(serializers.ModelSerializer):
