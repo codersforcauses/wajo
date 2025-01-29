@@ -66,24 +66,23 @@ export interface School {
 export interface User {
   id: number;
   // username: string;
-  password: string;
-  email?: string;
   first_name: string;
   last_name: string;
+  password: string;
   role: Role;
 }
 
 export interface Student extends User {
   year_level: number;
   attendent_year: number;
-  quiz_attempts: any[];
-  school: School;
+  // quiz_attempts: any[];
+  school_id: number;
 }
 
 export interface Teacher extends User {
   phone: string;
   email: string;
-  school: School;
+  school_id: number;
 }
 
 /**

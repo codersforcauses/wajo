@@ -66,13 +66,7 @@ export function StudentDataTableForm() {
     password: "",
     year_level: 7,
     attendent_year: new Date().getFullYear(),
-    quiz_attempts: [],
-    school: {
-      id: 0,
-      name: "",
-      type: "",
-      is_country: false,
-    },
+    school_id: 0,
   };
 
   const createUserForm = useForm<{
@@ -228,12 +222,12 @@ export function StudentDataTableForm() {
                   <TableCell className="align-top">
                     <FormField
                       control={createUserForm.control}
-                      name={`users.${index}.school`}
+                      name={`users.${index}.school_id`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
                             <SelectSchool
-                              selectedId={field.value.id}
+                              selectedId={field.value}
                               onChange={field.onChange}
                             />
                           </FormControl>

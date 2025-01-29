@@ -59,14 +59,6 @@ export function SelectSchool({ selectedId, onChange, className }: Props) {
     console.log("changed value: ", value);
     console.log("changed int value: ", parsed);
   };
-  // const onValueChange = (event: any) => {
-  //   const selectedSchool = schools.find(
-  //     (school) => school.id === parseInt(event.target.value, 10),
-  //   );
-  //   if (selectedSchool) {
-  //     onChange(selectedSchool.id);
-  //   }
-  // };
 
   return (
     <Select
@@ -84,7 +76,6 @@ export function SelectSchool({ selectedId, onChange, className }: Props) {
         ) : (
           schools.map((school) => (
             <SelectItem value={school.id.toString()} key={school.id}>
-              {school.id}
               {school.name}
             </SelectItem>
           ))
