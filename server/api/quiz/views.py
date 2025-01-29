@@ -63,7 +63,41 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
             serializer = QuizSlotSerializer(data=request.data, many=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            quiz = Quiz.objects.get(pk=pk)
+            quiz_slots = quiz.quiz_slots.all()
+            questions = [slot.question for slot in quiz_slots]
+            quiz.total_marks = sum([question.mark for question in questions])
+            quiz.save()
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['get'])
+    def marking(self, request, pk=None):
+        """
+        Mark the quiz attempt.
+        """
+
+        # get the quiz attempts
+        quiz_attempts = QuizAttempt.objects.all().filter(quiz_id=pk)
+
+        for attempt in quiz_attempts:
+            question_attempts = attempt.question_attempts.all()
+            total_marks = 0
+            for question_attempt in question_attempts:
+                question = question_attempt.question.all()
+                answers = [
+                    question.answer.value.all() for question.answer in question.answers]
+                if question_attempt.answer_student in answers:
+                    total_marks += question.mark
+                    question_attempt.is_correct = True
+                    question_attempt.save()
+                else:
+                    question_attempt.is_correct = False
+                    question_attempt.save()
+            attempt.total_marks = total_marks
+            attempt.save()
+
+        return Response({'message': 'Quiz attempt marked successfully.'})
 
 
 @permission_classes([AllowAny])
