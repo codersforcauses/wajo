@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import axios from "axios";
+import { User } from "lucide-react";
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SelectRole } from "@/components/ui/select-role";
 import {
   Table,
   TableBody,
@@ -22,17 +23,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SelectSchool } from "@/components/ui/Users/select-school";
+import SelectYearLevel from "@/components/ui/Users/select-year";
+import api from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { createUserSchema } from "@/types/user";
+import {
+  createUserSchema,
+  Student as StudentType,
+  User as UserType,
+} from "@/types/user";
 
-type User = z.infer<typeof createUserSchema>;
+// type User = z.infer<typeof createUserSchema>;
 
 /**
  * Renders a data table form for managing user information with a dynamic table structure.
  *
  * The `DataTableForm` component allows users to add, and delete rows of user data.
  * It uses `react-hook-form` with Zod schema validation to manage and validate the form state.
- * Each row includes fields for `Username`, `Password`, `Email`, `User Role`, and `School`.
+ * Each row includes fields for `Firstname`, `Lastname`, `Password`, `School` and `Year level`.
  *
  * @function DataTableForm
  *
@@ -49,15 +56,27 @@ type User = z.infer<typeof createUserSchema>;
  * Additional Reference:
  * - {@link https://react-hook-form.com/docs/usefieldarray React Hook Form: useFieldArray}
  */
-export function DataTableForm() {
-  const defaultUser = {
-    username: "",
+export function StudentDataTableForm() {
+  const defaultUser: StudentType = {
+    id: 0,
+    role: "student",
+    first_name: "",
+    last_name: "",
+    // username: "",
     password: "",
-    email: "",
-  } as User;
+    year_level: 7,
+    attendent_year: new Date().getFullYear(),
+    quiz_attempts: [],
+    school: {
+      id: 0,
+      name: "",
+      type: "",
+      is_country: false,
+    },
+  };
 
   const createUserForm = useForm<{
-    users: User[];
+    users: StudentType[];
   }>({
     resolver: zodResolver(z.object({ users: z.array(createUserSchema) })),
     defaultValues: { users: [defaultUser] },
@@ -68,8 +87,18 @@ export function DataTableForm() {
     name: "users",
   });
 
-  const onSubmit = (data: { users: User[] }) => {
-    console.log("Submitted data:", data.users);
+  const onSubmit = (data: { users: StudentType[] }) => {
+    console.log("Submitting data:", data.users);
+    data.users.forEach((user) => {
+      api
+        .post(`/users/students/`, user)
+        .then((response) => {
+          console.log("Response:", response.data);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    });
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
@@ -90,8 +119,14 @@ export function DataTableForm() {
                   No.
                 </TableHead>
                 <TableHead className={commonTableHeadClasses}>
-                  Username*
+                  Firstname*
                 </TableHead>
+                <TableHead className={commonTableHeadClasses}>
+                  Lastname*
+                </TableHead>
+                {/* <TableHead className={commonTableHeadClasses}>
+                  Username*
+                </TableHead> */}
                 <TableHead
                   className={cn(commonTableHeadClasses, "text-pretty", "w-1/5")}
                 >
@@ -100,12 +135,12 @@ export function DataTableForm() {
                     Minimum 8 characters with letters, numbers, and symbols
                   </FormDescription>
                 </TableHead>
-                <TableHead className={commonTableHeadClasses}>Email</TableHead>
-                <TableHead className={commonTableHeadClasses}>
-                  User Role*
-                </TableHead>
+
                 <TableHead className={commonTableHeadClasses}>
                   School*
+                </TableHead>
+                <TableHead className={commonTableHeadClasses}>
+                  Year level*
                 </TableHead>
                 <TableHead
                   className={cn(commonTableHeadClasses, "rounded-tr-lg", "w-0")}
@@ -125,15 +160,31 @@ export function DataTableForm() {
                     {index + 1}
                   </TableCell>
 
-                  {/* Username Field */}
+                  {/* Firstname Field */}
                   <TableCell className="align-top">
                     <FormField
                       control={createUserForm.control}
-                      name={`users.${index}.username`}
+                      name={`users.${index}.first_name`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
-                            <Input {...field} placeholder="Enter username" />
+                            <Input {...field} placeholder="Enter firstname" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TableCell>
+
+                  {/* Lastname Field */}
+                  <TableCell className="align-top">
+                    <FormField
+                      control={createUserForm.control}
+                      name={`users.${index}.last_name`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                          <FormControl>
+                            <Input {...field} placeholder="Enter lastname" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -157,7 +208,7 @@ export function DataTableForm() {
                     />
                   </TableCell>
 
-                  {/* Email Field */}
+                  {/* Email Field
                   <TableCell className="align-top">
                     <FormField
                       control={createUserForm.control}
@@ -171,18 +222,18 @@ export function DataTableForm() {
                         </FormItem>
                       )}
                     />
-                  </TableCell>
+                  </TableCell> */}
 
-                  {/* User Role Field */}
+                  {/* School Field */}
                   <TableCell className="align-top">
                     <FormField
                       control={createUserForm.control}
-                      name={`users.${index}.userRole`}
+                      name={`users.${index}.school`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
-                            <SelectRole
-                              selectedRole={field.value}
+                            <SelectSchool
+                              selectedId={field.value.id}
                               onChange={field.onChange}
                             />
                           </FormControl>
@@ -192,16 +243,16 @@ export function DataTableForm() {
                     />
                   </TableCell>
 
-                  {/* School Field */}
+                  {/* Year level Field */}
                   <TableCell className="align-top">
                     <FormField
                       control={createUserForm.control}
-                      name={`users.${index}.school_id`}
+                      name={`users.${index}.year_level`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
-                            <SelectSchool
-                              selectedId={field.value}
+                            <SelectYearLevel
+                              selectedId={Number(field.value)}
                               onChange={field.onChange}
                             />
                           </FormControl>

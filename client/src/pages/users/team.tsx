@@ -16,7 +16,7 @@ export default function TeamList() {
     error: TeamError,
   } = useFetchData<Team[]>({
     queryKey: ["users.team.list"],
-    endpoint: "/users/team",
+    endpoint: "/users/teams/",
   });
 
   const [page, setPage] = useState<number>(1);

@@ -65,6 +65,8 @@ export function DataGrid({
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentData = datacontext.slice(indexOfFirstItem, indexOfLastItem);
+    console.log("datacontext: ", datacontext);
+    console.log("currentData: ", currentData);
 
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
@@ -102,11 +104,16 @@ export function DataGrid({
               className={"divide-gray-200 border-gray-50 text-sm text-black"}
             >
               <TableCell className="w-1/4">{item.id}</TableCell>
-              <TableCell className="w-1/4">{item.username}</TableCell>
+              <TableCell className="w-1/4">
+                {item.first_name}
+                {item.last_name}
+              </TableCell>
               <TableCell className="w-1/4">{item.role}</TableCell>
-              <TableCell className="w-1/4">{item.school}</TableCell>
+              {item.school_id && (
+                <TableCell className="w-1/4">{item.school_id}</TableCell>
+              )}
               <TableCell className="flex py-4">
-                <div className={cn("flex", { invisible: !item.username })}>
+                <div className={cn("flex", { invisible: !item.first_name })}>
                   <Button className="me-2">View</Button>
                   <Button variant={"destructive"}>Delete</Button>
                 </div>

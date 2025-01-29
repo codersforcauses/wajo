@@ -20,11 +20,11 @@ import { User } from "@/types/user";
 const mockUser: User = {
   id: 1,
   username: "johndoe",
-  email: "johndoe@example.com",
+  // email: "johndoe@example.com",
   first_name: "John",
   last_name: "Doe",
   role: "admin",
-  school: "University of Western Australia",
+  // school: "University of Western Australia",
 };
 
 /**

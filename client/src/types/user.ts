@@ -1,3 +1,4 @@
+import { PassThrough } from "stream";
 import { z } from "zod";
 
 /**
@@ -21,6 +22,36 @@ export const RoleEnum = z.enum(["admin", "teacher", "student"], {
 export type Role = z.infer<typeof RoleEnum>;
 
 /**
+ * Defines the possible schools.
+ *
+ * @example
+ * const school: School = "public";
+ */
+export const SchoolTypeEnum = z.enum(
+  ["public", "independent", "catholic", ""],
+  {
+    errorMap: () => ({ message: "Invalid School Type" }),
+  },
+);
+
+/**
+ * Type representing a school type. Can be one of the following:
+ * - "public"
+ * - "independent"
+ * - "catholic"
+ *
+ * @type {SchoolType}
+ */
+export type SchoolType = z.infer<typeof SchoolTypeEnum>;
+
+export interface School {
+  id: number;
+  name: string;
+  type: SchoolType;
+  is_country: boolean;
+}
+
+/**
  * Represents a user object.
  *
  * @interface User
@@ -34,12 +65,25 @@ export type Role = z.infer<typeof RoleEnum>;
  */
 export interface User {
   id: number;
-  username: string;
-  email: string;
+  // username: string;
+  password: string;
+  email?: string;
   first_name: string;
   last_name: string;
   role: Role;
-  school: string;
+}
+
+export interface Student extends User {
+  year_level: number;
+  attendent_year: number;
+  quiz_attempts: any[];
+  school: School;
+}
+
+export interface Teacher extends User {
+  phone: string;
+  email: string;
+  school: School;
 }
 
 /**

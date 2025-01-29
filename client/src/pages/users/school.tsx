@@ -16,7 +16,7 @@ export default function SchoolList() {
     error: schoolError,
   } = useFetchData<School[]>({
     queryKey: ["users.school.list"],
-    endpoint: "/users/school",
+    endpoint: "/users/schools/",
   });
 
   const [page, setPage] = useState<number>(1);

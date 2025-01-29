@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/select";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { cn } from "@/lib/utils";
-import { School } from "@/types/school";
 
 type Props = {
   selectedId: number | undefined;
@@ -16,11 +15,11 @@ type Props = {
 };
 
 /**
- * A form field for selecting a school from a dropdown list fetched from an API.
+ * A form field for selecting a year from a dropdown list.
  *
  * @param {Object} props - The props for the component.
- * @param {number | undefined} props.selectedId - The currently selected school ID.
- * @param {Function} props.onChange - A callback function that handles the change in school ID.
+ * @param {number | undefined} props.selectedId - The currently selected year ID.
+ * @param {Function} props.onChange - A callback function that handles the change in year ID.
  * @param {string} [props.className] - An optional className to customize the component's styling.
  *
  * @example
@@ -41,32 +40,31 @@ type Props = {
  *   )}
  * />
  */
-export function SelectSchool({ selectedId, onChange, className }: Props) {
-  const {
-    data: schools,
-    isPending,
-    isError,
-  } = useFetchData<School[]>({
-    queryKey: ["users.school.list"],
-    endpoint: "/users/schools/",
-  });
+export default function SelectYearLevel({
+  selectedId,
+  onChange,
+  className,
+}: Props) {
+  // const {
+  //   data: schools,
+  //   isPending,
+  //   isError,
+  // } = useFetchData<School[]>({
+  //   queryKey: ["users.school.list"],
+  //   endpoint: "/users/schools/",
+  // });
 
+  const years = [
+    { id: 1, name: "7" },
+    { id: 2, name: "8" },
+    { id: 3, name: "9" },
+  ];
   const onValueChange = (value: string) => {
     const parsed = parseInt(value);
     if (parsed) {
       onChange(parsed);
     }
-    console.log("changed value: ", value);
-    console.log("changed int value: ", parsed);
   };
-  // const onValueChange = (event: any) => {
-  //   const selectedSchool = schools.find(
-  //     (school) => school.id === parseInt(event.target.value, 10),
-  //   );
-  //   if (selectedSchool) {
-  //     onChange(selectedSchool.id);
-  //   }
-  // };
 
   return (
     <Select
@@ -74,21 +72,20 @@ export function SelectSchool({ selectedId, onChange, className }: Props) {
       onValueChange={onValueChange}
     >
       <SelectTrigger className={cn(className)}>
-        <SelectValue placeholder="School" />
+        <SelectValue placeholder="Year" />
       </SelectTrigger>
       <SelectContent>
-        {isPending || isError ? (
-          <SelectItem value="NaN" disabled>
-            Loading...
-          </SelectItem>
-        ) : (
-          schools.map((school) => (
-            <SelectItem value={school.id.toString()} key={school.id}>
-              {school.id}
-              {school.name}
+        {/* {isPending || isError ? (
+            <SelectItem value="NaN" disabled>
+              Loading...
             </SelectItem>
-          ))
-        )}
+          ) : ( */}
+
+        {years.map((year) => (
+          <SelectItem value={year.id.toString()} key={year.id}>
+            {year.name}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

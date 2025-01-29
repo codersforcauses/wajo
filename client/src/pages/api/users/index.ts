@@ -26,19 +26,19 @@ for (let i = 0; i < 9; i++) {
       id: i * 3 + 1,
       username: `adminMaster${i + 1}`,
       role: "admin",
-      school: "Greenfield High",
+      // school: "Greenfield High",
     },
     {
       id: i * 3 + 2,
       username: `mathPro${i + 1}`,
       role: "teacher",
-      school: "Westwood Academy",
+      // school: "Westwood Academy",
     },
     {
       id: i * 3 + 3,
       username: `scienceGeek${i + 1}`,
       role: "student",
-      school: "Northside School",
+      // school: "Northside School",
     },
   );
 }
