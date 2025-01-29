@@ -89,7 +89,7 @@ class StudentAPITestCase(APITestCase):
 
 
         }
-        self.student_data = {
+        self.student_data = [{
 
             "first_name": "Abc",
             "last_name": "De",
@@ -97,8 +97,9 @@ class StudentAPITestCase(APITestCase):
 
             'school_id': self.school.id,
             'year_level': '12',
+            'attendent_year': 2023,
             'email': 'student@example.com',
-        }
+        }]
         # Generate JWT token
         refresh = RefreshToken.for_user(self.user)
         self.access_token = str(refresh.access_token)
@@ -149,7 +150,7 @@ class TeacherAPITestCase(APITestCase):
         response = self.client.post(
             '/api/users/teachers/', self.teacher_data, format='json')
         if response.status_code == 400:
-            print(response.data)
+            print(response.data, "@@@@")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 

@@ -39,8 +39,10 @@ class QuestionSerializer(serializers.ModelSerializer):
         is_comp (BooleanField): Indicates if the question is for competition.
     """
     name = serializers.CharField(max_length=255, required=True)
-    created_by = UserSerializer(read_only=True).fields['username']
-    modified_by = UserSerializer(read_only=True).fields['username']
+    created_by = serializers.CharField(
+        source='created_by.username', read_only=True)
+    modified_by = serializers.CharField(
+        source='modified_by.username', read_only=True)
     category_ids = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(), write_only=True, required=False, allow_null=True, many=True, source='categories')
     categories = CategorySerializer(read_only=True, many=True)
@@ -85,3 +87,5 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = '__all__'
+        read_only_fields = ['created_by', 'modified_by',
+                            'time_created', 'time_modified']

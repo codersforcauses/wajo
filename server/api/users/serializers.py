@@ -213,6 +213,8 @@ class TeacherSerializer(serializers.ModelSerializer):
         """
         # Extract and create the nested User instance
         user_data = validated_data.pop('user')
+        # user_data['username'] = user_data['email']
+        user_data['username'] = user_data['first_name'] + user_data['last_name']
         user_serializer = UserSerializer(data=user_data)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
