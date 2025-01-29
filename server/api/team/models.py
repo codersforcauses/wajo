@@ -1,7 +1,7 @@
 from django.db import models
-# from api.quiz.models import Quiz
+from api.quiz.models import Quiz
 from api.users.models import School, Student
-import uuid
+
 
 # Create your models here.
 
@@ -37,8 +37,6 @@ class Team(models.Model):
 
 
 class TeamMember(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-class Team_member(models.Model):
     """
     Represents a member of a team in the system.
 
@@ -72,8 +70,6 @@ class Team_member(models.Model):
         """
         constraints = [
             models.UniqueConstraint(
-                fields=["student", "team"], name="unique_student_team"
-            )
                 fields=["student", "team"], name="unique_student_team"
             )
         ]
