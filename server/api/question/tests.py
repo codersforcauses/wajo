@@ -97,4 +97,5 @@ class QuestionCategoryTestCase(TestCase):
             'diff_level': 1,
         })
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # Check if the question has been created
         self.assertEqual(Question.objects.count(), 2)
