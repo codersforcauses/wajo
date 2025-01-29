@@ -150,7 +150,7 @@ class TeacherAPITestCase(APITestCase):
         response = self.client.post(
             '/api/users/teachers/', self.teacher_data, format='json')
         if response.status_code == 400:
-            print(response.data, "@@@@")
+            print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
