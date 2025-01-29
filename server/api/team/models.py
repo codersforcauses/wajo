@@ -1,7 +1,9 @@
 from django.db import models
-
 # from api.quiz.models import Quiz
 from api.users.models import School, Student
+import uuid
+
+# Create your models here.
 
 
 class Team(models.Model):
@@ -24,16 +26,18 @@ class Team(models.Model):
 
     # not sure if this school can work becasue we have school related to student
     school = models.ForeignKey(
-        School, on_delete=models.SET_NULL, null=True, blank=True, related_name="has")
+        School, on_delete=models.SET_NULL, null=True, blank=True, related_name="has"
+    )
     description = models.CharField(max_length=100)
     time_created = models.DateTimeField(auto_now_add=True)
-    grades = models.IntegerField()
+    students = models.ManyToManyField(Student, through="TeamMember")
 
     def __str__(self):
-        # Format when printed: Team ID (Name): Grade
-        return f"Team {self.id} ({self.name}): {self.grades}"
+        return f"{self.name} ({self.id})"
 
 
+class TeamMember(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 class Team_member(models.Model):
     """
     Represents a member of a team in the system.
@@ -56,8 +60,7 @@ class Team_member(models.Model):
     time_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        # Format when printed: Team ID has member student
-        return f"Team {self.id} has member {self.student}"
+        return f"{self.team} - {self.student}"
 
     class Meta:
         """
@@ -69,6 +72,8 @@ class Team_member(models.Model):
         """
         constraints = [
             models.UniqueConstraint(
+                fields=["student", "team"], name="unique_student_team"
+            )
                 fields=["student", "team"], name="unique_student_team"
             )
         ]

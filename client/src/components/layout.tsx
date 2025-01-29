@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 import Navbar from "@/components/navbar";
-import { WaitingLoader } from "@/components/ui/loading";
-import { useAuth } from "@/context/auth-provider";
-import { useFetchData } from "@/hooks/use-fetch-data";
-import { User } from "@/types/user";
+import { useTokenStore } from "@/store/token-store";
+import { Role } from "@/types/user";
 
 import Sidebar from "./sidebar";
 import Footer from "./ui/footer";
@@ -22,28 +20,21 @@ interface LayoutProps {
  */
 export default function Layout({ children }: LayoutProps) {
   const [isAuthChecked, setIsAuthChecked] = useState(false);
-  const { userId } = useAuth();
-  const isLoggedIn = Boolean(userId);
+  const { access } = useTokenStore(); // access the JWT token
+  const [role, setRole] = useState<string | undefined>(undefined);
 
-  // wait for auth to be checked before rendering
   useEffect(() => {
+    if (access?.decoded) {
+      const userRole = access.decoded["role"];
+      setRole(userRole);
+    }
+    // wait for auth to be checked before rendering
     setIsAuthChecked(true);
-  }, []);
-
-  const {
-    data: user,
-    error,
-    isLoading,
-  } = useFetchData<User>({
-    queryKey: ["user", userId],
-    endpoint: "/users/me",
-    staleTime: 5 * 60 * 1000,
-    enabled: Boolean(userId),
-  });
+  }, [access]);
 
   if (!isAuthChecked) return null;
 
-  if (!isLoggedIn) {
+  if (!access) {
     return (
       <div>
         <Navbar />
@@ -53,8 +44,16 @@ export default function Layout({ children }: LayoutProps) {
     );
   }
 
-  if (isLoading) return <WaitingLoader />;
-  if (!user) return <div>{error?.message || "Failed to load user data."}</div>;
+  if (!role) {
+    return (
+      <div>
+        <Navbar />
+        <main>
+          <div>Failed to get user role.</div>
+        </main>
+      </div>
+    );
+  }
 
-  return <Sidebar role={user.role}>{children}</Sidebar>;
+  return <Sidebar role={role.toLowerCase() as Role}>{children}</Sidebar>;
 }

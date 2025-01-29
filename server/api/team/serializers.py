@@ -1,4 +1,4 @@
-from .models import Team, Team_member
+from .models import Team, TeamMember
 from rest_framework import serializers
 from api.users.serializers import SchoolSerializer, StudentSerializer
 from api.users.models import School, Student
@@ -22,8 +22,9 @@ class TeamMemberSerializer(serializers.ModelSerializer):
         queryset=Student.objects.all(), write_only=True, source='student')
 
     class Meta:
-        model = Team_member
-        fields = '__all__'
+        model = TeamMember
+        fields = "__all__"
+        read_only_fields = ("id", "time_added")
 
 
 class TeamSerializer(serializers.ModelSerializer):
@@ -47,4 +48,5 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = '__all__'
+        fields = "__all__"
+        read_only_fields = ("id", "time_created")
