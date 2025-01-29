@@ -115,14 +115,19 @@ class StudentSerializer(serializers.ModelSerializer):
         """
         # Extract and create the nested User instance
         user = validated_data.pop('user')
-        digits = [i for i in range(0, 10)]
-        random_str = ""
-        for i in range(4):
-            random_str += str(random.choice(digits))
-        year = now().year
-        random_str = str(year) + str(validated_data['school'].id) + random_str
+        random_str = self.random_digits(4)
+
+        random_str = str(now().year) + \
+            str(validated_data['school'].id) + random_str
         user['username'] = random_str
         user_serializer = UserSerializer(data=user)
+        # if the username clashes with another student, generate a new one
+        while User.objects.filter(username=random_str).exists():
+            random_str = self.random_digits(4)
+            random_str = str(now().year) + \
+                str(validated_data['school'].id) + random_str
+            user['username'] = random_str
+            user_serializer = UserSerializer(data=user)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
         validated_data['user'] = user
@@ -151,6 +156,13 @@ class StudentSerializer(serializers.ModelSerializer):
         # Update the Student instance
         instance = super().update(instance, validated_data)
         return instance
+
+    def random_digits(self, n):
+        digits = [i for i in range(0, 10)]
+        random_str = ""
+        for i in range(n):
+            random_str += str(random.choice(digits))
+        return random_str
 
     class Meta:
         model = Student
