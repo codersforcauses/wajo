@@ -124,8 +124,21 @@ export const loginSchema = z.object({
  *   email: "user@example.com",
  * });
  */
-export const createUserSchema = loginSchema.extend({
+export const createUserSchema = z.object({
   userRole: RoleEnum,
-  school_id: z.number({ message: "Required" }),
+  firstname: z.string().min(1, "First name is required"),
+  lastname: z.string().min(1, "Last name is required"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Za-z]/, "Password must contain letters")
+    .regex(/[0-9]/, "Password must contain numbers")
+    .regex(/[^A-Za-z0-9]/, "Password must contain symbols"),
   email: z.string().email("Invalid email address").optional(),
+});
+
+export const createStudentSchema = createUserSchema.extend({
+  school_id: z.number().int().optional(),
+  year_level: z.number().int().positive().optional(),
+  attendent_year: z.number().int().positive().optional(),
 });

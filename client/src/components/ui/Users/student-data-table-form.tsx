@@ -29,12 +29,12 @@ import { usePostMutation } from "@/hooks/use-post-data";
 import api from "@/lib/api";
 import { cn } from "@/lib/utils";
 import {
-  createUserSchema,
+  createStudentSchema,
   Student as StudentType,
   User as UserType,
 } from "@/types/user";
 
-// type User = z.infer<typeof createUserSchema>;
+type Student = z.infer<typeof createStudentSchema>;
 
 /**
  * Renders a data table form for managing user information with a dynamic table structure.
@@ -69,47 +69,56 @@ export function StudentDataTableForm() {
   //     endpoint: "/users/students/",
   //   });
   const router = useRouter();
-  const { mutateAsync: postStudents, isPending } = usePostMutation<{
-    id: number;
-    role: string;
-    first_name: string;
-    last_name: string;
-    password: string;
-    year_level: number;
-    attendent_year: number;
-    school_id: number;
-  }>(["postStudents"], "/users/students/", 1000, {
-    onSuccess: () => {
-      toast.success("Schools created successfully!");
-      router.push("/users/");
+  // const { mutateAsync: postStudents, isPending } = usePostMutation<{
+  //   id: number;
+  //   role: string;
+  //   first_name: string;
+  //   last_name: string;
+  //   password: string;
+  //   year_level: number;
+  //   attendent_year: number;
+  //   school_id: number;
+  // }>(["postStudents"], "/users/students/", 1000, {
+  //   onSuccess: () => {
+  //     toast.success("Schools created successfully!");
+  //     router.push("/users/");
+  //   },
+  // });
+  const { mutateAsync: postStudents, isPending } = usePostMutation<Student[]>(
+    ["postStudents"],
+    "/users/students/",
+    1000,
+    {
+      onSuccess: () => {
+        toast.success("Schools created successfully!");
+        router.push("/users/");
+      },
     },
-  });
+  );
 
-  const defaultUser: StudentType = {
-    id: 0,
-    role: "student",
-    first_name: "",
-    last_name: "",
-    // username: "",
+  const defaultStudent: Student = {
+    userRole: "student",
+    firstname: "",
+    lastname: "",
     password: "",
     year_level: 7,
     attendent_year: new Date().getFullYear(),
     school_id: 0,
   };
 
-  const createUserForm = useForm<{
-    users: StudentType[];
+  const createStudentForm = useForm<{
+    students: Student[];
   }>({
-    resolver: zodResolver(z.object({ users: z.array(createUserSchema) })),
-    defaultValues: { users: [defaultUser] },
+    resolver: zodResolver(z.object({ students: z.array(createStudentSchema) })),
+    defaultValues: { students: [defaultStudent] },
   });
 
   const { fields, append, remove } = useFieldArray({
-    control: createUserForm.control,
-    name: "users",
+    control: createStudentForm.control,
+    name: "students",
   });
 
-  const onSubmit: SubmitHandler<{ users: StudentType[] }> = async (data) => {
+  const onSubmit = async (data: { students: Student[] }) => {
     alert("Hello");
     alert("Submitted data: " + JSON.stringify(data, null, 2));
     console.log("Inside onSubmit");
@@ -122,7 +131,7 @@ export function StudentDataTableForm() {
     //   .catch(function (error) {
     //     console.log(error);
     //   });
-    await postStudents(data)
+    await postStudents({ ...data.students })
       .then((response) => {
         console.log("Response:", response);
       })
@@ -134,10 +143,10 @@ export function StudentDataTableForm() {
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
     <div className="space-y-4 p-4">
-      <Form {...createUserForm}>
+      <Form {...createStudentForm}>
         <form
           id="create_user_form"
-          onSubmit={createUserForm.handleSubmit(() => console.log("Hello"))}
+          onSubmit={createStudentForm.handleSubmit(onSubmit)}
           className="space-y-4"
         >
           <Table className="w-full border-collapse text-left shadow-md">
@@ -193,8 +202,8 @@ export function StudentDataTableForm() {
                   {/* Firstname Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.first_name`}
+                      control={createStudentForm.control}
+                      name={`students.${index}.firstname`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
@@ -209,8 +218,8 @@ export function StudentDataTableForm() {
                   {/* Lastname Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.last_name`}
+                      control={createStudentForm.control}
+                      name={`students.${index}.lastname`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
@@ -225,8 +234,8 @@ export function StudentDataTableForm() {
                   {/* Password Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.password`}
+                      control={createStudentForm.control}
+                      name={`students.${index}.password`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
@@ -241,7 +250,7 @@ export function StudentDataTableForm() {
                   {/* Email Field
                   <TableCell className="align-top">
                     <FormField
-                      control={createUserForm.control}
+                      control={createStudentForm.control}
                       name={`users.${index}.email`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
@@ -257,8 +266,8 @@ export function StudentDataTableForm() {
                   {/* School Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.school_id`}
+                      control={createStudentForm.control}
+                      name={`students.${index}.school_id`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
@@ -276,8 +285,8 @@ export function StudentDataTableForm() {
                   {/* Year level Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.year_level`}
+                      control={createStudentForm.control}
+                      name={`students.${index}.year_level`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
@@ -310,7 +319,7 @@ export function StudentDataTableForm() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => append(defaultUser)}
+              onClick={() => append(defaultStudent)}
             >
               Add Row
             </Button>
