@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 import os
 import uuid
 from django.conf import settings
@@ -17,7 +16,7 @@ class Image(models.Model):
     url = models.CharField(max_length=255)
 
     def __str__(self):
-        return f'{self.id} {self.url}'
+        return f"{self.id} {self.url}"
 
     def save_image_to_local(self, image_data, filename=None):
         """
@@ -86,10 +85,6 @@ class Question(models.Model):
     name = models.CharField(max_length=255, unique=True)
     question_text = models.TextField(default="")
     note = models.TextField(default="")
-    # answer to the question
-    answer = ArrayField(models.IntegerField(), default=list)
-    # detailed answer with explanation
-    answer_text = models.TextField(default="")
     categories = models.ManyToManyField(Category, related_name='questions', blank=True)
     created_by = models.ForeignKey(
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='questions_created')
@@ -97,6 +92,7 @@ class Question(models.Model):
         'auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='questions_modified')
     is_comp = models.BooleanField()
     diff_level = models.IntegerField()
+    solution_text = models.TextField(default="")
     layout = models.TextField(default="")  # Placeholder for layout enum
     image = models.ForeignKey(
         Image, on_delete=models.SET_NULL, null=True, blank=True, related_name='questions', default=None)
@@ -112,3 +108,12 @@ class Question(models.Model):
 
     def __str__(self):
         return f'{self.name} {self.question_text}'
+
+
+class Answer(models.Model):
+    id = models.AutoField(primary_key=True)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers")
+    value = models.IntegerField()
+
+    def __str__(self):
+        return f'{self.question} {self.value}'

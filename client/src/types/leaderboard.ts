@@ -1,16 +1,9 @@
 /**
- * Example of `LeaderboardStatus`.
- *
- * @example
- * const status: LeaderboardStatus = "Active";
- */
-export type LeaderboardStatus = "Active" | "Inactive";
-
-/**
  * Example of `Leaderboard`.
  *
  * @example
  * const leaderboard: Leaderboard = {
+ *   id: 1,
  *   name: "John Doe",
  *   school: "UWA",
  *   school_email: "john.doe@uwa.edu.au",
@@ -22,14 +15,24 @@ export type LeaderboardStatus = "Active" | "Inactive";
  *   status: "Active",
  * };
  */
-export type Leaderboard = {
+export interface Leaderboard {
+  id: number;
   name: string;
+  participant_students: number;
+  participant_teams: number;
+}
+
+export interface Ranking {
+  student_name: string;
+  team: string;
   school: string;
-  school_email: string;
-  user_name: string;
-  password: string;
-  individual_score: number;
-  team_name: string;
-  team_score: number;
-  status: LeaderboardStatus;
-};
+  marks: number;
+  response_time: string;
+}
+
+export interface Insight {
+  question_name: string;
+  genre: string;
+  difficulty: string;
+  correct_rate: number;
+}
