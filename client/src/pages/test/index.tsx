@@ -6,7 +6,7 @@ import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
 import { PracticeDataGrid } from "@/components/ui/Test/practice-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import { Practice } from "@/types/practice";
+import { AdminQuiz } from "@/types/quiz";
 
 export default function Index() {
   const {
@@ -14,13 +14,13 @@ export default function Index() {
     isLoading: isPracticeLoading,
     isError: isPracticeError,
     error: practiceError,
-  } = useFetchData<Practice[]>({
-    queryKey: ["practice.list"],
-    endpoint: "/test/practices",
+  } = useFetchData<AdminQuiz[]>({
+    queryKey: ["quiz.admin-quizzes"],
+    endpoint: "/quiz/admin-quizzes/",
   });
 
   const [page, setPage] = useState<number>(1);
-  const [filteredData, setFilteredData] = useState<Practice[]>([]);
+  const [filteredData, setFilteredData] = useState<AdminQuiz[]>([]);
 
   useEffect(() => {
     if (practices) {

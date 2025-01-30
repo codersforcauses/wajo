@@ -13,6 +13,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { Team } from "@/types/team";
+import { School } from "@/types/user";
 
 /**
  * Mock data representing team entries.
@@ -25,21 +26,21 @@ for (let i = 0; i < 9; i++) {
     {
       id: i * 3 + 1,
       name: `Team Alpha ${i + 1}`,
-      school: "Greenfield High",
+      school: { name: "Greenfield High" } as School,
       description: `A description for Team Alpha ${i + 1}.`,
       time_created: new Date(`2025-01-01T12:00:00Z`),
     },
     {
       id: i * 3 + 2,
       name: `Team Beta ${i + 1}`,
-      school: "Westwood Academy",
+      school: { name: "Westwood Academy" } as School,
       description: `A description for Team Beta ${i + 1}.`,
       time_created: new Date(`2025-01-01T13:00:00Z`),
     },
     {
       id: i * 3 + 3,
       name: `Team Gamma ${i + 1}`,
-      school: "Northside School",
+      school: { name: "Northside School" } as School,
       description: `A description for Team Gamma ${i + 1}.`,
       time_created: new Date(`2025-01-01T14:00:00Z`),
     },
