@@ -129,3 +129,8 @@ export interface PreviewModalProps {
   children: ReactNode;
   dataContext: PreviewModalDataContext;
 }
+
+export interface DeleteModalProps {
+  children: ReactNode;
+  data: Question;
+}
