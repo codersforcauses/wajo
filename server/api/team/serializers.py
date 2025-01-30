@@ -25,3 +25,19 @@ class TeamSerializer(serializers.ModelSerializer):
         model = Team
         fields = "__all__"
         read_only_fields = ("id", "time_created")
+
+
+class TeamStudentSerializer(serializers.ModelSerializer):
+    studentName = serializers.CharField(
+        source="student.user.username", read_only=True)
+    schoolName = serializers.CharField(
+        source="team.school.name", read_only=True)
+
+    class Meta:
+        model = TeamMember
+        fields = ["id", "team", "team_name",
+                  "studentName", "schoolName", "description"]
+
+    team_name = serializers.CharField(source="team.name", read_only=True)
+    description = serializers.CharField(
+        source="team.description", read_only=True)

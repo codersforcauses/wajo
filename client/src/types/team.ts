@@ -19,12 +19,12 @@
  */
 import { z } from "zod";
 
-interface Team {
-  teamId: string;
-  name: string;
+export interface Team {
+  id: string;
+  team_name: string;
   studentName: string;
   schoolName: string;
-  competitionPeriod: string;
+  description: string; //competitionPeriod
 }
 
 /**
@@ -45,10 +45,19 @@ interface Team {
  *   changePage: 1
  * };
  */
-interface TeamDatagridProps {
+// export interface TeamDatagridProps {
+//   datacontext: Team[];
+//   onDataChange: (updatedData: Team[]) => void;
+//   changePage: number;
+// }
+export interface TeamDatagridProps {
   datacontext: Team[];
-  onDataChange: (updatedData: Team[]) => void;
-  changePage: number;
+  onSort: (field: keyof Team) => void;
+  sortField: string;
+  sortOrder: "asc" | "desc";
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
 /**
@@ -68,7 +77,7 @@ interface TeamDatagridProps {
  *   className: "flex text-lg"
  * };
  */
-interface PaginationProps {
+export interface PaginationProps {
   totalPages: number;
   currentPage: number;
   onPageChange: (page: number) => void;

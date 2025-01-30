@@ -1,26 +1,18 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser
-from rest_framework.pagination import PageNumberPagination
 from django.db import IntegrityError
 from rest_framework.decorators import permission_classes
 
 from .models import Team, TeamMember
-from .serializers import TeamSerializer, TeamMemberSerializer
-
-
-class TeamPagination(PageNumberPagination):
-    page_size = 5
-    page_size_query_param = "page_size"
-    max_page_size = 100
+from .serializers import TeamSerializer, TeamMemberSerializer, TeamStudentSerializer
 
 
 @permission_classes([IsAdminUser])
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all().order_by("id")
     serializer_class = TeamSerializer
-    pagination_class = TeamPagination
 
     def create(self, request, *args, **kwargs):
         try:
@@ -75,3 +67,10 @@ class TeamMemberViewSet(viewsets.ModelViewSet):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+@permission_classes([IsAdminUser])
+class TeamStudentListView(generics.ListAPIView):
+    queryset = TeamMember.objects.select_related(
+        "team", "student", "team__school")
+    serializer_class = TeamStudentSerializer

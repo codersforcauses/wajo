@@ -1,74 +1,67 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
-import SidebarLayout from "@/components/sidebar-layout";
+// import SidebarLayout from "@/components/sidebar-layout";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/search";
 import { TeamDatagrid } from "@/components/ui/Team/data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
+import { Team } from "@/types/team";
 
-const Index = () => {
-  // Fetches the list of teams using the custom hook.
-  const {
-    data: teams,
-    isLoading: isTeamLoading,
-    isError: isTeamError,
-    error: teamError,
-  } = useFetchData<Team[]>({
-    queryKey: ["team.list"],
-    endpoint: "/team/list",
+export default function TeamsPage() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState("team_name"); // Default sorting field
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [searchQuery, setSearchQuery] = useState(""); // What the user types
+  const [search, setSearch] = useState(""); // Only updates when user submits search
+
+  // Fetch data when page or sorting changes
+  const { data, isLoading, error } = useFetchData<{
+    results: Team[];
+    count: number;
+    next: string | null;
+    previous: string | null;
+  }>({
+    queryKey: ["teams", currentPage, sortField, sortOrder, search], // Include search in queryKey
+    endpoint: "/team/students/",
+    params: {
+      page: currentPage,
+      sortField,
+      sortOrder,
+      ...(search ? { search } : {}), // Only include search if not empty
+    },
   });
 
-  // Tracks the current page number for pagination.
-  const [page, setPage] = useState<number>(1);
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading teams.</p>;
+  if (data?.results.length === 0) {
+    return <p>No teams found.</p>;
+  }
 
-  // Stores the filtered list of teams based on search input.
-  const [filteredData, setFilteredData] = useState<Team[]>([]);
+  const pageSize = 5; // Adjust this if your backend uses a different page size
+  const totalPages = data ? Math.ceil(data.count / pageSize) : 1;
 
-  // Updates the filtered data when teams are loaded.
-  useEffect(() => {
-    if (teams) {
-      setFilteredData(teams);
-    }
-  }, [teams]);
-
-  // Filters teams based on the search input.
-  const handleFilterChange = (value: string) => {
-    if (!teams) return;
-
-    if (value.trim() === "") {
-      setFilteredData(teams);
-    } else {
-      const filtered = teams.filter((item) =>
-        item.name.toLowerCase().includes(value.toLowerCase()),
-      );
-      setFilteredData(filtered);
-    }
-
-    // Resets to the first page after a search.
-    setPage(1);
+  // Handle sorting changes
+  const handleSort = (field: keyof Team) => {
+    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    setSortField(field);
   };
 
-  // Displays a loading state while data is being fetched.
-  if (isTeamLoading) {
-    return <div>Loading...</div>;
-  }
-
-  // Displays an error message if the API request fails.
-  if (isTeamError) {
-    return <div>Error: {teamError?.message}</div>;
-  }
-
-  // Renders the main content, including the search bar and data grid.
+  const handleSearchSubmit = (value: string) => {
+    console.log("Search input changed to: ", value);
+    setSearch(value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+  console.log(search);
   return (
     <div className="m-4 space-y-4">
       <div className="flex justify-between">
         {/* Search bar to filter teams */}
         <SearchInput
-          label=""
-          value={""}
+          label="Search"
+          value={search}
           placeholder="Search by name..."
-          onSearch={handleFilterChange}
+          onSearch={handleSearchSubmit}
         />
         {/* Button to navigate to the create team page */}
         <Button asChild className="mr-6">
@@ -76,18 +69,16 @@ const Index = () => {
         </Button>
       </div>
 
-      {/* Data grid to display the list of teams */}
+      <h1 className="text-2xl font-bold">Teams</h1>
       <TeamDatagrid
-        datacontext={filteredData}
-        onDataChange={setFilteredData}
-        changePage={page}
-      ></TeamDatagrid>
+        datacontext={data?.results ?? []}
+        onSort={handleSort}
+        sortField={sortField}
+        sortOrder={sortOrder}
+        currentPage={currentPage}
+        totalPages={totalPages || 1}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </div>
   );
-};
-
-Index.getLayout = function getLayout(page: React.ReactElement) {
-  return <SidebarLayout role="admin">{page}</SidebarLayout>;
-};
-
-export default Index;
+}
