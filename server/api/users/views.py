@@ -56,18 +56,20 @@ class StudentViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         data = request.data.copy()  # Create a mutable copy of request.data
         if hasattr(self.request.user, "teacher"):
-            data["school"] = self.request.user.teacher.school.id
-        try:
+            # teacher can only create students for their school
+            for student in data:
+                student["school_id"] = self.request.user.teacher.school.id
+
             serializer = self.get_serializer(data=data, many=True)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except IntegrityError as error:
+        elif self.request.user.is_staff:
+            return super().create(request, *args, **kwargs)
+        else:
             return Response(
-                {"error": str(
-                    error), "message": "A student with this username already exists."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                {"error": "You do not have permission to access this resource."},
+                status=status.HTTP_403_FORBIDDEN)
 
     def update(self, request, *args, **kwargs):
         data = request.data.copy()  # Create a mutable copy of request.data
