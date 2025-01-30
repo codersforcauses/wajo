@@ -5,5 +5,6 @@ from .views import QuestionViewSet, CategoryViewSet
 router = DefaultRouter()
 router.register(r'question-bank', QuestionViewSet, basename='question-bank')
 router.register(r'categories', CategoryViewSet, basename='categories')
+# router.register(r'answers', AnswerViewSet, basename='answers')
 
 urlpatterns = router.urls

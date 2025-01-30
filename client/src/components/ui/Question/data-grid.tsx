@@ -113,7 +113,7 @@ export function Datagrid({
                 <span>Difficulty</span>
                 <span
                   className="ml-2 cursor-pointer"
-                  onClick={() => sortByColumn("difficulty")}
+                  onClick={() => sortByColumn("diff_level")}
                 >
                   <svg
                     width="10"
@@ -139,10 +139,10 @@ export function Datagrid({
             >
               <TableCell className="w-1/4">{item.name || "\u00A0"}</TableCell>
               <TableCell className="w-1/4">
-                {item.category || "\u00A0"}
+                {item.category ? item.category.join(", ") : "\u00A0"}
               </TableCell>
               <TableCell className="w-1/4">
-                {item.difficulty || "\u00A0"}
+                {item.diff_level || "\u00A0"}
               </TableCell>
               <TableCell className="flex justify-evenly py-4">
                 {item.name ? (

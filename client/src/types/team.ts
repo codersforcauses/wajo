@@ -1,3 +1,7 @@
+import { z } from "zod";
+
+import { School, Student } from "@/types/user";
+
 /**
  * Represents a Team object with its properties.
  *
@@ -17,14 +21,22 @@
  *   competitionPeriod: "2024"
  * };
  */
-import { z } from "zod";
+
+export interface TeamMember {
+  id: number;
+  student: Student;
+  time_added: Date;
+  team: number;
+}
 
 export interface Team {
-  id: string;
-  team_name: string;
-  studentName: string;
-  schoolName: string;
-  description: string; //competitionPeriod
+  id: number;
+  members: TeamMember[];
+  school: School;
+  name: string;
+  description: string;
+  time_created: Date;
+  students: Student[];
 }
 
 /**
