@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { User } from "lucide-react";
+import { useRouter } from "next/router";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/table";
 import { SelectSchool } from "@/components/ui/Users/select-school";
 import SelectYearLevel from "@/components/ui/Users/select-year";
+import { usePostMutation } from "@/hooks/use-post-data";
 import api from "@/lib/api";
 import { cn } from "@/lib/utils";
 import {
@@ -57,6 +59,32 @@ import {
  * - {@link https://react-hook-form.com/docs/usefieldarray React Hook Form: useFieldArray}
  */
 export function StudentDataTableForm() {
+  // const {
+  //     data: studentUsers,
+  //     isLoading: isStudentUsersLoading,
+  //     isError: isStudentUsersError,
+  //     error: studentUsersError,
+  //   } = useFetchData<Student[]>({
+  //     queryKey: ["users.students.list"],
+  //     endpoint: "/users/students/",
+  //   });
+  const router = useRouter();
+  const { mutateAsync: postStudents, isPending } = usePostMutation<{
+    id: number;
+    role: string;
+    first_name: string;
+    last_name: string;
+    password: string;
+    year_level: number;
+    attendent_year: number;
+    school_id: number;
+  }>(["postStudents"], "/users/students/", 1000, {
+    onSuccess: () => {
+      toast.success("Schools created successfully!");
+      router.push("/users/");
+    },
+  });
+
   const defaultUser: StudentType = {
     id: 0,
     role: "student",
@@ -81,18 +109,26 @@ export function StudentDataTableForm() {
     name: "users",
   });
 
-  const onSubmit = (data: { users: StudentType[] }) => {
-    console.log("Submitting data:", data.users);
-    data.users.forEach((user) => {
-      api
-        .post(`/users/students/`, user)
-        .then((response) => {
-          console.log("Response:", response.data);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    });
+  const onSubmit: SubmitHandler<{ users: StudentType[] }> = async (data) => {
+    alert("Hello");
+    alert("Submitted data: " + JSON.stringify(data, null, 2));
+    console.log("Inside onSubmit");
+    console.log("Submitting data:", data);
+    // api
+    //   .post(`/users/students/`, data)
+    //   .then((response) => {
+    //     console.log("Response:", response.data);
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   });
+    await postStudents(data)
+      .then((response) => {
+        console.log("Response:", response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
@@ -101,7 +137,7 @@ export function StudentDataTableForm() {
       <Form {...createUserForm}>
         <form
           id="create_user_form"
-          onSubmit={createUserForm.handleSubmit(onSubmit)}
+          onSubmit={createUserForm.handleSubmit(() => console.log("Hello"))}
           className="space-y-4"
         >
           <Table className="w-full border-collapse text-left shadow-md">
@@ -278,7 +314,9 @@ export function StudentDataTableForm() {
             >
               Add Row
             </Button>
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isPending}>
+              Submit
+            </Button>
           </div>
         </form>
       </Form>
