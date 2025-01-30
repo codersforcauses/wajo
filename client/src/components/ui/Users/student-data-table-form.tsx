@@ -87,7 +87,7 @@ export function StudentDataTableForm() {
   const { mutateAsync: postStudents, isPending } = usePostMutation<Student[]>(
     ["postStudents"],
     "/users/students/",
-    1000,
+    20000,
     {
       onSuccess: () => {
         toast.success("Schools created successfully!");
@@ -97,13 +97,13 @@ export function StudentDataTableForm() {
   );
 
   const defaultStudent: Student = {
-    userRole: "student",
-    firstname: "",
-    lastname: "",
+    first_name: "",
+    last_name: "",
     password: "",
     year_level: 7,
     attendent_year: new Date().getFullYear(),
     school_id: 0,
+    extension_time: 0,
   };
 
   const createStudentForm = useForm<{
@@ -120,7 +120,7 @@ export function StudentDataTableForm() {
 
   const onSubmit = async (data: { students: Student[] }) => {
     alert("Hello");
-    alert("Submitted data: " + JSON.stringify(data, null, 2));
+    alert("Submitted data: " + JSON.stringify(data.students, null, 2));
     console.log("Inside onSubmit");
     console.log("Submitting data:", data);
     // api
@@ -131,7 +131,7 @@ export function StudentDataTableForm() {
     //   .catch(function (error) {
     //     console.log(error);
     //   });
-    await postStudents({ ...data.students })
+    await postStudents(data.students)
       .then((response) => {
         console.log("Response:", response);
       })
@@ -203,11 +203,11 @@ export function StudentDataTableForm() {
                   <TableCell className="align-top">
                     <FormField
                       control={createStudentForm.control}
-                      name={`students.${index}.firstname`}
+                      name={`students.${index}.first_name`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
-                            <Input {...field} placeholder="Enter firstname" />
+                            <Input {...field} placeholder="Enter first_name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -219,11 +219,11 @@ export function StudentDataTableForm() {
                   <TableCell className="align-top">
                     <FormField
                       control={createStudentForm.control}
-                      name={`students.${index}.lastname`}
+                      name={`students.${index}.last_name`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
-                            <Input {...field} placeholder="Enter lastname" />
+                            <Input {...field} placeholder="Enter last name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -323,9 +323,7 @@ export function StudentDataTableForm() {
             >
               Add Row
             </Button>
-            <Button type="submit" disabled={isPending}>
-              Submit
-            </Button>
+            <Button type="submit">Submit</Button>
           </div>
         </form>
       </Form>

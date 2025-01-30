@@ -125,9 +125,8 @@ export const loginSchema = z.object({
  * });
  */
 export const createUserSchema = z.object({
-  userRole: RoleEnum,
-  firstname: z.string().min(1, "First name is required"),
-  lastname: z.string().min(1, "Last name is required"),
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -141,4 +140,5 @@ export const createStudentSchema = createUserSchema.extend({
   school_id: z.number().int().optional(),
   year_level: z.number().int().positive().optional(),
   attendent_year: z.number().int().positive().optional(),
+  extension_time: z.number().int().optional(),
 });
