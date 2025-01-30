@@ -12,8 +12,8 @@ export default function Index() {
     isError: isInsightError,
     error: insightError,
   } = useFetchData<Insight[]>({
-    queryKey: ["insight.list"],
-    endpoint: "/test/insights",
+    queryKey: ["leaderboard.individual"],
+    endpoint: "/leaderboard/individual/",
   });
 
   const [page, setPage] = useState<number>(1);

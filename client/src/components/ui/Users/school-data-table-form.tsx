@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { createSchoolSchema } from "@/types/school";
+import { createSchoolSchema } from "@/types/user";
 
 type School = z.infer<typeof createSchoolSchema>;
 
