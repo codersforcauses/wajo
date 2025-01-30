@@ -9,6 +9,20 @@ import { toast } from "sonner";
 
 import api from "@/lib/api";
 
+interface UseDeleteMutationOptions<
+  TData,
+  TVariables,
+  TError = AxiosError<{ error: string; message: string }>,
+> extends Omit<
+    UseMutationOptions<TData, TError, TVariables>,
+    "mutationKey" | "mutationFn"
+  > {
+  mutationKey: string[];
+  queryKeys?: Array<string | number>[];
+  endpoint: string;
+  timeout?: number;
+}
+
 /**
  * Custom hook for performing a DELETE request mutation.
  *
@@ -48,16 +62,17 @@ export const useDeleteMutation = <
   TData,
   TError = AxiosError<{ error: string; message: string }>,
   TVariables = void,
->(
-  mutationKey: string[],
-  endpoint: string,
-  queryKeys: Array<string | number>[] = [],
-  timeout: number = 10000, // Default timeout of 10 seconds
-  args?: Omit<
-    UseMutationOptions<TData, TError, TVariables>,
-    "mutationKey" | "mutationFn"
-  >,
-): UseMutationResult<TData, TError, TVariables> => {
+>({
+  mutationKey,
+  queryKeys = [],
+  endpoint,
+  timeout = 10000,
+  ...args
+}: UseDeleteMutationOptions<TData, TVariables, TError>): UseMutationResult<
+  TData,
+  TError,
+  TVariables
+> => {
   const queryClient = useQueryClient();
 
   return useMutation<TData, TError, TVariables>({
@@ -70,7 +85,58 @@ export const useDeleteMutation = <
       // extract error message from BE response
       if (axios.isAxiosError(error) && error.response?.data) {
         const { message, error: detailedError } = error.response.data;
-        toast.error(message || detailedError || "Something went wrong");
+        toast.error(detailedError || message || "Something went wrong");
+      }
+    },
+    onSuccess: (data, variables, context) => {
+      queryKeys.forEach((queryKey) => {
+        queryClient.invalidateQueries({ queryKey });
+      });
+      if (args?.onSuccess) args.onSuccess(data, variables, context);
+    },
+  });
+};
+
+interface useDynamicDeleteMutationOptions<TData, TVariables, TError>
+  extends Omit<
+    UseMutationOptions<TData, TError, TVariables>,
+    "mutationKey" | "mutationFn"
+  > {
+  baseUrl: string;
+  mutationKey: string[];
+  queryKeys?: Array<string | number>[]; // Optional query keys to invalidate after success
+  timeout?: number; // Optional timeout for the request
+}
+
+export const useDynamicDeleteMutation = <
+  TData,
+  TVariables = number,
+  TError = AxiosError<{ error: string; message: string }>,
+>({
+  baseUrl,
+  mutationKey,
+  queryKeys = [],
+  timeout = 10000,
+  ...args
+}: useDynamicDeleteMutationOptions<
+  TData,
+  TVariables,
+  TError
+>): UseMutationResult<TData, TError, TVariables> => {
+  const queryClient = useQueryClient();
+
+  return useMutation<TData, TError, TVariables>({
+    ...args,
+    mutationKey,
+    mutationFn: (id: TVariables) => {
+      // dynamically set the endpoint for the DELETE request using the provided id
+      return api.delete(`${baseUrl}/${id}/`, { timeout });
+    },
+    onError: (error: TError) => {
+      // extract error message from BE response
+      if (axios.isAxiosError(error) && error.response?.data) {
+        const { message, error: detailedError } = error.response.data;
+        toast.error(detailedError || message || "Something went wrong");
       }
     },
     onSuccess: (data, variables, context) => {

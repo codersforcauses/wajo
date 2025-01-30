@@ -61,7 +61,7 @@ export const usePostMutation = <
       // extract error message from BE response
       if (axios.isAxiosError(error) && error.response?.data) {
         const { message, error: detailedError } = error.response.data;
-        toast.error(message || detailedError || "Something went wrong");
+        toast.error(detailedError || message || "Something went wrong");
       }
     },
     onSuccess: (data, details, context) => {

@@ -29,7 +29,7 @@ export interface Question {
   name: string;
   created_by: string;
   modified_by: string;
-  category: Category[]; // to be discussed
+  category: Category[]; // ask: to be discussed
   is_comp: boolean;
   answer: number[];
   question_text: string;
