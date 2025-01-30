@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "api.users",
     "api.quiz",
     "api.team",
+    "api.invoice",
     'drf_spectacular',
 ]
 
