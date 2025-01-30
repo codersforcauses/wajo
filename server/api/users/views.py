@@ -97,6 +97,14 @@ class TeacherViewSet(viewsets.ModelViewSet):
     filterset_fields = ['school']
     search_fields = ['user__username']
 
+    def list(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return super().list(request, *args, **kwargs)
+        else:
+            return Response(
+                {"error": "You do not have permission to access this resource."},
+                status=status.HTTP_403_FORBIDDEN)
+
     def retrieve(self, request, *args, **kwargs):
         if request.user.is_staff:
             return super().retrieve(request, *args, **kwargs)
@@ -111,17 +119,13 @@ class TeacherViewSet(viewsets.ModelViewSet):
             return Response(
                 {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
 
-    @permission_classes([IsAdminUser])
     def create(self, request, *args, **kwargs):
-        try:
+        if request.user.is_staff:
             return super().create(request, *args, **kwargs)
-        except IntegrityError as error:
+        else:
             return Response(
-                {"error": str(error)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
 
-    @permission_classes([IsAuthenticated])
     def update(self, request, *args, **kwargs):
         if request.user.is_staff:
             return super().update(request, *args, **kwargs)
@@ -131,6 +135,13 @@ class TeacherViewSet(viewsets.ModelViewSet):
             else:
                 return Response(
                     {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response(
+                {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+
+    def destroy(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return super().destroy(request, *args, **kwargs)
         else:
             return Response(
                 {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
