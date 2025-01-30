@@ -9,6 +9,15 @@ class QuestionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CompQuestionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Question model with no answer field.
+    """
+    class Meta:
+        model = Question
+        fields = ['id', 'name', 'question_text', 'layout', 'image', 'mark']
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -39,11 +48,28 @@ class QuizSlotSerializer(serializers.ModelSerializer):
         read_only_fields = ['quiz']
 
 
+class CompQuizSlotSerializer(serializers.ModelSerializer):
+    question = CompQuestionSerializer(read_only=True)
+
+    class Meta:
+        model = QuizSlot
+        fields = '__all__'
+
+
 class QuizSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Quiz
-        fields = ['id', 'name', 'intro', 'total_marks']
+        fields = '__all__'
+
+
+class UserQuizSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Quiz model with no is_comp, visible, and status fields.
+    """
+    class Meta:
+        model = Quiz
+        exclude = ['is_comp', 'visible', 'status']
 
 
 class AdminQuizSerializer(serializers.ModelSerializer):
@@ -53,6 +79,9 @@ class AdminQuizSerializer(serializers.ModelSerializer):
 
 
 class QuizAttemptSerializer(serializers.ModelSerializer):
+    current_page = serializers.IntegerField(default=0, required=False)
+    total_marks = serializers.IntegerField(default=0, required=False)
+
     class Meta:
         model = QuizAttempt
         fields = '__all__'
