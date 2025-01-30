@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/select";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { cn } from "@/lib/utils";
-import { School } from "@/types/user";
+import { School, SchoolTypeEnum } from "@/types/user";
 
 type Props = {
   selectedId: number | undefined;
@@ -78,6 +78,40 @@ export function SelectSchool({ selectedId, onChange, className }: Props) {
             </SelectItem>
           ))
         )}
+      </SelectContent>
+    </Select>
+  );
+}
+
+type SchoolTypeProps = {
+  selectedType: string | undefined;
+  onChange: (role: string) => void;
+  className?: string;
+};
+
+export function SelectSchoolType({
+  selectedType,
+  onChange,
+  className,
+}: SchoolTypeProps) {
+  const onValueChange = (value: string) => {
+    onChange(value);
+  };
+
+  return (
+    <Select
+      value={selectedType ? selectedType.toString() : ""}
+      onValueChange={onValueChange}
+    >
+      <SelectTrigger className={cn(className)}>
+        <SelectValue placeholder="Type" />
+      </SelectTrigger>
+      <SelectContent>
+        {SchoolTypeEnum.options.map((type) => (
+          <SelectItem key={type} value={type}>
+            {type}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

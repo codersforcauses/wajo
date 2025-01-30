@@ -52,8 +52,8 @@ export interface Competition {
   name: string;
   intro: string;
   total_marks: string;
-  open_time_date: Date; // need from server
-  status: QuizStatus; // to be discuss
+  open_time_date: Date; // ask: need from server
+  status: QuizStatus; // ask: to be discuss
 }
 
 export interface CompetitionSlot {

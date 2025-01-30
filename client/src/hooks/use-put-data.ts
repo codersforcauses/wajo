@@ -9,6 +9,20 @@ import { toast } from "sonner";
 
 import api from "@/lib/api";
 
+interface UsePutMutationOptions<
+  TData,
+  TVariables,
+  TError = AxiosError<{ error: string; message: string }>,
+> extends Omit<
+    UseMutationOptions<TData, TError, TVariables>,
+    "mutationKey" | "mutationFn"
+  > {
+  mutationKey: string[];
+  queryKeys: Array<string | number>[];
+  endpoint: string;
+  timeout?: number;
+}
+
 /**
  * Custom hook for performing a `PUT` request mutation with automatic cache invalidation and error handling.
  *
@@ -50,29 +64,26 @@ export const usePutMutation = <
   TData,
   TVariables = unknown,
   TError = AxiosError<{ error: string; message: string }>,
->(
-  mutationKey: string[],
-  queryKeys: Array<string | number>[],
-  endpoint: string,
-  timeout: number = 10000, // Default timeout of 10 seconds
-  args?: Omit<
-    UseMutationOptions<TData, TError, TVariables>,
-    "mutationKey" | "mutationFn"
-  >,
-): UseMutationResult<TData, TError, TVariables> => {
+>({
+  mutationKey,
+  queryKeys,
+  endpoint,
+  timeout = 10000,
+  ...args
+}: UsePutMutationOptions<TData, TVariables, TError>): UseMutationResult<
+  TData,
+  TError,
+  TVariables
+> => {
   const queryClient = useQueryClient();
-
   return useMutation<TData, TError, TVariables>({
-    ...args,
     mutationKey,
-    mutationFn: (variables: TVariables) => {
-      return api.put(endpoint, variables, { timeout });
-    },
+    mutationFn: (variables: TVariables) =>
+      api.put(endpoint, variables, { timeout }),
     onError: (error: TError) => {
-      // extract error message from BE response
       if (axios.isAxiosError(error) && error.response?.data) {
         const { message, error: detailedError } = error.response.data;
-        toast.error(message || detailedError || "Something went wrong");
+        toast.error(detailedError || message || "Something went wrong");
       }
     },
     onSuccess: (data, details, context) => {
@@ -81,5 +92,6 @@ export const usePutMutation = <
       );
       if (args?.onSuccess) args.onSuccess(data, details, context);
     },
+    ...args, // Spread additional mutation options
   });
 };
