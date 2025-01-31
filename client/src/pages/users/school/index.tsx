@@ -4,37 +4,37 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
-import { TeamDataGrid } from "@/components/ui/Users/team-data-grid";
+import { SchoolDataGrid } from "@/components/ui/Users/school-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import type { Team } from "@/types/team";
+import type { School } from "@/types/user";
 
-export default function TeamList() {
+export default function SchoolList() {
   const {
-    data: teams,
-    isLoading: isTeamLoading,
-    isError: isTeamError,
-    error: TeamError,
-  } = useFetchData<Team[]>({
-    queryKey: ["team.teams"],
-    endpoint: "/team/teams/",
+    data: schools,
+    isLoading: isSchoolLoading,
+    isError: isSchoolError,
+    error: schoolError,
+  } = useFetchData<School[]>({
+    queryKey: ["users.schools"],
+    endpoint: "/users/schools/",
   });
 
   const [page, setPage] = useState<number>(1);
-  const [filteredData, setFilteredData] = useState<Team[]>([]);
+  const [filteredData, setFilteredData] = useState<School[]>([]);
 
   useEffect(() => {
-    if (teams) {
-      setFilteredData(teams);
+    if (schools) {
+      setFilteredData(schools);
     }
-  }, [teams]);
+  }, [schools]);
 
   const handleFilterChange = (value: string) => {
-    if (!teams) return;
+    if (!schools) return;
 
     const filtered =
       value.trim() === ""
-        ? teams
-        : teams.filter((item) => {
+        ? schools
+        : schools.filter((item) => {
             const query = value.toLowerCase().trim();
             const isExactMatch = query.startsWith('"') && query.endsWith('"');
             const normalizedQuery = isExactMatch ? query.slice(1, -1) : query;
@@ -48,8 +48,8 @@ export default function TeamList() {
     setPage(1);
   };
 
-  if (isTeamLoading) return <WaitingLoader />;
-  if (isTeamError) return <div>Error: {TeamError?.message}</div>;
+  if (isSchoolLoading) return <WaitingLoader />;
+  if (isSchoolError) return <div>Error: {schoolError?.message}</div>;
 
   return (
     <div className="m-4 space-y-4">
@@ -57,19 +57,19 @@ export default function TeamList() {
         <SearchInput
           label=""
           value={""}
-          placeholder="Search Team"
+          placeholder="Search School"
           onSearch={handleFilterChange}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"/users/create_team"}>Create a Team</Link>
+          <Link href={"/users/school/create"}>Create a School</Link>
         </Button>
       </div>
 
-      <TeamDataGrid
+      <SchoolDataGrid
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
-      ></TeamDataGrid>
+      ></SchoolDataGrid>
     </div>
   );
 }

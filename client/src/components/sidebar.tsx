@@ -36,13 +36,28 @@ export default function Sidebar({ children, role }: LayoutProps) {
   const pathSegments = router.pathname.split("/").filter(Boolean);
 
   const breadcrumbItems = pathSegments.map((segment, index) => {
-    const formattedSegment = segment
-      .replace(/_/g, " ") // replace underscores with spaces
-      .replace(/\b\w/g, (char) => char.toUpperCase()); // capitalize first letter
-    return {
-      title: formattedSegment,
-      url: `/${pathSegments.slice(0, index + 1).join("/")}`,
-    };
+    // handle dynamic segments
+    const isDynamic = /^\[.*\]$/.test(segment);
+    const actualSegment = isDynamic
+      ? router.query[segment.slice(1, -1)] || segment.slice(1, -1)
+      : segment;
+
+    const title = actualSegment
+      .toString()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+    const url =
+      "/" +
+      pathSegments
+        .slice(0, index + 1)
+        .map((seg) => {
+          const isParam = /^\[.*\]$/.test(seg);
+          return isParam ? router.query[seg.slice(1, -1)] || seg : seg;
+        })
+        .join("/");
+
+    return { title, url };
   });
 
   return (

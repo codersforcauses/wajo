@@ -12,41 +12,41 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Competition } from "@/types/competition";
+import { Competition, QuizStatus } from "@/types/quiz";
 
 // Mock data representing competition entries
 const mockCompetitions: Partial<Competition>[] = [
   {
     id: 1,
     name: "Competition01_2024",
-    status: "Published",
-    competition_time: new Date(`2025-01-30T10:00:00Z`),
+    status: QuizStatus.NormalPractice,
+    open_time_date: new Date(`2025-01-30T10:00:00Z`),
   },
   {
     id: 2,
     name: "Competition02_2024",
-    status: "Unpublished",
-    competition_time: new Date(`2024-01-01T02:00:00Z`),
+    status: QuizStatus.Finished,
+    open_time_date: new Date(`2024-01-01T02:00:00Z`),
   },
   {
     name: "Competition03_2024",
-    status: "Unpublished",
-    competition_time: new Date(`2025-01-10T18:00:00Z`),
+    status: QuizStatus.Ongoing,
+    open_time_date: new Date(`2025-01-10T18:00:00Z`),
   },
   {
     name: "Competition04_2024",
-    status: "Published",
-    competition_time: new Date(`2025-04-15T13:00:00Z`),
+    status: QuizStatus.Upcoming,
+    open_time_date: new Date(`2025-04-15T13:00:00Z`),
   },
   {
     name: "Competition05_2024",
-    status: "Published",
-    competition_time: new Date(`2025-02-01T20:00:00Z`),
+    status: QuizStatus.Finished,
+    open_time_date: new Date(`2025-02-01T20:00:00Z`),
   },
   {
     name: "Competition06_2024",
-    status: "Unpublished",
-    competition_time: new Date(`2025-01-01T12:00:00Z`),
+    status: QuizStatus.Upcoming,
+    open_time_date: new Date(`2025-01-01T12:00:00Z`),
   },
 ];
 
