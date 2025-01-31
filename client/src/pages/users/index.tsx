@@ -6,56 +6,36 @@ import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
 import { DataGrid } from "@/components/ui/Users/data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import type { Student, Teacher, User } from "@/types/user";
+import type { User } from "@/types/user";
 
 export default function UserList() {
   const {
-    data: studentUsers,
-    isLoading: isStudentUsersLoading,
-    isError: isStudentUsersError,
-    error: studentUsersError,
-  } = useFetchData<Student[]>({
-    queryKey: ["users.students.list"],
-    endpoint: "/users/students/",
-  });
-
-  const {
-    data: teacherUsers,
-    isLoading: isTeacherUsersLoading,
-    isError: isTeacherUsersError,
-    error: teacherUsersError,
-  } = useFetchData<Teacher[]>({
-    queryKey: ["users.teachers.list"],
-    endpoint: "/users/teachers/",
-  });
-
-  const {
-    data: staffUsers,
-    isLoading: isStaffUsersLoading,
-    isError: isStaffUsersError,
-    error: staffUsersError,
+    data: users,
+    isLoading: isUsersLoading,
+    isError: isUsersError,
+    error: usersError,
   } = useFetchData<User[]>({
-    queryKey: ["users.staffs.list"],
-    endpoint: "/users/staffs/",
+    queryKey: ["users.users.list"],
+    endpoint: "/users/users/",
   });
 
   const [page, setPage] = useState<number>(1);
   const [filteredData, setFilteredData] = useState<User[]>([]);
 
   useEffect(() => {
-    if (studentUsers) {
-      console.log(studentUsers);
-      setFilteredData(studentUsers);
+    if (users) {
+      console.log("users: ", users);
+      setFilteredData(users);
     }
-  }, [studentUsers]);
+  }, [users]);
 
   const handleFilterChange = (value: string) => {
-    if (!studentUsers) return;
+    if (!users) return;
 
     const filtered =
       value.trim() === ""
-        ? studentUsers
-        : studentUsers.filter((item) => {
+        ? users
+        : users.filter((item) => {
             const query = value.toLowerCase().trim();
             const isExactMatch = query.startsWith('"') && query.endsWith('"');
             const normalizedQuery = isExactMatch ? query.slice(1, -1) : query;
@@ -72,9 +52,8 @@ export default function UserList() {
     setPage(1);
   };
 
-  if (isStudentUsersLoading) return <WaitingLoader />;
-  if (isStudentUsersError)
-    return <div>Error: {studentUsersError?.message}</div>;
+  if (isUsersLoading) return <WaitingLoader />;
+  if (isUsersError) return <div>Error: {usersError?.message}</div>;
 
   return (
     <div className="m-4 space-y-4">

@@ -137,8 +137,14 @@ export const createUserSchema = z.object({
 });
 
 export const createStudentSchema = createUserSchema.extend({
-  school_id: z.number().int().optional(),
-  year_level: z.number().int().positive().optional(),
+  school_id: z.number().int(),
+  year_level: z.number().int().positive(),
   attendent_year: z.number().int().positive().optional(),
   extension_time: z.number().int().optional(),
+});
+
+export const createTeacherSchema = createUserSchema.extend({
+  school_id: z.number().int(),
+  email: z.string().email("Invalid email address").optional(),
+  phone: z.string().optional(),
 });

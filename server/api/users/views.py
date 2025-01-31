@@ -35,6 +35,15 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             )
 
 
+@permission_classes([IsAdminUser])
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return self.queryset
+
+
 @permission_classes([IsAuthenticated])
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()

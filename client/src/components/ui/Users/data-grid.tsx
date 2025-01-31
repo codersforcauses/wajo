@@ -10,8 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
+import { School } from "@/types/school";
 import { User } from "@/types/user";
 
 /**
@@ -60,6 +62,15 @@ export function DataGrid({
       setCurrentPage(page);
     }
   };
+  // fetch the list of schools and match the school_id to the school name
+  const {
+    data: schools,
+    isPending,
+    isError,
+  } = useFetchData<School[]>({
+    queryKey: ["users.school.list"],
+    endpoint: "/users/schools/",
+  });
 
   useEffect(() => {
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -109,8 +120,10 @@ export function DataGrid({
                 {item.last_name}
               </TableCell>
               <TableCell className="w-1/4">{item.role}</TableCell>
-              {item.school_id && (
+              {item.school_id ? (
                 <TableCell className="w-1/4">{item.school_id}</TableCell>
+              ) : (
+                <TableCell className="w-1/4"></TableCell>
               )}
               <TableCell className="flex py-4">
                 <div className={cn("flex", { invisible: !item.first_name })}>

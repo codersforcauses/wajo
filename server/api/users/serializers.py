@@ -25,6 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(required=True)
     username = serializers.CharField(required=True)
     password = serializers.CharField(write_only=True)
+    role = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -45,6 +46,18 @@ class UserSerializer(serializers.ModelSerializer):
             instance.save()
             validated_data['password'] = instance.password
         return super().update(instance, validated_data)
+
+    def get_role(self, obj):
+        if hasattr(obj, 'student'):
+            return 'student'
+        elif hasattr(obj, 'teacher'):
+            return 'teacher'
+        return 'user'
+  
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['role'] = self.get_role(instance)
+        return representation
 
 
 class SchoolSerializer(serializers.ModelSerializer):
