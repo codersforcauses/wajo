@@ -53,10 +53,18 @@ class UserSerializer(serializers.ModelSerializer):
         elif hasattr(obj, 'teacher'):
             return 'teacher'
         return 'user'
-  
+
+    def get_school(self, obj):
+        if hasattr(obj, 'student'):
+            return SchoolSerializer(obj.student.school).data if obj.student.school else None
+        elif hasattr(obj, 'teacher'):
+            return SchoolSerializer(obj.teacher.school).data if obj.teacher.school else None
+        return None
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['role'] = self.get_role(instance)
+        representation['school'] = self.get_school(instance)
         return representation
 
 

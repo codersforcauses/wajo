@@ -90,8 +90,8 @@ export function StudentDataTableForm() {
     20000,
     {
       onSuccess: () => {
-        toast.success("Schools created successfully!");
-        router.push("/users/");
+        toast.success("Students created successfully!");
+        router.push("/users");
       },
     },
   );
@@ -119,8 +119,8 @@ export function StudentDataTableForm() {
   });
 
   const onSubmit = async (data: { students: Student[] }) => {
-    alert("Hello");
-    alert("Submitted data: " + JSON.stringify(data.students, null, 2));
+    // alert("Hello");
+    // alert("Submitted data: " + JSON.stringify(data.students, null, 2));
     console.log("Inside onSubmit");
     console.log("Submitting data:", data);
     // api

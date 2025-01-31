@@ -116,19 +116,31 @@ export function DataGrid({
             >
               <TableCell className="w-1/4">{item.id}</TableCell>
               <TableCell className="w-1/4">
-                {item.first_name}
-                {item.last_name}
+                {item.first_name
+                  ? `${item.first_name} ${item.last_name}`
+                  : item.username}
               </TableCell>
-              <TableCell className="w-1/4">{item.role}</TableCell>
-              {item.school_id ? (
-                <TableCell className="w-1/4">{item.school_id}</TableCell>
+              <TableCell className="w-1/4">
+                {item.role == "user" ? "admin" : item.role}
+              </TableCell>
+              {item.school ? (
+                <TableCell className="w-1/4">{item.school.name}</TableCell>
+              ) : item.id ? (
+                <TableCell className="w-1/4">N/A</TableCell>
               ) : (
                 <TableCell className="w-1/4"></TableCell>
               )}
               <TableCell className="flex py-4">
-                <div className={cn("flex", { invisible: !item.first_name })}>
+                <div className={cn("flex", { invisible: !item.id })}>
                   <Button className="me-2">View</Button>
-                  <Button variant={"destructive"}>Delete</Button>
+                  <Button
+                    variant={"destructive"}
+                    className={cn("", {
+                      invisible: !item.first_name,
+                    })}
+                  >
+                    Delete
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
