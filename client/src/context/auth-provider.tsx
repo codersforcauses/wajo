@@ -59,7 +59,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const { mutateAsync: postLogin } = usePostMutation<
     AxiosResponse<TokenResponse>,
-    Error,
     { username: string; password: string }
   >(["login"], "/auth/token/", 2000);
 

@@ -20,6 +20,11 @@ export const RoleEnum = z.enum(["admin", "teacher", "student"], {
  */
 export type Role = z.infer<typeof RoleEnum>;
 
+export const SchoolTypeEnum = z.enum(["Public", "Independent", "Catholic"], {
+  errorMap: () => ({ message: "Invalid School Type" }),
+});
+export type SchoolType = z.infer<typeof SchoolTypeEnum>;
+
 /**
  * Represents a user object.
  *
@@ -39,7 +44,7 @@ export interface User {
   first_name: string;
   last_name: string;
   role: Role;
-  school: string;
+  school: School;
 }
 
 export interface Student {
@@ -59,9 +64,10 @@ export interface Student {
 export interface School {
   id: number;
   name: string;
-  type: string;
+  type: SchoolType;
   is_country: boolean;
-  created_at: Date; // need from server
+  created_at: Date; // ask: need from server
+  abbreviation: string;
 }
 
 export interface Teacher {
@@ -87,16 +93,11 @@ export interface Teacher {
  * @const {z.ZodSchema} loginSchema
  *
  * @property {z.ZodString} username - Required, must be at least 1 character.
- * @property {z.ZodString} password - Required, must be at least 8 characters, include letters, numbers, and symbols.
+ * @property {z.ZodString} password - Required, must be at least 1 character.
  */
 export const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Za-z]/, "Password must contain letters")
-    .regex(/[0-9]/, "Password must contain numbers")
-    .regex(/[^A-Za-z0-9]/, "Password must contain symbols"),
+  password: z.string().min(1, "Password is required"),
 });
 
 /**
@@ -128,4 +129,7 @@ export const createUserSchema = loginSchema.extend({
  */
 export const createSchoolSchema = z.object({
   name: z.string().min(1, "Required"),
+  type: SchoolTypeEnum,
+  is_country: z.boolean(),
+  abbreviation: z.string().min(1, "Required"),
 });

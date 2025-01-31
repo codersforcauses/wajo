@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/router";
 import { useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -21,6 +23,7 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { SelectSchool } from "@/components/ui/Users/select-school";
+import { usePostMutation } from "@/hooks/use-post-data";
 import { cn } from "@/lib/utils";
 import { createTeamSchema } from "@/types/team";
 
@@ -55,8 +58,21 @@ export function TeamDataTableForm() {
     name: "teams",
   });
 
+  const router = useRouter();
+  const { mutate: createTeam, isPending } = usePostMutation<Team[]>(
+    ["teams"],
+    "/team/teams/",
+    1000,
+    {
+      onSuccess: () => {
+        toast.success("Teams created successfully!");
+        router.push("/users/team/");
+      },
+    },
+  );
+
   const onSubmit = (data: { teams: Team[] }) => {
-    console.log("Submitted data:", data.teams);
+    createTeam({ ...data.teams });
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
