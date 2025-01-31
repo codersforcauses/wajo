@@ -110,8 +110,6 @@ export interface PaginationProps {
  *   answer: "5",
  *   solution: "Adding 2 and 3 gives 5.",
  *   mark: "5",
- *   difficulty: "Easy",
- *   genre: "Arithmetic"
  * };
  */
 export interface PreviewModalDataContext {
@@ -120,8 +118,6 @@ export interface PreviewModalDataContext {
   answer: string;
   solution: string;
   mark: string;
-  difficulty: string;
-  genre: string;
 }
 
 /**
@@ -151,6 +147,11 @@ export interface PreviewModalProps {
   children: ReactNode;
   dataContext: PreviewModalDataContext;
 }
+
+export const createCategorySchema = z.object({
+  genre: z.string().min(1, "Genre is required"),
+  info: z.string().min(1, "Info is required"),
+});
 
 /**
  * Zod schema for validating a question creation input.

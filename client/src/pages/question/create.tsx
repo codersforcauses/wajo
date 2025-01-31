@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { ChangeEvent, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -17,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import PreviewModal from "@/components/ui/Question/preview-modal";
+import { MultipleSelectCategory } from "@/components/ui/Question/select-category";
 import {
   Select,
   SelectContent,
@@ -56,12 +59,26 @@ const formSchema = z.object({
     .min(1, "Mark is required")
     .regex(/^\d+$/, "Mark must be a number"),
   difficulty: z.string().min(1, "Difficulty is required"),
-  genre: z.string().min(1, "Genre is required"),
+  genre: z
+    .array(
+      z.object({
+        value: z.string(),
+        label: z.string(),
+      }),
+    )
+    .min(1, "Genre is required"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 export default function Create() {
+  const router = useRouter();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const imageUrl = useMemo(
+    () => (imageFile ? URL.createObjectURL(imageFile) : null),
+    [imageFile],
+  );
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema), // Integrate zod validation
     defaultValues: {
@@ -71,7 +88,7 @@ export default function Create() {
       solution: "",
       mark: "",
       difficulty: "",
-      genre: "",
+      genre: [],
     },
   });
 
@@ -79,7 +96,6 @@ export default function Create() {
     control: form.control,
   });
 
-  const router = useRouter();
   const { mutate: createQuestion, isPending: isCreatePending } =
     usePostMutation<Question>(["question"], "/questions/question-bank/", 1000, {
       onSuccess: () => {
@@ -88,10 +104,16 @@ export default function Create() {
       },
     });
 
+  function onImageChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+  }
+
   const handleSubmit = (data: FormValues) => {
     createQuestion({
       name: data.questionName,
-      category_ids: [1],
+      category_ids: data.genre.map((g) => parseInt(g.value)),
       is_comp: false,
       answer: data.answer.split(",").map((num) => Number(num.trim())), // list of numbers
       question_text: data.question,
@@ -247,35 +269,54 @@ export default function Create() {
                 </FormItem>
               )}
             />
-
             {/* Genre */}
             <FormField
               name="genre"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="genre-select">
+                  <FormLabel>
                     Genre <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger
-                        id="genre-select"
-                        className="bg-yellow-400 w-32"
-                      >
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent className="w-32">
-                        <SelectItem value="math">Arithmatic</SelectItem>
-                        <SelectItem value="science">Science</SelectItem>
-                        <SelectItem value="history">Algebra</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <MultipleSelectCategory
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>
+
+          <div className="flex min-h-[325px] flex-1 flex-col gap-3 rounded-lg border-2 border-[#7D916F] p-5">
+            <label
+              htmlFor="imageInput"
+              className="flex items-center gap-2 text-lg"
+            >
+              Upload Image <ImageIcon />
+            </label>
+
+            <input
+              id="imageInput"
+              type="file"
+              onChange={onImageChange}
+              className="block w-full text-sm text-slate-500 file:ml-0 file:mr-4 file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[#7D916F] hover:cursor-pointer hover:file:bg-violet-100"
+              accept="image/jpeg, image/png, image/jpg, image/gif"
+            />
+
+            <div className="flex flex-1 items-center justify-center">
+              {imageUrl && (
+                <Image
+                  src={imageUrl}
+                  alt="Question Image"
+                  width="0"
+                  height="0"
+                  className="h-auto w-full"
+                />
+              )}
+            </div>
           </div>
 
           <div className="flex justify-end gap-4">
@@ -286,8 +327,6 @@ export default function Create() {
                 answer: watchedValues.answer || "",
                 solution: watchedValues.solution || "",
                 mark: watchedValues.mark || "",
-                difficulty: watchedValues.difficulty || "",
-                genre: watchedValues.genre || "",
               }}
             >
               <Button type="button" variant={"ghost"} className="bg-gray-200">
