@@ -91,10 +91,17 @@ export interface QuestionAttempt {
   quiz_attempt: number;
 }
 
+export enum QuizState {
+  UNATTEMPTED = 1,
+  IN_PROGRESS = 2,
+  SUBMITTED = 3,
+  COMPLETED = 4,
+}
+
 export interface QuizAttempt {
   id: number;
   current_page: number;
-  state: number;
+  state: QuizState;
   time_start: Date;
   time_finish: Date;
   time_modified: Date;

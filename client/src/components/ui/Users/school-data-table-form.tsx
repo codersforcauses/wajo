@@ -74,7 +74,7 @@ export function SchoolDataTableForm() {
   );
 
   const onSubmit = (data: { schools: School[] }) => {
-    createSchool({ ...data.schools });
+    createSchool([...data.schools]);
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
