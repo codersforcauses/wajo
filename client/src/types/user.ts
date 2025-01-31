@@ -133,3 +133,10 @@ export const createSchoolSchema = z.object({
   is_country: z.boolean(),
   abbreviation: z.string().min(1, "Required"),
 });
+
+export const createRandomPwd = () => {
+  const passhelp = require("passhelp");
+  // 8 character alphanumeric for those silly banks. ensure that
+  // it has 1 digit, 1 upper-case and 1 lower-case character
+  return passhelp.character(8, passhelp.alphabets.alphanumeric, true); // "A2nJEH4o"
+};
