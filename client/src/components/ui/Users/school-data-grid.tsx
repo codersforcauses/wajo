@@ -11,7 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { School } from "@/types/school";
+import { DatagridProps } from "@/types/data-grid";
+import { School } from "@/types/user";
 
 /**
  * Renders a paginated data grid for displaying school information.
@@ -83,13 +84,13 @@ export function SchoolDataGrid({
               <TableCell className="w-1/4">{item.id}</TableCell>
               <TableCell className="w-1/4">{item.name}</TableCell>
               <TableCell className="w-1/4">
-                {item.time_created ? (
+                {item.created_at ? (
                   <>
                     <div className="text-nowrap">
-                      {new Date(item.time_created).toLocaleDateString()}
+                      {new Date(item.created_at).toLocaleDateString()}
                     </div>
                     <div className="text-nowrap">
-                      {new Date(item.time_created).toLocaleTimeString()}
+                      {new Date(item.created_at).toLocaleTimeString()}
                     </div>
                   </>
                 ) : null}

@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { DatagridProps } from "@/types/data-grid";
 import { Team } from "@/types/team";
 
 /**
@@ -85,7 +86,7 @@ export function TeamDataGrid({
             >
               <TableCell className="w-1/4">{item.id}</TableCell>
               <TableCell className="w-1/4">{item.name}</TableCell>
-              <TableCell className="w-1/4">{item.school}</TableCell>
+              <TableCell className="w-1/4">{item.school?.name}</TableCell>
               <TableCell className="w-1/4">{item.description}</TableCell>
               <TableCell className="w-1/4">
                 {item.time_created ? (

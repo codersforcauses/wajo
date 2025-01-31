@@ -1,6 +1,9 @@
 from django.db import models
+from api.team.models import Team
 from api.users.models import Student
 from api.question.models import Question
+from django.utils.timezone import now
+from datetime import timedelta
 
 
 class Quiz(models.Model):
@@ -73,6 +76,12 @@ class QuizAttempt(models.Model):
 
     """
 
+    class State(models.IntegerChoices):
+        UNATTEMPTED = 1
+        IN_PROGRESS = 2
+        SUBMITTED = 3
+        COMPLETED = 4
+
     id = models.AutoField(primary_key=True)
     quiz = models.ForeignKey(
         Quiz, on_delete=models.CASCADE, related_name="attempts")
@@ -80,11 +89,16 @@ class QuizAttempt(models.Model):
         Student, on_delete=models.CASCADE, related_name="quiz_attempts", default=None, null=True
     )
     current_page = models.IntegerField()
-    state = models.IntegerField()
+    state = models.IntegerField(
+        choices=State.choices, default=State.UNATTEMPTED)
     time_start = models.DateTimeField(auto_now_add=True)
-    time_finish = models.DateTimeField(auto_now_add=True)
+    time_finish = models.DateTimeField(null=True, blank=True)
     time_modified = models.DateTimeField(auto_now=True)
     total_marks = models.IntegerField()
+    team = models.ForeignKey(
+        Team, on_delete=models.CASCADE, related_name="quiz_attempts", default=None, null=True, blank=True
+    )
+    dead_line = models.DateTimeField(default=None, null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} {self.quiz} "
@@ -93,6 +107,34 @@ class QuizAttempt(models.Model):
         for question_attempt in self.question_attempts.all():
             question_attempt.check_answer()
             question_attempt.save()
+
+    @property
+    def is_available(self):
+        current_time = now()
+        end_time = self.quiz.open_time_date + \
+            timedelta(minutes=self.quiz.time_limit) + \
+            timedelta(minutes=self.quiz.time_window)
+        end_time = min(end_time, self.time_start +
+                       timedelta(minutes=self.quiz.time_limit))
+        if int(self.student.extenstion_time) > 0:
+            end_time = now() + \
+                timedelta(minutes=self.student.extenstion_time)
+            self.student.extenstion_time = 0
+            self.student.save()
+        if self.dead_line is None:
+            self.dead_line = end_time
+            self.save()
+        else:
+            self.dead_line = max(self.dead_line, end_time)
+
+        is_available = self.quiz.open_time_date <= current_time <= self.dead_line
+        if not is_available:
+            self.state = QuizAttempt.State.COMPLETED
+            self.save()
+        else:
+            self.state = QuizAttempt.State.IN_PROGRESS
+            self.save()
+        return is_available
 
 
 class QuestionAttempt(models.Model):
@@ -107,7 +149,7 @@ class QuestionAttempt(models.Model):
     is_correct = models.BooleanField(default=None)
 
     def __str__(self):
-        return f"{self.id} {self.question_id} {self.quiz_attempt_id}"
+        return f"{self.id} {self.question} {self.quiz_attempt}"
 
     def check_answer(self):
         if self.answer_student == self.question.answer:

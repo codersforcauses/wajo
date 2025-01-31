@@ -16,7 +16,7 @@
  *   changePage: 1
  * };
  */
-interface DatagridProps<T> {
+export interface DatagridProps<T> {
   datacontext: T[];
   onDataChange: (updatedData: T[]) => void;
   changePage: number;
@@ -39,9 +39,44 @@ interface DatagridProps<T> {
  *   className: "flex text-lg"
  * };
  */
-interface PaginationProps {
+export interface PaginationProps {
   totalPages: number;
   currentPage: number;
   onPageChange: (page: number) => void;
   className?: string;
 }
+
+export const sortData = <T>(
+  data: T[],
+  column: keyof T,
+  isAscending: boolean,
+): T[] => {
+  return [...data].sort((a, b) => {
+    const valueA = a[column];
+    const valueB = b[column];
+
+    if (typeof valueA === "string" && typeof valueB === "string") {
+      return isAscending
+        ? valueA.localeCompare(valueB)
+        : valueB.localeCompare(valueA);
+    }
+
+    if (valueA instanceof Date && valueB instanceof Date) {
+      return isAscending
+        ? valueA.getTime() - valueB.getTime()
+        : valueB.getTime() - valueA.getTime();
+    }
+
+    if (typeof valueA === "number" && typeof valueB === "number") {
+      return isAscending ? valueA - valueB : valueB - valueA;
+    }
+
+    if (typeof valueA === "object" && typeof valueB === "object") {
+      return isAscending
+        ? JSON.stringify(valueA).localeCompare(JSON.stringify(valueB))
+        : JSON.stringify(valueB).localeCompare(JSON.stringify(valueA));
+    }
+
+    return 0; // Default to no sorting if types are unsupported
+  });
+};

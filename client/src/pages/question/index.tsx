@@ -16,8 +16,8 @@ export default function Index() {
     isError: isQuestionError,
     error: QuestionError,
   } = useFetchData<Question[]>({
-    queryKey: ["question.list"],
-    endpoint: "/question/list",
+    queryKey: ["questions.question-bank"],
+    endpoint: "/questions/question-bank/",
   });
 
   // Tracks the current page number for pagination.
@@ -80,7 +80,7 @@ export default function Index() {
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
-      ></Datagrid>
+      />
     </div>
   );
 }

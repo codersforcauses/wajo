@@ -1,24 +1,46 @@
 import { ReactNode } from "react";
+import { z } from "zod";
+
+export interface Category {
+  id: number;
+  genre: string;
+  info: string;
+}
 
 /**
  * Represents a Question object with its properties.
  *
  * @interface Question
+ * @property {number} id
  * @property {string} name - The name of the question.
  * @property {string} category - The category the question belongs to (e.g., Geometry, Algebra).
  * @property {string} difficulty - The difficulty level of the question (e.g., Easy, Medium, Difficult).
  *
  * @example
  * const exampleQuestion: Question = {
+ *   id: 1,
  *   name: "Question01_2024",
  *   category: "Geometry Questions",
  *   difficulty: "Difficult"
  * };
  */
 export interface Question {
+  id: number;
   name: string;
-  category: string;
-  difficulty: string;
+  created_by: string;
+  modified_by: string;
+  category: Category[]; // to be discussed
+  is_comp: boolean;
+  answer: number[];
+  question_text: string;
+  note: string;
+  answer_text: string;
+  diff_level: number;
+  layout: string;
+  mark: number;
+  time_created: Date;
+  time_modified: Date;
+  image: number;
 }
 
 /**
@@ -134,3 +156,79 @@ export interface DeleteModalProps {
   children: ReactNode;
   data: Question;
 }
+
+/**
+ * Zod schema for validating a question creation input.
+ *
+ * Ensures that each question has a non-negative integer ID and a non-empty name.
+ *
+ * @constant
+ */
+const createQuestionSchema = z.object({
+  id: z.number().int().nonnegative(),
+  name: z.string().min(1, "Question name is required"),
+});
+
+/**
+ * Zod schema for validating a question block.
+ *
+ * Ensures that each question block has a non-negative integer ID and at least one question.
+ *
+ * @constant
+ */
+const createQuestionBlockSchema = z.object({
+  id: z.number().int().nonnegative(),
+  questions: z
+    .array(createQuestionSchema)
+    .min(1, "At least one question is required"),
+});
+
+/**
+ * Zod schema for validating generic test creation input.
+ *
+ * Validates name, general instructions, and at least one question block.
+ *
+ * @constant
+ */
+export const genericCreateTestSchema = z.object({
+  name: z.string().min(1, "Required"),
+  general_instructions: z.string().min(1, "Required"),
+  blocks: z
+    .array(createQuestionBlockSchema)
+    .min(1, "At least one question block is required"), // An array of question blocks
+});
+
+/**
+ * Zod schema for validating competition creation input.
+ *
+ * Extends the generic test schema and ensures that the start time is earlier than the end time.
+ *
+ * @constant
+ */
+export const createCompetitionSchema = genericCreateTestSchema
+  .extend({
+    start_time: z.date(),
+    end_time: z.date(),
+  })
+  .refine((data) => data.start_time < data.end_time, {
+    message: "Start time must be earlier than end time.",
+    path: ["start_time"], // optional: Specify which field the error applies to
+  });
+
+/**
+ * Zod schema for validating practice creation input.
+ *
+ * Extends the generic test schema with additional validations for `hours` and `minutes`.
+ *
+ * @constant
+ */
+export const createPracticeSchema = genericCreateTestSchema.extend({
+  hours: z
+    .number()
+    .min(0, "Number must be at least 0")
+    .max(24, "Number must be at most 24"),
+  minutes: z
+    .number()
+    .min(0, "Number must be at least 0")
+    .max(60, "Number must be at most 60"),
+});
