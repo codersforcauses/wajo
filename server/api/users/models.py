@@ -10,12 +10,16 @@ class School(models.Model):
         id: The primary key for the school.
         name (CharField): The name of the school, up to 100 characters.
         code (CharField): A unique code for the school, up to 10 characters.
+        type (CharField): The type of the school (e.g., public, independent, etc.).
+        is_country (BooleanField): Indicates if the school is a country (regional) school.
+        abbreviation (CharField): The abbreviation of the school, up to 10 characters.
     """
 
     class SchoolType(models.TextChoices):
         PUBLIC = "Public"
         INDEPENDENT = "Independent"
         CATHOLIC = "Catholic"
+        ALLIES = "Allies"
 
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, unique=True)
