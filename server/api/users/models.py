@@ -29,6 +29,7 @@ class School(models.Model):
     # new added fields based on google sheet
     type = models.CharField(max_length=100, choices=TYPE_CHOICES, blank=True)
     is_country = models.BooleanField(default=False)
+    abbreviation = models.CharField(max_length=10, default="", blank=True)
     note = models.TextField(blank=True)
 
     def __str__(self):

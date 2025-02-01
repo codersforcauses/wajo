@@ -118,7 +118,6 @@ class QuizAttempt(models.Model):
         end_time = min(end_time, self.time_start +
                        timedelta(minutes=self.quiz.time_limit))
         if int(self.student.extenstion_time) > 0:
-            print("extenstion time")
             end_time = now() + \
                 timedelta(minutes=self.student.extenstion_time)
             self.student.extenstion_time = 0
