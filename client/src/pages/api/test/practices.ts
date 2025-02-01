@@ -12,32 +12,32 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 // Mock data representing practice entries
-import { Practice } from "@/types/practice";
+import { AdminQuiz } from "@/types/quiz";
 
-const mockPractices: Partial<Practice>[] = [
+const mockPractices: Partial<AdminQuiz>[] = [
   {
     name: "Practice01_2024",
-    status: "Published",
+    status: 0,
   },
   {
     name: "Practice02_2024",
-    status: "Unpublished",
+    status: 1,
   },
   {
     name: "Practice03_2024",
-    status: "Unpublished",
+    status: 2,
   },
   {
     name: "Practice04_2024",
-    status: "Published",
+    status: 3,
   },
   {
     name: "Practice05_2024",
-    status: "Published",
+    status: 1,
   },
   {
     name: "Practice06_2024",
-    status: "Unpublished",
+    status: 3,
   },
 ];
 
@@ -53,7 +53,7 @@ const mockPractices: Partial<Practice>[] = [
  */
 export default function handler(
   _req: NextApiRequest,
-  res: NextApiResponse<Practice[]>,
+  res: NextApiResponse<AdminQuiz[]>,
 ): void {
-  res.status(200).json(mockPractices as Practice[]);
+  res.status(200).json(mockPractices as AdminQuiz[]);
 }

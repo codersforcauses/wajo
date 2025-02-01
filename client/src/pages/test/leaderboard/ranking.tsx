@@ -12,8 +12,8 @@ export default function Index() {
     isError: isRankingError,
     error: rankingError,
   } = useFetchData<Ranking[]>({
-    queryKey: ["ranking.list"],
-    endpoint: "/test/rankings",
+    queryKey: ["leaderboard.individual"],
+    endpoint: "/leaderboard/individual/",
   });
 
   const [page, setPage] = useState<number>(1);
