@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status, generics
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser
@@ -6,7 +6,7 @@ from django.db import IntegrityError
 from rest_framework.decorators import permission_classes
 
 from .models import Team, TeamMember
-from .serializers import TeamSerializer, TeamMemberSerializer, TeamStudentSerializer
+from .serializers import TeamSerializer, TeamMemberSerializer
 
 
 @permission_classes([IsAdminUser])
@@ -67,10 +67,3 @@ class TeamMemberViewSet(viewsets.ModelViewSet):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-
-@permission_classes([IsAdminUser])
-class TeamStudentListView(generics.ListAPIView):
-    queryset = TeamMember.objects.select_related(
-        "team", "student", "team__school")
-    serializer_class = TeamStudentSerializer

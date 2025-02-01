@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import {
   Table,
@@ -14,99 +14,6 @@ import { Team, TeamDatagridProps } from "@/types/team";
 import { Button } from "../button";
 import { Pagination } from "../pagination";
 
-const fetchTeams = async (
-  page: number,
-  sortField: string,
-  sortOrder: "asc" | "desc",
-) => {
-  const response = await api.get("/api/teams", {
-    params: { page, sortField, sortOrder },
-  });
-  return response.data;
-};
-
-/**
- * The Datagrid component is a flexible, paginated data table with sorting and navigation features.
- *
- * @param {TeamDatagridProps} props - Props including datacontext (data array), onDataChange (callback for data update), and ChangePage (external control for current page).
- */
-// export function TeamDatagrid({
-//   datacontext,
-//   onDataChange,
-//   changePage,
-// }: TeamDatagridProps) {
-//   // State to track sorting direction
-//   const [isAscending, setIsAscending] = useState(true);
-//   // State for the current page number
-//   const [currentPage, setCurrentPage] = useState(1);
-//   // State to hold padded data for consistent rows
-//   const [paddedData, setPaddedData] = useState<Team[]>([]);
-//   // Number of items displayed per page
-//   const itemsPerPage = 5;
-//   // Calculate total pages based on the data length
-//   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
-
-//   /**
-//    * Handles sorting of the data based on a specified column.
-//    * @param {keyof Team} column - Column key to sort by.
-//    */
-//   const sortByColumn = (column: keyof Team) => {
-//     const sortedData = [...datacontext].sort((a, b) => {
-//       return isAscending
-//         ? a[column].localeCompare(b[column])
-//         : b[column].localeCompare(a[column]);
-//     });
-//     setCurrentPage(1); // Reset to the first page after sorting
-//     onDataChange(sortedData); // Update the parent with sorted data
-//     setIsAscending(!isAscending); // Toggle sorting direction
-//   };
-
-//   /**
-//    * Handles page change logic.
-//    * @param {number} page - The new page number.
-//    */
-//   const handlePageChange = (page: number) => {
-//     if (page >= 1 && page <= totalPages) {
-//       setCurrentPage(page);
-//     }
-//   };
-
-//   /**
-//    * Updates the displayed data based on the current page.
-//    * Pads the data to ensure consistent rows (e.g., always 5 rows).
-//    */
-//   useEffect(() => {
-//     const indexOfLastItem = currentPage * itemsPerPage;
-//     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//     const currentData = datacontext.slice(indexOfFirstItem, indexOfLastItem);
-
-//     // Ensure paddedData always has 5 rows
-//     const updatedPaddedData = [...currentData];
-//     while (updatedPaddedData.length < itemsPerPage) {
-//       updatedPaddedData.push({
-//         teamId: "",
-//         name: "",
-//         studentName: "",
-//         schoolName: "",
-//         competitionPeriod: "",
-//       });
-//     }
-
-//     setPaddedData(updatedPaddedData);
-//   }, [datacontext, currentPage]);
-
-//   /**
-//    * Make the default page always 1 when search button makes any change
-//    */
-//   useEffect(() => {
-//     setCurrentPage(changePage);
-//   }, [datacontext]);
-
-/**
- * Handles page change by triggering a backend API request.
- * @param {number} page - The new page number.
- */
-
 export function TeamDatagrid({
   datacontext,
   onSort,
@@ -116,6 +23,15 @@ export function TeamDatagrid({
   totalPages,
   onPageChange,
 }: TeamDatagridProps) {
+  const deleteTeam = async (id: number) => {
+    try {
+      const response = await api.delete(`/team/teams/${id}/`);
+      console.log("Deleted successfully:", response.data);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting:", error);
+    }
+  };
   return (
     <div>
       <Table className="w-full border-collapse text-left shadow-md">
@@ -129,7 +45,7 @@ export function TeamDatagrid({
                 <span>Name</span>
                 <span
                   className="ml-2 cursor-pointer"
-                  onClick={() => onSort("team_name")}
+                  onClick={() => onSort("name")}
                 >
                   <svg
                     width="10"
@@ -147,21 +63,6 @@ export function TeamDatagrid({
             <TableHead className="w-1/5">
               <div className="flex items-center text-white">
                 <span>Student Name</span>
-                <span
-                  className="ml-2 cursor-pointer"
-                  onClick={() => onSort("studentName")}
-                >
-                  <svg
-                    width="10"
-                    height="19"
-                    viewBox="0 0 10 19"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M5 19L0.669872 11.5H9.33013L5 19Z" fill="white" />
-                    <path d="M5 0L9.33013 7.5H0.669873L5 0Z" fill="white" />
-                  </svg>
-                </span>
               </div>
             </TableHead>
             <TableHead className="w-1/5">
@@ -169,7 +70,7 @@ export function TeamDatagrid({
                 <span>School Name</span>
                 <span
                   className="ml-2 cursor-pointer"
-                  onClick={() => onSort("schoolName")}
+                  onClick={() => onSort("school")}
                 >
                   <svg
                     width="10"
@@ -213,14 +114,14 @@ export function TeamDatagrid({
               className={"divide-gray-200 border-gray-50 text-sm text-black"}
             >
               <TableCell className="w-1/5">{item.id || "\u00A0"}</TableCell>
+              <TableCell className="w-1/5">{item.name || "\u00A0"}</TableCell>
               <TableCell className="w-1/5">
-                {item.team_name || "\u00A0"}
+                {item?.members
+                  ?.map((member) => member.studentName)
+                  .join(", ") || "\u00A0"}
               </TableCell>
               <TableCell className="w-1/5">
-                {item.studentName || "\u00A0"}
-              </TableCell>
-              <TableCell className="w-1/5">
-                {item.schoolName || "\u00A0"}
+                {item.school?.name || "\u00A0"}
               </TableCell>
               <TableCell className="w-1/5">
                 {item.description || "\u00A0"}
@@ -229,7 +130,12 @@ export function TeamDatagrid({
                 {item.id ? (
                   <>
                     <Button>View</Button>
-                    <Button variant={"destructive"}>Delete</Button>
+                    <Button
+                      variant={"destructive"}
+                      onClick={() => deleteTeam(item.id)}
+                    >
+                      Delete
+                    </Button>
                   </>
                 ) : (
                   <div className="invisible flex">

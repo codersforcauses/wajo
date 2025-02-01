@@ -23,7 +23,7 @@ export default function TeamsPage() {
     previous: string | null;
   }>({
     queryKey: ["teams", currentPage, sortField, sortOrder, search], // Include search in queryKey
-    endpoint: "/team/students/",
+    endpoint: "/team/teams/",
     params: {
       page: currentPage,
       sortField,

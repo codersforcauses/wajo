@@ -25,6 +25,7 @@ import { School, Student } from "@/types/user";
 export interface TeamMember {
   id: number;
   student: Student;
+  studentName?: string;
   time_added: Date;
   team: number;
 }
