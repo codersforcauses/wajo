@@ -62,15 +62,6 @@ export function DataGrid({
       setCurrentPage(page);
     }
   };
-  // fetch the list of schools and match the school_id to the school name
-  const {
-    data: schools,
-    isPending,
-    isError,
-  } = useFetchData<School[]>({
-    queryKey: ["users.school.list"],
-    endpoint: "/users/schools/",
-  });
 
   useEffect(() => {
     const indexOfLastItem = currentPage * itemsPerPage;

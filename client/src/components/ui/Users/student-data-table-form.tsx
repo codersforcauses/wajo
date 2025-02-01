@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
@@ -37,13 +38,13 @@ import {
 type Student = z.infer<typeof createStudentSchema>;
 
 /**
- * Renders a data table form for managing user information with a dynamic table structure.
+ * Renders a data table form for managing student information with a dynamic table structure.
  *
- * The `DataTableForm` component allows users to add, and delete rows of user data.
+ * The `StudentDataTableForm` component allows users to add, and delete rows of student data.
  * It uses `react-hook-form` with Zod schema validation to manage and validate the form state.
  * Each row includes fields for `Firstname`, `Lastname`, `Password`, `School` and `Year level`.
  *
- * @function DataTableForm
+ * @function StudentDataTableForm
  *
  * @description
  * The component utilizes the following libraries and components:
@@ -51,49 +52,20 @@ type Student = z.infer<typeof createStudentSchema>;
  * - `zod` for schema validation.
  *
  * Features:
- * - Dynamically adds or removes rows with user data.
+ * - Dynamically adds or removes rows with student data.
  * - Provides validation for all input fields.
- * - Submits the collected data as an array of users.
+ * - Submits the collected data as an array of students.
  *
  * Additional Reference:
  * - {@link https://react-hook-form.com/docs/usefieldarray React Hook Form: useFieldArray}
  */
 export function StudentDataTableForm() {
-  // const {
-  //     data: studentUsers,
-  //     isLoading: isStudentUsersLoading,
-  //     isError: isStudentUsersError,
-  //     error: studentUsersError,
-  //   } = useFetchData<Student[]>({
-  //     queryKey: ["users.students.list"],
-  //     endpoint: "/users/students/",
-  //   });
   const router = useRouter();
-  // const { mutateAsync: postStudents, isPending } = usePostMutation<{
-  //   id: number;
-  //   role: string;
-  //   first_name: string;
-  //   last_name: string;
-  //   password: string;
-  //   year_level: number;
-  //   attendent_year: number;
-  //   school_id: number;
-  // }>(["postStudents"], "/users/students/", 1000, {
-  //   onSuccess: () => {
-  //     toast.success("Schools created successfully!");
-  //     router.push("/users/");
-  //   },
-  // });
+  const queryClient = useQueryClient();
   const { mutateAsync: postStudents, isPending } = usePostMutation<Student[]>(
     ["postStudents"],
     "/users/students/",
     20000,
-    {
-      onSuccess: () => {
-        toast.success("Students created successfully!");
-        router.push("/users");
-      },
-    },
   );
 
   const defaultStudent: Student = {
@@ -119,25 +91,19 @@ export function StudentDataTableForm() {
   });
 
   const onSubmit = async (data: { students: Student[] }) => {
-    // alert("Hello");
-    // alert("Submitted data: " + JSON.stringify(data.students, null, 2));
-    console.log("Inside onSubmit");
-    console.log("Submitting data:", data);
-    // api
-    //   .post(`/users/students/`, data)
-    //   .then((response) => {
-    //     console.log("Response:", response.data);
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-    await postStudents(data.students)
-      .then((response) => {
+    console.log("inside onSubmit", data);
+    await postStudents(data.students, {
+      onSuccess: (response) => {
+        queryClient.invalidateQueries({ queryKey: ["users.users.list"] });
+        toast.success("Students created successfully");
         console.log("Response:", response);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+        router.push("/users");
+      },
+      onError: (error) => {
+        toast.error("Failed to create students");
+        console.error("Error creating students", error);
+      },
+    });
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
@@ -246,22 +212,6 @@ export function StudentDataTableForm() {
                       )}
                     />
                   </TableCell>
-
-                  {/* Email Field
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createStudentForm.control}
-                      name={`users.${index}.email`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                          <FormControl>
-                            <Input {...field} placeholder="Enter email" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell> */}
 
                   {/* School Field */}
                   <TableCell className="align-top">
