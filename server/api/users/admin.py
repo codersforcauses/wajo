@@ -15,8 +15,8 @@ class TeacherInline(admin.StackedInline):
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "code")
-    search_fields = ("name", "code")
+    list_display = ("id", "name", "code", "type", "abbreviation", "is_country")
+    search_fields = ("name", "code", "type", "abbreviation", "is_country")
     ordering = ("id",)
 
 

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Student, Teacher, School
+from .models import Student, Teacher, School, SchoolType
 import random
 from django.utils.timezone import now
 
@@ -60,6 +60,8 @@ class SchoolSerializer(serializers.ModelSerializer):
         - exclude: ['id', 'code']
     """
     name = serializers.CharField(required=True)
+    type = serializers.ChoiceField(choices=SchoolType.choices, required=False, allow_blank=True)
+    is_country = serializers.BooleanField(default=False)
 
     class Meta:
         model = School
