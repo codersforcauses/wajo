@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/select";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { cn } from "@/lib/utils";
-import { School } from "@/types/school";
+import { School } from "@/types/user";
 
 type Props = {
   selectedId: number | undefined;
@@ -47,7 +47,7 @@ export function SelectSchool({ selectedId, onChange, className }: Props) {
     isPending,
     isError,
   } = useFetchData<School[]>({
-    queryKey: ["users.school.list"],
+    queryKey: ["users.schools"],
     endpoint: "/users/schools/",
   });
 

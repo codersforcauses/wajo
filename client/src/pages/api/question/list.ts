@@ -12,51 +12,51 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Question } from "@/types/question";
+import { Category, Question } from "@/types/question";
 
 // Mock data representing question entries
-const mockQuestions: Question[] = [
+const mockQuestions: Partial<Question>[] = [
   {
     id: 1,
     name: "Question01_2024",
-    category: "Geometry Questions",
-    difficulty: "Difficult",
+    category: [{ genre: "Geometry Questions" }] as Category[],
+    diff_level: 1,
   },
   {
     id: 2,
     name: "Question02_2024",
-    category: "Algebra Questions",
-    difficulty: "Difficult",
+    category: [{ genre: "Algebra Questions" }] as Category[],
+    diff_level: 3,
   },
   {
     id: 3,
     name: "Question03_2024",
-    category: "Arithmetic Questions",
-    difficulty: "Easy",
+    category: [{ genre: "Arithmetic Questions" }] as Category[],
+    diff_level: 1,
   },
   {
     id: 4,
     name: "Question04_2024",
-    category: "Statistics Questions",
-    difficulty: "Medium",
+    category: [{ genre: "Statistics Questions" }] as Category[],
+    diff_level: 2,
   },
   {
     id: 5,
     name: "Question05_2024",
-    category: "Calculus Questions",
-    difficulty: "Difficult",
+    category: [{ genre: "Calculus Questions" }] as Category[],
+    diff_level: 3,
   },
   {
     id: 6,
     name: "Question06_2024",
-    category: "Calculus Questions",
-    difficulty: "Difficult",
+    category: [{ genre: "Calculus Questions" }] as Category[],
+    diff_level: 3,
   },
   {
     id: 7,
     name: "Question07_2024",
-    category: "Calculus Questions",
-    difficulty: "Easy",
+    category: [{ genre: "Calculus Questions" }] as Category[],
+    diff_level: 1,
   },
 ];
 
@@ -74,5 +74,5 @@ export default function handler(
   _req: NextApiRequest,
   res: NextApiResponse<Question[]>,
 ): void {
-  res.status(200).json(mockQuestions);
+  res.status(200).json(mockQuestions as Question[]);
 }

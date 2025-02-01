@@ -6,7 +6,7 @@ import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
 import { SchoolDataGrid } from "@/components/ui/Users/school-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import type { School } from "@/types/school";
+import type { School } from "@/types/user";
 
 export default function SchoolList() {
   const {
@@ -15,7 +15,7 @@ export default function SchoolList() {
     isError: isSchoolError,
     error: schoolError,
   } = useFetchData<School[]>({
-    queryKey: ["users.school.list"],
+    queryKey: ["users.schools"],
     endpoint: "/users/schools/",
   });
 

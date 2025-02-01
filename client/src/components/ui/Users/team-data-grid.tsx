@@ -86,7 +86,7 @@ export function TeamDataGrid({
             >
               <TableCell className="w-1/4">{item.id}</TableCell>
               <TableCell className="w-1/4">{item.name}</TableCell>
-              <TableCell className="w-1/4">{item.school}</TableCell>
+              <TableCell className="w-1/4">{item.school?.name}</TableCell>
               <TableCell className="w-1/4">{item.description}</TableCell>
               <TableCell className="w-1/4">
                 {item.time_created ? (

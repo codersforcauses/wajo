@@ -235,7 +235,8 @@ class TeacherSerializer(serializers.ModelSerializer):
         # Extract and create the nested User instance
         user_data = validated_data.pop('user')
         # user_data['username'] = user_data['email']
-        user_data['username'] = user_data['first_name'] + user_data['last_name']
+        user_data['username'] = user_data['first_name'] + \
+            user_data['last_name']
         user_serializer = UserSerializer(data=user_data)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
@@ -256,12 +257,32 @@ class TeacherSerializer(serializers.ModelSerializer):
         """
         # Extract and update the nested User instance
         user_data = validated_data.pop('user', None)
+        school = validated_data.get('school', None)
+        if school and (school != instance.school):
+            request = self.context.get('request')
+            if not request.user.is_staff:
+                # return a error if the school is changed
+                raise serializers.ValidationError(
+                    {"error": "You are not allowed to change the school.\n Please contact the administrator."})
+
         if user_data:
+
+            # check if the first name and last name are provided
+            first_name = user_data.get('first_name', None)
+            last_name = user_data.get('last_name', None)
+            if first_name and last_name is None:
+                raise serializers.ValidationError(
+                    {"error": "First name and last name are required."})
+            if last_name and first_name is None:
+                raise serializers.ValidationError(
+                    {"error": "First name and last name are required."})
+            if first_name and last_name:
+                user_data['username'] = first_name + last_name
+
             user_serializer = UserSerializer(
                 instance.user, data=user_data, partial=True)
             user_serializer.is_valid(raise_exception=True)
             user_serializer.save()
-
         # Update the Teacher instance and return it
         return super().update(instance, validated_data)
 

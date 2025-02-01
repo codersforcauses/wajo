@@ -176,8 +176,8 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
     isPending,
     isError,
   } = useFetchData<Question[]>({
-    queryKey: ["question.list"],
-    endpoint: "/question/list",
+    queryKey: ["questions.question-bank"],
+    endpoint: "/questions/question-bank/",
   });
 
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -251,7 +251,7 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
           />
           {searchTerm && !isForceClose && (
             <div className="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-md">
-              {isPending || isError || searchResults.length < 1 ? (
+              {isPending || isError || searchResults?.length < 1 ? (
                 <div className="p-2 text-center text-gray-500">
                   {isPending
                     ? "Loading..."

@@ -15,7 +15,7 @@ export default function UserList() {
     isError: isUsersError,
     error: usersError,
   } = useFetchData<User[]>({
-    queryKey: ["users.users.list"],
+    queryKey: ["users.users"],
     endpoint: "/users/users/",
   });
 

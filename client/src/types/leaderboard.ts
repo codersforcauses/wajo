@@ -1,3 +1,5 @@
+import { Student } from "@/types/user";
+
 /**
  * Example of `Leaderboard`.
  *
@@ -16,10 +18,28 @@
  * };
  */
 export interface Leaderboard {
+  // to be discuss
   id: number;
   name: string;
   participant_students: number;
   participant_teams: number;
+}
+
+export interface LeaderboardIndividual {
+  name: string;
+  year_level: number;
+  school: string;
+  school_type: string;
+  is_country: boolean;
+  total_marks: number;
+}
+
+export interface LeaderboardTeam {
+  school: string;
+  id: number;
+  total_marks: number;
+  is_country: true;
+  students: Student[];
 }
 
 export interface Ranking {

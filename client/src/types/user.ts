@@ -86,6 +86,45 @@ export interface Teacher extends User {
   school_id: number;
 }
 
+export interface Student {
+  id: number;
+  name: string;
+  year_level: number;
+}
+
+/**
+ * Represents a school with its id, name, and creation date.
+ *
+ * @interface School
+ * @property {number} id - The unique identifier for the school.
+ * @property {string} name - The name of the school.
+ * @property {Date} time_created - The timestamp of when the school was created.
+ */
+
+// export interface Student {
+//   id: number;
+//   name: string;
+//   year_level: number;
+// }
+
+// export interface School {
+//   id: number;
+//   name: string;
+//   type: string;
+//   is_country: boolean;
+//   created_at: Date; // need from server
+// }
+
+export interface Teacher {
+  id: number;
+  first_name: string;
+  last_name: string;
+  school: School;
+  email: string;
+  phone: string;
+  created_at: Date;
+}
+
 /**
  * Zod schema for validating login input.
  *
@@ -148,4 +187,15 @@ export const createTeacherSchema = createUserSchema.extend({
   school_id: z.number().int(),
   email: z.string().email("Invalid email address").optional(),
   phone: z.string().optional(),
+});
+
+/**
+ * A Zod schema for validating the creation of a school.
+ *
+ * @example
+ * const schoolData = { name: "University of Example" };
+ * const parsedData = createSchoolSchema.parse(schoolData);
+ */
+export const createSchoolSchema = z.object({
+  name: z.string().min(1, "Required"),
 });
