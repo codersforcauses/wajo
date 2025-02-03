@@ -7,7 +7,7 @@ import ButtonList from "@/components/ui/Quiz/buttonList";
 import CountdownDisplay from "@/components/ui/Quiz/countdown-display";
 import GenericQuiz from "@/components/ui/Quiz/generic-quiz";
 import QuizStartPage from "@/components/ui/Quiz/quiz-start-page";
-import RetrieveQuestion from "@/components/ui/retrieve-questions";
+import RetrieveQuestion from "@/components/ui/Quiz/retrieve-questions";
 import SubmissionPopup from "@/components/ui/submission-popup";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import type { NextPageWithLayout } from "@/pages/_app";
