@@ -1,17 +1,19 @@
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 
+import CompetitionLayout from "@/components/competition-layout";
 import { Button } from "@/components/ui/button";
-import ButtonList from "@/components/ui/buttonList";
-import CountdownDisplay from "@/components/ui/countdown-display";
-import GenericQuiz from "@/components/ui/generic-quiz";
-import QuizStartPage from "@/components/ui/quiz-start-page";
+import ButtonList from "@/components/ui/Quiz/buttonList";
+import CountdownDisplay from "@/components/ui/Quiz/countdown-display";
+import GenericQuiz from "@/components/ui/Quiz/generic-quiz";
+import QuizStartPage from "@/components/ui/Quiz/quiz-start-page";
 import RetrieveQuestion from "@/components/ui/retrieve-questions";
 import SubmissionPopup from "@/components/ui/submission-popup";
 import { useFetchData } from "@/hooks/use-fetch-data";
+import type { NextPageWithLayout } from "@/pages/_app";
 import { Quiz } from "@/types/quiz";
 
-export default function CompetitionQuizPage() {
+const CompetitionQuizPage: NextPageWithLayout = () => {
   // Fetches the quiz data using the custom hook.
   const router = useRouter();
   let { id }: { id?: string | string[] | undefined | Number } = router.query;
@@ -21,8 +23,8 @@ export default function CompetitionQuizPage() {
     isError: isQuizDataError,
     error: QuizDataError,
   } = useFetchData<Quiz>({
-    queryKey: [`quiz.${id}`],
-    endpoint: `/quiz/${id}`,
+    queryKey: [`quiz.competition.${id}`],
+    endpoint: `/quiz/competition/${id}`,
   });
 
   // console.log("Quiz Data: ", quizData);
@@ -45,10 +47,10 @@ export default function CompetitionQuizPage() {
   const quizIndex = Number(id);
 
   if (quizData && !isNaN(quizIndex)) {
-    quizTitle = quizData?.name;
-    quizStartTime = quizData?.startTime.toString();
-    quizDuration = quizData?.duration;
-    numberOfQuestions = quizData?.questions?.length;
+    quizTitle = quizData.name;
+    quizStartTime = quizData.startTime.toString();
+    quizDuration = quizData.duration;
+    numberOfQuestions = quizData.questions.length;
   }
 
   const handleStartQuiz = () => {
@@ -85,10 +87,6 @@ export default function CompetitionQuizPage() {
     setIsSubmitted(false); // Hide the popup
   };
 
-  const tryAgain = () => {
-    console.log("Try again");
-  };
-
   return (
     <>
       {isQuizDataLoading ? (
@@ -109,7 +107,7 @@ export default function CompetitionQuizPage() {
       ) : (
         <div className="">
           <h1 className="my-4 text-center">{quizTitle}</h1>
-          <RetrieveQuestion />
+          {/* <RetrieveQuestion /> */}
 
           <div className="my-4 flex justify-center">
             <div>
@@ -145,4 +143,10 @@ export default function CompetitionQuizPage() {
       )}
     </>
   );
-}
+};
+
+CompetitionQuizPage.getLayout = (page: ReactElement) => {
+  return <CompetitionLayout>{page}</CompetitionLayout>;
+};
+
+export default CompetitionQuizPage;

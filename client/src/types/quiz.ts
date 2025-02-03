@@ -44,7 +44,7 @@ export interface Quiz {
   totalMarks: number;
   blocks: string[];
   quizInstructions: string;
-  quizType: "Competition" | "Practice" | "PastPaper";
+  is_comp: boolean;
   isPublished: boolean;
 }
 

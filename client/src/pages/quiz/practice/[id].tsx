@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import ButtonList from "@/components/ui/buttonList";
-import GenericQuiz from "@/components/ui/generic-quiz";
+import ButtonList from "@/components/ui/Quiz/buttonList";
+import GenericQuiz from "@/components/ui/Quiz/generic-quiz";
 import SubmissionPopup from "@/components/ui/submission-popup";
 
 export default function PracticeQuizPage() {

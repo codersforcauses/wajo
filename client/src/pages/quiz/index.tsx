@@ -16,19 +16,18 @@ export default function QuizPage() {
     isError: isQuizDataError,
     error: QuizDataError,
   } = useFetchData<Quiz[]>({
-    queryKey: ["quiz.list"],
-    endpoint: "/quiz/list",
+    queryKey: ["quizzes"],
+    endpoint: "/quiz/all_quizzes",
   });
 
-  let upcomingCompetition = quizData?.filter(
-    (quiz) => quiz.quizType === "Competition",
-  );
-  let pastPapers = quizData?.filter((quiz) => quiz.quizType === "PastPaper");
-  let practiceTests = quizData?.filter((quiz) => quiz.quizType === "Practice");
+  let upcomingCompetition = quizData?.filter((quiz) => quiz.is_comp === true);
+  let pastPapers = quizData?.filter((quiz) => quiz.is_comp === false);
+  // let practiceTests = quizData?.filter((quiz) => quiz.quizType === "Practice");
+  let practiceTests: Array<Quiz> = [];
   return (
     <div className="justify-centre mt-8 flex h-full w-full flex-col items-center bg-white text-center">
       <section className="my-4 flex min-h-32 w-full flex-col items-center justify-center bg-[#FFD659] p-4">
-        <h2>Upcoming Competition</h2>
+        <h2>{new Date().getFullYear()} Competition</h2>
         <h6 className="my-4">
           Competition will start at{" "}
           {upcomingCompetition
@@ -36,12 +35,6 @@ export default function QuizPage() {
             : "[TBD]"}{" "}
         </h6>
         <div className="flex w-full flex-col items-center justify-center gap-4">
-          {/* {upcomingCompetitions.map((quiz) => (
-            <HorizontalCard
-              title={quiz.title}
-              href={`quiz/competition/${quiz.id}`}
-            />
-          ))} */}
           <HorizontalCard
             title="2025 Competition"
             href={`quiz/competition/${upcomingCompetition ? upcomingCompetition[0].id : "[TBD]"}`}
@@ -51,23 +44,31 @@ export default function QuizPage() {
       <section className="mb-2 flex w-full flex-col items-center justify-center p-4">
         <h2 className="mb-4">Past Questions and Solutions</h2>
         <div className="flex w-full flex-col items-center justify-center gap-4">
-          {pastPapers?.map((quiz) => (
-            <HorizontalCard
-              title={quiz.name}
-              href={`quiz/pastpaper/${quiz.id}`}
-            />
-          ))}
+          {pastPapers && pastPapers.length > 0 ? (
+            pastPapers.map((quiz) => (
+              <HorizontalCard
+                title={quiz.name}
+                href={`quiz/pastpapers/${quiz.id}`}
+              />
+            ))
+          ) : (
+            <HorizontalCard title={"Coming soon!"} href={`quiz/pastpapers/1`} />
+          )}
         </div>
       </section>
       <section className="mb-2 flex w-full flex-col items-center justify-center p-4">
         <h2 className="mb-4">Practice Tests</h2>
         <div className="flex w-full flex-col items-center justify-center gap-4">
-          {practiceTests?.map((quiz) => (
-            <HorizontalCard
-              title={quiz.name}
-              href={`quiz/practice/${quiz.id}`}
-            />
-          ))}
+          {practiceTests && practiceTests.length > 0 ? (
+            practiceTests.map((quiz) => (
+              <HorizontalCard
+                title={quiz.name}
+                href={`quiz/practice/${quiz.id}`}
+              />
+            ))
+          ) : (
+            <HorizontalCard title={"Coming soon!"} href={`quiz/`} />
+          )}
         </div>
       </section>
     </div>

@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 
-import Navbar from "@/components/navbar";
 import { WaitingLoader } from "@/components/ui/loading";
 import { useAuth } from "@/context/auth-provider";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { User } from "@/types/user";
 
-import Sidebar from "./sidebar";
 import Footer from "./ui/footer";
 
 interface LayoutProps {
@@ -20,7 +18,7 @@ interface LayoutProps {
  * @param {React.ReactNode} props.children - The child components to render within the layout.
  *
  */
-export default function Layout({ children }: LayoutProps) {
+export default function CompetitionLayout({ children }: LayoutProps) {
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const { userId } = useAuth();
   const isLoggedIn = Boolean(userId);
@@ -41,22 +39,12 @@ export default function Layout({ children }: LayoutProps) {
     enabled: Boolean(userId),
   });
 
-  if (!isAuthChecked) return null;
-
-  if (!isLoggedIn) {
-    return (
-      <div>
-        <Navbar />
-        <main className="flex min-h-[100vh] flex-grow flex-col">
-          {children}
-        </main>
-        <Footer isCompetition={false} />
-      </div>
-    );
-  }
-
   if (isLoading) return <WaitingLoader />;
-  if (!user) return <div>{error?.message || "Failed to load user data."}</div>;
 
-  return <Sidebar role={user.role}>{children}</Sidebar>;
+  return (
+    <div>
+      <div className="flex min-h-[90vh] flex-grow flex-col">{children}</div>
+      <Footer isCompetition={true} />
+    </div>
+  );
 }

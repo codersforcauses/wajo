@@ -38,13 +38,14 @@ type AppPropsWithLayout = AppProps & {
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
-  const myLayout = Component.getLayout ? (
-    Component.getLayout(<Component {...pageProps} />)
-  ) : (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
-  );
+  // const myLayout = Component.getLayout ? (
+  //   Component.getLayout(<Component {...pageProps} />)
+  // ) : (
+  //   <Layout>
+  //     <Component {...pageProps} />
+  //   </Layout>
+  // );
+  const getLayout = Component.getLayout ?? ((page) => <Layout>{page}</Layout>);
 
   return (
     <>
@@ -57,7 +58,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ReactQueryDevtools initialIsOpen={false} />
-          {myLayout}
+          <div>{getLayout(<Component {...pageProps} />)}</div>
           <Toaster position="bottom-center" richColors />
         </AuthProvider>
       </QueryClientProvider>
