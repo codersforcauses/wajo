@@ -45,15 +45,6 @@ export default function SelectYearLevel({
   onChange,
   className,
 }: Props) {
-  // const {
-  //   data: schools,
-  //   isPending,
-  //   isError,
-  // } = useFetchData<School[]>({
-  //   queryKey: ["users.school.list"],
-  //   endpoint: "/users/schools/",
-  // });
-
   const years = [
     { id: 1, name: "7" },
     { id: 2, name: "8" },
@@ -75,12 +66,6 @@ export default function SelectYearLevel({
         <SelectValue placeholder="Year" />
       </SelectTrigger>
       <SelectContent>
-        {/* {isPending || isError ? (
-            <SelectItem value="NaN" disabled>
-              Loading...
-            </SelectItem>
-          ) : ( */}
-
         {years.map((year) => (
           <SelectItem value={year.id.toString()} key={year.id}>
             {year.name}
