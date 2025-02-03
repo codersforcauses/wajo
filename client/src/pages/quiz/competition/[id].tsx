@@ -23,8 +23,8 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
     isError: isQuizDataError,
     error: QuizDataError,
   } = useFetchData<Quiz>({
-    queryKey: [`quiz.competition.${id}`],
-    endpoint: `/quiz/competition/${id}`,
+    queryKey: [`quiz.competition.${id}.slots`],
+    endpoint: `/quiz/competition/${id}/slots`,
   });
 
   // console.log("Quiz Data: ", quizData);
