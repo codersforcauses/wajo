@@ -6,6 +6,7 @@ import ButtonList from "@/components/ui/buttonList";
 import CountdownDisplay from "@/components/ui/countdown-display";
 import GenericQuiz from "@/components/ui/generic-quiz";
 import QuizStartPage from "@/components/ui/quiz-start-page";
+import RetrieveQuestion from "@/components/ui/retrieve-questions";
 import SubmissionPopup from "@/components/ui/submission-popup";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { Quiz } from "@/types/quiz";
@@ -108,6 +109,7 @@ export default function CompetitionQuizPage() {
       ) : (
         <div className="">
           <h1 className="my-4 text-center">{quizTitle}</h1>
+          <RetrieveQuestion />
 
           <div className="my-4 flex justify-center">
             <div>
