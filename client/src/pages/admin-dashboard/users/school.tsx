@@ -63,7 +63,7 @@ const SchoolPage: NextPageWithLayout = () => {
           onSearch={handleFilterChange}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"/users/create_school"}>Create a School</Link>
+          <Link href={"create_school"}>Create a School</Link>
         </Button>
       </div>
 

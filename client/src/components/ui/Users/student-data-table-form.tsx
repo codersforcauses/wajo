@@ -97,7 +97,7 @@ export function StudentDataTableForm() {
         queryClient.invalidateQueries();
         toast.success("Students created successfully");
         console.log("Response:", response);
-        router.push("/users");
+        router.push("/admin-dashboard/users");
       },
       onError: (error) => {
         toast.error("Failed to create students");
