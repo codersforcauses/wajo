@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { WaitingLoader } from "@/components/ui/loading";
 import { RankingDataGrid } from "@/components/ui/Test/ranking-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
+import { NextPageWithLayout } from "@/pages/_app";
 import { Ranking } from "@/types/leaderboard";
 
-export default function Index() {
+const RankingPage: NextPageWithLayout = () => {
   const {
     data: rankings,
     isLoading: isRankingLoading,
@@ -37,4 +39,10 @@ export default function Index() {
       />
     </div>
   );
-}
+};
+
+RankingPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default RankingPage;

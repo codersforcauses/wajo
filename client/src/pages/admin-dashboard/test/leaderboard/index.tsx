@@ -1,40 +1,42 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
-import { PracticeDataGrid } from "@/components/ui/Test/practice-data-grid";
+import { LeaderboardDataGrid } from "@/components/ui/Test/leaderboard-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import { AdminQuiz } from "@/types/quiz";
+import { NextPageWithLayout } from "@/pages/_app";
+import { Leaderboard } from "@/types/leaderboard";
 
-export default function Index() {
+const LeaderboardPage: NextPageWithLayout = () => {
   const {
-    data: practices,
-    isLoading: isPracticeLoading,
-    isError: isPracticeError,
-    error: practiceError,
-  } = useFetchData<AdminQuiz[]>({
-    queryKey: ["quiz.admin-quizzes"],
-    endpoint: "/quiz/admin-quizzes/",
+    data: leaderboards,
+    isLoading: isLeaderboardLoading,
+    isError: isLeaderboardError,
+    error: leaderboardError,
+  } = useFetchData<Leaderboard[]>({
+    queryKey: ["leaderboard.individual"],
+    endpoint: "/leaderboard/individual/",
   });
 
   const [page, setPage] = useState<number>(1);
-  const [filteredData, setFilteredData] = useState<AdminQuiz[]>([]);
+  const [filteredData, setFilteredData] = useState<Leaderboard[]>([]);
 
   useEffect(() => {
-    if (practices) {
-      setFilteredData(practices);
+    if (leaderboards) {
+      setFilteredData(leaderboards);
     }
-  }, [practices]);
+  }, [leaderboards]);
 
   const handleFilterChange = (value: string) => {
-    if (!practices) return;
+    if (!leaderboards) return;
 
     const filtered =
       value.trim() === ""
-        ? practices
-        : practices.filter((item) => {
+        ? leaderboards
+        : leaderboards.filter((item) => {
             const query = value.toLowerCase().trim();
             const isExactMatch = query.startsWith('"') && query.endsWith('"');
             const normalizedQuery = isExactMatch ? query.slice(1, -1) : query;
@@ -48,8 +50,8 @@ export default function Index() {
     setPage(1);
   };
 
-  if (isPracticeLoading) return <WaitingLoader />;
-  if (isPracticeError) return <div>Error: {practiceError?.message}</div>;
+  if (isLeaderboardLoading) return <WaitingLoader />;
+  if (isLeaderboardError) return <div>Error: {leaderboardError?.message}</div>;
 
   return (
     <div className="m-4 space-y-4">
@@ -57,19 +59,22 @@ export default function Index() {
         <SearchInput
           label=""
           value={""}
-          placeholder="Search Practice"
+          placeholder="Search Leaderboard"
           onSearch={handleFilterChange}
         />
-        <Button asChild className="mr-6 h-auto">
-          <Link href={"test/create"}>Create a Practice</Link>
-        </Button>
       </div>
 
-      <PracticeDataGrid
+      <LeaderboardDataGrid
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
       />
     </div>
   );
-}
+};
+
+LeaderboardPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default LeaderboardPage;

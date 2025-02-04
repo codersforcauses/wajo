@@ -42,26 +42,29 @@ export const navData: NavigationData = {
       title: "Question Management",
       icon: FileJson,
       items: [
-        { title: "Create Question", url: "/question/create" },
-        { title: "Question Bank", url: "/question" },
+        { title: "Create Question", url: "/admin-dashboard/question/create" },
+        { title: "Question Bank", url: "/admin-dashboard/question" },
       ],
     },
     {
       title: "Test Management",
       icon: BookType,
       items: [
-        { title: "Practice Test", url: "/test" },
-        { title: "Competitions", url: "/test/competition" },
-        { title: "Results & Rankings", url: "/test/leaderboard" },
+        { title: "Practice Test", url: "/admin-dashboard/test" },
+        { title: "Competitions", url: "/admin-dashboard/test/competition" },
+        {
+          title: "Results & Rankings",
+          url: "/admin-dashboard/test/leaderboard",
+        },
       ],
     },
     {
       title: "User Management",
       icon: UserRoundCog,
       items: [
-        { title: "Schools", url: "/users/school" },
-        { title: "Users", url: "/users" },
-        { title: "Teams", url: "/users/team" },
+        { title: "Schools", url: "/admin-dashboard/users/school" },
+        { title: "Users", url: "/admin-dashboard/users" },
+        { title: "Teams", url: "/admin-dashboard/users/team" },
         { title: "Admin Portal", url: `${backendURL}admin`, isNewTab: true },
       ],
     },

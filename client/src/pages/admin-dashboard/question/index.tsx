@@ -1,14 +1,16 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import { Datagrid } from "@/components/ui/Question/data-grid";
 import { SearchInput } from "@/components/ui/search";
 import { useFetchData } from "@/hooks/use-fetch-data";
+import { NextPageWithLayout } from "@/pages/_app";
 import { Question } from "@/types/question";
 
-export default function Index() {
+const QuestionPage: NextPageWithLayout = () => {
   // Fetches the list of questions using the custom hook.
   const {
     data: questions,
@@ -83,4 +85,10 @@ export default function Index() {
       />
     </div>
   );
-}
+};
+
+QuestionPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default QuestionPage;

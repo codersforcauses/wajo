@@ -3,6 +3,7 @@ import React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { NextPageWithLayout } from "@/pages/_app";
 
 // Define the Zod schema for validation
 const formSchema = z.object({
@@ -57,7 +59,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function Create() {
+const CreatePage: NextPageWithLayout = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema), // Integrate zod validation
     defaultValues: {
@@ -279,4 +281,10 @@ export default function Create() {
       </Form>
     </div>
   );
-}
+};
+
+CreatePage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default CreatePage;

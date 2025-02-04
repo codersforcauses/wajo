@@ -1,40 +1,42 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
-import { CompetitionDataGrid } from "@/components/ui/Test/competition-data-grid";
+import { SchoolDataGrid } from "@/components/ui/Users/school-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import { Competition } from "@/types/quiz";
+import { NextPageWithLayout } from "@/pages/_app";
+import type { School } from "@/types/user";
 
-export default function Index() {
+const SchoolPage: NextPageWithLayout = () => {
   const {
-    data: competitions,
-    isLoading: isCompetitionLoading,
-    isError: isCompetitionError,
-    error: competitionError,
-  } = useFetchData<Competition[]>({
-    queryKey: ["quiz.competition"],
-    endpoint: "/quiz/competition/",
+    data: schools,
+    isLoading: isSchoolLoading,
+    isError: isSchoolError,
+    error: schoolError,
+  } = useFetchData<School[]>({
+    queryKey: ["users.schools"],
+    endpoint: "/users/schools/",
   });
 
   const [page, setPage] = useState<number>(1);
-  const [filteredData, setFilteredData] = useState<Competition[]>([]);
+  const [filteredData, setFilteredData] = useState<School[]>([]);
 
   useEffect(() => {
-    if (competitions) {
-      setFilteredData(competitions);
+    if (schools) {
+      setFilteredData(schools);
     }
-  }, [competitions]);
+  }, [schools]);
 
   const handleFilterChange = (value: string) => {
-    if (!competitions) return;
+    if (!schools) return;
 
     const filtered =
       value.trim() === ""
-        ? competitions
-        : competitions.filter((item) => {
+        ? schools
+        : schools.filter((item) => {
             const query = value.toLowerCase().trim();
             const isExactMatch = query.startsWith('"') && query.endsWith('"');
             const normalizedQuery = isExactMatch ? query.slice(1, -1) : query;
@@ -48,8 +50,8 @@ export default function Index() {
     setPage(1);
   };
 
-  if (isCompetitionLoading) return <WaitingLoader />;
-  if (isCompetitionError) return <div>Error: {competitionError?.message}</div>;
+  if (isSchoolLoading) return <WaitingLoader />;
+  if (isSchoolError) return <div>Error: {schoolError?.message}</div>;
 
   return (
     <div className="m-4 space-y-4">
@@ -57,19 +59,25 @@ export default function Index() {
         <SearchInput
           label=""
           value={""}
-          placeholder="Search Competition"
+          placeholder="Search School"
           onSearch={handleFilterChange}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"competition/create"}>Create a Competition</Link>
+          <Link href={"/users/create_school"}>Create a School</Link>
         </Button>
       </div>
 
-      <CompetitionDataGrid
+      <SchoolDataGrid
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
-      />
+      ></SchoolDataGrid>
     </div>
   );
-}
+};
+
+SchoolPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default SchoolPage;

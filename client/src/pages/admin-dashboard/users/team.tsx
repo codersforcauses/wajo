@@ -1,59 +1,57 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
-import { DataGrid } from "@/components/ui/Users/data-grid";
+import { TeamDataGrid } from "@/components/ui/Users/team-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import type { User } from "@/types/user";
+import { NextPageWithLayout } from "@/pages/_app";
+import type { Team } from "@/types/team";
 
-export default function UserList() {
+const TeamPage: NextPageWithLayout = () => {
   const {
-    data: users,
-    isLoading: isUsersLoading,
-    isError: isUsersError,
-    error: usersError,
-  } = useFetchData<User[]>({
-    queryKey: ["users"],
-    endpoint: "/users/users/",
+    data: teams,
+    isLoading: isTeamLoading,
+    isError: isTeamError,
+    error: TeamError,
+  } = useFetchData<Team[]>({
+    queryKey: ["team.teams"],
+    endpoint: "/team/teams/",
   });
 
   const [page, setPage] = useState<number>(1);
-  const [filteredData, setFilteredData] = useState<User[]>([]);
+  const [filteredData, setFilteredData] = useState<Team[]>([]);
 
   useEffect(() => {
-    if (users) {
-      console.log("users: ", users);
-      setFilteredData(users);
+    if (teams) {
+      setFilteredData(teams);
     }
-  }, [users]);
+  }, [teams]);
 
   const handleFilterChange = (value: string) => {
-    if (!users) return;
+    if (!teams) return;
 
     const filtered =
       value.trim() === ""
-        ? users
-        : users.filter((item) => {
+        ? teams
+        : teams.filter((item) => {
             const query = value.toLowerCase().trim();
             const isExactMatch = query.startsWith('"') && query.endsWith('"');
             const normalizedQuery = isExactMatch ? query.slice(1, -1) : query;
 
             return isExactMatch
-              ? `${item.first_name.toLowerCase()}${item.last_name.toLowerCase()}` ===
-                  normalizedQuery
-              : `${item.first_name.toLowerCase()}${item.last_name.toLowerCase()}`.includes(
-                  normalizedQuery,
-                );
+              ? item.name.toLowerCase() === normalizedQuery
+              : item.name.toLowerCase().includes(normalizedQuery);
           });
 
     setFilteredData(filtered);
     setPage(1);
   };
 
-  if (isUsersLoading) return <WaitingLoader />;
-  if (isUsersError) return <div>Error: {usersError?.message}</div>;
+  if (isTeamLoading) return <WaitingLoader />;
+  if (isTeamError) return <div>Error: {TeamError?.message}</div>;
 
   return (
     <div className="m-4 space-y-4">
@@ -61,19 +59,25 @@ export default function UserList() {
         <SearchInput
           label=""
           value={""}
-          placeholder="Search User"
+          placeholder="Search Team"
           onSearch={handleFilterChange}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"users/create/"}>Create a User</Link>
+          <Link href={"/users/create_team"}>Create a Team</Link>
         </Button>
       </div>
 
-      <DataGrid
+      <TeamDataGrid
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
-      ></DataGrid>
+      ></TeamDataGrid>
     </div>
   );
-}
+};
+
+TeamPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default TeamPage;

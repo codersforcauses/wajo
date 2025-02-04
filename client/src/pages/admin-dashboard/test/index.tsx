@@ -1,40 +1,42 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
-import { TeamDataGrid } from "@/components/ui/Users/team-data-grid";
+import { PracticeDataGrid } from "@/components/ui/Test/practice-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import type { Team } from "@/types/team";
+import { NextPageWithLayout } from "@/pages/_app";
+import { AdminQuiz } from "@/types/quiz";
 
-export default function TeamList() {
+const TestPage: NextPageWithLayout = () => {
   const {
-    data: teams,
-    isLoading: isTeamLoading,
-    isError: isTeamError,
-    error: TeamError,
-  } = useFetchData<Team[]>({
-    queryKey: ["team.teams"],
-    endpoint: "/team/teams/",
+    data: practices,
+    isLoading: isPracticeLoading,
+    isError: isPracticeError,
+    error: practiceError,
+  } = useFetchData<AdminQuiz[]>({
+    queryKey: ["quiz.admin-quizzes"],
+    endpoint: "/quiz/admin-quizzes/",
   });
 
   const [page, setPage] = useState<number>(1);
-  const [filteredData, setFilteredData] = useState<Team[]>([]);
+  const [filteredData, setFilteredData] = useState<AdminQuiz[]>([]);
 
   useEffect(() => {
-    if (teams) {
-      setFilteredData(teams);
+    if (practices) {
+      setFilteredData(practices);
     }
-  }, [teams]);
+  }, [practices]);
 
   const handleFilterChange = (value: string) => {
-    if (!teams) return;
+    if (!practices) return;
 
     const filtered =
       value.trim() === ""
-        ? teams
-        : teams.filter((item) => {
+        ? practices
+        : practices.filter((item) => {
             const query = value.toLowerCase().trim();
             const isExactMatch = query.startsWith('"') && query.endsWith('"');
             const normalizedQuery = isExactMatch ? query.slice(1, -1) : query;
@@ -48,8 +50,8 @@ export default function TeamList() {
     setPage(1);
   };
 
-  if (isTeamLoading) return <WaitingLoader />;
-  if (isTeamError) return <div>Error: {TeamError?.message}</div>;
+  if (isPracticeLoading) return <WaitingLoader />;
+  if (isPracticeError) return <div>Error: {practiceError?.message}</div>;
 
   return (
     <div className="m-4 space-y-4">
@@ -57,19 +59,25 @@ export default function TeamList() {
         <SearchInput
           label=""
           value={""}
-          placeholder="Search Team"
+          placeholder="Search Practice"
           onSearch={handleFilterChange}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"/users/create_team"}>Create a Team</Link>
+          <Link href={"test/create"}>Create a Practice</Link>
         </Button>
       </div>
 
-      <TeamDataGrid
+      <PracticeDataGrid
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
-      ></TeamDataGrid>
+      />
     </div>
   );
-}
+};
+
+TestPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default TestPage;

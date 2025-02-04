@@ -94,7 +94,7 @@ export function StudentDataTableForm() {
     console.log("inside onSubmit", data);
     await postStudents(data.students, {
       onSuccess: (response) => {
-        queryClient.invalidateQueries({ queryKey: ["users"] });
+        queryClient.invalidateQueries();
         toast.success("Students created successfully");
         console.log("Response:", response);
         router.push("/users");

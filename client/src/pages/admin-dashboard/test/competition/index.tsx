@@ -1,40 +1,42 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
-import { LeaderboardDataGrid } from "@/components/ui/Test/leaderboard-data-grid";
+import { CompetitionDataGrid } from "@/components/ui/Test/competition-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import { Leaderboard } from "@/types/leaderboard";
+import { NextPageWithLayout } from "@/pages/_app";
+import { Competition } from "@/types/quiz";
 
-export default function Index() {
+const IndexPage: NextPageWithLayout = () => {
   const {
-    data: leaderboards,
-    isLoading: isLeaderboardLoading,
-    isError: isLeaderboardError,
-    error: leaderboardError,
-  } = useFetchData<Leaderboard[]>({
-    queryKey: ["leaderboard.individual"],
-    endpoint: "/leaderboard/individual/",
+    data: competitions,
+    isLoading: isCompetitionLoading,
+    isError: isCompetitionError,
+    error: competitionError,
+  } = useFetchData<Competition[]>({
+    queryKey: ["quiz.competition"],
+    endpoint: "/quiz/competition/",
   });
 
   const [page, setPage] = useState<number>(1);
-  const [filteredData, setFilteredData] = useState<Leaderboard[]>([]);
+  const [filteredData, setFilteredData] = useState<Competition[]>([]);
 
   useEffect(() => {
-    if (leaderboards) {
-      setFilteredData(leaderboards);
+    if (competitions) {
+      setFilteredData(competitions);
     }
-  }, [leaderboards]);
+  }, [competitions]);
 
   const handleFilterChange = (value: string) => {
-    if (!leaderboards) return;
+    if (!competitions) return;
 
     const filtered =
       value.trim() === ""
-        ? leaderboards
-        : leaderboards.filter((item) => {
+        ? competitions
+        : competitions.filter((item) => {
             const query = value.toLowerCase().trim();
             const isExactMatch = query.startsWith('"') && query.endsWith('"');
             const normalizedQuery = isExactMatch ? query.slice(1, -1) : query;
@@ -48,8 +50,8 @@ export default function Index() {
     setPage(1);
   };
 
-  if (isLeaderboardLoading) return <WaitingLoader />;
-  if (isLeaderboardError) return <div>Error: {leaderboardError?.message}</div>;
+  if (isCompetitionLoading) return <WaitingLoader />;
+  if (isCompetitionError) return <div>Error: {competitionError?.message}</div>;
 
   return (
     <div className="m-4 space-y-4">
@@ -57,16 +59,25 @@ export default function Index() {
         <SearchInput
           label=""
           value={""}
-          placeholder="Search Leaderboard"
+          placeholder="Search Competition"
           onSearch={handleFilterChange}
         />
+        <Button asChild className="mr-6 h-auto">
+          <Link href={"competition/create"}>Create a Competition</Link>
+        </Button>
       </div>
 
-      <LeaderboardDataGrid
+      <CompetitionDataGrid
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
       />
     </div>
   );
-}
+};
+
+IndexPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default IndexPage;

@@ -1,4 +1,4 @@
-import { ChevronRight, LogOut } from "lucide-react";
+import { ArrowLeft, ChevronRight, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -83,6 +83,10 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
     logout();
   };
 
+  const handleBack = () => {
+    router.push("/");
+  };
+
   return (
     <Sidebar {...props}>
       <SidebarContent className="no-scrollbar gap-0 overflow-y-scroll">
@@ -156,7 +160,12 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
         ))}
       </SidebarContent>
       <SidebarFooter className="gap-0">
-        <SidebarMenu>
+        <SidebarMenu className="gap-10">
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleBack} aria-label="Back">
+              <ArrowLeft /> Back
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} aria-label="Logout">
               <LogOut /> Logout

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { WaitingLoader } from "@/components/ui/loading";
 import { InsightDataGrid } from "@/components/ui/Test/insight-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
+import { NextPageWithLayout } from "@/pages/_app";
 import { Insight } from "@/types/leaderboard";
 
-export default function Index() {
+const InsightPage: NextPageWithLayout = () => {
   const {
     data: insights,
     isLoading: isInsightLoading,
@@ -37,4 +39,10 @@ export default function Index() {
       />
     </div>
   );
-}
+};
+
+InsightPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default InsightPage;

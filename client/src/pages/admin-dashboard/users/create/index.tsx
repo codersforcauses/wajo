@@ -1,8 +1,10 @@
 import Link from "next/link";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { StudentDataTableForm } from "@/components/ui/Users/student-data-table-form";
+import { NextPageWithLayout } from "@/pages/_app";
 
-export default function Create() {
+const CreatePage: NextPageWithLayout = () => {
   return (
     <div className="m-auto flex items-center justify-center gap-20 border border-red-500">
       <Link
@@ -25,4 +27,10 @@ export default function Create() {
       </Link>
     </div>
   );
-}
+};
+
+CreatePage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default CreatePage;
