@@ -2,6 +2,8 @@ import "katex/dist/katex.min.css";
 
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { AlertTriangle } from "lucide-react";
+import { useRouter } from "next/router";
+import { toast } from "sonner";
 
 import {
   Dialog,
@@ -10,13 +12,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useDynamicDeleteMutation } from "@/hooks/use-delete-data";
 import { DeleteModalProps } from "@/types/question";
 
 import { Button } from "../button";
 
 export default function DeleteModal({ children, data }: DeleteModalProps) {
+  const router = useRouter();
+
+  const { mutate: deleteQuestion, isPending } = useDynamicDeleteMutation({
+    baseUrl: "/questions/question-bank",
+    mutationKey: ["question_delete"],
+    onSuccess: () => {
+      router.reload();
+      toast.success("School has been deleted.");
+    },
+  });
   const handleDelete = () => {
-    alert(`${data.id}`);
+    deleteQuestion(data.id);
   };
 
   return (

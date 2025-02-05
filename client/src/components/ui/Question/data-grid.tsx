@@ -12,10 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  useDeleteMutation,
-  useDynamicDeleteMutation,
-} from "@/hooks/use-delete-data";
+import { useDynamicDeleteMutation } from "@/hooks/use-delete-data";
 import { cn } from "@/lib/utils";
 import { DatagridProps, sortData } from "@/types/data-grid";
 import { Question } from "@/types/question";
@@ -179,12 +176,15 @@ export function Datagrid({
                   >
                     View
                   </Button>
-                  <Button
-                    variant={"destructive"}
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    {isPending ? "Deleting..." : "Delete"}
-                  </Button>
+                  <DeleteModal data={item}>
+                    <Button
+                      variant={"destructive"}
+                      // onClick={() => handleDelete(item.id)}
+                    >
+                      {/* {isPending ? "Deleting..." : "Delete"} */}
+                      Delete
+                    </Button>
+                  </DeleteModal>
                 </div>
               </TableCell>
             </TableRow>
