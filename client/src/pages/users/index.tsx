@@ -15,8 +15,8 @@ export default function UserList() {
     isError: isUserError,
     error: UserError,
   } = useFetchData<User[]>({
-    queryKey: ["user.list"],
-    endpoint: "/users",
+    queryKey: ["users.students"],
+    endpoint: "/users/students/",
   });
 
   const [page, setPage] = useState<number>(1);

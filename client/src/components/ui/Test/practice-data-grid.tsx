@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
-import { Practice } from "@/types/practice";
+import { AdminQuiz, QuizStatus } from "@/types/quiz";
 
 /**
  * Renders a paginated data grid for displaying practice data.
@@ -39,9 +39,9 @@ export function PracticeDataGrid({
   datacontext,
   onDataChange,
   changePage,
-}: DatagridProps<Practice>) {
+}: DatagridProps<AdminQuiz>) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<Practice[]>([]);
+  const [paddedData, setPaddedData] = useState<AdminQuiz[]>([]);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
 
@@ -58,7 +58,7 @@ export function PracticeDataGrid({
 
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as Practice);
+      updatedPaddedData.push({} as AdminQuiz);
     }
 
     setPaddedData(updatedPaddedData);
@@ -99,7 +99,7 @@ export function PracticeDataGrid({
                 >
                   <Button className="me-2">View</Button>
                   <Button className="me-2">
-                    {item.status === "Published" ? (
+                    {item.status === QuizStatus.Finished ? (
                       <a href="/withdraw">Withdraw</a>
                     ) : (
                       <a href="/publish">Publish</a>

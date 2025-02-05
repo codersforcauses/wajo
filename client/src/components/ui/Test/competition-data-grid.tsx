@@ -12,8 +12,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { Competition } from "@/types/competition";
 import { DatagridProps, sortData } from "@/types/data-grid";
+import { Competition, QuizStatus } from "@/types/quiz";
 
 /**
  * Renders a paginated data grid for displaying competition information.
@@ -122,13 +122,13 @@ export function CompetitionDataGrid({
             >
               <TableCell className="w-1/2">{item.name}</TableCell>
               <TableCell className="w-1/4">
-                {item.competition_time ? (
+                {item.open_time_date ? (
                   <>
                     <div className="text-nowrap">
-                      {new Date(item.competition_time).toLocaleDateString()}
+                      {new Date(item.open_time_date).toLocaleDateString()}
                     </div>
                     <div className="text-nowrap">
-                      {new Date(item.competition_time).toLocaleTimeString()}
+                      {new Date(item.open_time_date).toLocaleTimeString()}
                     </div>
                   </>
                 ) : null}
@@ -142,7 +142,7 @@ export function CompetitionDataGrid({
                 >
                   <Button className="me-2">View</Button>
                   <Button className="me-2">
-                    {item.status === "Published" ? (
+                    {item.status === QuizStatus.Finished ? (
                       <a href="/withdraw">Withdraw</a>
                     ) : (
                       <a href="/publish">Publish</a>

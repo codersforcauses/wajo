@@ -6,7 +6,7 @@ import { WaitingLoader } from "@/components/ui/loading";
 import { SearchInput } from "@/components/ui/search";
 import { CompetitionDataGrid } from "@/components/ui/Test/competition-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import { Competition } from "@/types/competition";
+import { Competition } from "@/types/quiz";
 
 export default function Index() {
   const {
@@ -15,8 +15,8 @@ export default function Index() {
     isError: isCompetitionError,
     error: competitionError,
   } = useFetchData<Competition[]>({
-    queryKey: ["competition.list"],
-    endpoint: "/test/competitions",
+    queryKey: ["quiz.competition"],
+    endpoint: "/quiz/competition/",
   });
 
   const [page, setPage] = useState<number>(1);

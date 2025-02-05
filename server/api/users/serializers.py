@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Student, Teacher, School
+import random
+from django.utils.timezone import now
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -21,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
-    username = serializers.CharField(read_only=True)
+    username = serializers.CharField(required=True)
     password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -30,21 +32,19 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['last_login', 'date_joined']
 
     def create(self, validated_data):
-        """
-        Creates a new User instance.
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
-        Args:
-            validated_data (dict): The validated data for creating a User instance.
-                - first_name (str): The first name of the user.
-                - last_name (str): The last name of the user.
-                - password (str): The password for the user.
-
-        Returns:
-            User: The created User instance.
-        """
-        fullname = validated_data['first_name'] + validated_data['last_name']
-        validated_data['username'] = fullname
-        return super().create(validated_data)
+    def update(self, instance, validated_data):
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+            instance.set_password(password)
+            instance.save()
+            validated_data['password'] = instance.password
+        return super().update(instance, validated_data)
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -89,7 +89,7 @@ class StudentSerializer(serializers.ModelSerializer):
     """
     first_name = serializers.CharField(required=True, source='user.first_name')
     last_name = serializers.CharField(required=True, source='user.last_name')
-    full_name = serializers.CharField(source='user.username', read_only=True)
+    student_id = serializers.CharField(source='user.username', read_only=True)
     password = serializers.CharField(
         required=True, source='user.password', write_only=True)
     year_level = serializers.IntegerField(
@@ -115,7 +115,19 @@ class StudentSerializer(serializers.ModelSerializer):
         """
         # Extract and create the nested User instance
         user = validated_data.pop('user')
+        random_str = self.random_digits(4)
+
+        random_str = str(now().year) + \
+            str(validated_data['school'].id) + random_str
+        user['username'] = random_str
         user_serializer = UserSerializer(data=user)
+        # if the username clashes with another student, generate a new one
+        while User.objects.filter(username=random_str).exists():
+            random_str = self.random_digits(4)
+            random_str = str(now().year) + \
+                str(validated_data['school'].id) + random_str
+            user['username'] = random_str
+            user_serializer = UserSerializer(data=user)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
         validated_data['user'] = user
@@ -144,6 +156,13 @@ class StudentSerializer(serializers.ModelSerializer):
         # Update the Student instance
         instance = super().update(instance, validated_data)
         return instance
+
+    def random_digits(self, n):
+        digits = [i for i in range(0, 10)]
+        random_str = ""
+        for i in range(n):
+            random_str += str(random.choice(digits))
+        return random_str
 
     class Meta:
         model = Student
@@ -194,6 +213,9 @@ class TeacherSerializer(serializers.ModelSerializer):
         """
         # Extract and create the nested User instance
         user_data = validated_data.pop('user')
+        # user_data['username'] = user_data['email']
+        user_data['username'] = user_data['first_name'] + \
+            user_data['last_name']
         user_serializer = UserSerializer(data=user_data)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
@@ -214,12 +236,32 @@ class TeacherSerializer(serializers.ModelSerializer):
         """
         # Extract and update the nested User instance
         user_data = validated_data.pop('user', None)
+        school = validated_data.get('school', None)
+        if school and (school != instance.school):
+            request = self.context.get('request')
+            if not request.user.is_staff:
+                # return a error if the school is changed
+                raise serializers.ValidationError(
+                    {"error": "You are not allowed to change the school.\n Please contact the administrator."})
+
         if user_data:
+
+            # check if the first name and last name are provided
+            first_name = user_data.get('first_name', None)
+            last_name = user_data.get('last_name', None)
+            if first_name and last_name is None:
+                raise serializers.ValidationError(
+                    {"error": "First name and last name are required."})
+            if last_name and first_name is None:
+                raise serializers.ValidationError(
+                    {"error": "First name and last name are required."})
+            if first_name and last_name:
+                user_data['username'] = first_name + last_name
+
             user_serializer = UserSerializer(
                 instance.user, data=user_data, partial=True)
             user_serializer.is_valid(raise_exception=True)
             user_serializer.save()
-
         # Update the Teacher instance and return it
         return super().update(instance, validated_data)
 

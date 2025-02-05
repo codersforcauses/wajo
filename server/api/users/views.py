@@ -2,7 +2,8 @@ from django.db import IntegrityError
 from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework import status, viewsets, filters
-from rest_framework.permissions import IsAuthenticated, IsAdminUser  # ,allowAny
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAdminUser)
 from django.contrib.auth.models import User
 from .models import Student, Teacher, School
 from .serializers import StudentSerializer, SchoolSerializer, TeacherSerializer, UserSerializer
@@ -55,18 +56,24 @@ class StudentViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         data = request.data.copy()  # Create a mutable copy of request.data
         if hasattr(self.request.user, "teacher"):
-            data["school"] = self.request.user.teacher.school.id
-        try:
-            serializer = self.get_serializer(data=data)
+            # teacher can only create students for their school
+            for student in data:
+                student["school_id"] = self.request.user.teacher.school.id
+
+            serializer = self.get_serializer(data=data, many=True)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except IntegrityError as error:
+        elif self.request.user.is_staff:
+            # allow bulk creation of students by admin
+            serializer = self.get_serializer(data=data, many=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
             return Response(
-                {"error": str(
-                    error), "message": "A student with this username already exists."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                {"error": "You do not have permission to access this resource."},
+                status=status.HTTP_403_FORBIDDEN)
 
     def update(self, request, *args, **kwargs):
         data = request.data.copy()  # Create a mutable copy of request.data
@@ -88,7 +95,7 @@ class StudentViewSet(viewsets.ModelViewSet):
             )
 
 
-@permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated])
 class TeacherViewSet(viewsets.ModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
@@ -96,23 +103,54 @@ class TeacherViewSet(viewsets.ModelViewSet):
     filterset_fields = ['school']
     search_fields = ['user__username']
 
-    def create(self, request, *args, **kwargs):
-        try:
-            return super().create(request, *args, **kwargs)
-        except IntegrityError as error:
+    def list(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return super().list(request, *args, **kwargs)
+        else:
             return Response(
-                {"error": str(error)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                {"error": "You do not have permission to access this resource."},
+                status=status.HTTP_403_FORBIDDEN)
+
+    def retrieve(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return super().retrieve(request, *args, **kwargs)
+        elif hasattr(request.user, "teacher"):
+            print(kwargs["pk"])
+            if request.user.teacher.id == int(kwargs["pk"]):
+                return super().retrieve(request, *args, **kwargs)
+            else:
+                return Response(
+                    {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response(
+                {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+
+    def create(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return super().create(request, *args, **kwargs)
+        else:
+            return Response(
+                {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
 
     def update(self, request, *args, **kwargs):
-        try:
+        if request.user.is_staff:
             return super().update(request, *args, **kwargs)
-        except IntegrityError as error:
+        elif hasattr(request.user, "teacher"):
+            if request.user.teacher.id == int(kwargs["pk"]):
+                return super().update(request, *args, **kwargs)
+            else:
+                return Response(
+                    {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+        else:
             return Response(
-                {"error": str(error)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+
+    def destroy(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(
+                {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
 
 
 @permission_classes([IsAdminUser])
