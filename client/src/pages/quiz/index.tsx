@@ -17,7 +17,7 @@ export default function QuizPage() {
     error: QuizDataError,
   } = useFetchData<AdminQuiz[]>({
     queryKey: ["quizzes"],
-    endpoint: "/quiz/all_quizzes",
+    endpoint: "/quiz/all_quizzes/",
   });
 
   let upcomingCompetition = quizData?.filter((quiz) => quiz.is_comp === true);
@@ -37,7 +37,7 @@ export default function QuizPage() {
         <div className="flex w-full flex-col items-center justify-center gap-4">
           <HorizontalCard
             title="2025 Competition"
-            href={`quiz/competition/${upcomingCompetition ? upcomingCompetition[0].id : "[TBD]"}`}
+            href={`quiz/competition/${upcomingCompetition ? upcomingCompetition[0].id : "[TBD]"}/`}
           />
         </div>
       </section>

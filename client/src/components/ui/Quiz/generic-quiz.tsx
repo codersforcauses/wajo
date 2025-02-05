@@ -38,11 +38,6 @@ export default function GenericQuiz({
     }
   };
 
-  function onSave() {
-    // save the answer
-    console.log("Answer saved", answer);
-  }
-
   const handleNext = () => {
     if (currentPage < totalQuestions) {
       setCurrentPage(currentPage + 1);
@@ -50,23 +45,39 @@ export default function GenericQuiz({
     }
   };
 
-  const [answer, setAnswer] = useState(
-    () => localStorage.getItem("answer") || "",
-  );
+  const [answers, setAnswers] = useState<string[]>(() => {
+    const savedAnswers = localStorage.getItem("quizAnswers");
+    return savedAnswers
+      ? JSON.parse(savedAnswers)
+      : Array(totalQuestions).fill("");
+  });
+
+  const handleAnswerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newAnswers = [...answers];
+    newAnswers[currentPage - 1] = e.target.value;
+    setAnswers(newAnswers);
+  };
+
+  function onSave() {
+    // save the answer
+    localStorage.setItem("quizAnswers", JSON.stringify(answers));
+    console.log("Answers saved", answers);
+  }
 
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     console.log("saved: ", saved);
     const timer = setTimeout(() => {
-      localStorage.setItem("answer", answer);
+      localStorage.setItem("answer", answers[questionNumber - 1]);
       setSaved(true);
     }, 2000); // Auto-save after 2 seconds
+    console.log("answers: ", answers);
     return () => {
       clearTimeout(timer);
       setSaved(false);
     }; // Cleanup previous timer
-  }, [answer]); // Runs when `answers` changes
+  }, [answers]); // Runs when `answers` changes
 
   return (
     <div className="flex w-full items-center justify-center">
@@ -88,7 +99,14 @@ export default function GenericQuiz({
           Must be an integer from 1-999, use "," to seperate multiple answers
         </p>
         <div>
-          <AutoSavingAnswer answer={answer} setAnswer={setAnswer} />{" "}
+          {/* <AutoSavingAnswer answer={answer} setAnswer={setAnswer} />{" "} */}
+          <input
+            type="text"
+            value={answers[currentPage - 1]}
+            onChange={handleAnswerChange}
+            placeholder="Enter your answer"
+            className="mt-4 h-10 w-full min-w-64 rounded-sm border border-slate-500 px-2"
+          />
           {saved == true && <p className="text-gray-500">✅ Saved!</p>}
         </div>
         <div className="mt-6 flex flex-col items-center justify-center">

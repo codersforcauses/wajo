@@ -25,7 +25,7 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
     error: QuizDataError,
   } = useFetchData<AdminQuiz>({
     queryKey: [`quiz.competition.${id}`],
-    endpoint: `/quiz/competition/${id}`,
+    endpoint: `/quiz/competition/${id}/`,
   });
 
   const {
@@ -34,8 +34,8 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
     isError: isQuizQuestionDataError,
     error: QuizQuestionDataError,
   } = useFetchData<Question[]>({
-    queryKey: [`quiz.competition.${id}/slot`],
-    endpoint: `/quiz/competition/${id}/slot`,
+    queryKey: [`quiz.competition.${id}/slots`],
+    endpoint: `/quiz/competition/${id}/slots/`,
   });
 
   // console.log("Quiz Data: ", quizData);
@@ -101,7 +101,7 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
   return (
     <>
       {isQuizDataLoading ? (
-        <div>Loading...</div>
+        <div>QuizData Loading...</div>
       ) : isQuizDataError ? (
         <div>Error: {QuizDataError?.message}</div>
       ) : !displayQuiz ? (
