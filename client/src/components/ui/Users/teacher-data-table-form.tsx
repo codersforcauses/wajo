@@ -53,16 +53,16 @@ type Teacher = z.infer<typeof createTeacherSchema>;
  */
 export function TeacherDataTableForm() {
   const router = useRouter();
-  const { mutateAsync: postTeachers, isPending } = usePostMutation<Teacher[]>(
+  const { mutate: postTeachers, isPending } = usePostMutation<Teacher[]>(
     ["postTeachers"],
     "/users/teachers/",
     20000,
-    {
-      onSuccess: () => {
-        toast.success("Teachers created successfully!");
-        router.push("/users/");
-      },
-    },
+    // {
+    //   onSuccess: () => {
+    //     toast.success("Teachers created successfully!");
+    //     router.push("/users/");
+    //   },
+    // },
   );
 
   const defaultTeacher: Teacher = {
@@ -86,26 +86,24 @@ export function TeacherDataTableForm() {
     name: "teachers",
   });
 
-  const onSubmit = async (data: { teachers: Teacher[] }) => {
-    alert("Hello");
+  const onSubmit = (data: { teachers: Teacher[] }) => {
     alert("Submitted data: " + JSON.stringify(data.teachers, null, 2));
     console.log("Inside onSubmit");
     console.log("Submitting data:", data);
-    // api
-    //   .post(`/users/teachers/`, data)
-    //   .then((response) => {
-    //     console.log("Response:", response.data);
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-    await postTeachers(data.teachers)
-      .then((response) => {
-        console.log("Response:", response);
-      })
-      .catch((error) => {
-        console.log(error);
+    data.teachers.forEach((teacher) => {
+      postTeachers(teacher, {
+        onSuccess: (response) => {
+          // queryClient.invalidateQueries({ queryKey: ["users"] });
+          toast.success("Teacher created successfully");
+          console.log("Response:", response);
+          router.push("/admin-dashboard/users");
+        },
+        onError: (error) => {
+          toast.error("Failed to create teacher");
+          console.error("Error creating teacher", error);
+        },
       });
+    });
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
@@ -247,24 +245,24 @@ export function TeacherDataTableForm() {
                       )}
                     />
                   </TableCell>
-                  {/* Year level Field */}
-                  {/* <TableCell className="align-top">
+                  {/* phone Field */}
+                  <TableCell className="align-top">
                     <FormField
                       control={createTeacherForm.control}
-                      name={`teachers.${index}.year_level`}
+                      name={`teachers.${index}.phone`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
-                            <SelectYearLevel
-                              selectedId={Number(field.value)}
-                              onChange={field.onChange}
+                            <Input
+                              {...field}
+                              placeholder="Enter phone number"
                             />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  </TableCell> */}
+                  </TableCell>
                   {/* Delete Button */}
                   <TableCell className="w-24 text-right align-top">
                     <Button
