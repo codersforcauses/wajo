@@ -22,7 +22,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Image
-        fields = ['id', 'url']
+        fields = ['url', 'question']
 
 
 class AnswerSerializer(serializers.ModelSerializer):
@@ -54,7 +54,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     categories = CategorySerializer(read_only=True, many=True)
     is_comp = serializers.BooleanField(required=False, default=False)
     answers = AnswerSerializer(required=False, many=True)
-    # image_url = serializers.ImageField(required=False)
+    images = ImageSerializer(read_only=True, many=True)
 
     def create(self, validated_data):
         """

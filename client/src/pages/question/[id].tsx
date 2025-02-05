@@ -102,7 +102,7 @@ function EditQuestionForm({ question }: { question: Question }) {
       diff_level: parseInt(data.difficulty),
       layout: "layout",
       mark: parseInt(data.mark, 10),
-      image: null,
+      images: null,
     });
   };
 
@@ -281,14 +281,16 @@ function EditQuestionForm({ question }: { question: Question }) {
             />
 
             <div className="flex flex-1 items-center justify-center">
-              {imageUrl && (
+              {question.images && question.images.length > 0 ? (
                 <Image
-                  src={imageUrl}
+                  src={question.images[0].url}
                   alt="Question Image"
-                  width="0"
-                  height="0"
+                  width={300}
+                  height={200}
                   className="h-auto w-full"
                 />
+              ) : (
+                <p>No image available</p>
               )}
             </div>
           </div>

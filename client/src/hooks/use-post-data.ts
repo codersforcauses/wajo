@@ -55,7 +55,14 @@ export const usePostMutation = <
     ...args,
     mutationKey,
     mutationFn: (variables: TVariables) => {
-      return api.post(endpoint, variables, { timeout });
+      const isFormData = variables instanceof FormData;
+
+      return api.post(endpoint, variables, {
+        timeout,
+        headers: isFormData
+          ? { "Content-Type": "multipart/form-data" } //check for formdata, needed for image upload
+          : { "Content-Type": "application/json" },
+      });
     },
     onError: (error: TError) => {
       // extract error message from BE response

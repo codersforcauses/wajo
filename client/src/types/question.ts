@@ -40,7 +40,11 @@ export interface Question {
   mark: number;
   time_created: Date;
   time_modified: Date;
-  image: number;
+  images: Image[];
+}
+
+export interface Image {
+  url: string;
 }
 
 export interface Answer {

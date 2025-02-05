@@ -96,31 +96,57 @@ export default function Create() {
 
   const { mutate: createQuestion, isPending: isCreatePending } =
     usePostMutation<Question>(["question"], "/questions/question-bank/", 1000, {
-      onSuccess: () => {
-        toast.success("Question created successfully!");
-        router.push("/question/");
-      },
+      // Ignore this error, response is not a question object?
+      onSuccess: (response) => handleImageUpload(response.data.id),
     });
+
+  const uploadImageMutation = usePostMutation(
+    ["uploadImage"],
+    "/questions/images/",
+    1000,
+  );
 
   function onImageChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file) return;
-    setImageFile(file);
+    if (file) setImageFile(file);
   }
 
+  function handleImageUpload(questionId: number) {
+    if (!imageFile) return router.push("/question/");
+
+    const formData = new FormData();
+    formData.append("url", imageFile);
+    formData.append("question", String(questionId));
+
+    console.log("📡 Uploading Image:", questionId, formData);
+
+    uploadImageMutation.mutate(formData, {
+      onSuccess: () => {
+        toast.success("Image uploaded successfully!");
+        router.push("/question/");
+      },
+      onError: () => {
+        toast.error("Image upload failed, but question was created.");
+        router.push("/question/");
+      },
+    });
+  }
+
+  //Handles Form Submission
   const handleSubmit = (data: FormValues) => {
     createQuestion({
       name: data.questionName,
       category_ids: data.genre.map((g) => parseInt(g.value)),
       is_comp: false,
-      answers: data.answer.split(",").map((num) => Number(num.trim())), // list of numbers
+      answers: data.answer
+        .split(",")
+        .map((num) => ({ value: Number(num.trim()) })), // list of numbers
       question_text: data.question,
       note: "note",
       answer_text: data.solution,
       diff_level: parseInt(data.difficulty),
       layout: "layout",
       mark: parseInt(data.mark, 0),
-      image: null,
     });
   };
 
