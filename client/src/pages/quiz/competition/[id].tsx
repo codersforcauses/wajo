@@ -11,7 +11,8 @@ import RetrieveQuestion from "@/components/ui/Quiz/retrieve-questions";
 import SubmissionPopup from "@/components/ui/submission-popup";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import type { NextPageWithLayout } from "@/pages/_app";
-import { Quiz } from "@/types/quiz";
+import { Question } from "@/types/question";
+import { AdminQuiz, Competition, Quiz } from "@/types/quiz";
 
 const CompetitionQuizPage: NextPageWithLayout = () => {
   // Fetches the quiz data using the custom hook.
@@ -22,9 +23,19 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
     isLoading: isQuizDataLoading,
     isError: isQuizDataError,
     error: QuizDataError,
-  } = useFetchData<Quiz>({
-    queryKey: [`quiz.competition.${id}.slots`],
-    endpoint: `/quiz/competition/${id}/slots`,
+  } = useFetchData<AdminQuiz>({
+    queryKey: [`quiz.competition.${id}`],
+    endpoint: `/quiz/competition/${id}`,
+  });
+
+  const {
+    data: quizQuestionData,
+    isLoading: isQuizQuestionDataLoading,
+    isError: isQuizQuestionDataError,
+    error: QuizQuestionDataError,
+  } = useFetchData<Question[]>({
+    queryKey: [`quiz.competition.${id}/slot`],
+    endpoint: `/quiz/competition/${id}/slot`,
   });
 
   // console.log("Quiz Data: ", quizData);
@@ -48,9 +59,9 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
 
   if (quizData && !isNaN(quizIndex)) {
     quizTitle = quizData.name;
-    quizStartTime = quizData.startTime.toString();
-    quizDuration = quizData.duration;
-    numberOfQuestions = quizData.questions.length;
+    quizStartTime = quizData.open_time_date.toString();
+    quizDuration = quizData.time_limit;
+    // numberOfQuestions = quizData.questions.length;
   }
 
   const handleStartQuiz = () => {
@@ -129,7 +140,7 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             totalQuestions={numberOfQuestions}
-            questions={quizData ? quizData?.questions : []}
+            questions={quizQuestionData ? quizQuestionData : []}
           />
           {isSubmitted && (
             <SubmissionPopup

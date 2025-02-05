@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { set } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { QuizQuestion } from "@/types/quiz";
+import { Question } from "@/types/question";
 
 import AutoSavingAnswer from "./auto-saving";
 
@@ -10,7 +10,7 @@ interface GenericQuizProps {
   currentPage: number;
   setCurrentPage: (page: number) => void;
   totalQuestions: number;
-  questions: QuizQuestion[];
+  questions: Question[];
 }
 
 export default function GenericQuiz({
@@ -20,39 +20,9 @@ export default function GenericQuiz({
   questions,
 }: GenericQuizProps) {
   const headingStyle = `text-xl sm:text-2xl md:text-3xl text-slate-800 font-bold`;
-  // these values will be fetched from the database
-  // let questionNumber = 1;
-  // let marks = 2;
-  // let question =
-  //   "After 15 women leave a party, there are 3 times as many men as women. Later 40 men leave, so that then 7 times as many women as men remain. How many women were there at the start of the party?";
-  // let mathJax = "";
-
-  // let questions = [
-  //   {
-  //     questionNumber: 1,
-  //     question:
-  //       "The regular hexagon ABCDEF shown, has area 24.What is the area of △ABD?",
-  //     image: "hexagon.png",
-  //     marks: 1,
-  //   },
-  //   {
-  //     questionNumber: 2,
-  //     question:
-  //       "How many digits are needed to write the expression 8^7 × 5^25 in full?",
-  //     image: "",
-  //     marks: 1,
-  //   },
-  //   {
-  //     questionNumber: 3,
-  //     question:
-  //       "After 15 women leave a party, there are 3 times as many men as women. Later 40 men leave, so that then 7 times as many women as men remain. How many women were there at the start of the party?",
-  //     image: "",
-  //     marks: 1,
-  //   },
-  // ];
 
   const [questionNumber, setQuestionNumber] = useState(currentPage);
-  const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion>(
+  const [currentQuestion, setCurrentQuestion] = useState<Question>(
     questions[currentPage - 1],
   );
 
@@ -104,11 +74,11 @@ export default function GenericQuiz({
         <div className="mb-2 flex items-center justify-between">
           <h2 className={headingStyle}>Question {questionNumber}</h2>
           <h2 className={headingStyle}>
-            [{currentQuestion.marks}{" "}
-            {currentQuestion.marks === 1 ? "Mark" : "Marks"}]
+            [{currentQuestion.mark}{" "}
+            {currentQuestion.mark === 1 ? "Mark" : "Marks"}]
           </h2>
         </div>
-        <p>{currentQuestion.question}</p>
+        <p>{currentQuestion.question_text}</p>
         {/* <p className="mb-6 mt-4">{currentQuestion.mathJax}</p> */}
         <br />
         <h3 className="mt-8 text-lg text-slate-800 sm:text-xl md:text-2xl">

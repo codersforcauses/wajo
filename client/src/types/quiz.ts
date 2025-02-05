@@ -4,7 +4,7 @@ export interface AdminQuiz {
   id: number;
   name: string;
   intro: string;
-  total_marks: string;
+  total_marks: number;
   is_comp: boolean;
   visible: boolean;
   open_time_date: Date;
@@ -47,11 +47,11 @@ export enum QuizStatus {
   Finished = 3,
 }
 
-export interface Competition {
-  id: number;
-  name: string;
-  intro: string;
-  total_marks: string;
+export interface Competition extends Quiz {
+  // id: number;
+  // name: string;
+  // intro: string;
+  // total_marks: string;
   open_time_date: Date; // need from server
   status: QuizStatus; // to be discuss
 }

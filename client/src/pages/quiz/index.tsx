@@ -1,6 +1,6 @@
 import HorizontalCard from "@/components/ui/horizontal-card";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import { Quiz } from "@/types/quiz";
+import { AdminQuiz } from "@/types/quiz";
 
 /**
  * The `QuizPage` component is the page that displays the lists of all quizzes admins have published.
@@ -15,15 +15,15 @@ export default function QuizPage() {
     isLoading: isQuizDataLoading,
     isError: isQuizDataError,
     error: QuizDataError,
-  } = useFetchData<Quiz[]>({
+  } = useFetchData<AdminQuiz[]>({
     queryKey: ["quizzes"],
     endpoint: "/quiz/all_quizzes",
   });
 
   let upcomingCompetition = quizData?.filter((quiz) => quiz.is_comp === true);
-  let pastPapers = quizData?.filter((quiz) => quiz.is_comp === false);
-  // let practiceTests = quizData?.filter((quiz) => quiz.quizType === "Practice");
-  let practiceTests: Array<Quiz> = [];
+  // let pastPapers = quizData?.filter((quiz) => quiz.is_comp === false);
+  let practiceTests = quizData?.filter((quiz) => quiz.is_comp === false);
+  let pastPapers: Array<AdminQuiz> = [];
   return (
     <div className="justify-centre mt-8 flex h-full w-full flex-col items-center bg-white text-center">
       <section className="my-4 flex min-h-32 w-full flex-col items-center justify-center bg-[#FFD659] p-4">
@@ -31,7 +31,7 @@ export default function QuizPage() {
         <h6 className="my-4">
           Competition will start at{" "}
           {upcomingCompetition
-            ? upcomingCompetition[0].startTime.toString()
+            ? upcomingCompetition[0].open_time_date.toString()
             : "[TBD]"}{" "}
         </h6>
         <div className="flex w-full flex-col items-center justify-center gap-4">
