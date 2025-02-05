@@ -17,15 +17,8 @@ import { Student } from "@/types/user";
  *   status: "Active",
  * };
  */
-export interface Leaderboard {
-  // to be discuss
-  id: number;
-  name: string;
-  participant_students: number;
-  participant_teams: number;
-}
 
-export interface LeaderboardIndividual {
+export interface IndividualLeaderboard {
   name: string;
   year_level: number;
   school: string;
@@ -34,11 +27,11 @@ export interface LeaderboardIndividual {
   total_marks: number;
 }
 
-export interface LeaderboardTeam {
+export interface TeamLeaderboard {
   school: string;
   id: number;
   total_marks: number;
-  is_country: true;
+  is_country: boolean;
   students: Student[];
 }
 
