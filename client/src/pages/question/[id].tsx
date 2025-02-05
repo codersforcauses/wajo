@@ -21,13 +21,6 @@ import { Input } from "@/components/ui/input";
 import { WaitingLoader } from "@/components/ui/loading";
 import PreviewModal from "@/components/ui/Question/preview-modal";
 import { MultipleSelectCategory } from "@/components/ui/Question/select-category";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePostMutation } from "@/hooks/use-post-data";
