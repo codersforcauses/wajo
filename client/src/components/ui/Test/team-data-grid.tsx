@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
-import { IndividualLeaderboard, Ranking } from "@/types/leaderboard";
+import { TeamLeaderboard } from "@/types/leaderboard";
 
 /**
  * Renders a paginated data grid for displaying ranking data.
@@ -34,13 +34,13 @@ import { IndividualLeaderboard, Ranking } from "@/types/leaderboard";
  *   changePage={currentPage}
  * />
  */
-export function IndividualDataGrid({
+export function TeamDataGrid({
   datacontext,
   onDataChange,
   changePage,
-}: DatagridProps<IndividualLeaderboard>) {
+}: DatagridProps<TeamLeaderboard>) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<IndividualLeaderboard[]>([]);
+  const [paddedData, setPaddedData] = useState<TeamLeaderboard[]>([]);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
 
@@ -57,7 +57,7 @@ export function IndividualDataGrid({
 
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as IndividualLeaderboard);
+      updatedPaddedData.push({} as TeamLeaderboard);
     }
 
     setPaddedData(updatedPaddedData);
@@ -74,31 +74,44 @@ export function IndividualDataGrid({
         <TableHeader className="bg-black text-lg font-semibold">
           <TableRow className="hover:bg-muted/0">
             <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
-              Student Name
+              School
             </TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Year Level</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>School</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>School Type</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>Id</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>Total Marks</TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>Is Country?</TableHead>
-            <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>Total Marks</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>Student 1</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>Student 2</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>Student 3</TableHead>
+            <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>Student 4</TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
-          {paddedData.map((item, index) => (
-            <TableRow
-              key={index}
-              className={"divide-gray-200 border-gray-50 text-sm text-black"}
-            >
-              {/* TODO: student_name, team, marks, and response_time don't correspond to the backend */}
-              <TableCell className="w-1/4">{item.name}</TableCell>
-              <TableCell className="text-center">{item.year_level}</TableCell>
-              <TableCell className="w-1/4">{item.school}</TableCell>
-              <TableCell className="w-1/4">{item.school_type}</TableCell>
-              <TableCell className="text-center">{item.is_country ? "Yes" : "No"}</TableCell>
-              <TableCell className="text-center">{item.total_marks}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
+  {paddedData.map((item, index) => {
+    const studentCells = Array(4)
+      .fill(null)
+      .map((_, i) => (
+        <TableCell key={i} className="">
+          {item.students?.[i] ? `${item.students[i].name} (${item.students[i].year_level})` : "-"}
+        </TableCell>
+      ));
+
+    return (
+      <TableRow
+        key={index}
+        className="divide-gray-200 border-gray-50 text-sm text-black"
+      >
+        <TableCell className="w-1/4">{item.school}</TableCell>
+        <TableCell className="w-1/4">{item.id}</TableCell>
+        <TableCell className="text-center">{item.total_marks}</TableCell>
+        <TableCell className="w-1/4">{item.is_country ? "Yes" : "No"}</TableCell>
+        {studentCells}
+      </TableRow>
+    );
+  })}
+</TableBody>
+
+
       </Table>
 
       <Pagination

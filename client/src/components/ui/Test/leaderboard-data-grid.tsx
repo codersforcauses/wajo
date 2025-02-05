@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
-import { Leaderboard } from "@/types/leaderboard";
+import { IndividualLeaderboard } from "@/types/leaderboard";
 
 /**
  * Renders a paginated data grid for displaying leaderboard data.
@@ -41,10 +41,10 @@ export function LeaderboardDataGrid({
   datacontext,
   onDataChange,
   changePage,
-}: DatagridProps<Leaderboard>) {
+}: DatagridProps<IndividualLeaderboard>) {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<Leaderboard[]>([]);
+  const [paddedData, setPaddedData] = useState<IndividualLeaderboard[]>([]);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
 
@@ -61,7 +61,7 @@ export function LeaderboardDataGrid({
 
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as Leaderboard);
+      updatedPaddedData.push({} as IndividualLeaderboard);
     }
 
     setPaddedData(updatedPaddedData);
@@ -99,10 +99,11 @@ export function LeaderboardDataGrid({
             >
               <TableCell className="w-2/5">{item.name}</TableCell>
               <TableCell className="w-1/5 text-center">
-                {item.participant_students}
+                {item.name}
               </TableCell>
               <TableCell className="w-2/5 text-center">
-                {item.participant_teams}
+                {item.school}
+                {/* just for now */}
               </TableCell>
               <TableCell className="flex py-4">
                 <div
