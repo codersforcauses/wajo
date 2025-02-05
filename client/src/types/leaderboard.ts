@@ -18,7 +18,7 @@ import { Student } from "@/types/user";
  * };
  */
 export interface Leaderboard {
-  // to be discuss
+  // ask: to be discuss
   id: number;
   name: string;
   participant_students: number;

@@ -4,7 +4,8 @@ import {
   UseMutationResult,
   useQueryClient,
 } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
+import { toast } from "sonner";
 
 import api from "@/lib/api";
 
@@ -23,10 +24,10 @@ import api from "@/lib/api";
  * @param {number} [timeout=10000] - The timeout for the POST request in milliseconds. Defaults to 10000ms (10 seconds).
  * @param {UseMutationOptions<TData, TError, TVariables>} [args] - Optional configuration options for the mutation. This can include callbacks like `onSuccess`, `onError`, etc.
  *
- * @returns {UseMutationResult<TData, TError, TVariables>} The result of the mutation, which includes properties like `mutate`, `isLoading`, `isError`, etc.
+ * @returns {UseMutationResult<TData, TError, TVariables>} The result of the mutation, which includes properties like `mutate`, `isPending`, `isError`, etc.
  *
  * @example
- * const { mutate, isLoading, isError } = usePostMutation(["login"], "/api/login", {
+ * const { mutate, isPending, isError } = usePostMutation(["login"], "/api/login", {
  *   onSuccess: () => {
  *     console.log("Logged in successfully");
  *   },
@@ -37,8 +38,8 @@ import api from "@/lib/api";
  */
 export const usePostMutation = <
   TData,
-  TError = AxiosError,
   TVariables = unknown,
+  TError = AxiosError<{ error: string; message: string }>,
 >(
   mutationKey: string[],
   endpoint: string,
@@ -56,8 +57,16 @@ export const usePostMutation = <
     mutationFn: (variables: TVariables) => {
       return api.post(endpoint, variables, { timeout });
     },
-    onSuccess: () => {
+    onError: (error: TError) => {
+      // extract error message from BE response
+      if (axios.isAxiosError(error) && error.response?.data) {
+        const { message, error: detailedError } = error.response.data;
+        toast.error(detailedError || message || "Something went wrong");
+      }
+    },
+    onSuccess: (data, details, context) => {
       queryClient.invalidateQueries({ queryKey: [mutationKey] });
+      if (args?.onSuccess) args.onSuccess(data, details, context);
     },
   });
 };
