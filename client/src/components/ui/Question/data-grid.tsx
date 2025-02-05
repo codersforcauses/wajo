@@ -93,7 +93,7 @@ export function Datagrid({
                 <span>Genre</span>
                 <span
                   className="ml-2 cursor-pointer"
-                  onClick={() => sortByColumn("genre")}
+                  onClick={() => sortByColumn("category")}
                 >
                   <svg
                     width="10"
