@@ -16,7 +16,7 @@ import { Button } from "../button";
 
 export default function DeleteModal({ children, data }: DeleteModalProps) {
   const handleDelete = () => {
-    alert(`${data.name}`);
+    alert(`${data.id}`);
   };
 
   return (

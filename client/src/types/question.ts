@@ -29,18 +29,22 @@ export interface Question {
   name: string;
   created_by: string;
   modified_by: string;
-  category: Category[]; // ask: to be discussed
+  categories: Category[]; // ask: to be discussed
   is_comp: boolean;
-  answer: number[];
+  answers: Answer[];
   question_text: string;
   note: string;
-  answer_text: string;
+  solution_text: string;
   diff_level: number;
   layout: string;
   mark: number;
   time_created: Date;
   time_modified: Date;
   image: number;
+}
+
+export interface Answer {
+  value: number;
 }
 
 /**
@@ -165,7 +169,58 @@ export const createCategorySchema = z.object({
  *
  * @constant
  */
-const createQuestionSchema = z.object({
+
+// Define the schema for the request payload
+export const createQuestionSchema = z.object({
+  questionName: z.string().min(1, "Question Name is required"),
+  question: z.string().min(1, "Question is required"),
+  answer: z
+    .string()
+    .min(1, "Answer is required")
+    .refine(
+      (val) =>
+        val
+          .split(",")
+          .every(
+            (num) =>
+              /^\d+$/.test(num.trim()) &&
+              +num.trim() >= 0 &&
+              +num.trim() <= 999,
+          ),
+      {
+        message:
+          "Must be an integer from 0-999, use “,” to separate multiple answers",
+      },
+    ),
+  solution_text: z.string().optional(),
+  mark: z
+    .string()
+    .min(1, "Mark is required")
+    .regex(/^\d+$/, "Mark must be a number"),
+  difficulty: z
+    .string()
+    .min(1, "Difficulty is required")
+    .refine((val) => /^[1-9]$|^10$/.test(val), {
+      message: "Difficulty must be a number between 1 and 10",
+    }),
+  genre: z
+    .array(
+      z.object({
+        value: z.string(),
+        label: z.string(),
+      }),
+    )
+    .min(1, "Genre is required"),
+});
+
+/**
+ * Zod schema for validating a question creation input.
+ *
+ * Ensures that each question has a non-negative integer ID and a non-empty name.
+ *
+ * @constant
+ */
+const createTestQuestionSchema = z.object({
   id: z.number().int().nonnegative(),
   name: z.string().min(1, "Question name is required"),
 });
@@ -177,10 +232,10 @@ const createQuestionSchema = z.object({
  *
  * @constant
  */
-const createQuestionBlockSchema = z.object({
+const createTestQuestionBlockSchema = z.object({
   id: z.number().int().nonnegative(),
   questions: z
-    .array(createQuestionSchema)
+    .array(createTestQuestionSchema)
     .min(1, "At least one question is required"),
 });
 
@@ -195,7 +250,7 @@ export const genericCreateTestSchema = z.object({
   name: z.string().min(1, "Required"),
   general_instructions: z.string().min(1, "Required"),
   blocks: z
-    .array(createQuestionBlockSchema)
+    .array(createTestQuestionBlockSchema)
     .min(1, "At least one question block is required"), // An array of question blocks
 });
 
