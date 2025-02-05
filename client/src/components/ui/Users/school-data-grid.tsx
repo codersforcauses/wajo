@@ -89,21 +89,6 @@ export function SchoolDataGrid({
             <TableHead className={commonTableHeadClasses}>
               School Name
             </TableHead>
-            <TableHead className={commonTableHeadClasses}>
-              School Name
-            </TableHead>
-            <TableHead className={commonTableHeadClasses}>
-              School Name
-            </TableHead>
-            <TableHead className={commonTableHeadClasses}>
-              School Name
-            </TableHead>
-            <TableHead className={commonTableHeadClasses}>
-              School Name
-            </TableHead>
-            <TableHead className={commonTableHeadClasses}>
-              School Name
-            </TableHead>
             <TableHead className={commonTableHeadClasses}>Created On</TableHead>
             <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
               Actions

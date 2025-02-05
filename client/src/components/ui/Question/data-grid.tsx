@@ -1,4 +1,6 @@
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
@@ -10,8 +12,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  useDeleteMutation,
+  useDynamicDeleteMutation,
+} from "@/hooks/use-delete-data";
+import { cn } from "@/lib/utils";
 import { DatagridProps, sortData } from "@/types/data-grid";
 import { Question } from "@/types/question";
+
+import DeleteModal from "./delete-modal";
 
 /**
  * The Datagrid component is a flexible, paginated data table with sorting and navigation features.
@@ -23,6 +32,8 @@ export function Datagrid({
   onDataChange,
   changePage,
 }: DatagridProps<Question>) {
+  const router = useRouter();
+
   // State to track sorting direction
   const [isAscending, setIsAscending] = useState(true);
   // State for the current page number
@@ -80,6 +91,22 @@ export function Datagrid({
     setCurrentPage(changePage);
   }, [datacontext]);
 
+  const { mutate: deleteQuestion, isPending } = useDynamicDeleteMutation({
+    baseUrl: "/questions/question-bank",
+    mutationKey: ["question_delete"],
+    onSuccess: () => {
+      router.reload();
+      toast.success("School has been deleted.");
+    },
+  });
+
+  const handleDelete = (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this category?")) {
+      return;
+    }
+    deleteQuestion(id);
+  };
+
   return (
     <div>
       <Table className="w-full border-collapse text-left shadow-md">
@@ -93,7 +120,7 @@ export function Datagrid({
                 <span>Category</span>
                 <span
                   className="ml-2 cursor-pointer"
-                  onClick={() => sortByColumn("category")}
+                  onClick={() => sortByColumn("categories")}
                 >
                   <svg
                     width="10"
@@ -139,23 +166,26 @@ export function Datagrid({
             >
               <TableCell className="w-1/4">{item.name || "\u00A0"}</TableCell>
               <TableCell className="w-1/4">
-                {item.category ? item.category.join(", ") : "\u00A0"}
+                {item.categories?.map((c) => c.genre).join(", ") || "\u00A0"}
               </TableCell>
               <TableCell className="w-1/4">
                 {item.diff_level || "\u00A0"}
               </TableCell>
-              <TableCell className="flex justify-evenly py-4">
-                {item.name ? (
-                  <>
-                    <Button>View</Button>
-                    <Button variant={"destructive"}>Delete</Button>
-                  </>
-                ) : (
-                  <div className="invisible flex">
-                    <Button>View</Button>
-                    <Button variant={"destructive"}>Delete</Button>
-                  </div>
-                )}
+              <TableCell className="flex py-4">
+                <div className={cn("flex", { invisible: !item.name })}>
+                  <Button
+                    className="me-2"
+                    onClick={() => router.push(`/question/${item.id}`)}
+                  >
+                    View
+                  </Button>
+                  <Button
+                    variant={"destructive"}
+                    onClick={() => handleDelete(item.id)}
+                  >
+                    {isPending ? "Deleting..." : "Delete"}
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
