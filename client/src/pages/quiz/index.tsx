@@ -30,14 +30,14 @@ export default function QuizPage() {
         <h2>{new Date().getFullYear()} Competition</h2>
         <h6 className="my-4">
           Competition will start at{" "}
-          {upcomingCompetition
+          {upcomingCompetition && upcomingCompetition.length > 0
             ? upcomingCompetition[0].open_time_date.toString()
             : "[TBD]"}{" "}
         </h6>
         <div className="flex w-full flex-col items-center justify-center gap-4">
           <HorizontalCard
             title="2025 Competition"
-            href={`quiz/competition/${upcomingCompetition ? upcomingCompetition[0].id : "[TBD]"}/`}
+            href={`quiz/competition/${upcomingCompetition && upcomingCompetition.length > 0 ? upcomingCompetition[0].id : ""}`}
           />
         </div>
       </section>
