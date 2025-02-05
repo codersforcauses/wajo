@@ -10,9 +10,10 @@ import { Team } from "@/types/team";
 
 export default function TeamsPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState("team_name"); // Default sorting field
+  const [sortField, setSortField] = useState("name"); // Default sorting field
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [searchQuery, setSearchQuery] = useState(""); // What the user types
+  const [ordering, setOrdering] = useState<string>("name");
+
   const [search, setSearch] = useState(""); // Only updates when user submits search
 
   // Fetch data when page or sorting changes
@@ -26,17 +27,13 @@ export default function TeamsPage() {
     endpoint: "/team/teams/",
     params: {
       page: currentPage,
-      sortField,
-      sortOrder,
+      ordering,
       ...(search ? { search } : {}), // Only include search if not empty
     },
   });
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error loading teams.</p>;
-  if (data?.results.length === 0) {
-    return <p>No teams found.</p>;
-  }
 
   const pageSize = 5; // Adjust this if your backend uses a different page size
   const totalPages = data ? Math.ceil(data.count / pageSize) : 1;
@@ -45,6 +42,7 @@ export default function TeamsPage() {
   const handleSort = (field: keyof Team) => {
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
     setSortField(field);
+    setOrdering(sortOrder === "asc" ? field : `-${field}`);
   };
 
   const handleSearchSubmit = (value: string) => {
@@ -52,18 +50,37 @@ export default function TeamsPage() {
     setSearch(value);
     setCurrentPage(1); // Reset to first page when searching
   };
-  console.log(search);
+
+  if (data?.results.length === 0) {
+    return (
+      <div className="m-4 space-y-4">
+        <div className="flex justify-between">
+          {/* Search bar to filter teams */}
+          <SearchInput
+            label=""
+            value={search}
+            placeholder="Search by name..."
+            onSearch={handleSearchSubmit}
+          />
+          {/* Button to navigate to the create team page */}
+          <Button asChild className="mr-6">
+            <Link href={"team/create"}>Create a Team</Link>
+          </Button>
+        </div>
+        <p>No teams found.</p>
+      </div>
+    );
+  }
   return (
     <div className="m-4 space-y-4">
       <div className="flex justify-between">
-        {/* Search bar to filter teams */}
         <SearchInput
-          label="Search"
+          label=""
           value={search}
           placeholder="Search by name..."
           onSearch={handleSearchSubmit}
         />
-        {/* Button to navigate to the create team page */}
+
         <Button asChild className="mr-6">
           <Link href={"team/create"}>Create a Team</Link>
         </Button>
@@ -73,8 +90,6 @@ export default function TeamsPage() {
       <TeamDatagrid
         datacontext={data?.results ?? []}
         onSort={handleSort}
-        sortField={sortField}
-        sortOrder={sortOrder}
         currentPage={currentPage}
         totalPages={totalPages || 1}
         onPageChange={(page) => setCurrentPage(page)}

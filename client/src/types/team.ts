@@ -66,8 +66,7 @@ export interface Team {
 export interface TeamDatagridProps {
   datacontext: Team[];
   onSort: (field: keyof Team) => void;
-  sortField: string;
-  sortOrder: "asc" | "desc";
+
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
