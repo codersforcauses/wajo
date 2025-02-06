@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/table";
 import { SelectSchool } from "@/components/ui/Users/select-school";
 import { cn } from "@/lib/utils";
-import { createUserSchema } from "@/types/user";
+import { createRandomPwd, createUserSchema } from "@/types/user";
 
 type User = z.infer<typeof createUserSchema>;
 
@@ -142,7 +142,7 @@ export function DataTableForm() {
                   </TableCell>
 
                   {/* Password Field */}
-                  <TableCell className="align-top">
+                  {/* <TableCell className="align-top">
                     <FormField
                       control={createUserForm.control}
                       name={`users.${index}.password`}
@@ -150,6 +150,39 @@ export function DataTableForm() {
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
                             <Input {...field} placeholder="Enter password" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TableCell> */}
+
+                  <TableCell className="align-top">
+                    <FormField
+                      control={createUserForm.control}
+                      name={`users.${index}.password`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                          <FormControl>
+                            <div className="relative flex items-center">
+                              {/* input*/}
+                              <Input
+                                {...field}
+                                placeholder="Enter password (or Auto Generate)"
+                              />
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                className="ml-2"
+                                // click event to generate random password and pass it to the input field
+                                onClick={() => {
+                                  const randomPwd = createRandomPwd();
+                                  field.onChange(randomPwd);
+                                }}
+                              >
+                                Auto
+                              </Button>
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
