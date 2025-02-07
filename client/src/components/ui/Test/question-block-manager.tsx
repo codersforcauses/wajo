@@ -21,7 +21,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import {
@@ -33,7 +32,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import { cn } from "@/lib/utils";
 import { Question } from "@/types/question";
 
 type Props = {
@@ -84,14 +82,24 @@ export function QuestionBlockManager({ formControl }: Props) {
     }
   };
 
+  const requiredStar = <span className="text-red-500">*</span>;
   return (
     <div className="space-y-4">
-      <Button
-        type="button"
-        onClick={() => appendBlock({ id: blocks.length + 1, questions: [] })}
-      >
-        Add Block
-      </Button>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="-mb-2 text-lg">Question Blocks {requiredStar}</h3>
+          <span className="text-xs text-gray-400">
+            Questions inside a block are randomly sorted.
+          </span>
+        </div>
+        <Button
+          className="me-4"
+          type="button"
+          onClick={() => appendBlock({ id: blocks.length + 1, questions: [] })}
+        >
+          Add Block
+        </Button>
+      </div>
       {/* Blocks */}
       <FormField
         control={formControl}
@@ -165,6 +173,7 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
     fields: questions,
     append: appendQuestion,
     remove: removeQuestion,
+    move: moveQuestion,
   } = useFieldArray({
     control: formControl,
     name: `blocks.${blockIndex}.questions`,
@@ -212,6 +221,20 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor),
+  );
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = questions.findIndex((q) => q._id === active.id);
+      const newIndex = questions.findIndex((q) => q._id === over.id);
+      moveQuestion(oldIndex, newIndex);
+    }
+  };
+
   const {
     attributes,
     listeners,
@@ -225,8 +248,10 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
     transform: transform ? CSS.Translate.toString(transform) : undefined,
     transition,
     zIndex: isDragging ? 1 : 0,
+    opacity: isDragging ? 0.6 : 1,
   };
 
+  const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
     <div
       ref={setNodeRef}
@@ -289,93 +314,112 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
           Remove
         </Button>
       </div>
-
-      <QuestionTable
-        questions={questions}
-        blockIndex={blockIndex}
-        formControl={formControl}
-        removeQuestion={removeQuestion}
-      />
+      {/* Question Table */}
+      <div className="space-y-4 p-0 pt-2">
+        <div className="grid">
+          <div className="overflow-hidden rounded-lg border border-black">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <Table className="w-full border-collapse text-left shadow-md">
+                <TableHeader className="bg-black text-lg font-semibold">
+                  <TableRow className="hover:bg-muted/0">
+                    <TableHead className={commonTableHeadClasses}></TableHead>
+                    <TableHead className={commonTableHeadClasses}>Id</TableHead>
+                    <TableHead className={commonTableHeadClasses}>
+                      Name
+                    </TableHead>
+                    <TableHead className={commonTableHeadClasses}>
+                      Difficulty
+                    </TableHead>
+                    <TableHead className={commonTableHeadClasses}>
+                      Actions
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <SortableContext
+                    items={questions.map((q) => q._id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {questions.map((field, index) => (
+                      <SortableQuestionRow
+                        key={field._id}
+                        id={field._id}
+                        question={field}
+                        questionIndex={index}
+                        removeQuestion={removeQuestion}
+                      />
+                    ))}
+                  </SortableContext>
+                </TableBody>
+              </Table>
+            </DndContext>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-interface QuestionTableProps {
-  questions: any[];
-  blockIndex: number;
-  formControl: Control<any>;
+interface SortableQuestionProps {
+  id: string;
+  question: any;
+  questionIndex: number;
   removeQuestion: (index: number) => void;
 }
 
-const QuestionTable = ({
-  questions,
-  blockIndex,
-  formControl,
+const SortableQuestionRow = ({
+  id,
+  question,
+  questionIndex,
   removeQuestion,
-}: QuestionTableProps) => {
-  const commonTableHeadClasses = "w-auto text-white text-nowrap";
+}: SortableQuestionProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: transform ? CSS.Translate.toString(transform) : undefined,
+    transition,
+    zIndex: isDragging ? 1 : 0,
+    opacity: isDragging ? 0.6 : 1,
+  };
+
+  const ques = question as Question;
   return (
-    <div className="space-y-4 p-0 pt-2">
-      {/* Block Questions Table */}
-      <Table className="w-full border-collapse text-left shadow-md">
-        <TableHeader className="bg-black text-lg font-semibold">
-          <TableRow className="hover:bg-muted/0">
-            <TableHead
-              className={cn(commonTableHeadClasses, "rounded-tl-lg", "w-0")}
-            >
-              Question Id
-            </TableHead>
-            <TableHead className={commonTableHeadClasses}>
-              Question Name
-            </TableHead>
-            <TableHead
-              className={cn(commonTableHeadClasses, "rounded-tr-lg", "w-0")}
-            >
-              Actions
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {questions.map((question, index) => (
-            <TableRow
-              key={question._id}
-              className="divide-gray-200 border-gray-50 text-sm text-black"
-            >
-              <TableCell className="text-lg font-semibold">
-                <FormField
-                  control={formControl}
-                  name={`blocks.${blockIndex}.questions.${index}.id`}
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-1.5 space-y-0">
-                      <FormLabel {...field}>{question.id}</FormLabel>
-                    </FormItem>
-                  )}
-                />
-              </TableCell>
-              <TableCell>
-                <FormField
-                  control={formControl}
-                  name={`blocks.${blockIndex}.questions.${index}.name`}
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                      <FormLabel {...field}>{question.name}</FormLabel>
-                    </FormItem>
-                  )}
-                />
-              </TableCell>
-              <TableCell className="w-24 text-right">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => removeQuestion(index)}
-                >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <TableRow
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className={`divide-gray-200 border-black text-sm text-black ${
+        isDragging ? "bg-gray-100" : ""
+      }`}
+    >
+      <TableCell className="w-0 py-2">
+        <div {...listeners} className="me-2">
+          <AlignJustifyIcon className="h-5 w-5 cursor-move" />
+        </div>
+      </TableCell>
+      <TableCell className="w-0 py-2">{ques.id}</TableCell>
+      <TableCell className="w-full py-2">{ques.name}</TableCell>
+      <TableCell className="w-0 py-2">{ques.diff_level}</TableCell>
+      <TableCell className="w-0 py-2 text-right">
+        <Button
+          type="button"
+          variant="destructive"
+          onClick={() => removeQuestion(questionIndex)}
+        >
+          Delete
+        </Button>
+      </TableCell>
+    </TableRow>
   );
 };

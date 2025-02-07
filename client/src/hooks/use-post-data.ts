@@ -55,7 +55,7 @@ export const usePostMutation = <
     ...args,
     mutationKey,
     mutationFn: (variables: TVariables) => {
-      return api.post(endpoint, variables, { timeout });
+      return api.post(endpoint, variables, { timeout }).then((res) => res.data);
     },
     onError: (error: TError) => {
       // extract error message from BE response
@@ -65,7 +65,7 @@ export const usePostMutation = <
       }
     },
     onSuccess: (data, details, context) => {
-      queryClient.invalidateQueries({ queryKey: [mutationKey] });
+      queryClient.invalidateQueries({ queryKey: mutationKey });
       if (args?.onSuccess) args.onSuccess(data, details, context);
     },
   });
