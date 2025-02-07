@@ -44,13 +44,6 @@ export const SchoolTypeEnum = z.enum(
  */
 export type SchoolType = z.infer<typeof SchoolTypeEnum>;
 
-export interface School {
-  id: number;
-  name: string;
-  type: SchoolType;
-  is_country: boolean;
-}
-
 /**
  * Represents a user object.
  *
@@ -86,12 +79,6 @@ export interface Teacher extends User {
   school_id: number;
 }
 
-export interface Student {
-  id: number;
-  name: string;
-  year_level: number;
-}
-
 /**
  * Represents a school with its id, name, and creation date.
  *
@@ -100,20 +87,13 @@ export interface Student {
  * @property {string} name - The name of the school.
  * @property {Date} time_created - The timestamp of when the school was created.
  */
-
-// export interface Student {
-//   id: number;
-//   name: string;
-//   year_level: number;
-// }
-
-// export interface School {
-//   id: number;
-//   name: string;
-//   type: string;
-//   is_country: boolean;
-//   created_at: Date; // need from server
-// }
+export interface School {
+  id: number;
+  name: string;
+  type: string;
+  is_country: boolean;
+  created_at?: Date; // need from server
+}
 
 export interface Teacher {
   id: number;
@@ -138,16 +118,11 @@ export interface Teacher {
  * @const {z.ZodSchema} loginSchema
  *
  * @property {z.ZodString} username - Required, must be at least 1 character.
- * @property {z.ZodString} password - Required, must be at least 8 characters, include letters, numbers, and symbols.
+ * @property {z.ZodString} password - Required, must be at least 1 character.
  */
 export const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Za-z]/, "Password must contain letters")
-    .regex(/[0-9]/, "Password must contain numbers")
-    .regex(/[^A-Za-z0-9]/, "Password must contain symbols"),
+  password: z.string().min(1, "Password is required"),
 });
 
 /**
@@ -198,4 +173,14 @@ export const createTeacherSchema = createUserSchema.extend({
  */
 export const createSchoolSchema = z.object({
   name: z.string().min(1, "Required"),
+  type: SchoolTypeEnum,
+  is_country: z.boolean(),
+  abbreviation: z.string().min(1, "Required"),
 });
+
+export const createRandomPwd = () => {
+  const passhelp = require("passhelp");
+  // 8 character alphanumeric for those silly banks. ensure that
+  // it has 1 digit, 1 upper-case and 1 lower-case character
+  return passhelp.character(8, passhelp.alphabets.alphanumeric, true); // "A2nJEH4o"
+};

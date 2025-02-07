@@ -170,12 +170,25 @@ class TeacherViewSet(viewsets.ModelViewSet):
 
 @permission_classes([IsAdminUser])
 class SchoolViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for managing schools.
+
+    Attributes:
+        queryset: QuerySet of all School instances.
+        serializer_class: Serializer class for School instances.
+        filter_backends: Filters applied to the viewset.
+        search_fields: Fields that can be searched.
+    """
     queryset = School.objects.all()
     serializer_class = SchoolSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name']
+    search_fields = ['name', 'abbreviation', 'type', 'is_country']
 
     def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
         try:
             return super().create(request, *args, **kwargs)
         except IntegrityError as error:

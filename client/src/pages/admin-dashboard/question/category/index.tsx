@@ -1,57 +1,55 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
-import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
+import { CategoryDataGrid } from "@/components/ui/Question/category-data-grid";
 import { SearchInput } from "@/components/ui/search";
-import { TeamDataGrid } from "@/components/ui/Users/team-data-grid";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import { NextPageWithLayout } from "@/pages/_app";
-import type { Team } from "@/types/team";
+import { Category } from "@/types/question";
 
-const TeamPage: NextPageWithLayout = () => {
+export default function Index() {
   const {
-    data: teams,
-    isLoading: isTeamLoading,
-    isError: isTeamError,
-    error: TeamError,
-  } = useFetchData<Team[]>({
-    queryKey: ["team.teams"],
-    endpoint: "/team/teams/",
+    data: categories,
+    isLoading: isCategoryLoading,
+    isError: isCategoryError,
+    error: categoryError,
+  } = useFetchData<Category[]>({
+    queryKey: ["questions.categories"],
+    endpoint: "/questions/categories/",
   });
 
   const [page, setPage] = useState<number>(1);
-  const [filteredData, setFilteredData] = useState<Team[]>([]);
+  const [filteredData, setFilteredData] = useState<Category[]>([]);
 
   useEffect(() => {
-    if (teams) {
-      setFilteredData(teams);
+    if (categories) {
+      setFilteredData(categories);
     }
-  }, [teams]);
+  }, [categories]);
 
   const handleFilterChange = (value: string) => {
-    if (!teams) return;
+    if (!categories) return;
 
     const filtered =
       value.trim() === ""
-        ? teams
-        : teams.filter((item) => {
+        ? categories
+        : categories.filter((item) => {
             const query = value.toLowerCase().trim();
             const isExactMatch = query.startsWith('"') && query.endsWith('"');
             const normalizedQuery = isExactMatch ? query.slice(1, -1) : query;
 
             return isExactMatch
-              ? item.name.toLowerCase() === normalizedQuery
-              : item.name.toLowerCase().includes(normalizedQuery);
+              ? item.genre.toLowerCase() === normalizedQuery
+              : item.genre.toLowerCase().includes(normalizedQuery);
           });
 
     setFilteredData(filtered);
     setPage(1);
   };
 
-  if (isTeamLoading) return <WaitingLoader />;
-  if (isTeamError) return <div>Error: {TeamError?.message}</div>;
+  if (isCategoryLoading) return <WaitingLoader />;
+  if (isCategoryError) return <div>Error: {categoryError?.message}</div>;
 
   return (
     <div className="m-4 space-y-4">
@@ -59,25 +57,19 @@ const TeamPage: NextPageWithLayout = () => {
         <SearchInput
           label=""
           value={""}
-          placeholder="Search Team"
+          placeholder="Search Genre"
           onSearch={handleFilterChange}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"/users/team/create"}>Create a Team</Link>
+          <Link href={"/question/category/create"}>Create a Category</Link>
         </Button>
       </div>
 
-      <TeamDataGrid
+      <CategoryDataGrid
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
-      ></TeamDataGrid>
+      />
     </div>
   );
-};
-
-TeamPage.getLayout = function getLayout(page) {
-  return <DashboardLayout>{page}</DashboardLayout>;
-};
-
-export default TeamPage;
+}

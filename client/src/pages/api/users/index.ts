@@ -12,7 +12,7 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { User } from "@/types/user";
+import { School, User } from "@/types/user";
 
 /**
  * Mock data representing user entries.
@@ -25,20 +25,20 @@ for (let i = 0; i < 9; i++) {
     {
       id: i * 3 + 1,
       username: `adminMaster${i + 1}`,
-      role: "admin",
-      // school: "Greenfield High",
+      role: "user",
+      school: { name: "Greenfield High" } as School,
     },
     {
       id: i * 3 + 2,
       username: `mathPro${i + 1}`,
       role: "teacher",
-      // school: "Westwood Academy",
+      school: { name: "Westwood Academy" } as School,
     },
     {
       id: i * 3 + 3,
       username: `scienceGeek${i + 1}`,
       role: "student",
-      // school: "Northside School",
+      school: { name: "Northside School" } as School,
     },
   );
 }

@@ -81,6 +81,8 @@ class SchoolSerializer(serializers.ModelSerializer):
         - exclude: ['id', 'code']
     """
     name = serializers.CharField(required=True)
+    type = serializers.ChoiceField(choices=School.SchoolType.choices, required=False, allow_blank=True)
+    is_country = serializers.BooleanField(default=False)
 
     class Meta:
         model = School

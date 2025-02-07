@@ -2,12 +2,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { ChangeEvent, useMemo, useState } from "react";
+import React, { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,59 +18,33 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { WaitingLoader } from "@/components/ui/loading";
 import PreviewModal from "@/components/ui/Question/preview-modal";
 import { MultipleSelectCategory } from "@/components/ui/Question/select-category";
 import { Textarea } from "@/components/ui/textarea";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePostMutation } from "@/hooks/use-post-data";
-import { NextPageWithLayout } from "@/pages/_app";
-import { Question } from "@/types/question";
+import { usePutMutation } from "@/hooks/use-put-data";
+import { createQuestionSchema, Question } from "@/types/question";
 
-// Define the Zod schema for validation
-const formSchema = z.object({
-  questionName: z.string().min(1, "Question Name is required"),
-  question: z.string().min(1, "Question is required"),
-  answer: z
-    .string()
-    .min(1, "Answer is required")
-    .refine(
-      (val) =>
-        val
-          .split(",")
-          .every(
-            (num) =>
-              /^\d+$/.test(num.trim()) &&
-              +num.trim() >= 0 &&
-              +num.trim() <= 999,
-          ),
-      {
-        message:
-          "Must be an integer from 0-999, use “,” to separate multiple answers",
-      },
-    ),
-  solution: z.string().optional(),
-  mark: z
-    .string()
-    .min(1, "Mark is required")
-    .regex(/^\d+$/, "Mark must be a number"),
-  difficulty: z
-    .string()
-    .min(1, "Difficulty is required")
-    .refine((val) => /^[1-9]$|^10$/.test(val), {
-      message: "Difficulty must be a number between 1 and 10",
-    }),
-  genre: z
-    .array(
-      z.object({
-        value: z.string(),
-        label: z.string(),
-      }),
-    )
-    .min(1, "Genre is required"),
-});
+type UpdateQuestion = z.infer<typeof createQuestionSchema>;
 
-type FormValues = z.infer<typeof formSchema>;
+export default function Edit() {
+  const router = useRouter();
+  const questionId = parseInt(router.query.id as string);
 
-const CreatePage: NextPageWithLayout = () => {
+  const { data, isLoading, isError, error } = useFetchData<Question>({
+    queryKey: [`questions.question-bank.${questionId}`],
+    endpoint: `/questions/question-bank/${questionId}/`,
+    enabled: !isNaN(questionId),
+  });
+
+  if (isLoading || !data) return <WaitingLoader />;
+  else if (isError) return <div>Error: {error?.message}</div>;
+  else return <EditQuestionForm question={data} />;
+}
+
+function EditQuestionForm({ question }: { question: Question }) {
   const router = useRouter();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const imageUrl = useMemo(
@@ -79,30 +52,37 @@ const CreatePage: NextPageWithLayout = () => {
     [imageFile],
   );
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema), // Integrate zod validation
+  const form = useForm<UpdateQuestion>({
+    resolver: zodResolver(createQuestionSchema),
     defaultValues: {
-      questionName: "",
-      question: "",
-      answer: "",
-      solution: "",
-      mark: "",
-      difficulty: "",
-      genre: [],
+      questionName: question.name,
+      question: question.question_text,
+      answer: question.answers?.map((a) => a.value).join(",") || "",
+      solution_text: question.solution_text || "",
+      mark: question.mark.toString(),
+      difficulty: question.diff_level.toString(),
+      genre:
+        question.categories?.map((c) => ({
+          value: c.id.toString(),
+          label: c.genre,
+        })) || [],
     },
   });
 
-  const watchedValues = useWatch<FormValues>({
+  const watchedValues = useWatch<UpdateQuestion>({
     control: form.control,
   });
 
-  const { mutate: createQuestion, isPending: isCreatePending } =
-    usePostMutation<Question>(["question"], "/questions/question-bank/", 1000, {
-      onSuccess: () => {
-        toast.success("Question created successfully!");
-        router.push("/question/");
-      },
-    });
+  const mutationKey = ["question_update", `${question.id}`];
+  const { mutate: updateQuestion, isPending } = usePutMutation({
+    mutationKey: mutationKey,
+    queryKeys: [mutationKey, ["question"]],
+    endpoint: `/questions/question-bank/${question.id}/`,
+    onSuccess: () => {
+      router.reload();
+      toast.success("Question has been updated.");
+    },
+  });
 
   function onImageChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -110,25 +90,25 @@ const CreatePage: NextPageWithLayout = () => {
     setImageFile(file);
   }
 
-  const handleSubmit = (data: FormValues) => {
-    createQuestion({
+  const handleSubmit = (data: UpdateQuestion) => {
+    updateQuestion({
       name: data.questionName,
       category_ids: data.genre.map((g) => parseInt(g.value)),
       is_comp: false,
-      answers: data.answer.split(",").map((num) => Number(num.trim())), // list of numbers
+      answers: data.answer.split(",").map((num) => Number(num.trim())),
       question_text: data.question,
       note: "note",
-      answer_text: data.solution,
+      solution_text: data.solution_text,
       diff_level: parseInt(data.difficulty),
       layout: "layout",
-      mark: parseInt(data.mark, 0),
+      mark: parseInt(data.mark, 10),
       image: null,
     });
   };
 
   return (
     <div className="mx-auto my-4 max-w-3xl rounded-lg bg-gray-50 p-4 shadow-lg">
-      <h1 className="mb-6 text-center text-xl font-bold">Create Question</h1>
+      <h1 className="mb-6 text-center text-xl font-bold">Edit Question</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -201,7 +181,7 @@ const CreatePage: NextPageWithLayout = () => {
 
           {/* Solution */}
           <FormField
-            name="solution"
+            name="solution_text"
             control={form.control}
             render={({ field }) => (
               <FormItem>
@@ -319,7 +299,7 @@ const CreatePage: NextPageWithLayout = () => {
                 questionName: watchedValues.questionName || "",
                 question: watchedValues.question || "",
                 answer: watchedValues.answer || "",
-                solution: watchedValues.solution || "",
+                solution: watchedValues.solution_text || "",
                 mark: watchedValues.mark || "",
               }}
             >
@@ -331,7 +311,7 @@ const CreatePage: NextPageWithLayout = () => {
             <Button
               type="submit"
               variant={"outline"}
-              disabled={isCreatePending}
+              disabled={isPending}
               onClick={() => {
                 handleSubmit;
               }}
@@ -343,10 +323,4 @@ const CreatePage: NextPageWithLayout = () => {
       </Form>
     </div>
   );
-};
-
-CreatePage.getLayout = function getLayout(page) {
-  return <DashboardLayout>{page}</DashboardLayout>;
-};
-
-export default CreatePage;
+}

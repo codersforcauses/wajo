@@ -104,11 +104,7 @@ export function DataGrid({
               className={"divide-gray-200 border-gray-50 text-sm text-black"}
             >
               <TableCell className="w-1/4">{item.id}</TableCell>
-              <TableCell className="w-1/4">
-                {item.first_name
-                  ? `${item.first_name} ${item.last_name}`
-                  : item.username}
-              </TableCell>
+              <TableCell className="w-1/4">{item.username}</TableCell>
               <TableCell className="w-1/4">
                 {item.role == "user" ? "admin" : item.role}
               </TableCell>
