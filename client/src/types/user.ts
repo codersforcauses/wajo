@@ -87,13 +87,14 @@ export interface Teacher extends User {
  * @property {string} name - The name of the school.
  * @property {Date} time_created - The timestamp of when the school was created.
  */
-export interface School {
+export type School = {
   id: number;
   name: string;
   type: string;
   is_country: boolean;
   created_at?: Date; // need from server
-}
+  abbreviation: string;
+};
 
 export interface Teacher {
   id: number;
