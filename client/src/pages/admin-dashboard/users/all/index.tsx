@@ -80,6 +80,7 @@ const UserPage: NextPageWithLayout = () => {
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
+        usersRole="all"
       ></DataGrid>
     </div>
   );

@@ -64,6 +64,8 @@ export interface User {
   password: string;
   role: Role;
   school?: School;
+  student_id?: string;
+  email?: string;
 }
 
 export interface Student extends User {

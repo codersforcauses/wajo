@@ -191,6 +191,11 @@ class StudentSerializer(serializers.ModelSerializer):
         model = Student
         exclude = ['user']
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['role'] = 'student'
+        return representation
+
 
 class TeacherSerializer(serializers.ModelSerializer):
     """
@@ -291,3 +296,8 @@ class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teacher
         exclude = ['user']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['role'] = 'teacher'
+        return representation

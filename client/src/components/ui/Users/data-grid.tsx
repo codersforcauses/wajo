@@ -49,6 +49,7 @@ export function DataGrid({
   datacontext,
   onDataChange,
   changePage,
+  usersRole,
 }: DatagridProps<User>) {
   const [currentPage, setCurrentPage] = useState(1);
   const [paddedData, setPaddedData] = useState<User[]>([]);
@@ -78,42 +79,83 @@ export function DataGrid({
 
   useEffect(() => {
     setCurrentPage(changePage);
+    console.log("datacontext: ", datacontext);
   }, [datacontext]);
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
-    <div>
-      <Table className="w-full border-collapse text-left shadow-md">
-        <TableHeader className="bg-black text-lg font-semibold">
+    <div className="overflow-x-auto">
+      <Table className="min-w-full border-collapse text-left shadow-md">
+        <TableHeader className="w-full bg-black text-lg font-semibold">
           <TableRow className="hover:bg-muted/0">
             <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
               User Id
             </TableHead>
             <TableHead className={commonTableHeadClasses}>User Name</TableHead>
-            <TableHead className={commonTableHeadClasses}>User Role</TableHead>
-            <TableHead className={commonTableHeadClasses}>School</TableHead>
+            <TableHead className={commonTableHeadClasses}>First Name</TableHead>
+            <TableHead className={commonTableHeadClasses}>Last Name</TableHead>
+            {usersRole == "all" && (
+              <TableHead className={commonTableHeadClasses}>
+                User Role
+              </TableHead>
+            )}
+            {usersRole != "admin" && (
+              <TableHead className={commonTableHeadClasses}>School</TableHead>
+            )}
+            {usersRole != "student" && usersRole != "all" && (
+              <TableHead className={commonTableHeadClasses}>Email</TableHead>
+            )}
             <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
               Actions
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className="w-full">
           {paddedData.map((item, index) => (
             <TableRow
               key={index}
               className={"divide-gray-200 border-gray-50 text-sm text-black"}
             >
               <TableCell className="w-1/4">{item.id}</TableCell>
-              <TableCell className="w-1/4">{item.username}</TableCell>
-              <TableCell className="w-1/4">
-                {item.role == "user" ? "admin" : item.role}
-              </TableCell>
-              {item.school ? (
-                <TableCell className="w-1/4">{item.school.name}</TableCell>
-              ) : item.id ? (
-                <TableCell className="w-1/4">N/A</TableCell>
-              ) : (
-                <TableCell className="w-1/4"></TableCell>
+              {
+                <TableCell className="w-1/4">
+                  {!item.id
+                    ? ""
+                    : item.username
+                      ? item.username
+                      : item.student_id
+                        ? item.student_id
+                        : "-"}
+                </TableCell>
+              }
+              {
+                <TableCell className="w-1/4">
+                  {!item.id ? "" : item.first_name ? item.first_name : "-"}
+                </TableCell>
+              }
+              {
+                <TableCell className="w-1/4">
+                  {!item.id ? "" : item.last_name ? item.last_name : "-"}
+                </TableCell>
+              }
+              {usersRole == "all" && (
+                <TableCell className="w-1/4">
+                  {item.role == "user" ? "admin" : item.role}
+                </TableCell>
+              )}
+              {usersRole != "admin" && item.id && (
+                <TableCell className="w-1/4">
+                  {item.school?.name ? item.school.name : "-"}
+                </TableCell>
+              )}
+              {usersRole != "student" && usersRole != "all" && item.id && (
+                <TableCell className="w-1/4">
+                  {item.email
+                    ? item.email
+                    : usersRole == "teacher"
+                      ? item.email
+                      : "-"}
+                </TableCell>
               )}
               <TableCell className="flex py-4">
                 <div className={cn("flex", { invisible: !item.id })}>

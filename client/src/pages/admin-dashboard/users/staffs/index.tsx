@@ -64,6 +64,7 @@ const StaffsPage: NextPageWithLayout = () => {
 
   return (
     <div className="m-4 space-y-4">
+      <h1 className="pt-1 text-center text-2xl font-semibold">Staff Users</h1>
       <div className="flex justify-between">
         <SearchInput
           label=""
@@ -72,7 +73,7 @@ const StaffsPage: NextPageWithLayout = () => {
           onSearch={handleFilterChange}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"staffs/create_staffs"}>Create a Saff user</Link>
+          <Link href={"staffs/create_staffs"}>Create a Staff user</Link>
         </Button>
       </div>
 
@@ -80,6 +81,7 @@ const StaffsPage: NextPageWithLayout = () => {
         datacontext={filteredData}
         onDataChange={setFilteredData}
         changePage={page}
+        usersRole="admin"
       ></DataGrid>
     </div>
   );

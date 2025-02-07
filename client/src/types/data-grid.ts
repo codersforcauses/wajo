@@ -20,6 +20,7 @@ export interface DatagridProps<T> {
   datacontext: T[];
   onDataChange: (updatedData: T[]) => void;
   changePage: number;
+  usersRole?: "student" | "teacher" | "admin" | "all";
 }
 
 /**
