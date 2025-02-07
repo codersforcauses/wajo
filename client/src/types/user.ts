@@ -49,8 +49,15 @@ export interface User {
 
 export interface Student {
   id: number;
-  name: string;
+  first_name: string;
+  last_name: string;
+  student_id: string;
   year_level: number;
+  school: School;
+  quiz_attempts: number[];
+  attendent_year: number;
+  created_at: Date;
+  extenstion_time: number;
 }
 
 /**
@@ -120,6 +127,23 @@ export const createUserSchema = loginSchema.extend({
   email: z.string().email("Invalid email address").optional(),
 });
 
+export const updateStudentSchema = loginSchema.extend({
+  first_name: z.string().min(1, "Required"),
+  last_name: z.string().min(1, "Required"),
+  year_level: z
+    .number({ invalid_type_error: "Year Level must be a number" })
+    .min(0, "Year must be at least 0")
+    .max(60, "Year at most 60"),
+
+  school_id: z.number({ invalid_type_error: "Required" }),
+  attendent_year: z
+    .number({ invalid_type_error: "Required" })
+    .refine((val) => val >= 1000 && val <= 9999, {
+      message: "Year must be a 4-digit number",
+    })
+    .default(new Date().getFullYear()),
+  extension_time: z.number({ invalid_type_error: "Required" }).default(0),
+});
 /**
  * A Zod schema for validating the creation of a school.
  *

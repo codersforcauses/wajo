@@ -1,4 +1,4 @@
-import { ChevronRight, LogOut } from "lucide-react";
+import { ChevronRight, Command, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -163,7 +163,13 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <SidebarGroupLabel>Ctrl/Cmd + b to hide me</SidebarGroupLabel>
+        <SidebarGroupLabel>
+          Ctrl /
+          <span className="mx-1 font-bold">
+            <Command size={12} />
+          </span>{" "}
+          + b to hide me
+        </SidebarGroupLabel>
       </SidebarFooter>
       {/* <SidebarRail /> */}
     </Sidebar>

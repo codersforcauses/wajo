@@ -1,8 +1,7 @@
-import { Ghost } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
+import { WaitingLoader } from "@/components/ui/loading";
 import Sponsor from "@/components/ui/sponsor";
 import { usePings } from "@/hooks/pings";
 
@@ -10,10 +9,10 @@ import { Button } from "../components/ui/button";
 
 export default function Home() {
   const [Loading, setLoading] = useState(true);
-  const [clicked, setClicked] = useState(false);
-  const { data, isLoading } = usePings({
-    enabled: clicked,
-  });
+  // const [clicked, setClicked] = useState(false);
+  // const { data, isLoading } = usePings({
+  //   enabled: clicked,
+  // });
   const router = useRouter();
 
   useEffect(() => {
@@ -26,16 +25,17 @@ export default function Home() {
   }, []);
 
   if (Loading) {
-    return (
-      <div className="font-urbanist flex min-h-screen flex-col items-center gap-4">
-        <Button onClick={() => setClicked(true)}>
-          {isLoading ? "Loading" : "Ping"}
-        </Button>
-        <p>
-          Response from server: <span>{data as string}</span>
-        </p>
-      </div>
-    );
+    return <WaitingLoader />;
+    // return (
+    //   <div className="font-urbanist flex min-h-screen flex-col items-center gap-4">
+    //     <Button onClick={() => setClicked(true)}>
+    //       {isLoading ? "Loading" : "Ping"}
+    //     </Button>
+    //     <p>
+    //       Response from server: <span>{data as string}</span>
+    //     </p>
+    //   </div>
+    // );
   }
 
   return (

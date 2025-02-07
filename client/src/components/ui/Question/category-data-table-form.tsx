@@ -62,7 +62,7 @@ export function CategoryDataTableForm() {
   );
 
   const onSubmit = (data: { categories: Category[] }) => {
-    createTeam({ ...data.categories });
+    createTeam([...data.categories]);
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";

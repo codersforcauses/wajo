@@ -27,6 +27,7 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     queryset = Quiz.objects.all()
     serializer_class = AdminQuizSerializer
     status = serializers.IntegerField(default=0, required=False)
+    search_fields = ['name']
 
     @action(detail=True, methods=['get', 'post'])
     def slots(self, request, pk=None):

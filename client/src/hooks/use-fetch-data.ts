@@ -5,7 +5,9 @@ import {
 } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 
+import { PaginationSearchParams } from "@/components/ui/pagination";
 import api from "@/lib/api";
+import { OrderingItem, orderingToString } from "@/types/data-grid";
 
 /**
  * The configuration object used by the `useFetchData` hook to make API requests.
@@ -58,3 +60,42 @@ export const useFetchData = <TData, TError = AxiosError>({
     ...options,
   });
 };
+
+interface FetchTableDataOptions<T> {
+  queryKey: string[];
+  endpoint: string;
+  searchParams: PaginationSearchParams;
+  pageSize?: number;
+}
+
+export function useFetchDataTable<T>({
+  queryKey,
+  endpoint,
+  searchParams,
+}: FetchTableDataOptions<T>) {
+  // Format sorting for Django's ordering format
+  // https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter
+  const { search, ordering, nrows, page } = searchParams;
+  const offset = (page - 1) * nrows;
+
+  const { data, isLoading, error } = useQuery<{
+    results: T[];
+    count: number;
+  }>({
+    queryKey: [endpoint, offset, queryKey, page, nrows, ordering, search],
+    queryFn: async () => {
+      const response = await api.get(endpoint, {
+        params: {
+          limit: nrows,
+          offset,
+          ...(ordering ? { ordering } : {}),
+          ...(search ? { search } : {}), // Include only if exists
+        },
+      });
+      return response.data;
+    },
+  });
+
+  const totalPages = data ? Math.ceil(data.count / nrows) : 1;
+  return { data: data?.results, isLoading, error, totalPages };
+}

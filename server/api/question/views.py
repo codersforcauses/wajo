@@ -102,14 +102,18 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by("id")
     serializer_class = CategorySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    search_fields = ['name']
+    search_fields = ['genre']
 
     def create(self, request, *args, **kwargs):
-        # validate integrity of genre
-        genre = request.data.get('genre')
-        if Category.objects.filter(genre=genre).exists():
-            return Response({'error': 'Category with this genre already exists'}, status=status.HTTP_400_BAD_REQUEST)
-        return super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # # validate integrity of genre
+        # genre = request.data.get('genre')
+        # if Category.objects.filter(genre=genre).exists():
+        #     return Response({'error': 'Category with this genre already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        # return super().create(request, *args, **kwargs)
 
 
 class AnswerViewSet(viewsets.ModelViewSet):

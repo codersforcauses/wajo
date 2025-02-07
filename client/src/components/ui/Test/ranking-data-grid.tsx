@@ -36,78 +36,65 @@ import { Ranking } from "@/types/leaderboard";
  */
 export function RankingDataGrid({
   datacontext,
-  onDataChange,
-  changePage,
+  onOrderingChange = () => {},
 }: DatagridProps<Ranking>) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<Ranking[]>([]);
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(datacontext.length / itemsPerPage);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  useEffect(() => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = datacontext.slice(indexOfFirstItem, indexOfLastItem);
-
-    const updatedPaddedData = [...currentData];
-    while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as Ranking);
-    }
-
-    setPaddedData(updatedPaddedData);
-  }, [datacontext, currentPage]);
-
-  useEffect(() => {
-    setCurrentPage(changePage);
-  }, [datacontext]);
-
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
-    <div>
-      <Table className="w-full border-collapse text-left shadow-md">
-        <TableHeader className="bg-black text-lg font-semibold">
-          <TableRow className="hover:bg-muted/0">
-            <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
-              Student Name
-            </TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Team</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>School</TableHead>
-            <TableHead className={cn(commonTableHeadClasses, "text-center")}>
-              Marks
-            </TableHead>
-            <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
-              Response Time
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paddedData.map((item, index) => (
-            <TableRow
-              key={index}
-              className={"divide-gray-200 border-gray-50 text-sm text-black"}
-            >
-              <TableCell className="w-1/4">{item.student_name}</TableCell>
-              <TableCell className="w-1/4">{item.team}</TableCell>
-              <TableCell className="w-1/5">{item.school}</TableCell>
-              <TableCell className="w-1/6 text-center">{item.marks}</TableCell>
-              <TableCell className="">{item.response_time}</TableCell>
+    <div className="grid">
+      <div className="overflow-hidden rounded-lg border">
+        <Table className="w-full border-collapse text-left shadow-md">
+          <TableHeader className="bg-black text-lg font-semibold">
+            <TableRow className="hover:bg-muted/0">
+              <TableHead
+                className={cn(commonTableHeadClasses, "rounded-tl-lg")}
+              >
+                Student Name
+              </TableHead>
+              <TableHead className={cn(commonTableHeadClasses)}>Team</TableHead>
+              <TableHead className={cn(commonTableHeadClasses)}>
+                School
+              </TableHead>
+              <TableHead className={cn(commonTableHeadClasses, "text-center")}>
+                Marks
+              </TableHead>
+              <TableHead
+                className={cn(commonTableHeadClasses, "rounded-tr-lg")}
+              >
+                Response Time
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={(page: number) => handlePageChange(page)}
-        className="mr-20 mt-5 flex justify-end"
-      />
+          </TableHeader>
+          <TableBody>
+            {datacontext.length > 0 ? (
+              datacontext.map((item, index) => (
+                <TableRow
+                  key={index}
+                  className={
+                    "divide-gray-200 border-gray-50 text-sm text-black"
+                  }
+                >
+                  <TableCell className="w-1/4">{item.student_name}</TableCell>
+                  <TableCell className="w-1/4">{item.team}</TableCell>
+                  <TableCell className="w-1/5">{item.school}</TableCell>
+                  <TableCell className="w-1/6 text-center">
+                    {item.marks}
+                  </TableCell>
+                  <TableCell className="">{item.response_time}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="py-4 text-center text-gray-500"
+                >
+                  No Results Found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

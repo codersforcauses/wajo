@@ -153,8 +153,10 @@ export interface PreviewModalProps {
 }
 
 export interface DeleteModalProps {
+  baseUrl: string;
+  id: number;
+  entity: string;
   children: ReactNode;
-  data: Question;
 }
 
 export const createCategorySchema = z.object({

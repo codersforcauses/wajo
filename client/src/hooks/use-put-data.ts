@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 import api from "@/lib/api";
 
-interface UsePutMutationOptions<
+interface UseUpdateMutationOptions<
   TData,
   TVariables,
   TError = AxiosError<{ error: string; message: string }>,
@@ -70,7 +70,7 @@ export const usePutMutation = <
   endpoint,
   timeout = 10000,
   ...args
-}: UsePutMutationOptions<TData, TVariables, TError>): UseMutationResult<
+}: UseUpdateMutationOptions<TData, TVariables, TError>): UseMutationResult<
   TData,
   TError,
   TVariables
@@ -93,5 +93,94 @@ export const usePutMutation = <
       if (args?.onSuccess) args.onSuccess(data, details, context);
     },
     ...args, // Spread additional mutation options
+  });
+};
+
+export const usePatchMutation = <
+  TData,
+  TVariables = unknown,
+  TError = AxiosError<{ error: string; message: string }>,
+>({
+  mutationKey,
+  queryKeys,
+  endpoint,
+  timeout = 10000,
+  ...args
+}: UseUpdateMutationOptions<TData, TVariables, TError>): UseMutationResult<
+  TData,
+  TError,
+  TVariables
+> => {
+  const queryClient = useQueryClient();
+  return useMutation<TData, TError, TVariables>({
+    mutationKey,
+    mutationFn: (variables: TVariables) =>
+      api.patch(endpoint, variables, { timeout }),
+    onError: (error: TError) => {
+      if (axios.isAxiosError(error) && error.response?.data) {
+        const { message, error: detailedError } = error.response.data;
+        toast.error(detailedError || message || "Something went wrong");
+      }
+    },
+    onSuccess: (data, details, context) => {
+      queryKeys.forEach((queryKey) =>
+        queryClient.invalidateQueries({ queryKey }),
+      );
+      if (args?.onSuccess) args.onSuccess(data, details, context);
+    },
+    ...args, // Spread additional mutation options
+  });
+};
+
+interface useDynamicMutationOptions<
+  TData,
+  TVariables,
+  TError = AxiosError<{ error: string; message: string }>,
+> extends Omit<
+    UseMutationOptions<TData, TError, TVariables>,
+    "mutationKey" | "mutationFn"
+  > {
+  baseUrl: string;
+  mutationKey: string[];
+  queryKeys: Array<string | number>[];
+  timeout?: number;
+}
+
+export const useDynamicPatchMutation = <
+  TData,
+  TVariables extends { id: number; data: any },
+  TError = AxiosError<{ error: string; message: string }>,
+>({
+  baseUrl,
+  mutationKey,
+  queryKeys = [],
+  timeout = 10000,
+  ...args
+}: useDynamicMutationOptions<TData, TVariables, TError>): UseMutationResult<
+  TData,
+  TError,
+  TVariables
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation<TData, TError, TVariables>({
+    ...args,
+    mutationKey,
+    mutationFn: ({ id, data }: TVariables) => {
+      return api.patch(`${baseUrl}/${id}/`, data, { timeout });
+    },
+    onError: (error: TError) => {
+      if (axios.isAxiosError(error) && error.response?.data) {
+        const { message, error: detailedError } = error.response.data;
+        toast.error(detailedError || message || "Something went wrong");
+      }
+    },
+    onSuccess: (data, variables, context) => {
+      queryKeys.forEach((queryKey) => {
+        queryClient.invalidateQueries({ queryKey });
+      });
+
+      if (args?.onSuccess) args.onSuccess(data, variables, context);
+    },
   });
 };
