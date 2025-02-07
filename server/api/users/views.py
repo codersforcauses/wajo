@@ -8,6 +8,9 @@ from django.contrib.auth.models import User
 from .models import Student, Teacher, School
 from .serializers import StudentSerializer, SchoolSerializer, TeacherSerializer, UserSerializer
 from django_filters.rest_framework import DjangoFilterBackend
+# import logging
+
+# logger = logging.getLogger(__name__)
 
 
 @permission_classes([IsAdminUser])
@@ -42,6 +45,10 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
     def get_queryset(self):
+        # logger.debug("Fetching users from the db")
+        # users = self.queryset
+
+        # logger.debug(f"Users: {users}")
         return self.queryset
 
 

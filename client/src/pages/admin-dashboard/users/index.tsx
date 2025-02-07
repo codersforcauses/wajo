@@ -16,6 +16,7 @@ const UserPage: NextPageWithLayout = () => {
     isLoading: isUsersLoading,
     isError: isUsersError,
     error: usersError,
+    fetchStatus,
   } = useFetchData<User[]>({
     queryKey: ["users"],
     endpoint: "/users/users/",
@@ -30,6 +31,10 @@ const UserPage: NextPageWithLayout = () => {
       setFilteredData(users);
     }
   }, [users]);
+
+  useEffect(() => {
+    console.log("fetchStatus: ", fetchStatus);
+  }, [fetchStatus]);
 
   const handleFilterChange = (value: string) => {
     if (!users) return;

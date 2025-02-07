@@ -10,10 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useFetchData } from "@/hooks/use-fetch-data";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
-import { School } from "@/types/school";
 import { User } from "@/types/user";
 
 /**
