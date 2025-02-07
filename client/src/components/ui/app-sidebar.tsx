@@ -149,6 +149,36 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
                               <span>{item.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
+                          {item.items && item.items.length > 0 && (
+                            <SidebarMenuSub>
+                              {item.items.map((subitem) => (
+                                <SidebarMenuSubItem key={subitem.title}>
+                                  <SidebarMenuSubButton
+                                    asChild
+                                    isActive={subitem.isActive}
+                                    className="hover:bg-yellow data-[active=true]:bg-yellow"
+                                    onClick={() =>
+                                      handleMenuToggle(section.title)
+                                    }
+                                  >
+                                    <Link
+                                      href={subitem.url}
+                                      target={
+                                        subitem.isNewTab ? "_blank" : "_self"
+                                      }
+                                      rel={
+                                        subitem.isNewTab
+                                          ? "noopener noreferrer"
+                                          : ""
+                                      } // add security for _blank only
+                                    >
+                                      <span>{subitem.title}</span>
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              ))}
+                            </SidebarMenuSub>
+                          )}
                         </SidebarMenuSubItem>
                       ))}
                     </SidebarMenuSub>

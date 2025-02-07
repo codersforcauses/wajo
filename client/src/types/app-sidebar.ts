@@ -13,6 +13,7 @@ interface MenuItem {
   url: string; // need to be unique
   isActive?: boolean;
   isNewTab?: boolean;
+  items?: MenuItem[]; // nested menu items
 }
 
 interface MenuSection {
@@ -63,7 +64,16 @@ export const navData: NavigationData = {
       icon: UserRoundCog,
       items: [
         { title: "Schools", url: "/admin-dashboard/users/school" },
-        { title: "Users", url: "/admin-dashboard/users" },
+        {
+          title: "Users",
+          url: "/admin-dashboard/users",
+          items: [
+            { title: "All Users", url: "/admin-dashboard/users/all" },
+            { title: "Teachers", url: "/admin-dashboard/users/teachers" },
+            { title: "Students", url: "/admin-dashboard/users/students" },
+            { title: "Staff", url: "/admin-dashboard/users/staffs" },
+          ],
+        },
         { title: "Teams", url: "/admin-dashboard/users/team" },
         { title: "Admin Portal", url: `${backendURL}admin`, isNewTab: true },
       ],

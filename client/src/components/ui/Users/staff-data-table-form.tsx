@@ -24,22 +24,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SelectSchool } from "@/components/ui/Users/select-school";
-import SelectYearLevel from "@/components/ui/Users/select-year";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { cn } from "@/lib/utils";
-import { createStudentSchema } from "@/types/user";
+import { createUserSchema } from "@/types/user";
 
-type Student = z.infer<typeof createStudentSchema>;
+type User = z.infer<typeof createUserSchema>;
 
 /**
- * Renders a data table form for managing student information with a dynamic table structure.
+ * Renders a data table form for managing staff information with a dynamic table structure.
  *
- * The `StudentDataTableForm` component allows users to add, and delete rows of student data.
+ * The `StaffDataTableForm` component allows users to add, and delete rows of staff data.
  * It uses `react-hook-form` with Zod schema validation to manage and validate the form state.
  * Each row includes fields for `Firstname`, `Lastname`, `Password`, `School` and `Year level`.
  *
- * @function StudentDataTableForm
+ * @function StaffDataTableForm
  *
  * @description
  * The component utilizes the following libraries and components:
@@ -47,56 +45,52 @@ type Student = z.infer<typeof createStudentSchema>;
  * - `zod` for schema validation.
  *
  * Features:
- * - Dynamically adds or removes rows with student data.
+ * - Dynamically adds or removes rows with staff data.
  * - Provides validation for all input fields.
- * - Submits the collected data as an array of students.
+ * - Submits the collected data as an array of staffs.
  *
  * Additional Reference:
  * - {@link https://react-hook-form.com/docs/usefieldarray React Hook Form: useFieldArray}
  */
-export function StudentDataTableForm() {
+export function StaffDataTableForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { mutateAsync: postStudents, isPending } = usePostMutation<Student[]>(
-    ["students", "users"],
-    "/users/students/",
+  const { mutateAsync: postStaffs, isPending } = usePostMutation<User[]>(
+    ["postStaffs"],
+    "/users/staffs/",
     20000,
   );
 
-  const defaultStudent: Student = {
+  const defaultStaff: User = {
     first_name: "",
     last_name: "",
     password: "",
-    year_level: 7,
-    attendent_year: new Date().getFullYear(),
-    school_id: 0,
-    extension_time: 0,
   };
 
-  const createStudentForm = useForm<{
-    students: Student[];
+  const createStaffForm = useForm<{
+    staffs: User[];
   }>({
-    resolver: zodResolver(z.object({ students: z.array(createStudentSchema) })),
-    defaultValues: { students: [defaultStudent] },
+    resolver: zodResolver(z.object({ staffs: z.array(createUserSchema) })),
+    defaultValues: { staffs: [defaultStaff] },
   });
 
   const { fields, append, remove } = useFieldArray({
-    control: createStudentForm.control,
-    name: "students",
+    control: createStaffForm.control,
+    name: "staffs",
   });
 
-  const onSubmit = async (data: { students: Student[] }) => {
+  const onSubmit = async (data: { staffs: User[] }) => {
     console.log("inside onSubmit", data);
-    await postStudents(data.students, {
+    await postStaffs(data.staffs, {
       onSuccess: (response) => {
         queryClient.invalidateQueries();
-        toast.success("Students created successfully");
+        toast.success("Staffs created successfully");
         console.log("Response:", response);
-        router.push("/admin-dashboard/users/students");
+        router.push("/admin-dashboard/users/staffs");
       },
       onError: (error) => {
-        toast.error("Failed to create students");
-        console.error("Error creating students", error);
+        toast.error("Failed to create staffs");
+        console.error("Error creating staffs", error);
       },
     });
   };
@@ -104,10 +98,10 @@ export function StudentDataTableForm() {
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
     <div className="space-y-4 p-4">
-      <Form {...createStudentForm}>
+      <Form {...createStaffForm}>
         <form
           id="create_user_form"
-          onSubmit={createStudentForm.handleSubmit(onSubmit)}
+          onSubmit={createStaffForm.handleSubmit(onSubmit)}
           className="space-y-4"
         >
           <Table className="w-full border-collapse text-left shadow-md">
@@ -135,13 +129,6 @@ export function StudentDataTableForm() {
                     Minimum 8 characters with letters, numbers, and symbols
                   </FormDescription>
                 </TableHead>
-
-                <TableHead className={commonTableHeadClasses}>
-                  School*
-                </TableHead>
-                <TableHead className={commonTableHeadClasses}>
-                  Year level*
-                </TableHead>
                 <TableHead
                   className={cn(commonTableHeadClasses, "rounded-tr-lg", "w-0")}
                 ></TableHead>
@@ -163,8 +150,8 @@ export function StudentDataTableForm() {
                   {/* Firstname Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createStudentForm.control}
-                      name={`students.${index}.first_name`}
+                      control={createStaffForm.control}
+                      name={`staffs.${index}.first_name`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
@@ -179,8 +166,8 @@ export function StudentDataTableForm() {
                   {/* Lastname Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createStudentForm.control}
-                      name={`students.${index}.last_name`}
+                      control={createStaffForm.control}
+                      name={`staffs.${index}.last_name`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
@@ -195,50 +182,12 @@ export function StudentDataTableForm() {
                   {/* Password Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createStudentForm.control}
-                      name={`students.${index}.password`}
+                      control={createStaffForm.control}
+                      name={`staffs.${index}.password`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
                             <Input {...field} placeholder="Enter password" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell>
-
-                  {/* School Field */}
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createStudentForm.control}
-                      name={`students.${index}.school_id`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                          <FormControl>
-                            <SelectSchool
-                              selectedId={field.value}
-                              onChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell>
-
-                  {/* Year level Field */}
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createStudentForm.control}
-                      name={`students.${index}.year_level`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                          <FormControl>
-                            <SelectYearLevel
-                              selectedId={Number(field.value)}
-                              onChange={field.onChange}
-                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -264,7 +213,7 @@ export function StudentDataTableForm() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => append(defaultStudent)}
+              onClick={() => append(defaultStaff)}
             >
               Add Row
             </Button>
