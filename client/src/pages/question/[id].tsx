@@ -249,9 +249,7 @@ function EditQuestionForm({ question }: { question: Question }) {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Category <span className="text-red-500">*</span>
-                  </FormLabel>
+                  <FormLabel>Category</FormLabel>
                   <FormControl>
                     <MultipleSelectCategory
                       value={field.value}

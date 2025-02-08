@@ -224,9 +224,7 @@ export default function Create() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Category <span className="text-red-500">*</span>
-                  </FormLabel>
+                  <FormLabel>Category</FormLabel>
                   <FormControl>
                     <MultipleSelectCategory
                       value={field.value}
