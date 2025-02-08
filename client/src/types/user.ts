@@ -143,6 +143,7 @@ export const loginSchema = z.object({
  * });
  */
 export const createUserSchema = z.object({
+  username: z.string().optional(),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
   password: z.string().optional(),

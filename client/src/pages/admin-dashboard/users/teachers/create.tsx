@@ -1,11 +1,11 @@
 import DashboardLayout from "@/components/dashboard-layout";
-import { TeacherDataTableForm } from "@/components/ui/Users/teacher-user-data-table-form";
+import { DataTableForm } from "@/components/ui/Users/data-table-form";
 import { NextPageWithLayout } from "@/pages/_app";
 
 const CreatePage: NextPageWithLayout = () => {
   return (
     <div>
-      <TeacherDataTableForm />
+      <DataTableForm />
     </div>
   );
 };
