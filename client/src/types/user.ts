@@ -127,7 +127,7 @@ export const createUserSchema = loginSchema.extend({
   email: z.string().email("Invalid email address").optional(),
 });
 
-export const updateStudentSchema = loginSchema.extend({
+export const updateStudentSchema = z.object({
   first_name: z.string().min(1, "Required"),
   last_name: z.string().min(1, "Required"),
   year_level: z
