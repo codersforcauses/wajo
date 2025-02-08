@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard-layout";
-import { TeacherDataTableForm } from "@/components/ui/Users/teacher-data-table-form";
+import { TeacherDataTableForm } from "@/components/ui/Users/teacher-user-data-table-form";
 import { NextPageWithLayout } from "@/pages/_app";
 
 const CreatePage: NextPageWithLayout = () => {
