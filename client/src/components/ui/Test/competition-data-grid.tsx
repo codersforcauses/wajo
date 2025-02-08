@@ -132,23 +132,29 @@ export function CompetitionDataGrid({
                   <TableCell className="sticky right-0 bg-white">
                     <div className="flex w-full justify-between">
                       <Button
-                        className="me-1"
-                        onClick={() =>
-                          router.push(`/test/competition/${item.id}`)
-                        }
-                      >
-                        View
-                      </Button>
-                      <Button
-                        className="me-1"
+                        className={cn(
+                          "me-1",
+                          item.visible
+                            ? "border-red-500 text-red-500 hover:border-red-500"
+                            : "bg-green-500 text-white hover:bg-green-500",
+                        )}
                         onClick={() => onVisible(item.id, !item.visible)}
                         disabled={isPending}
+                        variant={item.visible ? "outline" : "default"}
                       >
                         {isPending
                           ? "Processing..."
                           : item.visible
                             ? "Withdraw"
                             : "Publish"}
+                      </Button>
+                      <Button
+                        className="me-1"
+                        onClick={() =>
+                          router.push(`/test/competition/${item.id}`)
+                        }
+                      >
+                        View
                       </Button>
                       <DeleteModal
                         baseUrl="/quiz/admin-quizzes"
