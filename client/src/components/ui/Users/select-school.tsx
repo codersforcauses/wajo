@@ -102,7 +102,7 @@ export function SelectSchoolType({
 
   return (
     <Select
-      value={selectedType ? selectedType.toString() : ""}
+      value={selectedType ? selectedType.toString() : "Public"}
       onValueChange={onValueChange}
     >
       <SelectTrigger className={cn(className)}>

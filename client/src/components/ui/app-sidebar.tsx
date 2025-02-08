@@ -66,10 +66,21 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
 
     return navData[Role].map((section) => ({
       ...section,
-      isActive: section.items.some((item) => isPathActive(item.url)),
+      isActive:
+        section.items.some((item) => isPathActive(item.url)) ||
+        section.items.some(
+          (item) =>
+            item.items && item.items.some((inner) => isPathActive(inner.url)),
+        ),
       items: section.items.map((item) => ({
         ...item,
         isActive: isPathActive(item.url),
+        items:
+          item.items &&
+          item.items.map((inner) => ({
+            ...inner,
+            isActive: isPathActive(inner.url),
+          })),
       })),
     }));
   }, [Role, router.pathname]);

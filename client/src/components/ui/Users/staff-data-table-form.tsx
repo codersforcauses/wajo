@@ -56,7 +56,7 @@ export function StaffDataTableForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { mutateAsync: postStaffs, isPending } = usePostMutation<User[]>(
-    ["postStaffs"],
+    ["staffs", "users"],
     "/users/staffs/",
     20000,
   );

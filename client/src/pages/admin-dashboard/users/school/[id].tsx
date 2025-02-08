@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -21,11 +22,12 @@ import { WaitingLoader } from "@/components/ui/loading";
 import { SelectSchoolType } from "@/components/ui/Users/select-school";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePutMutation } from "@/hooks/use-put-data";
+import { NextPageWithLayout } from "@/pages/_app";
 import { createSchoolSchema, School } from "@/types/user";
 
 type UpdateSchool = z.infer<typeof createSchoolSchema>;
 
-export default function Edit() {
+const EditPage: NextPageWithLayout = () => {
   const router = useRouter();
   const schoolId = parseInt(router.query.id as string);
 
@@ -38,7 +40,7 @@ export default function Edit() {
   if (isLoading || !data) return <WaitingLoader />;
   else if (isError) return <div>Error: {error?.message}</div>;
   else return <EditSchoolForm school={data} />;
-}
+};
 
 function EditSchoolForm({ school }: { school: School }) {
   const router = useRouter();
@@ -58,7 +60,12 @@ function EditSchoolForm({ school }: { school: School }) {
     resolver: zodResolver(createSchoolSchema),
     defaultValues: {
       name: school.name,
-      type: school.type,
+      type: school.type as
+        | ""
+        | "public"
+        | "independent"
+        | "catholic"
+        | undefined,
       is_country: school.is_country,
       abbreviation: school.abbreviation,
     },
@@ -103,7 +110,12 @@ function EditSchoolForm({ school }: { school: School }) {
                 <FormLabel>Type {requiredStar}</FormLabel>
                 <FormControl>
                   <SelectSchoolType
-                    selectedType={field.value}
+                    selectedType={
+                      typeof field.value === "string" &&
+                      field.value.length === 0
+                        ? field.value
+                        : "Public"
+                    }
                     onChange={field.onChange}
                   />
                 </FormControl>
@@ -160,3 +172,9 @@ function EditSchoolForm({ school }: { school: School }) {
     </Form>
   );
 }
+
+EditPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default EditPage;

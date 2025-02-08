@@ -119,7 +119,7 @@ export function SchoolDataGrid({
                 <div className={cn("flex", { invisible: !item.id })}>
                   <Button
                     className="me-2"
-                    onClick={() => router.push(`/users/school/${item.id}`)}
+                    onClick={() => router.push(`school/${item.id}`)}
                   >
                     View
                   </Button>

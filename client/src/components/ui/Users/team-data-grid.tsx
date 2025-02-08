@@ -64,7 +64,7 @@ export function TeamDataGrid({
   useEffect(() => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = datacontext.slice(indexOfFirstItem, indexOfLastItem);
+    const currentData = datacontext?.slice(indexOfFirstItem, indexOfLastItem);
 
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
@@ -124,7 +124,7 @@ export function TeamDataGrid({
                 <div className={cn("flex", { invisible: !item.id })}>
                   <Button
                     className="me-2"
-                    onClick={() => router.push(`/users/team/${item.id}`)}
+                    onClick={() => router.push(`team/${item.id}`)}
                   >
                     View
                   </Button>

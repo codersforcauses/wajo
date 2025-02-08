@@ -71,9 +71,6 @@ const UserPage: NextPageWithLayout = () => {
           placeholder="Search User"
           onSearch={handleFilterChange}
         />
-        <Button asChild className="mr-6 h-auto">
-          <Link href={"users/create/"}>Create a User</Link>
-        </Button>
       </div>
 
       <DataGrid

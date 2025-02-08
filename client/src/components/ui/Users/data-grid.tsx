@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { useTokenStore } from "@/store/token-store";
 import { DatagridProps } from "@/types/data-grid";
 import { User } from "@/types/user";
 
@@ -55,6 +56,18 @@ export function DataGrid({
   const [paddedData, setPaddedData] = useState<User[]>([]);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
+  const { access } = useTokenStore(); // access the JWT token
+  const [role, setRole] = useState<string | undefined>(undefined);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+
+  useEffect(() => {
+    if (access?.decoded) {
+      const userRole = access.decoded["role"];
+      setRole(userRole);
+    }
+    // wait for auth to be checked before rendering
+    setIsAuthChecked(true);
+  }, [access]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -163,7 +176,9 @@ export function DataGrid({
                   <Button
                     variant={"destructive"}
                     className={cn("", {
-                      invisible: !item.first_name,
+                      invisible:
+                        usersRole === "admin" ||
+                        (usersRole === "all" && item.role === "user"),
                     })}
                   >
                     Delete

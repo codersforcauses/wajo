@@ -73,7 +73,7 @@ const StaffsPage: NextPageWithLayout = () => {
           onSearch={handleFilterChange}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"staffs/create_staffs"}>Create a Staff user</Link>
+          <Link href={"staffs/create"}>Create a Staff user</Link>
         </Button>
       </div>
 
