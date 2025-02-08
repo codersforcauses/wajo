@@ -73,7 +73,7 @@ class SchoolAPITestCase(APITestCase):
         self.client.credentials(
             HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
         response = self.client.post(
-            '/api/users/schools/', self.school_data, format='json')
+            '/api/users/schools/', [self.school_data], format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 

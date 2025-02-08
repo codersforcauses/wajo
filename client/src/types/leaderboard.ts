@@ -17,6 +17,13 @@ import { Student } from "@/types/user";
  *   status: "Active",
  * };
  */
+export interface Leaderboard {
+  // ask: to be discuss
+  id: number;
+  name: string;
+  participant_students: number;
+  participant_teams: number;
+}
 
 export interface IndividualLeaderboard {
   name: string;

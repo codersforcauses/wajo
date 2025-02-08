@@ -1,4 +1,6 @@
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
@@ -10,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useDynamicDeleteMutation } from "@/hooks/use-delete-data";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
 import { School } from "@/types/user";
@@ -29,10 +32,27 @@ export function SchoolDataGrid({
   onDataChange,
   changePage,
 }: DatagridProps<School>) {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [paddedData, setPaddedData] = useState<School[]>([]);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
+
+  const { mutate: deleteSchool, isPending } = useDynamicDeleteMutation({
+    baseUrl: "/users/schools",
+    mutationKey: ["school_delete"],
+    onSuccess: () => {
+      router.reload();
+      toast.success("School has been deleted.");
+    },
+  });
+
+  const onDelete = (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this school?")) {
+      return;
+    }
+    deleteSchool(id);
+  };
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -59,8 +79,8 @@ export function SchoolDataGrid({
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
-    <div>
-      <Table className="w-full border-collapse text-left shadow-md">
+    <div className="flex-grow">
+      <Table className="w-full border-collapse overflow-scroll text-left shadow-md">
         <TableHeader className="bg-black text-lg font-semibold">
           <TableRow className="hover:bg-muted/0">
             <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
@@ -97,8 +117,18 @@ export function SchoolDataGrid({
               </TableCell>
               <TableCell className="flex py-4">
                 <div className={cn("flex", { invisible: !item.id })}>
-                  <Button className="me-2">View</Button>
-                  <Button variant={"destructive"}>Delete</Button>
+                  <Button
+                    className="me-2"
+                    onClick={() => router.push(`/users/school/${item.id}`)}
+                  >
+                    View
+                  </Button>
+                  <Button
+                    variant={"destructive"}
+                    onClick={() => onDelete(item.id)}
+                  >
+                    {isPending ? "Deleting..." : "Delete"}
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>

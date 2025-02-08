@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { QuestionBlockManager } from "@/components/ui/Test/question-block-manager";
 import { SelectHour, SelectMinute } from "@/components/ui/Test/select-time";
 import { Textarea } from "@/components/ui/textarea";
-import { createPracticeSchema } from "@/types/practice";
+import { createPracticeSchema } from "@/types/quiz";
 
 type Practice = z.infer<typeof createPracticeSchema>;
 
