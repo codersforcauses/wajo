@@ -203,14 +203,13 @@ export const createQuestionSchema = z.object({
     .refine((val) => /^[1-9]$|^10$/.test(val), {
       message: "Difficulty must be a number between 1 and 10",
     }),
-  genre: z
-    .array(
-      z.object({
-        value: z.string(),
-        label: z.string(),
-      }),
-    )
-    .min(1, "Genre is required"),
+  genre: z.array(
+    z.object({
+      value: z.string(),
+      label: z.string(),
+    }),
+  ),
+  // .min(1, "Genre is required"),
 });
 
 /**

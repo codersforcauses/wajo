@@ -22,52 +22,9 @@ import PreviewModal from "@/components/ui/Question/preview-modal";
 import { MultipleSelectCategory } from "@/components/ui/Question/select-category";
 import { Textarea } from "@/components/ui/textarea";
 import { usePostMutation } from "@/hooks/use-post-data";
-import { Question } from "@/types/question";
+import { createQuestionSchema, Question } from "@/types/question";
 
-// Define the Zod schema for validation
-const formSchema = z.object({
-  questionName: z.string().min(1, "Question Name is required"),
-  question: z.string().min(1, "Question is required"),
-  answer: z
-    .string()
-    .min(1, "Answer is required")
-    .refine(
-      (val) =>
-        val
-          .split(",")
-          .every(
-            (num) =>
-              /^\d+$/.test(num.trim()) &&
-              +num.trim() >= 0 &&
-              +num.trim() <= 999,
-          ),
-      {
-        message:
-          "Must be an integer from 0-999, use “,” to separate multiple answers",
-      },
-    ),
-  solution: z.string().optional(),
-  mark: z
-    .string()
-    .min(1, "Mark is required")
-    .regex(/^\d+$/, "Mark must be a number"),
-  difficulty: z
-    .string()
-    .min(1, "Difficulty is required")
-    .refine((val) => /^[1-9]$|^10$/.test(val), {
-      message: "Difficulty must be a number between 1 and 10",
-    }),
-  genre: z
-    .array(
-      z.object({
-        value: z.string(),
-        label: z.string(),
-      }),
-    )
-    .min(1, "Genre is required"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof createQuestionSchema>;
 
 export default function Create() {
   const router = useRouter();
@@ -78,12 +35,12 @@ export default function Create() {
   );
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema), // Integrate zod validation
+    resolver: zodResolver(createQuestionSchema), // Integrate zod validation
     defaultValues: {
       questionName: "",
       question: "",
       answer: "",
-      solution: "",
+      solution_text: "",
       mark: "",
       difficulty: "",
       genre: [],
@@ -116,7 +73,7 @@ export default function Create() {
       answers: data.answer.split(",").map((num) => Number(num.trim())), // list of numbers
       question_text: data.question,
       note: "note",
-      answer_text: data.solution,
+      answer_text: data.solution_text,
       diff_level: parseInt(data.difficulty),
       layout: "layout",
       mark: parseInt(data.mark, 0),
@@ -199,14 +156,14 @@ export default function Create() {
 
           {/* Solution */}
           <FormField
-            name="solution"
+            name="solution_text"
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="solution">Solution</FormLabel>
+                <FormLabel htmlFor="solution_text">Solution</FormLabel>
                 <FormControl>
                   <Textarea
-                    id="solution"
+                    id="solution_text"
                     placeholder="Please input solution"
                     {...field}
                   />
@@ -317,7 +274,7 @@ export default function Create() {
                 questionName: watchedValues.questionName || "",
                 question: watchedValues.question || "",
                 answer: watchedValues.answer || "",
-                solution: watchedValues.solution || "",
+                solution: watchedValues.solution_text || "",
                 mark: watchedValues.mark || "",
               }}
             >
