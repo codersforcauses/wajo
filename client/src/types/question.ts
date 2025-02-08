@@ -156,6 +156,11 @@ export interface PreviewModalProps {
   dataContext: PreviewModalDataContext;
 }
 
+export interface DeleteModalProps {
+  children: ReactNode;
+  data: Question;
+}
+
 export const createCategorySchema = z.object({
   genre: z.string().min(1, "Genre is required"),
   info: z.string().min(1, "Info is required"),

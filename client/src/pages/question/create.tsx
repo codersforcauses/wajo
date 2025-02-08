@@ -97,7 +97,7 @@ export default function Create() {
   const { mutate: createQuestion, isPending: isCreatePending } =
     usePostMutation<Question>(["question"], "/questions/question-bank/", 1000, {
       // Ignore this error, response is not a question object?
-      onSuccess: (response) => handleImageUpload(response.data.id),
+      onSuccess: (data) => handleImageUpload(data.id),
     });
 
   const uploadImageMutation = usePostMutation(

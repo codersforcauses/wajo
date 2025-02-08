@@ -63,7 +63,7 @@ export function CategoryDataTableForm() {
 
   // Send each category as separate request
   const onSubmit = (data: { categories: Category[] }) => {
-    data.categories.forEach((category) => createTeam(category));
+    createTeam([...data.categories]);
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
