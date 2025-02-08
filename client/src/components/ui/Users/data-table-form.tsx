@@ -341,7 +341,12 @@ export function DataTableForm() {
               Add Row
             </Button>
             <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={downloadCSV}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={downloadCSV}
+                title="Click to export the user create history from this browser as a CSV file"
+              >
                 Export CSV
               </Button>
               <Button type="submit">Submit</Button>
