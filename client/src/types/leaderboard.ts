@@ -40,6 +40,7 @@ export interface TeamLeaderboard {
   total_marks: number;
   is_country: boolean;
   students: Student[];
+  max_year: number;
 }
 
 export interface Ranking {

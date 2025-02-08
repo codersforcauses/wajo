@@ -23,8 +23,8 @@ import { TeamLeaderboard } from "@/types/leaderboard";
  * @function RankingDataGrid
  * @template T - The type of data being displayed in the grid, in this case, `Ranking`.
  * @param {Object} props - The props object.
- * @param {Ranking[]} props.datacontext - The array of ranking data to be displayed in the grid.
- * @param {function(Ranking[]): void} props.onDataChange - Callback triggered when the data changes.
+ * @param {TeamLeaderboard[]} props.datacontext - The array of ranking data to be displayed in the grid.
+ * @param {function(TeamLeaderboard[]): void} props.onDataChange - Callback triggered when the data changes.
  * @param {number} props.changePage - The page number to navigate to when the data changes.
  *
  * @example
@@ -77,41 +77,67 @@ export function TeamDataGrid({
               School
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>Id</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Total Marks</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Is Country?</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Student 1</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Student 2</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Student 3</TableHead>
-            <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>Student 4</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              Total Marks
+            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              Is Country?
+            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              Max Year
+            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              Student 1
+            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              Student 2
+            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              Student 3
+            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
+              Student 4
+            </TableHead>
           </TableRow>
         </TableHeader>
 
         <TableBody>
-  {paddedData.map((item, index) => {
-    const studentCells = Array(4)
-      .fill(null)
-      .map((_, i) => (
-        <TableCell key={i} className="">
-          {item.students?.[i] ? `${item.students[i].name} (${item.students[i].year_level})` : "-"}
-        </TableCell>
-      ));
+          {paddedData.map((item, index) => {
+            console.log("Item:", item);
+            const studentCells = Array(4)
+              .fill(null)
+              .map((_, i) => (
+                <TableCell key={i} className="">
+                  {item.students?.[i]
+                    ? `${item.students[i].name} (${item.students[i].year_level})`
+                    : ""}
+                </TableCell>
+              ));
 
-    return (
-      <TableRow
-        key={index}
-        className="divide-gray-200 border-gray-50 text-sm text-black"
-      >
-        <TableCell className="w-1/4">{item.school}</TableCell>
-        <TableCell className="w-1/4">{item.id}</TableCell>
-        <TableCell className="text-center">{item.total_marks}</TableCell>
-        <TableCell className="w-1/4">{item.is_country ? "Yes" : "No"}</TableCell>
-        {studentCells}
-      </TableRow>
-    );
-  })}
-</TableBody>
+            return (
+              <TableRow
+                key={index}
+                className="divide-gray-200 border-gray-50 text-sm text-black"
+              >
+                <TableCell className="w-1/4">{item.school}</TableCell>
+                <TableCell className="w-1/4">{item.id}</TableCell>
+                <TableCell className="text-center">
+                  {item.total_marks}
+                </TableCell>
+                <TableCell className="w-1/4">
+                  {item.is_country === true
+                    ? "Yes"
+                    : item.is_country === false
+                      ? "No"
+                      : ""}
+                </TableCell>
+                <TableCell className="text-center">{item.max_year}</TableCell>
 
-
+                {studentCells}
+              </TableRow>
+            );
+          })}
+        </TableBody>
       </Table>
 
       <Pagination

@@ -41,7 +41,10 @@ class IndividualLeaderboardSerializer(serializers.ModelSerializer):
 
 
 class StudentSerializer(serializers.ModelSerializer):
-    name = serializers.StringRelatedField(source="user.username")
+    name = serializers.SerializerMethodField()
+    
+    def get_name(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}".strip()
 
     class Meta:
         model = Student
@@ -60,6 +63,7 @@ class TeamLeaderboardSerializer(serializers.ModelSerializer):
     is_country = serializers.BooleanField(source="school.is_country")
     students = StudentSerializer(many=True)
     total_marks = serializers.IntegerField()
+    max_year = serializers.IntegerField()
 
     class Meta:
         model = Team
@@ -69,6 +73,7 @@ class TeamLeaderboardSerializer(serializers.ModelSerializer):
             "total_marks",
             "is_country",
             "students",
+            "max_year"
         ]
 
     def to_representation(self, instance):

@@ -76,11 +76,19 @@ export function IndividualDataGrid({
             <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
               Student Name
             </TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Year Level</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              Year Level
+            </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>School</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>School Type</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Is Country?</TableHead>
-            <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>Total Marks</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              School Type
+            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              Is Country?
+            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
+              Total Marks
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -89,12 +97,17 @@ export function IndividualDataGrid({
               key={index}
               className={"divide-gray-200 border-gray-50 text-sm text-black"}
             >
-              {/* TODO: student_name, team, marks, and response_time don't correspond to the backend */}
               <TableCell className="w-1/4">{item.name}</TableCell>
               <TableCell className="text-center">{item.year_level}</TableCell>
               <TableCell className="w-1/4">{item.school}</TableCell>
               <TableCell className="w-1/4">{item.school_type}</TableCell>
-              <TableCell className="text-center">{item.is_country ? "Yes" : "No"}</TableCell>
+              <TableCell className="text-center">
+                {item.is_country === true
+                  ? "Yes"
+                  : item.is_country === false
+                    ? "No"
+                    : ""}
+              </TableCell>
               <TableCell className="text-center">{item.total_marks}</TableCell>
             </TableRow>
           ))}
