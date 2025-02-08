@@ -2,7 +2,7 @@ import { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import { createContext, useContext, useEffect } from "react";
 
-import { usePostMutation } from "@/hooks/use-post-data";
+import { usePostLogin } from "@/hooks/use-post-data";
 import { useTokenStore } from "@/store/token-store";
 
 type AuthContextType = {
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const userId = accessToken?.decoded.user_id ?? null;
   const isLoggedIn = userId !== null;
 
-  const { mutateAsync: postLogin } = usePostMutation<
+  const { mutateAsync: postLogin } = usePostLogin<
     AxiosResponse<TokenResponse>,
     { username: string; password: string }
   >(["login"], "/auth/token/", 2000);

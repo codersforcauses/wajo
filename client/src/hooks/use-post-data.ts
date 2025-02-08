@@ -9,6 +9,40 @@ import { toast } from "sonner";
 
 import api from "@/lib/api";
 
+export const usePostLogin = <
+  TData,
+  TVariables = unknown,
+  TError = AxiosError<{ error: string; message: string }>,
+>(
+  mutationKey: string[],
+  endpoint: string,
+  timeout: number = 10000, // Default timeout of 10 seconds
+  args?: Omit<
+    UseMutationOptions<TData, TError, TVariables>,
+    "mutationKey" | "mutationFn"
+  >,
+): UseMutationResult<TData, TError, TVariables> => {
+  const queryClient = useQueryClient();
+
+  return useMutation<TData, TError, TVariables>({
+    ...args,
+    mutationKey,
+    mutationFn: (variables: TVariables) => {
+      return api.post(endpoint, variables, { timeout });
+    },
+    onError: (error: TError) => {
+      if (axios.isAxiosError(error) && error.response?.data) {
+        const { message, error: detailedError } = error.response.data;
+        toast.error(detailedError || message || "Something went wrong");
+      }
+    },
+    onSuccess: (data, details, context) => {
+      queryClient.invalidateQueries({ queryKey: mutationKey });
+      if (args?.onSuccess) args.onSuccess(data, details, context);
+    },
+  });
+};
+
 /**
  * Custom hook for performing a POST request mutation.
  *

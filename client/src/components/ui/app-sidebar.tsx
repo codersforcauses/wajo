@@ -94,6 +94,7 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
               width={100}
               height={100}
               className="cursor-pointer"
+              priority
             />
           </Link>
         </div>
