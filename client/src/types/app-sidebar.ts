@@ -78,12 +78,9 @@ export const navData: NavigationData = {
   ],
   student: [
     {
-      title: "Student Menu",
+      title: "Practice",
       icon: SquareDashedMousePointer,
-      items: [
-        { title: "Student Menu Items 1", url: "#" },
-        { title: "Student Menu Items 2", url: "#" },
-      ],
+      items: [{ title: "Practice Result", url: "/practice/result" }],
     },
   ],
 };
