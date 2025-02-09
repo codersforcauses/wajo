@@ -176,9 +176,9 @@ export function SelectRow({
   );
 }
 
-export interface PaginationSearchParams {
+export type PaginationSearchParams = {
   search?: string;
   ordering?: string;
   nrows: number;
   page: number;
-}
+};

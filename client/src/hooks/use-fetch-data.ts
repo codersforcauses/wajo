@@ -106,21 +106,31 @@ export function useFetchDataTable<T>({
 }: FetchTableDataOptions<T>) {
   // Format sorting for Django's ordering format
   // https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter
-  const { search, ordering, nrows, page } = searchParams;
+  const { search, ordering, nrows, page, ...customParams } = searchParams;
   const offset = (page - 1) * nrows;
 
   const { data, isLoading, error } = useQuery<{
     results: T[];
     count: number;
   }>({
-    queryKey: [endpoint, offset, queryKey, page, nrows, ordering, search],
+    queryKey: [
+      endpoint,
+      offset,
+      queryKey,
+      page,
+      nrows,
+      ordering,
+      search,
+      customParams,
+    ],
     queryFn: async () => {
       const response = await api.get(endpoint, {
         params: {
           limit: nrows,
           offset,
           ...(ordering ? { ordering } : {}),
-          ...(search ? { search } : {}), // Include only if exists
+          ...(search ? { search } : {}), // Include only if exists,
+          ...(customParams ? { ...customParams } : {}),
         },
       });
       return response.data;

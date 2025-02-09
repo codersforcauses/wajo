@@ -12,12 +12,17 @@ import {
 import { SearchInput } from "@/components/ui/search";
 import { CompetitionDataGrid } from "@/components/ui/Test/competition-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
+import { pickKeys } from "@/lib/utils";
 import {
   OrderingItem,
   orderingToString,
   stringToOrdering,
 } from "@/types/data-grid";
-import { AdminQuiz } from "@/types/quiz";
+import { AdminQuiz, QuizStatus } from "@/types/quiz";
+
+type CustomSearchParams = PaginationSearchParams & {
+  status: QuizStatus;
+};
 
 export default function Index() {
   const router = useRouter();
@@ -25,11 +30,16 @@ export default function Index() {
 
   const [orderings, setOrderings] = useState<OrderingItem>({});
 
-  const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
+  const defaultSearchParams: PaginationSearchParams = {
     ordering: orderingToString(orderings),
     search: "",
     nrows: 5,
     page: 1,
+  };
+
+  const [searchParams, setSearchParams] = useState<CustomSearchParams>({
+    status: QuizStatus.Upcoming,
+    ...defaultSearchParams,
   });
 
   const { data, isLoading, error, totalPages } = useFetchDataTable<AdminQuiz>({
@@ -41,6 +51,7 @@ export default function Index() {
   useEffect(() => {
     if (!isLoading) {
       setSearchParams((prev) => ({
+        ...prev,
         ordering: (query.ordering as string) || prev.ordering,
         search: (query.search as string) || prev.search,
         nrows: Number(query.nrows) || prev.nrows,
@@ -50,14 +61,19 @@ export default function Index() {
     }
   }, [query.ordering, query.search, query.nrows, query.page, !isLoading]);
 
-  const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
+  const setAndPush = (newParams: Partial<CustomSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
+
+    const queryParams = pickKeys(
+      updatedParams,
+      ...(Object.keys(defaultSearchParams) as []),
+    );
     push(
       {
         pathname: "/test/competition",
         query: Object.fromEntries(
-          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
+          Object.entries(queryParams).filter(([_, v]) => Boolean(v)),
         ),
       },
       undefined,
