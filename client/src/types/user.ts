@@ -124,6 +124,10 @@ export const loginSchema = z.object({
 export const createUserSchema = loginSchema.extend({
   userRole: RoleEnum,
   school_id: z.number({ message: "Required" }),
+
+  //Test use to give school as optional
+  // school_id: z.number().optional(),
+
   email: z.string().email("Invalid email address").optional(),
 });
 
