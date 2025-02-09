@@ -260,8 +260,7 @@ function UpdatePracticeQuestionBlocksForm({
   });
 
   const onSubmit = (data: UpdatePracticeSlots) => {
-    console.log(mapBlocksToSlots(data.blocks, adminQuizId));
-    // createSlots([...mapBlocksToSlots(data.blocks, adminQuizId)]);
+    createSlots([...mapBlocksToSlots(data.blocks, adminQuizId)]);
   };
 
   return (

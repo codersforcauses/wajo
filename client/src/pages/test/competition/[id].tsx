@@ -285,8 +285,7 @@ function UpdateCompetitionQuestionBlocksForm({
   });
 
   const onSubmit = (data: UpdateCompetitionSlots) => {
-    console.log(mapBlocksToSlots(data.blocks, adminQuizId));
-    // createSlots([...mapBlocksToSlots(data.blocks, adminQuizId)]);
+    createSlots([...mapBlocksToSlots(data.blocks, adminQuizId)]);
   };
 
   return (
