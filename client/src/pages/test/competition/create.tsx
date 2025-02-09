@@ -39,9 +39,11 @@ export default function Create() {
     "/quiz/admin-quizzes/",
     1000,
     {
-      onSuccess: (data) => {
-        toast.success("Competition created successfully!");
-        router.push(`/test/competition/${data.id}`);
+      onSuccess: (res) => {
+        toast.success(
+          "Competition created successfully! Questions blocks input available below.",
+        );
+        router.push(`/test/competition/${res.data.id}`);
       },
     },
   );
@@ -54,6 +56,7 @@ export default function Create() {
       open_time_date: data.open_time_date,
       time_limit: data.time_limit,
       time_window: data.time_window,
+      status: 1,
     });
   };
 
@@ -134,7 +137,7 @@ export default function Create() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Time Limit {requiredStar}</FormLabel>
+                    <FormLabel>Time Limit</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -157,12 +160,12 @@ export default function Create() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="mt-2 flex flex-col gap-1.5">
-                    <FormLabel>Time Window {requiredStar}</FormLabel>
+                    <FormLabel>Time Window</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
-                        placeholder="Please input time limit"
+                        placeholder="Please input time window"
                         onChange={(e) =>
                           field.onChange(Number(e.target.value) || 0)
                         } // Convert to number

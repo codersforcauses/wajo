@@ -23,10 +23,12 @@ import {
   DateTimePickerFormat,
 } from "@/components/ui/time-picker/date-time-picker";
 import { useFetchData } from "@/hooks/use-fetch-data";
+import { usePostMutation } from "@/hooks/use-post-data";
 import { usePatchMutation } from "@/hooks/use-put-data";
 import {
   AdminQuiz,
   AdminQuizSlot,
+  AdminQuizSlotRequest,
   createSlotsSchema,
   genericCreateTestSchema,
   mapBlocksToSlots,
@@ -182,7 +184,7 @@ function UpdateCompetitionForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Time Limit {requiredStar}</FormLabel>
+                    <FormLabel>Time Limit</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -205,12 +207,12 @@ function UpdateCompetitionForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="mt-2 flex flex-col gap-1.5">
-                    <FormLabel>Time Window {requiredStar}</FormLabel>
+                    <FormLabel>Time Window</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
-                        placeholder="Please input time limit"
+                        placeholder="Please input time window"
                         onChange={(e) =>
                           field.onChange(Number(e.target.value) || 0)
                         } // Convert to number
@@ -239,16 +241,19 @@ function UpdateCompetitionQuestionBlocksForm({
 }) {
   const router = useRouter();
   const adminQuizId = parseInt(router.query.id as string);
-  const mutationKey = ["quiz.admin-quizzes.update.slots", `${adminQuizId}`];
-  const { mutate: updateSlots, isPending } = usePatchMutation({
-    mutationKey: mutationKey,
-    queryKeys: [mutationKey, ["quiz.admin-quizzes.slots"]],
-    endpoint: `/quiz/admin-quizzes/${adminQuizId}/slots/`,
-    onSuccess: () => {
-      toast.success("Competition question blocks created successfully!");
-      router.reload();
-    },
-  });
+
+  const { mutate: createSlots, isPending } =
+    usePostMutation<AdminQuizSlotRequest>(
+      ["quiz.admin-quizzes.competition.slots.create"],
+      `/quiz/admin-quizzes/${adminQuizId}/slots/`,
+      1000,
+      {
+        onSuccess: () => {
+          toast.success("Competition question blocks created successfully!");
+          router.reload();
+        },
+      },
+    );
 
   const form = useForm<UpdateCompetitionSlots>({
     resolver: zodResolver(createSlotsSchema),
@@ -259,15 +264,17 @@ function UpdateCompetitionQuestionBlocksForm({
 
   const onSubmit = (data: UpdateCompetitionSlots) => {
     console.log(mapBlocksToSlots(data.blocks, adminQuizId));
-    // updateSlots([...mapBlocksToSlots(data.blocks, adminQuizId)]);
+    // createSlots([...mapBlocksToSlots(data.blocks, adminQuizId)]);
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <h1 className="my-4 text-center text-xl font-bold">
-          Update Competition Question Block
-        </h1>
+        <div className="mx-auto flex max-w-3xl items-center gap-4 pt-6 font-bold text-gray-400">
+          <hr className="flex-1 border-2 border-gray-200" />
+          Update Competition Question Blocks Below
+          <hr className="flex-1 border-2 border-gray-200" />
+        </div>
         {/* Question Blocks */}
         <div className="mx-auto my-4 max-w-3xl space-y-4 rounded-lg bg-gray-50 p-4 shadow-lg">
           <QuestionBlockManager formControl={form.control} />

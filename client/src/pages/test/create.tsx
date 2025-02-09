@@ -29,26 +29,29 @@ export default function Create() {
   });
 
   const router = useRouter();
-  const { mutate: createCompetition, isPending } = usePostMutation<AdminQuiz>(
+  const { mutate: createPractice, isPending } = usePostMutation<AdminQuiz>(
     ["quiz.admin-quizzes.create"],
     "/quiz/admin-quizzes/",
     1000,
     {
-      onSuccess: (data) => {
-        toast.success("Practice created successfully!");
-        router.push(`/test/${data.id}`);
+      onSuccess: (res) => {
+        toast.success(
+          "Practice created successfully! Questions blocks input available below.",
+        );
+        router.push(`/test/${res.data.id}`);
       },
     },
   );
 
   const onSubmit = (data: CreatePractice) => {
-    createCompetition({
+    createPractice({
       name: data.name,
       intro: data.intro,
       total_marks: data.total_marks,
       open_time_date: data.open_time_date,
       time_limit: data.time_limit,
       time_window: data.time_window,
+      status: 0,
     });
   };
 
@@ -56,10 +59,7 @@ export default function Create() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <h1 className="my-4 text-center text-xl font-bold">
-          Create Competition
-        </h1>
-
+        <h1 className="my-4 text-center text-xl font-bold">Create Practice</h1>
         <div className="mx-auto max-w-3xl space-y-5 rounded-lg bg-gray-50 p-4 shadow-lg">
           <h3 className="-mb-2 text-lg">Basic</h3>
           <div className="flex gap-4">
@@ -129,7 +129,7 @@ export default function Create() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Time Limit {requiredStar}</FormLabel>
+                    <FormLabel>Time Limit</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -152,12 +152,12 @@ export default function Create() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="mt-2 flex flex-col gap-1.5">
-                    <FormLabel>Time Window {requiredStar}</FormLabel>
+                    <FormLabel>Time Window</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
-                        placeholder="Please input time limit"
+                        placeholder="Please input time window"
                         onChange={(e) =>
                           field.onChange(Number(e.target.value) || 0)
                         } // Convert to number

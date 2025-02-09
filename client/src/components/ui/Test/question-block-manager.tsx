@@ -87,9 +87,10 @@ export function QuestionBlockManager({ formControl }: Props) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="-mb-2 text-lg">Question Blocks {requiredStar}</h3>
-          <span className="text-xs text-gray-400">
-            Questions inside a block are randomly sorted.
+          <h3 className="text-lg">Question Blocks {requiredStar}</h3>
+          <span className="flex items-center text-xs text-gray-400">
+            You can sort the Question Blocks and Questions with icon{" "}
+            <AlignJustifyIcon className="ms-1" size={10} />
           </span>
         </div>
         <Button

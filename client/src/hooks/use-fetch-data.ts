@@ -7,7 +7,6 @@ import { AxiosError } from "axios";
 
 import { PaginationSearchParams } from "@/components/ui/pagination";
 import api from "@/lib/api";
-import { OrderingItem, orderingToString } from "@/types/data-grid";
 
 /**
  * The configuration object used by the `useFetchData` hook to make API requests.
@@ -68,6 +67,38 @@ interface FetchTableDataOptions<T> {
   pageSize?: number;
 }
 
+/**
+ * Custom hook for fetching paginated table data using React Query and Axios.
+ *
+ * This hook simplifies API calls for data tables by handling pagination, sorting, and searching.
+ * It follows Django's ordering format and integrates with query parameters for flexible filtering.
+ *
+ * @template T - The expected type of the data items in the response.
+ *
+ * @param {Object} options - The options for fetching table data.
+ * @param {string[]} options.queryKey - A unique key for caching and identifying the query in React Query.
+ * @param {string} options.endpoint - The API endpoint from which data is fetched.
+ * @param {PaginationSearchParams} options.searchParams - The search and pagination parameters.
+ * @param {number} [options.pageSize] - Optional page size (number of rows per page). Defaults to `searchParams.nrows`.
+ *
+ * @example
+ * const { data, isLoading, error, totalPages } = useFetchDataTable<User>({
+ *   queryKey: ["users"],
+ *   endpoint: "/api/users",
+ *   searchParams: { search: "john", ordering: "-created_at", nrows: 10, page: 1 },
+ * });
+ *
+ * if (isLoading) return <WaitingLoader />;
+ * if (error) return error.message;
+ *
+ * return (
+ *   <Table>
+ *     {data?.map((user) => (
+ *       <TableRow key={user.id}>{user.name}</TableRow>
+ *     ))}
+ *   </Table>
+ * );
+ */
 export function useFetchDataTable<T>({
   queryKey,
   endpoint,

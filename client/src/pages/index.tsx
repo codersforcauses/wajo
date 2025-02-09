@@ -1,42 +1,10 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 
-import { WaitingLoader } from "@/components/ui/loading";
+import { Button } from "@/components/ui/button";
 import Sponsor from "@/components/ui/sponsor";
-import { usePings } from "@/hooks/pings";
-
-import { Button } from "../components/ui/button";
 
 export default function Home() {
-  const [Loading, setLoading] = useState(true);
-  // const [clicked, setClicked] = useState(false);
-  // const { data, isLoading } = usePings({
-  //   enabled: clicked,
-  // });
   const router = useRouter();
-
-  useEffect(() => {
-    // Simulate a delay (e.g., data fetching or other asynchronous operation)
-    const timer = setTimeout(() => {
-      setLoading(false); // Set loading to false after the delay
-    }, 2000); // Replace with your actual loading logic
-
-    return () => clearTimeout(timer); // Cleanup the timer
-  }, []);
-
-  if (Loading) {
-    return <WaitingLoader />;
-    // return (
-    //   <div className="font-urbanist flex min-h-screen flex-col items-center gap-4">
-    //     <Button onClick={() => setClicked(true)}>
-    //       {isLoading ? "Loading" : "Ping"}
-    //     </Button>
-    //     <p>
-    //       Response from server: <span>{data as string}</span>
-    //     </p>
-    //   </div>
-    // );
-  }
 
   return (
     <main className="font-urbanist flex min-h-screen flex-col items-center gap-10">

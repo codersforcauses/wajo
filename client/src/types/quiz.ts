@@ -15,6 +15,13 @@ export interface AdminQuiz {
   status: number;
 }
 
+export interface AdminQuizSlotRequest {
+  question_id: number;
+  slot_index: number;
+  block: number;
+  quiz_id: number;
+}
+
 export interface AdminQuizSlot {
   id: number;
   question: Question;
