@@ -22,66 +22,56 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { SelectSchool } from "@/components/ui/Users/select-school";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { cn } from "@/lib/utils";
-import { createTeamSchema } from "@/types/team";
+import { createCategorySchema } from "@/types/question";
 
-type Team = z.infer<typeof createTeamSchema>;
+type Category = z.infer<typeof createCategorySchema>;
 
-/**
- * Renders a data table form for managing team information with dynamic rows.
- *
- * @function TeamDataTableForm
- *
- * @description
- * This component provides a table-based form for managing teams. It allows users to dynamically add, remove, and edit team entries.
- *
- * Similar Implementation:
- * @see [UserDataTableForm](./data-table-form.tsx) for reference.
- */
-export function TeamDataTableForm() {
-  const defaultTeam = {
-    name: "",
-    description: "",
-  } as Team;
+export function CategoryDataTableForm() {
+  const defaultCategory = {
+    genre: "",
+    info: "",
+  } as Category;
 
-  const createTeamForm = useForm<{
-    teams: Team[];
+  const createCategoryForm = useForm<{
+    categories: Category[];
   }>({
-    resolver: zodResolver(z.object({ teams: z.array(createTeamSchema) })),
-    defaultValues: { teams: [defaultTeam] },
+    resolver: zodResolver(
+      z.object({ categories: z.array(createCategorySchema) }),
+    ),
+    defaultValues: { categories: [defaultCategory] },
   });
 
   const { fields, append, remove } = useFieldArray({
-    control: createTeamForm.control,
-    name: "teams",
+    control: createCategoryForm.control,
+    name: "categories",
   });
 
   const router = useRouter();
-  const { mutate: createTeam, isPending } = usePostMutation<Team[]>(
-    ["teams"],
-    "/team/teams/",
+  const { mutate: createTeam, isPending } = usePostMutation<Category[]>(
+    ["categories"],
+    "/questions/categories/",
     1000,
     {
       onSuccess: () => {
         toast.success("Teams created successfully!");
-        router.push("/users/team/");
+        router.push("/question/category/");
       },
     },
   );
 
-  const onSubmit = (data: { teams: Team[] }) => {
-    createTeam({ ...data.teams });
+  const onSubmit = (data: { categories: Category[] }) => {
+    createTeam({ ...data.categories });
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
     <div className="space-y-4 p-4">
-      <Form {...createTeamForm}>
+      <Form {...createCategoryForm}>
         <form
-          id="create_team_form"
-          onSubmit={createTeamForm.handleSubmit(onSubmit)}
+          id="create_category_form"
+          onSubmit={createCategoryForm.handleSubmit(onSubmit)}
           className="space-y-4"
         >
           <Table className="w-full border-collapse text-left shadow-md">
@@ -92,16 +82,11 @@ export function TeamDataTableForm() {
                 >
                   No.
                 </TableHead>
-                <TableHead className={commonTableHeadClasses}>Name*</TableHead>
-                <TableHead className={commonTableHeadClasses}>
-                  Description*
-                </TableHead>
-                <TableHead className={commonTableHeadClasses}>
-                  School*
-                </TableHead>
+                <TableHead className={commonTableHeadClasses}>Genre*</TableHead>
+                <TableHead className={commonTableHeadClasses}>Info*</TableHead>
                 <TableHead
                   className={cn(commonTableHeadClasses, "rounded-tr-lg", "w-0")}
-                ></TableHead>
+                />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -117,15 +102,15 @@ export function TeamDataTableForm() {
                     {index + 1}
                   </TableCell>
 
-                  {/* Name Field */}
+                  {/* Genre */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createTeamForm.control}
-                      name={`teams.${index}.name`}
+                      control={createCategoryForm.control}
+                      name={`categories.${index}.genre`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
-                            <Input {...field} placeholder="Enter team name" />
+                            <Input {...field} placeholder="Enter genre" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -136,34 +121,15 @@ export function TeamDataTableForm() {
                   {/* Description Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createTeamForm.control}
-                      name={`teams.${index}.description`}
+                      control={createCategoryForm.control}
+                      name={`categories.${index}.info`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
                             <Textarea
                               {...field}
                               className="min-h-10"
-                              placeholder="Enter description"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell>
-
-                  {/* School Field */}
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createTeamForm.control}
-                      name={`teams.${index}.school_id`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                          <FormControl>
-                            <SelectSchool
-                              selectedId={field.value}
-                              onChange={field.onChange}
+                              placeholder="Enter info"
                             />
                           </FormControl>
                           <FormMessage />
@@ -190,11 +156,13 @@ export function TeamDataTableForm() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => append(defaultTeam)}
+              onClick={() => append(defaultCategory)}
             >
               Add Row
             </Button>
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isPending}>
+              Submit
+            </Button>
           </div>
         </form>
       </Form>

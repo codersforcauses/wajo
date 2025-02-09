@@ -42,6 +42,7 @@ export const navData: NavigationData = {
       title: "Question Management",
       icon: FileJson,
       items: [
+        { title: "Categories", url: "/question/category" },
         { title: "Create Question", url: "/question/create" },
         { title: "Question Bank", url: "/question" },
       ],

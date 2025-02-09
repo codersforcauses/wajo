@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/table";
 import { SelectSchool } from "@/components/ui/Users/select-school";
 import { cn } from "@/lib/utils";
-import { createUserSchema } from "@/types/user";
+import { createRandomPwd, createUserSchema } from "@/types/user";
 
 type User = z.infer<typeof createUserSchema>;
 
@@ -68,11 +68,85 @@ export function DataTableForm() {
     name: "users",
   });
 
+  // const onSubmit = (data: { users: User[] }) => {
+  //   console.log("Submitted data:", data.users);
+  // };
+
+  // new onsubmit function to save data to localStorage
   const onSubmit = (data: { users: User[] }) => {
-    console.log("Submitted data:", data.users);
+    const previousData = JSON.parse(
+      localStorage.getItem("userRecords") || "[]",
+    );
+
+    const perthTime = new Date().toLocaleString("en-AU", {
+      timeZone: "Australia/Perth",
+    });
+
+    const newRecords = data.users.map((user) => ({
+      username: user.username,
+      password: user.password,
+      role: user.userRole,
+      createdAt: perthTime,
+    }));
+
+    const updatedData = [...previousData, ...newRecords];
+
+    // store in localStorage
+    localStorage.setItem("userRecords", JSON.stringify(updatedData));
+
+    console.log("Submitted and saved to localStorage:", updatedData);
+  };
+
+  // function to download data as CSV from localStorage
+  const downloadCSV = () => {
+    type UserRecord = {
+      username: string;
+      password: string;
+      role: string;
+      createdAt: string;
+    };
+
+    const storedData: UserRecord[] = JSON.parse(
+      localStorage.getItem("userRecords") || "[]",
+    );
+
+    if (storedData.length === 0) {
+      alert("No data available to export.");
+      return;
+    }
+
+    // generate CSV headers
+    const csvHeaders = ["Username", "Password", "Role", "CreatedAt"];
+
+    // generate CSV rows
+    const csvRows = storedData.map((user: UserRecord) => [
+      user.username,
+      user.password,
+      user.role,
+      user.createdAt,
+    ]);
+
+    //  convert data to CSV format
+    const csvContent = [csvHeaders, ...csvRows]
+      .map((row: string[]) =>
+        row.map((value: string) => `"${value}"`).join(","),
+      ) // make sure values are enclosed in double quotes as strings
+      .join("\n");
+
+    //  create a Blob object with the CSV data and download it
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.setAttribute("download", "user_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
+
   return (
     <div className="space-y-4 p-4">
       <Form {...createUserForm}>
@@ -142,7 +216,7 @@ export function DataTableForm() {
                   </TableCell>
 
                   {/* Password Field */}
-                  <TableCell className="align-top">
+                  {/* <TableCell className="align-top">
                     <FormField
                       control={createUserForm.control}
                       name={`users.${index}.password`}
@@ -150,6 +224,39 @@ export function DataTableForm() {
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
                             <Input {...field} placeholder="Enter password" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TableCell> */}
+
+                  <TableCell className="align-top">
+                    <FormField
+                      control={createUserForm.control}
+                      name={`users.${index}.password`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                          <FormControl>
+                            <div className="relative flex items-center">
+                              {/* input*/}
+                              <Input
+                                {...field}
+                                placeholder="Enter password (or Auto Generate)"
+                              />
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                className="ml-2"
+                                // click event to generate random password and pass it to the input field
+                                onClick={() => {
+                                  const randomPwd = createRandomPwd();
+                                  field.onChange(randomPwd);
+                                }}
+                              >
+                                Auto
+                              </Button>
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -233,7 +340,17 @@ export function DataTableForm() {
             >
               Add Row
             </Button>
-            <Button type="submit">Submit</Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={downloadCSV}
+                title="Click to export the user create history from this browser as a CSV file"
+              >
+                Export CSV
+              </Button>
+              <Button type="submit">Submit</Button>
+            </div>
           </div>
         </form>
       </Form>

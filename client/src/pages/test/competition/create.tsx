@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { QuestionBlockManager } from "@/components/ui/Test/question-block-manager";
 import { Textarea } from "@/components/ui/textarea";
 import { DateTimePicker } from "@/components/ui/time-picker/date-time-picker";
-import { createCompetitionSchema } from "@/types/competition";
+import { createCompetitionSchema } from "@/types/quiz";
 
 type Competition = z.infer<typeof createCompetitionSchema>;
 
