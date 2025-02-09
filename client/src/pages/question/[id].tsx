@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { usePutMutation } from "@/hooks/use-put-data";
-import { createQuestionSchema, Question } from "@/types/question";
+import { createQuestionSchema, Layout, Question } from "@/types/question";
 
 type UpdateQuestion = z.infer<typeof createQuestionSchema>;
 
@@ -66,6 +66,8 @@ function EditQuestionForm({ question }: { question: Question }) {
           value: c.id.toString(),
           label: c.genre,
         })) || [],
+      layout: question.layout,
+      note: question.note,
     },
   });
 
@@ -95,14 +97,14 @@ function EditQuestionForm({ question }: { question: Question }) {
       name: data.questionName,
       category_ids: data.genre.map((g) => parseInt(g.value)),
       is_comp: false,
-      answers: data.answer.split(",").map((num) => Number(num.trim())),
+      answers: data.answer.split(",").map((num) => Number(num.trim())), // list of numbers
       question_text: data.question,
-      note: "note",
+      note: data.note,
       solution_text: data.solution_text,
       diff_level: parseInt(data.difficulty),
-      layout: "layout",
-      mark: parseInt(data.mark, 10),
-      image: null,
+      layout: data.layout,
+      mark: parseInt(data.mark, 0),
+      image: data.image,
     });
   };
 
@@ -299,7 +301,12 @@ function EditQuestionForm({ question }: { question: Question }) {
                 answer: watchedValues.answer || "",
                 solution: watchedValues.solution_text || "",
                 mark: watchedValues.mark || "",
+                layout: (watchedValues.layout ?? Layout.TOP) as Layout,
+                image: imageUrl,
               }}
+              setLayout={(newLayout: Layout) =>
+                form.setValue("layout", newLayout)
+              }
             >
               <Button type="button" variant={"ghost"} className="bg-gray-200">
                 Preview

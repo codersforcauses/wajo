@@ -36,7 +36,7 @@ export interface Question {
   note: string;
   solution_text: string;
   diff_level: number;
-  layout: string;
+  layout: Layout;
   mark: number;
   time_created: Date;
   time_modified: Date;
@@ -122,6 +122,8 @@ export interface PreviewModalDataContext {
   answer: string;
   solution: string;
   mark: string;
+  image: string | null;
+  layout: Layout;
 }
 
 /**
@@ -150,6 +152,7 @@ export interface PreviewModalDataContext {
 export interface PreviewModalProps {
   children: ReactNode;
   dataContext: PreviewModalDataContext;
+  setLayout: (layout: Layout) => void; // Function to update form state
 }
 
 export interface DeleteModalProps {
@@ -169,6 +172,17 @@ export const createCategorySchema = z.object({
  *
  * @constant
  */
+
+export const LayoutEnum = z.enum(["top", "bottom", "left", "right"], {
+  errorMap: () => ({ message: "Invalid Layout" }),
+});
+
+export enum Layout {
+  TOP = "top",
+  BOTTOM = "bottom",
+  LEFT = "left",
+  RIGHT = "right",
+}
 
 // Define the schema for the request payload
 export const createQuestionSchema = z.object({
@@ -210,6 +224,9 @@ export const createQuestionSchema = z.object({
     }),
   ),
   // .min(1, "Genre is required"),
+  note: z.string().optional(),
+  image: z.string().optional(),
+  layout: LayoutEnum.optional().default("top"),
 });
 
 /**

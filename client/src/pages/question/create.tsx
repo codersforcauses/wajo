@@ -22,7 +22,7 @@ import PreviewModal from "@/components/ui/Question/preview-modal";
 import { MultipleSelectCategory } from "@/components/ui/Question/select-category";
 import { Textarea } from "@/components/ui/textarea";
 import { usePostMutation } from "@/hooks/use-post-data";
-import { createQuestionSchema, Question } from "@/types/question";
+import { createQuestionSchema, Layout, Question } from "@/types/question";
 
 type FormValues = z.infer<typeof createQuestionSchema>;
 
@@ -44,6 +44,8 @@ export default function Create() {
       mark: "",
       difficulty: "",
       genre: [],
+      note: "some hidden note",
+      layout: Layout.TOP,
     },
   });
 
@@ -61,8 +63,7 @@ export default function Create() {
 
   function onImageChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file) return;
-    setImageFile(file);
+    !file ? setImageFile(null) : setImageFile(file);
   }
 
   const handleSubmit = (data: FormValues) => {
@@ -72,12 +73,12 @@ export default function Create() {
       is_comp: false,
       answers: data.answer.split(",").map((num) => Number(num.trim())), // list of numbers
       question_text: data.question,
-      note: "note",
+      note: data.note,
       solution_text: data.solution_text,
       diff_level: parseInt(data.difficulty),
-      layout: "layout",
+      layout: data.layout,
       mark: parseInt(data.mark, 0),
-      image: null,
+      image: data.image,
     });
   };
 
@@ -237,7 +238,7 @@ export default function Create() {
             />
           </div>
 
-          <div className="flex min-h-[325px] flex-1 flex-col gap-3 rounded-lg border-2 border-[#7D916F] p-5">
+          <div className="flex min-h-[325px] flex-1 flex-col gap-3 rounded-lg border-2 border-yellow p-5">
             <label
               htmlFor="imageInput"
               className="flex items-center gap-2 text-lg"
@@ -249,7 +250,7 @@ export default function Create() {
               id="imageInput"
               type="file"
               onChange={onImageChange}
-              className="block w-full text-sm text-slate-500 file:ml-0 file:mr-4 file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[#7D916F] hover:cursor-pointer hover:file:bg-violet-100"
+              className="block w-full text-sm text-slate-500 file:ml-0 file:mr-4 file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-secondary hover:cursor-pointer hover:file:bg-violet-100"
               accept="image/jpeg, image/png, image/jpg, image/gif"
             />
 
@@ -260,7 +261,7 @@ export default function Create() {
                   alt="Question Image"
                   width="0"
                   height="0"
-                  className="h-auto w-full"
+                  className="h-auto w-auto"
                 />
               )}
             </div>
@@ -274,7 +275,12 @@ export default function Create() {
                 answer: watchedValues.answer || "",
                 solution: watchedValues.solution_text || "",
                 mark: watchedValues.mark || "",
+                layout: (watchedValues.layout ?? Layout.TOP) as Layout,
+                image: imageUrl,
               }}
+              setLayout={(newLayout: Layout) =>
+                form.setValue("layout", newLayout)
+              }
             >
               <Button type="button" variant={"ghost"} className="bg-gray-200">
                 Preview
