@@ -30,14 +30,6 @@ const CreatePage: NextPageWithLayout = () => {
           staff
         </Link>
       </div>
-      <div className="flex h-40 w-40 items-center justify-center rounded-md border-2 border-yellow hover:bg-yellow">
-        <Link
-          className="flex h-full w-full items-center justify-center text-center"
-          href="users/all"
-        >
-          all users
-        </Link>
-      </div>
     </div>
   );
 };

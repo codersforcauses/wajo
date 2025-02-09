@@ -68,7 +68,6 @@ export const navData: NavigationData = {
           title: "Users",
           url: "/admin-dashboard/users",
           items: [
-            { title: "All Users", url: "/admin-dashboard/users/all" },
             { title: "Teachers", url: "/admin-dashboard/users/teachers" },
             { title: "Students", url: "/admin-dashboard/users/students" },
             { title: "Staff", url: "/admin-dashboard/users/staffs" },
