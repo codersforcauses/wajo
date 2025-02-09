@@ -1,4 +1,5 @@
 import {
+  useMutation,
   useQuery,
   UseQueryOptions,
   UseQueryResult,
@@ -140,3 +141,16 @@ export function useFetchDataTable<T>({
   const totalPages = data ? Math.ceil(data.count / nrows) : 1;
   return { data: data?.results, isLoading, error, totalPages };
 }
+
+export const useMarkCompetition = <TError = AxiosError>({ ...args }) => {
+  return useMutation<void, TError, { quiz_id: number; timeout?: number }>({
+    mutationFn: (param) => {
+      return api.get(`/quiz/admin-quizzes/${param.quiz_id}/marking/`, {
+        timeout: param.timeout,
+      });
+    },
+    onSuccess: (response, details, context) => {
+      if (args?.onSuccess) args.onSuccess(response, details, context);
+    },
+  });
+};

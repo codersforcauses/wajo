@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckCheck } from "lucide-react";
 import { useRouter } from "next/router";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -22,7 +23,7 @@ import {
   DateTimePicker,
   DateTimePickerFormat,
 } from "@/components/ui/time-picker/date-time-picker";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import { useFetchData, useMarkCompetition } from "@/hooks/use-fetch-data";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { usePatchMutation } from "@/hooks/use-put-data";
 import {
@@ -109,6 +110,15 @@ function UpdateCompetitionForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
     });
   };
 
+  const markCompetition = useMarkCompetition({
+    onSuccess: () => {
+      toast.success("Competition marked successfully!");
+    },
+  });
+  const handleFetch = () => {
+    markCompetition.mutate({ quiz_id: adminQuizId, timeout: 1000 });
+  };
+
   const requiredStar = <span className="text-red-500">*</span>;
   return (
     <Form {...form}>
@@ -118,7 +128,19 @@ function UpdateCompetitionForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
         </h1>
 
         <div className="mx-auto max-w-3xl space-y-6 rounded-lg bg-gray-50 p-4 shadow-lg">
-          <h3 className="-mb-2 text-lg">Basic</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="-mb-2 text-lg">Basic</h3>
+            <Button
+              type="button"
+              onClick={handleFetch}
+              variant={"link"}
+              disabled={markCompetition.isPending}
+              className="rounded-lg border-green-700 p-2 text-2xl font-black text-green-700 outline-double"
+            >
+              <CheckCheck className="me-1" size={30} />
+              {markCompetition.isPending ? "Marking" : "Mark"}
+            </Button>
+          </div>
 
           <div className="flex gap-4">
             <div className="flex-auto">
