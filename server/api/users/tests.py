@@ -120,6 +120,16 @@ class StudentAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_create_student_plain_text(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
+        response = self.client.post(
+            '/api/users/students/', self.student_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response_content = response.content.decode()
+        self.assertIn('password', response_content)
+        self.assertIn('password2', response_content)
+
 
 class TeacherAPITestCase(APITestCase):
 
