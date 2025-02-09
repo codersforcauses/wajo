@@ -73,7 +73,7 @@ export default function Create() {
       answers: data.answer.split(",").map((num) => Number(num.trim())), // list of numbers
       question_text: data.question,
       note: "note",
-      answer_text: data.solution_text,
+      solution_text: data.solution_text,
       diff_level: parseInt(data.difficulty),
       layout: "layout",
       mark: parseInt(data.mark, 0),
