@@ -1,3 +1,7 @@
+import { z } from "zod";
+
+import { School, Student } from "@/types/user";
+
 /**
  * Represents a Team object with its properties.
  *
@@ -17,12 +21,23 @@
  *   competitionPeriod: "2024"
  * };
  */
-interface Team {
-  teamId: string;
+
+export interface TeamMember {
+  id: number;
+  student: Student;
+  studentName?: string;
+  time_added: Date;
+  team: number;
+}
+
+export interface Team {
+  id: number;
+  members: TeamMember[];
+  school: School;
   name: string;
-  studentName: string;
-  schoolName: string;
-  competitionPeriod: string;
+  description: string;
+  time_created: Date;
+  students: Student[];
 }
 
 /**
@@ -43,10 +58,18 @@ interface Team {
  *   changePage: 1
  * };
  */
-interface TeamDatagridProps {
+// export interface TeamDatagridProps {
+//   datacontext: Team[];
+//   onDataChange: (updatedData: Team[]) => void;
+//   changePage: number;
+// }
+export interface TeamDatagridProps {
   datacontext: Team[];
-  onDataChange: (updatedData: Team[]) => void;
-  changePage: number;
+  onSort: (field: keyof Team) => void;
+
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
 /**
@@ -66,9 +89,23 @@ interface TeamDatagridProps {
  *   className: "flex text-lg"
  * };
  */
-interface PaginationProps {
+export interface PaginationProps {
   totalPages: number;
   currentPage: number;
   onPageChange: (page: number) => void;
   className?: string;
 }
+
+/**
+ * A Zod schema for validating the creation of a team.
+ *
+ * @example
+ * // Example usage of createTeamSchema to validate team data
+ * const teamData = { name: "Team A", school_id: 1, description: "A great team" };
+ * const parsedData = createTeamSchema.parse(teamData);
+ */
+export const createTeamSchema = z.object({
+  name: z.string().min(1, "Required"),
+  school_id: z.number({ message: "Required" }),
+  description: z.string().min(1, "Required"),
+});

@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -8,87 +14,40 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import api from "@/lib/api";
+import { useTokenStore } from "@/store/token-store";
+import { Team, TeamDatagridProps } from "@/types/team";
+import { School } from "@/types/user";
 
 import { Button } from "../button";
 import { Pagination } from "../pagination";
+import { SearchInput } from "../search";
 
-/**
- * The Datagrid component is a flexible, paginated data table with sorting and navigation features.
- *
- * @param {TeamDatagridProps} props - Props including datacontext (data array), onDataChange (callback for data update), and ChangePage (external control for current page).
- */
+export interface Student {
+  id: string;
+  first_name: string;
+  last_name: string;
+  school: School;
+  student_id: string;
+}
 export function TeamDatagrid({
   datacontext,
-  onDataChange,
-  changePage,
+  onSort,
+
+  currentPage,
+  totalPages,
+  onPageChange,
 }: TeamDatagridProps) {
-  // State to track sorting direction
-  const [isAscending, setIsAscending] = useState(true);
-  // State for the current page number
-  const [currentPage, setCurrentPage] = useState(1);
-  // State to hold padded data for consistent rows
-  const [paddedData, setPaddedData] = useState<Team[]>([]);
-  // Number of items displayed per page
-  const itemsPerPage = 5;
-  // Calculate total pages based on the data length
-  const totalPages = Math.ceil(datacontext.length / itemsPerPage);
-
-  /**
-   * Handles sorting of the data based on a specified column.
-   * @param {keyof Team} column - Column key to sort by.
-   */
-  const sortByColumn = (column: keyof Team) => {
-    const sortedData = [...datacontext].sort((a, b) => {
-      return isAscending
-        ? a[column].localeCompare(b[column])
-        : b[column].localeCompare(a[column]);
-    });
-    setCurrentPage(1); // Reset to the first page after sorting
-    onDataChange(sortedData); // Update the parent with sorted data
-    setIsAscending(!isAscending); // Toggle sorting direction
-  };
-
-  /**
-   * Handles page change logic.
-   * @param {number} page - The new page number.
-   */
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+  const deleteTeam = async (id: number) => {
+    try {
+      const response = await api.delete(`/team/teams/${id}/`);
+      console.log("Deleted successfully:", response.data);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting:", error);
     }
   };
-
-  /**
-   * Updates the displayed data based on the current page.
-   * Pads the data to ensure consistent rows (e.g., always 5 rows).
-   */
-  useEffect(() => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = datacontext.slice(indexOfFirstItem, indexOfLastItem);
-
-    // Ensure paddedData always has 5 rows
-    const updatedPaddedData = [...currentData];
-    while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({
-        teamId: "",
-        name: "",
-        studentName: "",
-        schoolName: "",
-        competitionPeriod: "",
-      });
-    }
-
-    setPaddedData(updatedPaddedData);
-  }, [datacontext, currentPage]);
-
-  /**
-   * Make the default page always 1 when search button makes any change
-   */
-  useEffect(() => {
-    setCurrentPage(changePage);
-  }, [datacontext]);
-
   return (
     <div>
       <Table className="w-full border-collapse text-left shadow-md">
@@ -102,7 +61,7 @@ export function TeamDatagrid({
                 <span>Name</span>
                 <span
                   className="ml-2 cursor-pointer"
-                  onClick={() => sortByColumn("name")}
+                  onClick={() => onSort("name")}
                 >
                   <svg
                     width="10"
@@ -120,41 +79,11 @@ export function TeamDatagrid({
             <TableHead className="w-1/5">
               <div className="flex items-center text-white">
                 <span>Student Name</span>
-                <span
-                  className="ml-2 cursor-pointer"
-                  onClick={() => sortByColumn("studentName")}
-                >
-                  <svg
-                    width="10"
-                    height="19"
-                    viewBox="0 0 10 19"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M5 19L0.669872 11.5H9.33013L5 19Z" fill="white" />
-                    <path d="M5 0L9.33013 7.5H0.669873L5 0Z" fill="white" />
-                  </svg>
-                </span>
               </div>
             </TableHead>
             <TableHead className="w-1/5">
               <div className="flex items-center text-white">
                 <span>School Name</span>
-                <span
-                  className="ml-2 cursor-pointer"
-                  onClick={() => sortByColumn("schoolName")}
-                >
-                  <svg
-                    width="10"
-                    height="19"
-                    viewBox="0 0 10 19"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M5 19L0.669872 11.5H9.33013L5 19Z" fill="white" />
-                    <path d="M5 0L9.33013 7.5H0.669873L5 0Z" fill="white" />
-                  </svg>
-                </span>
               </div>
             </TableHead>
             <TableHead className="w-1/5 rounded-tr-lg text-white">
@@ -162,7 +91,7 @@ export function TeamDatagrid({
                 <span>Competition Period</span>
                 <span
                   className="ml-2 cursor-pointer"
-                  onClick={() => sortByColumn("competitionPeriod")}
+                  onClick={() => onSort("description")}
                 >
                   <svg
                     width="10"
@@ -180,27 +109,34 @@ export function TeamDatagrid({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {paddedData.map((item, index) => (
+          {datacontext.map((item, index) => (
             <TableRow
               key={index}
               className={"divide-gray-200 border-gray-50 text-sm text-black"}
             >
-              <TableCell className="w-1/5">{item.teamId || "\u00A0"}</TableCell>
+              <TableCell className="w-1/5">{item.id || "\u00A0"}</TableCell>
               <TableCell className="w-1/5">{item.name || "\u00A0"}</TableCell>
               <TableCell className="w-1/5">
-                {item.studentName || "\u00A0"}
+                {item?.members
+                  ?.map((member) => member.studentName)
+                  .join(", ") || "\u00A0"}
               </TableCell>
               <TableCell className="w-1/5">
-                {item.schoolName || "\u00A0"}
+                {item.school?.name || "\u00A0"}
               </TableCell>
               <TableCell className="w-1/5">
-                {item.competitionPeriod || "\u00A0"}
+                {item.description || "\u00A0"}
               </TableCell>
               <TableCell className="flex justify-evenly py-4">
-                {item.teamId ? (
+                {item.id ? (
                   <>
                     <Button>View</Button>
-                    <Button variant={"destructive"}>Delete</Button>
+                    <Button
+                      variant={"destructive"}
+                      onClick={() => deleteTeam(item.id)}
+                    >
+                      Delete
+                    </Button>
                   </>
                 ) : (
                   <div className="invisible flex">
@@ -217,9 +153,167 @@ export function TeamDatagrid({
       <Pagination
         totalPages={totalPages}
         currentPage={currentPage}
-        onPageChange={(page) => handlePageChange(page)}
+        onPageChange={onPageChange}
         className="mr-20 mt-5 flex justify-end"
       />
     </div>
+  );
+}
+
+interface StudentDatagridProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (selectedStudents: Student[]) => void;
+}
+
+export function StudentDatagrid({
+  isOpen,
+  onClose,
+  onConfirm,
+}: StudentDatagridProps) {
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+  const { access } = useTokenStore(); // access the JWT token
+  const [schoolId, setSchoolId] = useState<number | undefined>(undefined);
+  // const [sortField, setSortField] = useState("name"); // Default sorting field
+  // const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  // const [ordering, setOrdering] = useState<string>("name");
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  useEffect(() => {
+    if (access?.decoded) {
+      const userSchoolId = access.decoded["school_id"];
+      setSchoolId(userSchoolId);
+    }
+  }, [access]);
+
+  const { data, isLoading, error } = useFetchData<{
+    results: Student[];
+    count: number;
+    next: string | null;
+    previous: string | null;
+  }>({
+    queryKey: ["students", currentPage, search],
+    endpoint: "/users/students/",
+    enabled: isOpen, // Only fetch when modal is open
+    params: {
+      page: currentPage,
+
+      ...(search ? { search } : {}), // Only include search if not empty
+    },
+  });
+  const pageSize = 5; // Adjust this if your backend uses a different page size
+  const totalPages = data ? Math.ceil(data.count / pageSize) : 1;
+
+  let filteredStudents: Student[] | undefined;
+  if (schoolId != null) {
+    filteredStudents =
+      data?.results?.filter((student) => student.school.id === schoolId) || [];
+  } else {
+    filteredStudents = data?.results;
+  }
+  const toggleSelection = (studentId: string) => {
+    setSelectedStudentIds((prevSelectedIds) => {
+      if (prevSelectedIds.includes(studentId)) {
+        return prevSelectedIds.filter((id) => id !== studentId);
+      } else {
+        return [...prevSelectedIds, studentId];
+      }
+    });
+  };
+
+  // Confirm selection and close modal
+  const handleConfirm = () => {
+    const selectedStudents: Student[] = (data?.results ?? []).filter(
+      (student) => selectedStudentIds.includes(student.id),
+    );
+
+    onConfirm(selectedStudents);
+    onClose();
+  };
+
+  const handleSearchSubmit = (value: string) => {
+    console.log("Search input changed to: ", value);
+    setSearch(value);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Select Team Members</DialogTitle>
+        </DialogHeader>
+
+        <SearchInput
+          label=""
+          value={search}
+          placeholder="Search by name..."
+          onSearch={handleSearchSubmit}
+        />
+        <Table className="w-full border-collapse text-left shadow-md">
+          <TableHeader className="bg-black text-lg font-semibold">
+            <TableRow className="hover:bg-muted/0">
+              <TableHead className="w-1/5 rounded-tl-lg text-white">
+                <span>Select</span>
+              </TableHead>
+              <TableHead className="w-1/5">
+                <div className="flex items-center text-white">
+                  <span>First Name</span>
+                </div>
+              </TableHead>
+              <TableHead className="w-1/5">
+                <div className="flex items-center text-white">
+                  <span>Last Name</span>
+                </div>
+              </TableHead>
+
+              <TableHead className="w-1/5 rounded-tr-lg text-white">
+                <div className="flex items-center text-white">
+                  <span>Student_id</span>
+                </div>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredStudents?.map((student) => (
+              <TableRow
+                key={student.id}
+                className={"divide-gray-200 border-gray-50 text-sm text-black"}
+              >
+                <TableCell className="w-1/5">
+                  <input
+                    type="checkbox"
+                    checked={selectedStudentIds.includes(student.id)}
+                    onChange={() => toggleSelection(student.id)}
+                  />
+                </TableCell>
+                <TableCell className="w-1/5">
+                  {student.first_name || "\u00A0"}
+                </TableCell>
+                <TableCell className="w-1/5">
+                  {student.last_name || "\u00A0"}
+                </TableCell>
+
+                <TableCell className="w-1/5">
+                  {student.student_id || "\u00A0"}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={(page) => setCurrentPage(page)}
+          className="mr-20 mt-5 flex justify-end"
+        />
+        <div className="mt-4 flex justify-end space-x-2">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleConfirm}>Confirm</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

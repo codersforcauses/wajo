@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -8,20 +10,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { Button } from "../button";
-import { Pagination } from "../pagination";
+import { DatagridProps, sortData } from "@/types/data-grid";
+import { Question } from "@/types/question";
 
 /**
  * The Datagrid component is a flexible, paginated data table with sorting and navigation features.
  *
- * @param {DatagridProps} props - Props including datacontext (data array), onDataChange (callback for data update), and ChangePage (external control for current page).
+ * @param {DatagridProps<Question>} props - Props including datacontext (data array), onDataChange (callback for data update), and ChangePage (external control for current page).
  */
 export function Datagrid({
   datacontext,
   onDataChange,
   changePage,
-}: DatagridProps) {
+}: DatagridProps<Question>) {
   // State to track sorting direction
   const [isAscending, setIsAscending] = useState(true);
   // State for the current page number
@@ -38,11 +39,7 @@ export function Datagrid({
    * @param {keyof Question} column - Column key to sort by.
    */
   const sortByColumn = (column: keyof Question) => {
-    const sortedData = [...datacontext].sort((a, b) => {
-      return isAscending
-        ? a[column].localeCompare(b[column])
-        : b[column].localeCompare(a[column]);
-    });
+    const sortedData = sortData(datacontext, column, isAscending);
     setCurrentPage(1); // Reset to the first page after sorting
     onDataChange(sortedData); // Update the parent with sorted data
     setIsAscending(!isAscending); // Toggle sorting direction
@@ -70,7 +67,7 @@ export function Datagrid({
     // Ensure paddedData always has 5 rows
     const updatedPaddedData = [...currentData];
     while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({ name: "", category: "", difficulty: "" });
+      updatedPaddedData.push({} as Question);
     }
 
     setPaddedData(updatedPaddedData);
@@ -116,7 +113,7 @@ export function Datagrid({
                 <span>Difficulty</span>
                 <span
                   className="ml-2 cursor-pointer"
-                  onClick={() => sortByColumn("difficulty")}
+                  onClick={() => sortByColumn("diff_level")}
                 >
                   <svg
                     width="10"
@@ -142,10 +139,10 @@ export function Datagrid({
             >
               <TableCell className="w-1/4">{item.name || "\u00A0"}</TableCell>
               <TableCell className="w-1/4">
-                {item.category || "\u00A0"}
+                {item.category ? item.category.join(", ") : "\u00A0"}
               </TableCell>
               <TableCell className="w-1/4">
-                {item.difficulty || "\u00A0"}
+                {item.diff_level || "\u00A0"}
               </TableCell>
               <TableCell className="flex justify-evenly py-4">
                 {item.name ? (
@@ -168,7 +165,7 @@ export function Datagrid({
       <Pagination
         totalPages={totalPages}
         currentPage={currentPage}
-        onPageChange={(page) => handlePageChange(page)}
+        onPageChange={(page: number) => handlePageChange(page)}
         className="mr-20 mt-5 flex justify-end"
       />
     </div>

@@ -17,13 +17,36 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from rest_framework.routers import DefaultRouter
+from api.leaderboard import urls as leaderboard_urls
+
+router = DefaultRouter()
+router.registry.extend(leaderboard_urls.router.registry)
+
+api_urls = [
+    path("healthcheck/", include("api.healthcheck.urls")),
+    path("question/", include("api.question.urls")),
+    path("auth/", include("api.auth.urls")),
+    path("team/", include("api.team.urls")),
+]
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/healthcheck/", include("api.healthcheck.urls")),
-    path("api/leaderboard/", include("api.leaderboard.urls")),
-    path("api/question/", include("api.question.urls")),
+    path("api/questions/", include("api.question.urls")),
+    path("api/quiz/", include("api.quiz.urls")),
     path("api/auth/", include("api.auth.urls")),
     path("api/team/", include("api.team.urls")),
+    path("api/users/", include("api.users.urls")),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/invoice/', include("api.invoice.urls")),
+    # Optional UI:
+    path('api/schema/swagger-ui/',
+         SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/',
+         SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
+    path("api/", include(leaderboard_urls)),
+    path(r"api/", include(router.urls)),
 ]

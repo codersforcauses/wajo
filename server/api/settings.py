@@ -52,13 +52,16 @@ INSTALLED_APPS = [
     "django_extensions",
     "rest_framework",
     "corsheaders",
+    "rest_framework_simplejwt",
+    "django_filters",
     "api.healthcheck",
     "api.leaderboard",
     "api.question",
-    "rest_framework_simplejwt",
     "api.users",
     "api.quiz",
     "api.team",
+    "api.invoice",
+    'drf_spectacular',
 ]
 
 REST_FRAMEWORK = {
@@ -66,7 +69,11 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    "PAGE_SIZE": 5,
 }
 
 SIMPLE_JWT = {
@@ -178,8 +185,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(
-    os.path.dirname(os.path.abspath(__file__))))  # <- '/' directory
+PROJECT_ROOT = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)  # <- '/' directory
 
 STATIC_URL = "/static/"
 
@@ -194,3 +202,11 @@ STATICFILES_DIRS = ("static",)
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# DRF Spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Your Project API',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}

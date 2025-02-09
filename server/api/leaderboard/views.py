@@ -1,12 +1,39 @@
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
-from rest_framework import status
-from rest_framework.response import Response
+from rest_framework import viewsets
+from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
+from django.db.models import Sum
+from ..quiz.models import Quiz, QuizAttempt
+from .serializers import IndividualLeaderboardSerializer, TeamLeaderboardSerializer
+from ..users.models import School, Student
+from ..team.models import Team
 
-from .serializers import LeaderboardSerializer
+
+class IndividualLeaderboardFilter(FilterSet):
+    quiz_name = ModelChoiceFilter(
+        field_name="quiz__name",
+        queryset=Quiz.objects.all(),
+        label="Quiz Name",
+        to_field_name="name"
+    )
+    quiz_id = ModelChoiceFilter(
+        queryset=Quiz.objects.all().values_list('id', flat=True),
+        label="Quiz ID",
+    )
+    year_level = ModelChoiceFilter(
+        field_name='student__year_level',
+        queryset=Student.objects.distinct("year_level").values_list('year_level', flat=True),
+        label="Year Level",
+        to_field_name="year_level"
+    )
+    school_type = ChoiceFilter(
+        field_name="student__school__type", choices=School.SchoolType.choices
+    )
+
+    class Meta:
+        model = QuizAttempt
+        fields = ["quiz_name", "quiz_id", "year_level", "school_type"]
 
 
-class LeaderboardView(APIView):
+class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     """
     LeaderboardView API view to manage leaderboard data.
 
@@ -19,33 +46,41 @@ class LeaderboardView(APIView):
     Methods:
         - get(request): Handles GET requests. Returns sample data for the leaderboard.
     """
-    permission_classes = [AllowAny]
-    serializer_class = LeaderboardSerializer
 
-    def get(self, request):
-        # sample data
-        data = [
-            {
-                "name": "Alice",
-                "school": "Green Valley High",
-                "school_email": "alice@greenvalley.edu",
-                "user_name": "alice123",
-                "password": "password123",
-                "individual_score": 95,
-                "team_name": "Team A",
-                "team_score": 290,
-                "status": "Active",
-            },
-            {
-                "name": "Charlie",
-                "school": "Riverstone Institute",
-                "school_email": "charlie@riverstone.edu",
-                "user_name": "charlie789",
-                "password": "charliepass",
-                "individual_score": 88,
-                "team_name": "Team A",
-                "team_score": 290,
-                "status": "Inactive",
-            },
-        ]
-        return Response(data, status=status.HTTP_200_OK)
+    queryset = QuizAttempt.objects.all()
+    serializer_class = IndividualLeaderboardSerializer
+    filterset_class = IndividualLeaderboardFilter
+
+
+class TeamLeaderboardFilter(FilterSet):
+    quiz_name = ModelChoiceFilter(
+        field_name="quiz_attempt__quiz__name",
+        queryset=Quiz.objects.all(),
+        label="Quiz Name",
+        to_field_name="name"
+    )
+    quiz_id = ModelChoiceFilter(
+        queryset=Quiz.objects.all().values_list('id', flat=True),
+        label="Quiz ID",
+    )
+    year_level = ModelChoiceFilter(
+        field_name="students__year_level",
+        queryset=Student.objects.distinct("year_level").values_list('year_level', flat=True),
+        label="Year Level",
+        to_field_name="year_level"
+    )
+    school_type = ChoiceFilter(
+        field_name="students__school__type",
+        choices=School.SchoolType.choices,
+        label="School Type",
+    )
+
+    class Meta:
+        model = Team
+        fields = ["quiz_name", "quiz_id", "year_level", "school_type"]
+
+
+class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Team.objects.annotate(total_marks=Sum('quiz_attempts__total_marks')).order_by('id')
+    serializer_class = TeamLeaderboardSerializer
+    filterset_class = TeamLeaderboardFilter
