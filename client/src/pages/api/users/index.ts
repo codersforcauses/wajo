@@ -25,7 +25,7 @@ for (let i = 0; i < 9; i++) {
     {
       id: i * 3 + 1,
       username: `adminMaster${i + 1}`,
-      role: "user",
+      role: "admin",
       school: { name: "Greenfield High" } as School,
     },
     {

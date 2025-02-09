@@ -7,7 +7,7 @@ import { z } from "zod";
  * @example
  * const role: Role = "student";
  */
-export const RoleEnum = z.enum(["user", "teacher", "student"], {
+export const RoleEnum = z.enum(["admin", "teacher", "student"], {
   errorMap: () => ({ message: "Invalid User Role" }),
 });
 

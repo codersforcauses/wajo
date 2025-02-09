@@ -1,5 +1,7 @@
 import { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import { useRouter } from "next/router";
 import { createContext, useContext, useEffect } from "react";
 
 import { usePostMutation } from "@/hooks/use-post-data";
@@ -19,6 +21,11 @@ type TokenResponse = {
   access: string;
   refresh: string;
   detail?: string;
+};
+
+type DecodedToken = {
+  user_id: string;
+  role: string;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -53,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const accessToken = useTokenStore((state) => state.access);
   const setTokens = useTokenStore((state) => state.setTokens);
   const clearTokens = useTokenStore((state) => state.clear);
+  const router = useRouter();
 
   const userId = accessToken?.decoded.user_id ?? null;
   const isLoggedIn = userId !== null;
@@ -98,6 +106,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setTokens(result.data.access, result.data.refresh);
+
+      const decodedToken: DecodedToken = jwtDecode(result.data.access);
+      const userRole = decodedToken.role.toLowerCase();
+
+      if (userRole === "admin") {
+        router.push("/admin-dashboard");
+      } else if (userRole === "teacher") {
+        router.push("/teacher-dashboard");
+      }
+
       return { success: true, error: null };
     } catch (error: any) {
       const errorMessage = formatErrorMsg(error.response);

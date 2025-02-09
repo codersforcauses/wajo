@@ -18,7 +18,7 @@ import { QuestionBlockManager } from "@/components/ui/Test/question-block-manage
 import { SelectHour, SelectMinute } from "@/components/ui/Test/select-time";
 import { Textarea } from "@/components/ui/textarea";
 import { NextPageWithLayout } from "@/pages/_app";
-import { createPracticeSchema } from "@/types/practice";
+import { createPracticeSchema } from "@/types/quiz";
 
 type Practice = z.infer<typeof createPracticeSchema>;
 

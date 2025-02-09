@@ -18,7 +18,7 @@ import { QuestionBlockManager } from "@/components/ui/Test/question-block-manage
 import { Textarea } from "@/components/ui/textarea";
 import { DateTimePicker } from "@/components/ui/time-picker/date-time-picker";
 import { NextPageWithLayout } from "@/pages/_app";
-import { createCompetitionSchema } from "@/types/competition";
+import { createCompetitionSchema } from "@/types/quiz";
 
 type Competition = z.infer<typeof createCompetitionSchema>;
 

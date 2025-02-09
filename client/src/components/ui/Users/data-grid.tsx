@@ -152,9 +152,7 @@ export function DataGrid({
                 </TableCell>
               }
               {usersRole == "all" && (
-                <TableCell className="w-1/4">
-                  {item.role == "user" ? "admin" : item.role}
-                </TableCell>
+                <TableCell className="w-1/4">{item.role}</TableCell>
               )}
               {usersRole != "admin" && item.id && (
                 <TableCell className="w-1/4">
@@ -176,9 +174,7 @@ export function DataGrid({
                   <Button
                     variant={"destructive"}
                     className={cn("", {
-                      invisible:
-                        usersRole === "admin" ||
-                        (usersRole === "all" && item.role === "user"),
+                      invisible: usersRole === "admin",
                     })}
                   >
                     Delete
