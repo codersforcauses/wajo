@@ -3,27 +3,16 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import SidebarLayout from "@/components/sidebar-layout";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { useFetchData } from "@/hooks/use-fetch-data";
 
 // Define the Zod schema for validation
 const formSchema = z.object({
@@ -141,10 +130,6 @@ const Index = () => {
       </div>
     </div>
   );
-};
-
-Index.getLayout = function getLayout(page: React.ReactElement) {
-  return <SidebarLayout role="admin">{page}</SidebarLayout>;
 };
 
 export default Index;
