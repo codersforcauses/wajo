@@ -1,14 +1,14 @@
 import { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
-import { useRouter } from "next/router";
 import { createContext, useContext, useEffect } from "react";
 
 import { usePostMutation } from "@/hooks/use-post-data";
 import { useTokenStore } from "@/store/token-store";
+import { Role } from "@/types/user";
 
 type AuthContextType = {
   userId: string | null;
+  userRole: Role;
   isLoggedIn: boolean;
   login: (
     username: string,
@@ -21,11 +21,6 @@ type TokenResponse = {
   access: string;
   refresh: string;
   detail?: string;
-};
-
-type DecodedToken = {
-  user_id: string;
-  role: string;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -60,9 +55,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const accessToken = useTokenStore((state) => state.access);
   const setTokens = useTokenStore((state) => state.setTokens);
   const clearTokens = useTokenStore((state) => state.clear);
-  const router = useRouter();
-
   const userId = accessToken?.decoded.user_id ?? null;
+  const userRole = accessToken?.decoded.role as Role;
+
   const isLoggedIn = userId !== null;
 
   const { mutateAsync: postLogin } = usePostMutation<
@@ -72,7 +67,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (accessToken) {
-      Cookies.set("user_role", "user", { sameSite: "strict", secure: true });
+      const newRole = accessToken?.decoded.role as Role;
+      Cookies.set("user_role", newRole, {
+        sameSite: "strict",
+        secure: true,
+      });
     } else {
       Cookies.remove("user_role");
     }
@@ -106,16 +105,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setTokens(result.data.access, result.data.refresh);
-
-      const decodedToken: DecodedToken = jwtDecode(result.data.access);
-      const userRole = decodedToken.role.toLowerCase();
-
-      if (userRole === "admin") {
-        router.push("/admin-dashboard");
-      } else if (userRole === "teacher") {
-        router.push("/teacher-dashboard");
-      }
-
       return { success: true, error: null };
     } catch (error: any) {
       const errorMessage = formatErrorMsg(error.response);
@@ -130,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearTokens();
   };
 
-  const context = { userId, isLoggedIn, login, logout };
+  const context = { userId, userRole, isLoggedIn, login, logout };
 
   return (
     <AuthContext.Provider value={context}>{children}</AuthContext.Provider>
