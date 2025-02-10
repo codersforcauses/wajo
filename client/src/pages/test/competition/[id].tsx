@@ -271,7 +271,7 @@ function UpdateCompetitionQuestionBlocksForm({
       1000,
       {
         onSuccess: () => {
-          toast.success("Competition question blocks created successfully!");
+          toast.success("Competition question blocks updated successfully!");
           router.reload();
         },
       },

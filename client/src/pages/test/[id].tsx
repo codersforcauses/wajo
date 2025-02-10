@@ -92,7 +92,7 @@ function UpdatePracticeForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
     queryKeys: [mutationKey, ["quiz.admin-quizzes"]],
     endpoint: `/quiz/admin-quizzes/${adminQuizId}/`,
     onSuccess: () => {
-      toast.success("Practice created successfully!");
+      toast.success("Practice updated successfully!");
       router.reload();
     },
   });
@@ -246,7 +246,7 @@ function UpdatePracticeQuestionBlocksForm({
       1000,
       {
         onSuccess: () => {
-          toast.success("Practice question blocks created successfully!");
+          toast.success("Practice question blocks updated successfully!");
           router.reload();
         },
       },

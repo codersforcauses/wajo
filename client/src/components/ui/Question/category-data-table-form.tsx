@@ -55,7 +55,7 @@ export function CategoryDataTableForm() {
     1000,
     {
       onSuccess: () => {
-        toast.success("Teams created successfully!");
+        toast.success("Categories created successfully!");
         router.push("/question/category/");
       },
     },
