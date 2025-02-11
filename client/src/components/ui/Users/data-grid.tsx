@@ -104,7 +104,7 @@ export function DataGrid({
               <TableCell className="w-1/4">{item.id}</TableCell>
               <TableCell className="w-1/4">{item.username}</TableCell>
               <TableCell className="w-1/4">{item.role}</TableCell>
-              <TableCell className="w-1/4">{item.school}</TableCell>
+              <TableCell className="w-1/4">{item.school?.name}</TableCell>
               <TableCell className="flex py-4">
                 <div className={cn("flex", { invisible: !item.username })}>
                   <Button className="me-2">View</Button>

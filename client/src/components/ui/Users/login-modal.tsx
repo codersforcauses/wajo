@@ -152,10 +152,10 @@ export function LoginModal({ children }: LoginFormProps) {
                           </span>
                         </div>
                       </FormControl>
-                      <FormDescription className="text-xs">
+                      {/* <FormDescription className="text-xs">
                         It must be a combination of minimum 8 letters, numbers,
                         and symbols
-                      </FormDescription>
+                      </FormDescription> */}
                       <FormMessage />
                     </div>
                   </FormItem>
