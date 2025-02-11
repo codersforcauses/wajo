@@ -40,11 +40,12 @@ export interface Question {
   mark: number;
   time_created: Date;
   time_modified: Date;
-  images: Image[];
+  images: QuestionImage[];
 }
 
-export interface Image {
+export interface QuestionImage {
   url: string;
+  question: number;
 }
 
 export interface Answer {
@@ -178,7 +179,7 @@ export const createCategorySchema = z.object({
 export const createQuestionSchema = z.object({
   questionName: z.string().min(1, "Question Name is required"),
   question: z.string().min(1, "Question is required"),
-  answer: z
+  answers: z
     .string()
     .min(1, "Answer is required")
     .refine(
@@ -215,6 +216,7 @@ export const createQuestionSchema = z.object({
       }),
     )
     .min(1, "Genre is required"),
+  image: z.string().optional(),
 });
 
 /**

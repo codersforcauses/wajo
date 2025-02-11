@@ -61,17 +61,14 @@ export function SchoolDataTableForm() {
   });
 
   const router = useRouter();
-  const { mutate: createSchool, isPending } = usePostMutation<School[]>(
-    ["schools"],
-    "/users/schools/",
-    1000,
-    {
-      onSuccess: () => {
-        toast.success("Schools created successfully!");
-        router.push("/users/school/");
-      },
+  const { mutate: createSchool, isPending } = usePostMutation<School[]>({
+    mutationKey: ["schools"],
+    endpoint: "/users/schools/",
+    onSuccess: () => {
+      toast.success("Schools created successfully!");
+      router.push("/users/school/");
     },
-  );
+  });
 
   const onSubmit = (data: { schools: School[] }) => {
     createSchool([...data.schools]);

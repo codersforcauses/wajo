@@ -87,7 +87,8 @@ class QuestionSerializer(serializers.ModelSerializer):
         answers_data = validated_data.pop('answers', [])
 
         instance = super().update(instance, validated_data)
-        #  instance.answers.all().delete()
+
+        instance.answers.all().delete()
         for answer_data in answers_data:
             Answer.objects.create(question=instance, **answer_data)
         return instance

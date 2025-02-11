@@ -27,10 +27,52 @@ class QuestionViewSet(viewsets.ModelViewSet):
     search_fields = ['name']
     filterset_fields = ['mark', 'answers__value']
 
+    # override the create method
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+        # validate integrity of name
+        name = request.data.get('name')
+        if Question.objects.filter(name=name).exists():
+            return Response({'error': 'Question with this name already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        response = self.handle_answers(request, True)
+        return response
+
+    # override the update method
+    def update(self, request, *args, **kwargs):
+        response = self.handle_answers(request, False)
+        return response
+
+    # override the partial_update method to disable PATCH requests
+    def partial_update(self, request, *args, **kwargs):
+        return Response({'error': 'PATCH method is not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
     def perform_update(self, serializer):
         instance = serializer.save(modified_by=self.request.user)
         instance.time_modified = now()
         instance.save()
+
+    def handle_answers(self, request, is_create, *args, **kwargs):
+        answers = request.data.get('answers')
+        if is_create:
+            if not answers or len(answers) == 0:
+                return Response({'error': 'Answers field is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if isinstance(answers[0], dict):
+            if is_create:
+                return super().create(request, *args, **kwargs)
+            else:
+                return super().update(request, *args, **kwargs)
+        else:
+            answers_list = [{'value': int(answer)} for answer in answers]
+            data = request.data.copy()
+            data['answers'] = answers_list
+            if is_create:
+                serializer = self.get_serializer(data=data)
+            else:
+                instance = self.get_object()
+                serializer = self.get_serializer(instance, data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     # @action(detail=False, methods=['get'])
     # def get_random_question(self, request):
@@ -80,3 +122,16 @@ class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
     parser_classes = [MultiPartParser, FormParser]
+
+    def create(self, request, *args, **kwargs):
+        question_id = request.data.get("question")
+
+        # check if the quiz solts already exist, if so, detele them in database
+        print(Image.objects, question_id)
+        if Image.objects.filter(question=question_id).exists():
+            Image.objects.filter(question=question_id).delete()
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
