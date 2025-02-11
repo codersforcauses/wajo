@@ -49,8 +49,10 @@ export interface User {
 
 export interface Student {
   id: number;
-  name: string;
-  year_level: number;
+  first_name: string;
+  last_name: string;
+  school: School;
+  student_id: number;
 }
 
 /**

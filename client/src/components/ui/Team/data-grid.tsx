@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
 import {
@@ -18,27 +19,20 @@ import { useFetchData } from "@/hooks/use-fetch-data";
 import api from "@/lib/api";
 import { useTokenStore } from "@/store/token-store";
 import { Team, TeamDatagridProps } from "@/types/team";
-import { School } from "@/types/user";
+import { School, Student } from "@/types/user";
 
 import { Button } from "../button";
 import { Pagination } from "../pagination";
 import { SearchInput } from "../search";
 
-export interface Student {
-  id: string;
-  first_name: string;
-  last_name: string;
-  school: School;
-  student_id: string;
-}
 export function TeamDatagrid({
   datacontext,
   onSort,
-
   currentPage,
   totalPages,
   onPageChange,
 }: TeamDatagridProps) {
+  const router = useRouter();
   const deleteTeam = async (id: number) => {
     try {
       const response = await api.delete(`/team/teams/${id}/`);
@@ -130,7 +124,9 @@ export function TeamDatagrid({
               <TableCell className="flex justify-evenly py-4">
                 {item.id ? (
                   <>
-                    <Button>View</Button>
+                    <Button onClick={() => router.push(`/team/${item.id}`)}>
+                      View
+                    </Button>
                     <Button
                       variant={"destructive"}
                       onClick={() => deleteTeam(item.id)}
@@ -164,19 +160,20 @@ interface StudentDatagridProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (selectedStudents: Student[]) => void;
+  selectedIds?: number[];
 }
 
 export function StudentDatagrid({
   isOpen,
   onClose,
   onConfirm,
+  selectedIds = [],
 }: StudentDatagridProps) {
-  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+  const [selectedStudentIds, setSelectedStudentIds] =
+    useState<number[]>(selectedIds);
+
   const { access } = useTokenStore(); // access the JWT token
   const [schoolId, setSchoolId] = useState<number | undefined>(undefined);
-  // const [sortField, setSortField] = useState("name"); // Default sorting field
-  // const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  // const [ordering, setOrdering] = useState<string>("name");
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   useEffect(() => {
@@ -211,7 +208,7 @@ export function StudentDatagrid({
   } else {
     filteredStudents = data?.results;
   }
-  const toggleSelection = (studentId: string) => {
+  const toggleSelection = (studentId: number) => {
     setSelectedStudentIds((prevSelectedIds) => {
       if (prevSelectedIds.includes(studentId)) {
         return prevSelectedIds.filter((id) => id !== studentId);
@@ -229,6 +226,7 @@ export function StudentDatagrid({
 
     onConfirm(selectedStudents);
     onClose();
+    console.log("Selected students:", selectedStudentIds);
   };
 
   const handleSearchSubmit = (value: string) => {

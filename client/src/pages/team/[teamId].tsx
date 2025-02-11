@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Description } from "@radix-ui/react-dialog";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -17,8 +19,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { StudentDatagrid } from "@/components/ui/Team/data-grid";
 import { Textarea } from "@/components/ui/textarea";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import api from "@/lib/api";
 import { useTokenStore } from "@/store/token-store";
+import { Team } from "@/types/team";
 import { Student } from "@/types/user";
 
 import AddItems from "../../../public/Add-items.svg";
@@ -30,9 +34,17 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function TeamCreatePage() {
+export default function TeamViewPage() {
+  const router = useRouter();
+  const { teamId } = router.query;
+  const { data, isLoading, error } = useFetchData<Team>({
+    queryKey: ["teams", teamId],
+    endpoint: `/team/teams/${teamId}/`,
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
+  const [initialStudentIds, setInitialStudentIds] = useState<number[]>([]);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema), // Integrate zod validation
     defaultValues: {
@@ -42,52 +54,89 @@ export default function TeamCreatePage() {
   });
   // Open modal
   const openModal = () => setIsModalOpen(true);
-  const { access } = useTokenStore(); // access the JWT token
-  const [schoolId, setSchoolId] = useState<number | undefined>(undefined);
-
-  useEffect(() => {
-    if (access?.decoded) {
-      const userSchoolId = access.decoded["school_id"];
-      setSchoolId(userSchoolId);
-    }
-  }, [access]);
-  // Handle student selection
+  //   const { access } = useTokenStore();
+  //   const [schoolId, setSchoolId] = useState<number | undefined>(undefined);
   const handleStudentSelection = (students: Student[]) => {
     setSelectedStudents(students);
-    console.log("selected students:", selectedStudents);
   };
 
-  const onSubmit = async (data: FormValues) => {
-    const teamData = {
-      school_id: schoolId,
-      //   school_id: 1, // to test(for admin which school_id is null)
-      ...data,
+  useEffect(() => {
+    // if (access?.decoded) {
+    //   const userSchoolId = access.decoded["school_id"];
+    //   setSchoolId(userSchoolId);
+    // }
+    if (data?.members) {
+      setSelectedStudents(data.members.map((member) => member.student));
+      setInitialStudentIds(data.members.map((member) => member.student.id));
+    }
+    if (data) {
+      form.reset({
+        name: data.name,
+        description: data.description,
+      });
+    }
+  }, [data?.members, data, form.reset]);
+
+  if (isLoading || !data || !data?.members) return <p>Loading...</p>;
+
+  const teamData = {
+    // school_id: schoolId,
+    name: data.name,
+    description: data.description,
+  };
+  const onSubmit = async (formData: FormValues) => {
+    const editedTeamData = {
+      ...formData,
     };
 
-    console.log("Form Data:", teamData);
+    console.log("Form Data:", editedTeamData);
 
-    let teamId: number | null = null; // Declare teamId outside
+    const differences: Partial<FormValues> = {};
+    for (const key of Object.keys(teamData) as Array<keyof FormValues>) {
+      if (teamData[key] !== editedTeamData[key]) {
+        differences[key] = editedTeamData[key];
+      }
+    }
+    console.log("differences:", differences);
+
+    const selectedStudentIds = selectedStudents.map((student) => student.id);
+    const removedStudentIds = initialStudentIds.filter(
+      (id) => !selectedStudentIds.includes(id),
+    );
+    const addedStudentIds = selectedStudentIds.filter(
+      (id) => !initialStudentIds.includes(id),
+    );
+
+    if (Object.keys(differences).length != 0) {
+      try {
+        const response: any = await api.patch(
+          `/team/teams/${teamId}/`,
+          differences,
+        );
+        console.log("Team updated successfully:", response.data);
+      } catch (error) {
+        console.error("Error updating team:", error);
+        return; // Stop execution if team creation fails
+      }
+    }
+    const removedMemberIds = data.members.filter((member) =>
+      removedStudentIds.includes(member.student.id),
+    );
 
     try {
-      const response: any = await api.post("/team/teams/", teamData);
-      console.log("First response:", response);
+      const requests = removedMemberIds.map((id) => {
+        return api.delete(`/team/team-members/${id}/`);
+      });
 
-      teamId = response.data.id; // Ensure response structure is correct
+      const responses = await Promise.all(requests); // Wait for all requests
+      console.log("Deleting team member requests successful:", responses);
     } catch (error) {
-      console.error("Error creating team:", error);
-      return; // Stop execution if team creation fails
+      console.error("Error sending delete requests:", error);
     }
-
-    // Ensure teamId exists before making the second request
-    if (!teamId) {
-      console.error("Failed to retrieve team ID.");
-      return;
-    }
-
     try {
-      const requests = selectedStudents.map((student) => {
+      const requests = addedStudentIds.map((id) => {
         return api.post("/team/team-members/", {
-          student_id: student.id,
+          student_id: id,
           team: teamId,
         });
       });
@@ -97,11 +146,14 @@ export default function TeamCreatePage() {
     } catch (error) {
       console.error("Error sending post requests:", error);
     }
+    router.push("/team");
   };
 
+  const teamStudents = data.members.map((member) => member.student.id);
+  console.log("team members:", teamStudents);
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">Create a Team</h1>
+      <h1 className="text-2xl font-bold">View or Edit a Team</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Question Name */}
@@ -114,7 +166,7 @@ export default function TeamCreatePage() {
                   Team Name <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Please input team name" {...field} />
+                  <Input placeholder={data.name} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -131,7 +183,7 @@ export default function TeamCreatePage() {
                   Competition Period <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Textarea placeholder="2024 Grade 7" {...field} />
+                  <Textarea placeholder={data.description} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -166,7 +218,7 @@ export default function TeamCreatePage() {
 
             <div className="flex justify-center">
               <Button type="submit" className="mt-4">
-                Submit Team
+                Submit
               </Button>
             </div>
           </div>
@@ -178,6 +230,7 @@ export default function TeamCreatePage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleStudentSelection}
+        selectedIds={teamStudents}
       />
     </div>
   );
