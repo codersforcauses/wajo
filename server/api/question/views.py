@@ -29,7 +29,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
     # override the create method
     def create(self, request, *args, **kwargs):
-        print(request.data)
         # validate integrity of name
         name = request.data.get('name')
         if Question.objects.filter(name=name).exists():
@@ -127,7 +126,6 @@ class ImageViewSet(viewsets.ModelViewSet):
         question_id = request.data.get("question")
 
         # check if the quiz solts already exist, if so, detele them in database
-        print(Image.objects, question_id)
         if Image.objects.filter(question=question_id).exists():
             Image.objects.filter(question=question_id).delete()
 
