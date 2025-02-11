@@ -20,7 +20,7 @@ export default function QuizPage() {
     endpoint: "/quiz/all_quizzes/",
   });
 
-  let upcomingCompetition = quizData?.filter((quiz) => quiz.is_comp === true);
+  let upcomingCompetitions = quizData?.filter((quiz) => quiz.is_comp === true);
   // let pastPapers = quizData?.filter((quiz) => quiz.is_comp === false);
   let practiceTests = quizData?.filter((quiz) => quiz.is_comp === false);
   let pastPapers: Array<AdminQuiz> = [];
@@ -69,6 +69,15 @@ export default function QuizPage() {
           ) : (
             <HorizontalCard title={"Coming soon!"} href={`quiz/`} />
           )}
+        </div>
+        <div className="flex w-full flex-col items-center justify-center gap-4">
+          {upcomingCompetitions?.map((quiz) => (
+            <HorizontalCard
+              title={quiz.name}
+              href={`quiz/competition/${quiz.id}`}
+            />
+          ))}
+          <HorizontalCard title="Practice" href={`/quiz/practice/1`} />
         </div>
       </section>
     </div>

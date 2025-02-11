@@ -24,6 +24,7 @@ export interface AdminQuizSlot {
   time_limit: number;
   time_window: number;
   status: number;
+  question: Question;
 }
 
 export interface Quiz {
