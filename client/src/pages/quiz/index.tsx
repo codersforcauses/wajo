@@ -20,9 +20,13 @@ export default function QuizPage() {
     endpoint: "/quiz/all_quizzes/",
   });
 
-  let upcomingCompetitions = quizData?.filter((quiz) => quiz.is_comp === true);
+  let upcomingCompetitions = quizData?.filter(
+    (quiz) => quiz.status === 1 && quiz.visible === true,
+  );
   // let pastPapers = quizData?.filter((quiz) => quiz.is_comp === false);
-  let practiceTests = quizData?.filter((quiz) => quiz.is_comp === false);
+  let practiceTests = quizData?.filter(
+    (quiz) => quiz.status === 0 && quiz.visible === true,
+  );
   let pastPapers: Array<AdminQuiz> = [];
   return (
     <div className="justify-centre mt-8 flex h-full w-full flex-col items-center bg-white text-center">
@@ -30,14 +34,15 @@ export default function QuizPage() {
         <h2>{new Date().getFullYear()} Competition</h2>
         <h6 className="my-4">
           Competition will start at{" "}
-          {upcomingCompetition && upcomingCompetition.length > 0
-            ? upcomingCompetition[0].open_time_date.toString()
+          {upcomingCompetitions && upcomingCompetitions.length > 0
+            ? upcomingCompetitions[0].open_time_date.toString()
             : "[TBD]"}{" "}
         </h6>
+        /
         <div className="flex w-full flex-col items-center justify-center gap-4">
           <HorizontalCard
             title="2025 Competition"
-            href={`quiz/competition/${upcomingCompetition && upcomingCompetition.length > 0 ? upcomingCompetition[0].id : ""}`}
+            href={`quiz/competition/${upcomingCompetitions && upcomingCompetitions.length > 0 ? upcomingCompetitions[0].id : ""}`}
           />
         </div>
       </section>

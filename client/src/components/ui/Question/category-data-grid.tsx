@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { SortIcon } from "@/components/ui/icon";
-import { Pagination } from "@/components/ui/pagination";
+import Pagination from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
