@@ -23,7 +23,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     """
     queryset = Question.objects.all().order_by("-time_created")
     serializer_class = QuestionSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
     filterset_fields = ['mark', 'answers__value']
     ordering_fields = ['time_created', 'time_modified', 'diff_level', 'mark']
