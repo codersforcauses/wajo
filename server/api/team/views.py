@@ -2,6 +2,7 @@ from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser
+from api.permissions import IsTeacher, IsAdmin
 from django.db import IntegrityError
 from rest_framework.decorators import permission_classes
 
@@ -9,15 +10,22 @@ from .models import Team, TeamMember
 from .serializers import TeamSerializer, TeamMemberSerializer
 
 
-@permission_classes([IsAdminUser])
+@permission_classes([IsTeacher | IsAdmin | IsAdminUser])
 class TeamViewSet(viewsets.ModelViewSet):
-    queryset = Team.objects.all().order_by("id")
     serializer_class = TeamSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["name"]
     # Specify which fields can be ordered
     ordering_fields = ["id", "name", "description"]
     ordering = ["id"]
+
+    def get_queryset(self):
+        """Filter teams based on user role."""
+        user = self.request.user
+        queryset = Team.objects.all()
+        if hasattr(user, "teacher"):
+            return queryset.filter(school_id=user.teacher.school_id)
+        return queryset.order_by("id")  # Admins can see all teams
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, many=True)

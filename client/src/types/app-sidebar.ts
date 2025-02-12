@@ -69,11 +69,11 @@ export const navData: NavigationData = {
   ],
   teacher: [
     {
-      title: "Teacher Menu",
-      icon: SquareDashedMousePointer,
+      title: "User Management",
+      icon: UserRoundCog,
       items: [
-        { title: "Teacher Menu Items 1", url: "#" },
-        { title: "Teacher Menu Items 2", url: "#" },
+        { title: "Students", url: "/users" },
+        { title: "Teams", url: "/users/team" },
       ],
     },
   ],
