@@ -115,3 +115,14 @@ export const createTeamSchema = z.object({
     .min(1, "Required")
     .max(100, "Description cannot more than 100 char."),
 });
+
+const createTeamMemberSchema = z.object({
+  student_id: z.number({ message: "Required" }),
+  team: z.number({ message: "Required" }),
+});
+
+export const createMembersSchema = z.object({
+  members: z
+    .array(createTeamMemberSchema)
+    .min(1, "At least one member is required"),
+});
