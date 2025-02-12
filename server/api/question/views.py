@@ -21,11 +21,12 @@ class QuestionViewSet(viewsets.ModelViewSet):
         search_fields (list): The fields to search in the viewset.
         filterset_fields (list): The fields to filter in the viewset.
     """
-    queryset = Question.objects.all()
+    queryset = Question.objects.all().order_by("-time_created")
     serializer_class = QuestionSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
     filterset_fields = ['mark', 'answers__value']
+    ordering_fields = ['time_created', 'time_modified', 'diff_level', 'mark']
 
     # override the create method
     def create(self, request, *args, **kwargs):
