@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SelectRole } from "@/components/ui/select-role";
 import {
   Table,
   TableBody,
@@ -22,25 +22,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SelectSchool } from "@/components/ui/Users/select-school";
+import { usePostMutation } from "@/hooks/use-post-data";
 import { cn } from "@/lib/utils";
-import { createRandomPwd, createUserSchema } from "@/types/user";
-
-// The shape of a single student returned from the backend
-type CreatedStudent = {
-  id: number;
-  first_name: string;
-  last_name: string;
-  student_id: string;
-  year_level: number | string;
-  school: {
-    id: number;
-    name: string;
-    // any other fields your backend returns...
-  };
-  attendent_year: number;
-  created_at: string;
-  extenstion_time: number;
-};
+import { createRandomPwd, createUserSchema, Student } from "@/types/user";
 
 // For localStorage and CSV export
 type StoredRecord = {
@@ -89,7 +73,7 @@ export function DataTableForm() {
     last_name: "",
     password: "",
     year_level: "7", // default year_level is "7"
-    school_id: 1, // default school_id is 1, need to be changed later
+    school_id: 0,
     attendent_year: defaultAttendentYear,
     // extenstion_time is optional, so it can be omitted
   };
@@ -106,61 +90,43 @@ export function DataTableForm() {
     name: "users",
   });
 
-  // const onSubmit = (data: { users: User[] }) => {
-  //   console.log("Submitted data:", data.users);
-  // };
+  const { mutate: createUser, isPending } = usePostMutation<Student[]>({
+    mutationKey: ["students"],
+    endpoint: "/users/students/",
+    onSuccess: (res) => {
+      console.log(res.data);
 
-  /**
-   * When form is submitted:
-   * 1. POST the array of users to /api/users/students/
-   * 2. Store the *response data* in localStorage
-   */
-  const onSubmit = async (data: { users: User[] }) => {
-    try {
-      // POST the array of user objects to your backend
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/users/students/",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data.users), // Send them as an array
-        },
-      );
+      toast.success("Students created successfully!");
+      try {
+        // Build newRecords in the shape you want to store in localStorage
+        const newRecords: StoredRecord[] = res.data.map((std) => ({
+          studentId: std.student_id,
+          firstName: std.first_name,
+          lastName: std.last_name,
+          yearLevel: std.year_level,
+          schoolId: std.school.id,
+          schoolName: std.school.name,
+          attendentYear: std.attendent_year,
+          createdAt: std.created_at.toString(),
+          extensionTime: std.extenstion_time || 0,
+        }));
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
+        // Merge with any existing data in localStorage
+        const previousData = JSON.parse(
+          localStorage.getItem("studentRecords") || "[]",
+        );
+        const updatedData = [...previousData, ...newRecords];
+
+        localStorage.setItem("studentRecords", JSON.stringify(updatedData));
+        toast.success("Please Click Export CSV button to download data.");
+      } catch (error) {
+        toast.error(`Error when update data for Export CSV. ${error}`);
       }
+    },
+  });
 
-      // The backend should return an array of created student records:
-      const createdStudents: CreatedStudent[] = await response.json();
-
-      // Build newRecords in the shape you want to store in localStorage
-      const newRecords: StoredRecord[] = createdStudents.map((std) => ({
-        studentId: std.student_id,
-        firstName: std.first_name,
-        lastName: std.last_name,
-        yearLevel: std.year_level,
-        schoolId: std.school.id,
-        schoolName: std.school.name,
-        attendentYear: std.attendent_year,
-        createdAt: std.created_at,
-        extensionTime: std.extenstion_time,
-      }));
-
-      // Merge with any existing data in localStorage
-      const previousData = JSON.parse(
-        localStorage.getItem("studentRecords") || "[]",
-      );
-      const updatedData = [...previousData, ...newRecords];
-
-      localStorage.setItem("studentRecords", JSON.stringify(updatedData));
-
-      console.log("Submitted and saved to localStorage:", updatedData);
-      alert("Students created successfully!");
-    } catch (error: any) {
-      console.error("Failed to create students:", error);
-      alert("Something went wrong while creating students.");
-    }
+  const onSubmit = (data: { users: User[] }) => {
+    createUser([...data.users]);
   };
 
   /**
@@ -232,232 +198,249 @@ export function DataTableForm() {
           onSubmit={createUserForm.handleSubmit(onSubmit)}
           className="space-y-4"
         >
-          <Table className="w-full border-collapse text-left shadow-md">
-            <TableHeader className="bg-black text-lg font-semibold">
-              <TableRow className="hover:bg-muted/0">
-                <TableHead
-                  className={cn(commonTableHeadClasses, "rounded-tl-lg", "w-0")}
-                >
-                  No.
-                </TableHead>
-                <TableHead className={commonTableHeadClasses}>
-                  First Name*
-                </TableHead>
-                <TableHead className={commonTableHeadClasses}>
-                  Last Name*
-                </TableHead>
-                <TableHead className={commonTableHeadClasses}>
-                  Password*
-                  <FormDescription className="text-xs text-white">
-                    Minimum 8 characters with letters, numbers, and symbols
-                  </FormDescription>
-                </TableHead>
-                <TableHead className={commonTableHeadClasses}>
-                  Year Level*
-                </TableHead>
-                <TableHead className={commonTableHeadClasses}>
-                  School*
-                </TableHead>
-                <TableHead className={commonTableHeadClasses}>
-                  Attendent Year*
-                </TableHead>
-                <TableHead className={commonTableHeadClasses}>
-                  Extenstion Time
-                </TableHead>
-                <TableHead
-                  className={cn(commonTableHeadClasses, "rounded-tr-lg", "w-0")}
-                ></TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {fields.map((field, index) => (
-                <TableRow
-                  key={field.id}
-                  className="divide-gray-200 border-gray-50 text-sm text-black"
-                >
-                  {/* No. Field */}
-                  <TableCell className="text-lg font-semibold">
-                    {index + 1}
-                  </TableCell>
-
-                  {/* First Name */}
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.first_name`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                          <FormControl>
-                            <Input {...field} placeholder="Enter first name" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+          <div className="grid">
+            <div className="overflow-hidden rounded-lg border">
+              <Table className="w-full border-collapse text-left shadow-md">
+                <TableHeader className="bg-black text-lg font-semibold">
+                  <TableRow className="hover:bg-muted/0">
+                    <TableHead className={commonTableHeadClasses}>
+                      No.
+                    </TableHead>
+                    <TableHead className={commonTableHeadClasses}>
+                      First Name*
+                    </TableHead>
+                    <TableHead className={commonTableHeadClasses}>
+                      Last Name*
+                    </TableHead>
+                    <TableHead className={commonTableHeadClasses}>
+                      Password*
+                      <FormDescription className="text-pretty text-xs text-white">
+                        Minimum 8 characters with letters, numbers, and symbols
+                      </FormDescription>
+                    </TableHead>
+                    <TableHead className={commonTableHeadClasses}>
+                      Year Level*
+                    </TableHead>
+                    <TableHead className={commonTableHeadClasses}>
+                      School*
+                    </TableHead>
+                    <TableHead className={commonTableHeadClasses}>
+                      Attendent Year*
+                    </TableHead>
+                    <TableHead className={commonTableHeadClasses}>
+                      Extenstion Time
+                    </TableHead>
+                    <TableHead
+                      className={cn(
+                        commonTableHeadClasses,
+                        "sticky right-0 bg-black",
                       )}
-                    />
-                  </TableCell>
-
-                  {/* Last Name */}
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.last_name`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                          <FormControl>
-                            <Input {...field} placeholder="Enter last name" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell>
-
-                  {/* Password Field */}
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.password`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                          <FormControl>
-                            <div className="relative flex items-center">
-                              <Input
-                                {...field}
-                                placeholder="Enter password (or Auto Generate)"
-                              />
-                              <Button
-                                type="button"
-                                variant="secondary"
-                                className="ml-2"
-                                onClick={() => {
-                                  const randomPwd = createRandomPwd();
-                                  field.onChange(randomPwd);
-                                }}
-                              >
-                                Auto
-                              </Button>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell>
-
-                  {/* Year Level Field (7/8/9) */}
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.year_level`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col gap-1.5">
-                          <FormControl>
-                            <select
-                              className="input rounded border p-2 hover:border-blue-400 focus:outline-none focus:ring-0"
-                              value={field.value}
-                              onChange={(e) => field.onChange(e.target.value)}
-                            >
-                              <option value="7">7</option>
-                              <option value="8">8</option>
-                              <option value="9">9</option>
-                            </select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell>
-
-                  {/* School Field */}
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.school_id`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                          <FormControl>
-                            <SelectSchool
-                              selectedId={field.value}
-                              onChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell>
-
-                  {/* Attendent Year Field (2024-2050) */}
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.attendent_year`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col gap-1.5">
-                          <FormControl>
-                            <select
-                              className="input rounded border p-2 hover:border-blue-400 focus:outline-none focus:ring-0"
-                              value={field.value}
-                              onChange={(e) =>
-                                field.onChange(Number(e.target.value))
-                              }
-                            >
-                              {Array.from({ length: 2050 - 2024 + 1 }).map(
-                                (_, i) => {
-                                  const y = 2024 + i;
-                                  return (
-                                    <option key={y} value={y}>
-                                      {y}
-                                    </option>
-                                  );
-                                },
-                              )}
-                            </select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell>
-
-                  {/* Extenstion Time (optional) */}
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.extenstion_time`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                          <FormControl>
-                            <Input
-                              type="number"
-                              {...field}
-                              placeholder="0"
-                              onChange={(e) =>
-                                field.onChange(Number(e.target.value))
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell>
-
-                  {/* Delete Button */}
-                  <TableCell className="w-24 text-right align-top">
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      onClick={() => remove(index)}
                     >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                      Actions
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  {fields.map((field, index) => (
+                    <TableRow
+                      key={field.id}
+                      className="divide-gray-200 border-gray-50 text-sm text-black"
+                    >
+                      {/* No. Field */}
+                      <TableCell className="text-lg font-semibold">
+                        {index + 1}
+                      </TableCell>
+
+                      {/* First Name */}
+                      <TableCell className="align-top">
+                        <FormField
+                          control={createUserForm.control}
+                          name={`users.${index}.first_name`}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  className="w-full"
+                                  placeholder="Enter first name"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </TableCell>
+
+                      {/* Last Name */}
+                      <TableCell className="align-top">
+                        <FormField
+                          control={createUserForm.control}
+                          name={`users.${index}.last_name`}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  placeholder="Enter last name"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </TableCell>
+
+                      {/* Password Field */}
+                      <TableCell className="align-top">
+                        <FormField
+                          control={createUserForm.control}
+                          name={`users.${index}.password`}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                              <FormControl>
+                                <div className="flex items-center">
+                                  <Input
+                                    {...field}
+                                    placeholder="Enter password (or Auto Generate)"
+                                    className="min-w-20"
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="secondary"
+                                    className="ml-2"
+                                    onClick={() => {
+                                      const randomPwd = createRandomPwd();
+                                      field.onChange(randomPwd);
+                                    }}
+                                  >
+                                    Auto
+                                  </Button>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </TableCell>
+
+                      {/* Year Level Field (7/8/9) */}
+                      <TableCell className="align-top">
+                        <FormField
+                          control={createUserForm.control}
+                          name={`users.${index}.year_level`}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col gap-1.5">
+                              <FormControl>
+                                <select
+                                  className="input rounded border p-2 hover:border-blue-400 focus:outline-none focus:ring-0"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(e.target.value)
+                                  }
+                                >
+                                  <option value="7">7</option>
+                                  <option value="8">8</option>
+                                  <option value="9">9</option>
+                                </select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </TableCell>
+
+                      {/* School Field */}
+                      <TableCell className="align-top">
+                        <FormField
+                          control={createUserForm.control}
+                          name={`users.${index}.school_id`}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                              <FormControl>
+                                <SelectSchool
+                                  selectedId={field.value}
+                                  onChange={field.onChange}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </TableCell>
+
+                      {/* Attendent Year Field (2024-2050) */}
+                      <TableCell className="align-top">
+                        <FormField
+                          control={createUserForm.control}
+                          name={`users.${index}.attendent_year`}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col gap-1.5">
+                              <FormControl>
+                                <select
+                                  className="input rounded border p-2 hover:border-blue-400 focus:outline-none focus:ring-0"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(Number(e.target.value))
+                                  }
+                                >
+                                  {Array.from({ length: 2050 - 2024 + 1 }).map(
+                                    (_, i) => {
+                                      const y = 2024 + i;
+                                      return (
+                                        <option key={y} value={y}>
+                                          {y}
+                                        </option>
+                                      );
+                                    },
+                                  )}
+                                </select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </TableCell>
+
+                      {/* Extenstion Time (optional) */}
+                      <TableCell className="align-top">
+                        <FormField
+                          control={createUserForm.control}
+                          name={`users.${index}.extenstion_time`}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  {...field}
+                                  placeholder="0"
+                                  onChange={(e) =>
+                                    field.onChange(Number(e.target.value))
+                                  }
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </TableCell>
+
+                      {/* Delete Button */}
+                      <TableCell className="sticky right-0 flex w-24 bg-white text-right align-top">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          onClick={() => remove(index)}
+                        >
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
 
           <div className="flex justify-between px-2">
             <Button
@@ -476,7 +459,10 @@ export function DataTableForm() {
               >
                 Export CSV
               </Button>
-              <Button type="submit">Submit</Button>
+
+              <Button type="submit" disabled={isPending}>
+                Submit
+              </Button>
             </div>
           </div>
         </form>

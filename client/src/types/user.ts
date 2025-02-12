@@ -127,7 +127,7 @@ export const createUserSchema = z.object({
   password: z.string().min(1, "Password is required"),
   year_level: z.enum(["7", "8", "9"]),
   //School ID now is not compuslory, need to modify later
-  school_id: z.number().int().positive(),
+  school_id: z.number().int().positive("Required"),
   attendent_year: z.number().int().min(2024).max(2050),
   extenstion_time: z.number().int().min(0).optional(),
 });
