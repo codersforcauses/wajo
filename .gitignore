@@ -291,4 +291,7 @@ dist
 # misc
 .DS_Store
 
+# media/image directory
+mediafiles/
+
 opt/

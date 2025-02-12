@@ -4,10 +4,24 @@ import {
   UseMutationResult,
   useQueryClient,
 } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "sonner";
 
 import api from "@/lib/api";
+
+interface UsePostMutationOptions<
+  TData,
+  TVariables,
+  TError = AxiosError<{ error: string; message: string }>,
+> extends Omit<
+    UseMutationOptions<TData, TError, TVariables>,
+    "mutationKey" | "mutationFn"
+  > {
+  mutationKey: string[];
+  endpoint: string;
+  timeout?: number;
+  headers?: Record<string, string>;
+}
 
 /**
  * Custom hook for performing a POST request mutation.
@@ -40,22 +54,26 @@ export const usePostMutation = <
   TData,
   TVariables = unknown,
   TError = AxiosError<{ error: string; message: string }>,
->(
-  mutationKey: string[],
-  endpoint: string,
-  timeout: number = 10000, // Default timeout of 10 seconds
-  args?: Omit<
-    UseMutationOptions<TData, TError, TVariables>,
-    "mutationKey" | "mutationFn"
-  >,
-): UseMutationResult<TData, TError, TVariables> => {
+>({
+  mutationKey,
+  endpoint,
+  timeout = 10000,
+  headers,
+  ...args
+}: UsePostMutationOptions<
+  AxiosResponse<TData>,
+  TVariables,
+  TError
+>): UseMutationResult<AxiosResponse<TData>, TError, TVariables> => {
   const queryClient = useQueryClient();
 
-  return useMutation<TData, TError, TVariables>({
-    ...args,
+  return useMutation<AxiosResponse<TData>, TError, TVariables>({
     mutationKey,
     mutationFn: (variables: TVariables) => {
-      return api.post(endpoint, variables, { timeout });
+      return api.post(endpoint, variables, {
+        timeout,
+        ...(headers && { headers }),
+      });
     },
     onError: (error: TError) => {
       // extract error message from BE response
@@ -64,9 +82,10 @@ export const usePostMutation = <
         toast.error(detailedError || message || "Something went wrong");
       }
     },
-    onSuccess: (data, details, context) => {
+    onSuccess: (response, details, context) => {
       queryClient.invalidateQueries({ queryKey: [mutationKey] });
-      if (args?.onSuccess) args.onSuccess(data, details, context);
+      if (args?.onSuccess) args.onSuccess(response, details, context);
     },
+    ...args,
   });
 };
