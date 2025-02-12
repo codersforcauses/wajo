@@ -38,8 +38,10 @@ export default function Layout({ children }: LayoutProps) {
     return (
       <div>
         <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <main className="flex min-h-[100vh] flex-grow flex-col">
+          {children}
+        </main>
+        <Footer isCompetition={false} />
       </div>
     );
   }

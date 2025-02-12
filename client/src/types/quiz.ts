@@ -6,7 +6,7 @@ export interface AdminQuiz {
   id: number;
   name: string;
   intro: string;
-  total_marks: string;
+  total_marks: number;
   is_comp: boolean;
   visible: boolean;
   open_time_date: Date;

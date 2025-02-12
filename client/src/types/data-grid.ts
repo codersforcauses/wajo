@@ -9,8 +9,8 @@
  * @example
  * const exampleDatagridProps: DatagridProps = {
  *   datacontext: [
- *     { name: "Question01_2024", category: "Geometry Questions", difficulty: "Difficult" },
- *     { name: "Question02_2024", category: "Algebra Questions", difficulty: "Easy" }
+ *     { name: "Question01_2024", genre: "Geometry Questions", difficulty: "Difficult" },
+ *     { name: "Question02_2024", genre: "Algebra Questions", difficulty: "Easy" }
  *   ],
  *   onDataChange: (updatedData) => console.log("Data updated:", updatedData),
  *   changePage: 1

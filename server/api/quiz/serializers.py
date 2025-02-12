@@ -15,7 +15,7 @@ class CompQuestionSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Question
-        fields = ['id', 'name', 'question_text', 'layout', 'image', 'mark']
+        fields = ['id', 'name', 'question_text', 'layout', 'images', 'mark']
 
 
 class CategorySerializer(serializers.ModelSerializer):
