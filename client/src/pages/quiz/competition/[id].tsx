@@ -38,13 +38,18 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
   });
   console.log(quizQuestionData);
 
+  const endTime = new Date(quizQuestionData?.end_time);
+  const now = new Date(); // Get current time (local to your system)
+
+  const secondsLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+
   const questionData = quizQuestionData?.data?.map((item) => ({
     question_text: item?.question?.question_text,
     mark: item?.question?.mark,
     image: item?.question?.images?.[0],
   }));
 
-  console.log(questionData);
+  // console.log(questionData);
 
   // console.log("Quiz Data: ", quizData);
   // console.log("2024 Quiz Data: ", quizData ? quizData[0] : "No data available");
@@ -76,7 +81,7 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
     console.log("Start Quiz");
     setDisplayQuiz(true);
     // setTimeLeft(quizDuration * 60 * 1000)
-    setTimeLeft(6000); // Set the countdown to 60 seconds (you can change this)
+    setTimeLeft(secondsLeft); // Set the countdown to 60 seconds (you can change this)
     setIsRunning(true);
   };
 
@@ -88,6 +93,7 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
 
     if (timeLeft <= 0) {
       setIsRunning(false); // Stop the countdown when time reaches 0
+      handleSubmit();
       return;
     }
 
@@ -140,7 +146,7 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
               setCurrentPage={setCurrentPage}
               totalQuestions={numberOfQuestions}
             />
-            <Button variant="secondary" onClick={() => setIsSubmitted(true)}>
+            <Button variant="secondary" onClick={() => handleSubmit()}>
               Submit
             </Button>
           </div>
