@@ -8,7 +8,7 @@ import {
 import { cn } from "@/lib/utils";
 import { PaginationProps } from "@/types/data-grid";
 
-export default function Pagination({
+export function Pagination({
   totalPages,
   currentPage,
   onPageChange,

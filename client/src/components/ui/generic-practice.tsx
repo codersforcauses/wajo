@@ -103,8 +103,8 @@ export default function GenericPractice({
         <div className="mb-2 flex items-center justify-between">
           <h2 className={headingStyle}>Question {questionNumber}</h2>
           <h2 className={headingStyle}>
-            [{currentQuestion.total_marks}{" "}
-            {currentQuestion.total_marks === "1" ? "Mark" : "Marks"}]
+            [{currentQuestion.question.mark}{" "}
+            {currentQuestion.question.mark === 1 ? "Mark" : "Marks"}]
           </h2>
         </div>
         <p>{currentQuestion.question.question_text}</p>
