@@ -27,6 +27,7 @@ class TeamAPITestCase(APITestCase):
             username="admin", password="Password123")
         # Create a school
         self.school = School.objects.create(name="Test School", code="TS123")
+        self.school.save()
         # Create a team
         self.team_data = {
             'name': 'Test Team',
@@ -41,7 +42,7 @@ class TeamAPITestCase(APITestCase):
         self.client.credentials(
             HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
         response = self.client.post(
-            '/api/team/teams/', self.team_data, format='json')
+            '/api/team/teams/', [self.team_data], format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_get_team_list(self):
