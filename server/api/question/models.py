@@ -1,47 +1,5 @@
 from django.db import models
-import os
-import uuid
-from django.conf import settings
-import base64
 from django.utils.timezone import now
-
-
-class Image(models.Model):
-    """
-    Represents an image in the system.
-    """
-    id = models.AutoField(primary_key=True)
-    scale = models.IntegerField()
-    jax_text = models.TextField(default="")
-    url = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.id} {self.url}"
-
-    def save_image_to_local(self, image_data, filename=None):
-        """
-        Save the image to a local file with a unique name.
-
-        :param image_data: Base64 encoded image data
-        :param filename: Optional filename. If not provided, a unique filename will be generated.
-        """
-        # Decode the base64 image data
-        image_data = base64.b64decode(image_data)
-
-        # Generate a unique filename if not provided
-        if not filename:
-            filename = f'{uuid.uuid4()}.png'
-
-        # Define the path to save the image
-        file_path = os.path.join(settings.MEDIA_ROOT, filename)
-
-        # Save the image to the file
-        with open(file_path, 'wb') as f:
-            f.write(image_data)
-
-        # Update the url field with the file path
-        self.url = file_path
-        self.save()
 
 
 class Category(models.Model):
@@ -79,7 +37,7 @@ class Question(models.Model):
     image: The image associated with the question.
     mark: The mark for the question.
     time_created: The timestamp when the question was created.
-    time_modified: The timestamp when the question was modified.
+gi    time_modified: The timestamp when the question was modified.
     """
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
@@ -94,8 +52,6 @@ class Question(models.Model):
     diff_level = models.IntegerField()
     solution_text = models.TextField(default="")
     layout = models.TextField(default="")  # Placeholder for layout enum
-    image = models.ForeignKey(
-        Image, on_delete=models.SET_NULL, null=True, blank=True, related_name='questions', default=None)
     mark = models.IntegerField(default=0)
     time_created = models.DateTimeField(auto_now_add=True)
     time_modified = models.DateTimeField(auto_now=True)
@@ -117,3 +73,15 @@ class Answer(models.Model):
 
     def __str__(self):
         return f'{self.question} {self.value}'
+
+
+class Image(models.Model):
+    """
+    Represents an image in the system.
+    """
+    id = models.AutoField(primary_key=True)
+    url = models.ImageField(upload_to="images/", blank=True, null=True)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="images")
+
+    def __str__(self):
+        return f'{self.url} {self.question}'

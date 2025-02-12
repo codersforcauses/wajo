@@ -1,75 +1,106 @@
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import React, { Suspense, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
+import {
+  Pagination,
+  PaginationSearchParams,
+  SelectRow,
+} from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
 import { TeamDataGrid } from "@/components/ui/Users/team-data-grid";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import type { Team } from "@/types/team";
 
 export default function TeamList() {
-  const {
-    data: teams,
-    isLoading: isTeamLoading,
-    isError: isTeamError,
-    error: TeamError,
-  } = useFetchData<Team[]>({
-    queryKey: ["team.teams"],
-    endpoint: "/team/teams/",
+  const router = useRouter();
+  const { query, isReady, push } = router;
+
+  const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
+    search: "",
+    nrows: 5,
+    page: 1,
   });
 
-  const [page, setPage] = useState<number>(1);
-  const [filteredData, setFilteredData] = useState<Team[]>([]);
+  const { data, isLoading, error, totalPages } = useFetchDataTable<Team>({
+    queryKey: ["team.teams"],
+    endpoint: "/team/teams/",
+    searchParams: searchParams,
+  });
 
   useEffect(() => {
-    if (teams) {
-      setFilteredData(teams);
+    if (!isLoading) {
+      setSearchParams((prev) => ({
+        search: (query.search as string) || prev.search,
+        nrows: Number(query.nrows) || prev.nrows,
+        page: Number(query.page) || prev.page,
+      }));
     }
-  }, [teams]);
+  }, [query.search, query.nrows, query.page, !isLoading]);
 
-  const handleFilterChange = (value: string) => {
-    if (!teams) return;
-
-    const filtered =
-      value.trim() === ""
-        ? teams
-        : teams.filter((item) => {
-            const query = value.toLowerCase().trim();
-            const isExactMatch = query.startsWith('"') && query.endsWith('"');
-            const normalizedQuery = isExactMatch ? query.slice(1, -1) : query;
-
-            return isExactMatch
-              ? item.name.toLowerCase() === normalizedQuery
-              : item.name.toLowerCase().includes(normalizedQuery);
-          });
-
-    setFilteredData(filtered);
-    setPage(1);
+  const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
+    const updatedParams = { ...searchParams, ...newParams };
+    setSearchParams(updatedParams);
+    push(
+      {
+        pathname: "/users/team",
+        query: Object.fromEntries(
+          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
+        ),
+      },
+      undefined,
+      { shallow: true },
+    );
   };
 
-  if (isTeamLoading) return <WaitingLoader />;
-  if (isTeamError) return <div>Error: {TeamError?.message}</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!isReady || isLoading) return <WaitingLoader />;
 
   return (
     <div className="m-4 space-y-4">
       <div className="flex justify-between">
         <SearchInput
           label=""
-          value={""}
+          value={searchParams.search ?? ""}
           placeholder="Search Team"
-          onSearch={handleFilterChange}
+          onSearch={(newSearch: string) => {
+            setAndPush({ search: newSearch, page: 1 });
+          }}
         />
         <Button asChild className="mr-6 h-auto">
           <Link href={"/users/team/create"}>Create a Team</Link>
         </Button>
       </div>
 
-      <TeamDataGrid
-        datacontext={filteredData}
-        onDataChange={setFilteredData}
-        changePage={page}
-      ></TeamDataGrid>
+      <Suspense>
+        <div>
+          <TeamDataGrid datacontext={data ?? []} />
+          <div className="flex items-center justify-between p-4">
+            {/* Rows Per Page Selector */}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Rows per page:</span>
+              <SelectRow
+                className="h-7 w-20"
+                selectedRow={searchParams.nrows}
+                onChange={(newNrows) =>
+                  setAndPush({ nrows: Number(newNrows), page: 1 })
+                }
+              />
+            </div>
+            {/* Pagination Controls */}
+            <Pagination
+              totalPages={totalPages}
+              currentPage={searchParams.page}
+              onPageChange={(newPage: number) =>
+                setAndPush({ page: Math.min(newPage, totalPages) })
+              }
+              className="mr-4 flex"
+            />
+          </div>
+        </div>
+      </Suspense>
     </div>
   );
 }

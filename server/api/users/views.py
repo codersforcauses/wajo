@@ -115,7 +115,6 @@ class TeacherViewSet(viewsets.ModelViewSet):
         if request.user.is_staff:
             return super().retrieve(request, *args, **kwargs)
         elif hasattr(request.user, "teacher"):
-            print(kwargs["pk"])
             if request.user.teacher.id == int(kwargs["pk"]):
                 return super().retrieve(request, *args, **kwargs)
             else:
@@ -174,16 +173,16 @@ class SchoolViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-        try:
-            return super().create(request, *args, **kwargs)
-        except IntegrityError as error:
-            return Response(
-                {
-                    "error": "A school with this name already exists.",
-                    "message": str(error)
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # try:
+        #     return super().create(request, *args, **kwargs)
+        # except IntegrityError as error:
+        #     return Response(
+        #         {
+        #             "error": "A school with this name already exists.",
+        #             "message": str(error)
+        #         },
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
 
     def update(self, request, *args, **kwargs):
         try:

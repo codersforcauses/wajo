@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import React from "react";
 
@@ -60,9 +61,11 @@ export default function Sidebar({ children, role }: LayoutProps) {
     return { title, url };
   });
 
+  // ref https://ui.shadcn.com/docs/components/sidebar#persisted-state
+  const defaultOpen = Cookies.get("sidebar:state") === "true";
   return (
     <div>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={defaultOpen}>
         <AppSidebar className="z-50" Role={role} />
         <SidebarInset>
           <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
