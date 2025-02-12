@@ -36,6 +36,15 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
     queryKey: [`quiz.competition.${id}/slots`],
     endpoint: `/quiz/competition/${id}/slots/`,
   });
+  console.log(quizQuestionData);
+
+  const questionData = quizQuestionData?.data?.map((item) => ({
+    question_text: item?.question?.question_text,
+    mark: item?.question?.mark,
+    image: item?.question?.images?.[0],
+  }));
+
+  console.log(questionData);
 
   // console.log("Quiz Data: ", quizData);
   // console.log("2024 Quiz Data: ", quizData ? quizData[0] : "No data available");
@@ -139,7 +148,7 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             totalQuestions={numberOfQuestions}
-            questions={quizQuestionData ? quizQuestionData : []}
+            questions={quizQuestionData ? questionData : []}
           />
           {isSubmitted && (
             <SubmissionPopup
