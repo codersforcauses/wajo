@@ -48,8 +48,8 @@ const ImageControls = ({
       <Image
         src={imageUrl}
         alt="Question Image Preview"
-        width={0}
-        height={0}
+        width={200}
+        height={300}
         className="h-auto max-h-[30vh] w-auto max-w-[30vw]"
       />
       {controls.map(({ Component, position, layout }) => (

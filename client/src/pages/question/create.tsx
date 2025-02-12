@@ -106,7 +106,7 @@ export default function Create() {
         note: "note",
         solution_text: data.solution_text,
         diff_level: parseInt(data.difficulty),
-        layout: "layout",
+        layout: data.layout,
         mark: parseInt(data.mark, 0),
       },
       {
