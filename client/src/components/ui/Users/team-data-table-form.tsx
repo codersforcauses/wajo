@@ -63,7 +63,9 @@ export function TeamDataTableForm() {
     mutationKey: ["teams"],
     endpoint: "/team/teams/",
     onSuccess: () => {
-      toast.success("Teams created successfully!");
+      toast.success(
+        "Teams created successfully! Team members can be add from edit page.",
+      );
       router.push("/users/team/");
     },
   });
