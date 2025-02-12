@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
-import { Insight } from "@/types/leaderboard";
+import { School } from "@/types/insights";
 
 /**
  * Renders a paginated data grid for displaying insights on questions.

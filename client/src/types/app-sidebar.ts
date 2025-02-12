@@ -57,6 +57,14 @@ export const navData: NavigationData = {
       ],
     },
     {
+      title: "Insights",
+      icon: BookType,
+      items: [
+        { title: "Questions", url: "/insights/questions" },
+        { title: "Schools", url: "/insights/schools" },
+      ],
+    },
+    {
       title: "User Management",
       icon: UserRoundCog,
       items: [

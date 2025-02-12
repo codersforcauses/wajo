@@ -25,8 +25,15 @@ type CustomSearchParams = PaginationSearchParams & {
 };
 
 export default function Index() {
-  const router = useRouter();
-  const { query, isReady, push } = router;
+  const {
+    data: competitions,
+    isLoading: isCompetitionLoading,
+    isError: isCompetitionError,
+    error: competitionError,
+  } = useFetchData<Competition[]>({
+    queryKey: ["quiz.competition"],
+    endpoint: "/quiz/admin-quizzes/",
+  });
 
   const [orderings, setOrderings] = useState<OrderingItem>({});
 

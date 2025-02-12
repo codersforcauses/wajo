@@ -49,10 +49,3 @@ export interface Ranking {
   marks: number;
   response_time: string;
 }
-
-export interface Insight {
-  question_name: string;
-  genre: string;
-  difficulty: string;
-  correct_rate: number;
-}
