@@ -131,6 +131,8 @@ class QuizAttempt(models.Model):
         if not is_available:
             self.state = QuizAttempt.State.COMPLETED
             self.save()
+        elif self.state == QuizAttempt.State.SUBMITTED:
+            return False
         else:
             self.state = QuizAttempt.State.IN_PROGRESS
             self.save()
