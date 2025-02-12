@@ -1,77 +1,108 @@
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import React, { Suspense, useEffect, useState } from "react";
 
 import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
+import {
+  Pagination,
+  PaginationSearchParams,
+  SelectRow,
+} from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
 import { SchoolDataGrid } from "@/components/ui/Users/school-data-grid";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import { NextPageWithLayout } from "@/pages/_app";
 import type { School } from "@/types/user";
 
 const SchoolsPage: NextPageWithLayout = () => {
-  const {
-    data: schools,
-    isLoading: isSchoolLoading,
-    isError: isSchoolError,
-    error: schoolError,
-  } = useFetchData<School[]>({
-    queryKey: ["users.schools"],
-    endpoint: "/users/schools/",
+  const router = useRouter();
+  const { query, isReady, push } = router;
+
+  const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
+    search: "",
+    nrows: 5,
+    page: 1,
   });
 
-  const [page, setPage] = useState<number>(1);
-  const [filteredData, setFilteredData] = useState<School[]>([]);
+  const { data, isLoading, error, totalPages } = useFetchDataTable<School>({
+    queryKey: ["users.schools"],
+    endpoint: "/users/schools/",
+    searchParams: searchParams,
+  });
 
   useEffect(() => {
-    if (schools) {
-      setFilteredData(schools);
+    if (!isLoading) {
+      setSearchParams((prev) => ({
+        search: (query.search as string) || prev.search,
+        nrows: Number(query.nrows) || prev.nrows,
+        page: Number(query.page) || prev.page,
+      }));
     }
-  }, [schools]);
+  }, [query.search, query.nrows, query.page, !isLoading]);
 
-  const handleFilterChange = (value: string) => {
-    if (!schools) return;
-
-    const filtered =
-      value.trim() === ""
-        ? schools
-        : schools.filter((item) => {
-            const query = value.toLowerCase().trim();
-            const isExactMatch = query.startsWith('"') && query.endsWith('"');
-            const normalizedQuery = isExactMatch ? query.slice(1, -1) : query;
-
-            return isExactMatch
-              ? item.name.toLowerCase() === normalizedQuery
-              : item.name.toLowerCase().includes(normalizedQuery);
-          });
-
-    setFilteredData(filtered);
-    setPage(1);
+  const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
+    const updatedParams = { ...searchParams, ...newParams };
+    setSearchParams(updatedParams);
+    push(
+      {
+        pathname: "/users/school",
+        query: Object.fromEntries(
+          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
+        ),
+      },
+      undefined,
+      { shallow: true },
+    );
   };
 
-  if (isSchoolLoading) return <WaitingLoader />;
-  if (isSchoolError) return <div>Error: {schoolError?.message}</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!isReady || isLoading) return <WaitingLoader />;
 
   return (
     <div className="m-4 space-y-4">
       <div className="flex justify-between">
         <SearchInput
           label=""
-          value={""}
+          value={searchParams.search ?? ""}
           placeholder="Search School"
-          onSearch={handleFilterChange}
+          onSearch={(newSearch: string) => {
+            setAndPush({ search: newSearch, page: 1 });
+          }}
         />
         <Button asChild className="mr-6 h-auto">
           <Link href={"school/create"}>Create a School</Link>
         </Button>
       </div>
 
-      <SchoolDataGrid
-        datacontext={filteredData}
-        onDataChange={setFilteredData}
-        changePage={page}
-      ></SchoolDataGrid>
+      <Suspense>
+        <div>
+          <SchoolDataGrid datacontext={data ?? []} />
+          <div className="flex items-center justify-between p-4">
+            {/* Rows Per Page Selector */}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Rows per page:</span>
+              <SelectRow
+                className="h-7 w-20"
+                selectedRow={searchParams.nrows}
+                onChange={(newNrows) =>
+                  setAndPush({ nrows: Number(newNrows), page: 1 })
+                }
+              />
+            </div>
+            {/* Pagination Controls */}
+            <Pagination
+              totalPages={totalPages}
+              currentPage={searchParams.page}
+              onPageChange={(newPage: number) =>
+                setAndPush({ page: Math.min(newPage, totalPages) })
+              }
+              className="mr-4 flex"
+            />
+          </div>
+        </div>
+      </Suspense>
     </div>
   );
 };

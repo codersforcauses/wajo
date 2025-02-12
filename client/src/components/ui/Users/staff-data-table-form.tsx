@@ -55,11 +55,10 @@ type User = z.infer<typeof createUserSchema>;
 export function StaffDataTableForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { mutateAsync: postStaffs, isPending } = usePostMutation<User[]>(
-    ["staffs", "users"],
-    "/users/staffs/",
-    20000,
-  );
+  const { mutateAsync: postStaffs, isPending } = usePostMutation<User[]>({
+    mutationKey: ["staffs", "users"],
+    endpoint: "/users/staffs/",
+  });
 
   const defaultStaff: User = {
     first_name: "",

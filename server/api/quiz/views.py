@@ -11,7 +11,8 @@ from .serializers import (QuizSerializer,
                           CompQuizSlotSerializer,
                           UserQuizSerializer)
 from rest_framework.response import Response
-from rest_framework import status, serializers
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status, serializers, filters
 from datetime import timedelta
 from django.utils.timezone import now
 
@@ -27,6 +28,9 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     queryset = Quiz.objects.all()
     serializer_class = AdminQuizSerializer
     status = serializers.IntegerField(default=0, required=False)
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ['name']
+    filterset_fields = ['is_comp', 'status']
 
     @action(detail=True, methods=['get', 'post'])
     def slots(self, request, pk=None):
@@ -60,6 +64,10 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
             serializer = QuizSlotSerializer(instance, many=True)
             return Response(serializer.data)
         if request.method == 'POST':
+            # check if the quiz solts already exist, if so, detele them in database
+            if QuizSlot.objects.filter(quiz_id=pk).exists():
+                QuizSlot.objects.filter(quiz_id=pk).delete()
+
             serializer = QuizSlotSerializer(data=request.data, many=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()

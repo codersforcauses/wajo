@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,46 +15,96 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { WaitingLoader } from "@/components/ui/loading";
+import { QuestionBlockManager } from "@/components/ui/Test/question-block-manager";
 import { Textarea } from "@/components/ui/textarea";
-import { DateTimePicker } from "@/components/ui/time-picker/date-time-picker";
+import {
+  DateTimePicker,
+  DateTimePickerFormat,
+} from "@/components/ui/time-picker/date-time-picker";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePostMutation } from "@/hooks/use-post-data";
-import { NextPageWithLayout } from "@/pages/_app";
-import { AdminQuiz, genericCreateTestSchema } from "@/types/quiz";
+import { usePutMutation } from "@/hooks/use-put-data";
+import {
+  AdminQuiz,
+  AdminQuizSlot,
+  AdminQuizSlotRequest,
+  createSlotsSchema,
+  genericCreateTestSchema,
+  mapBlocksToSlots,
+  mapSlotsToBlocks,
+} from "@/types/quiz";
 
-type CreateCompetition = z.infer<typeof genericCreateTestSchema>;
+type UpdatePractice = z.infer<typeof genericCreateTestSchema>;
+type UpdatePracticeSlots = z.infer<typeof createSlotsSchema>;
 
-const CreatePage: NextPageWithLayout = () => {
-  const form = useForm<CreateCompetition>({
+export default function Create() {
+  const router = useRouter();
+  const adminQuizId = parseInt(router.query.id as string);
+
+  const { data, isLoading, isError, error } = useFetchData<AdminQuiz>({
+    queryKey: [`quiz.admin-quizzes.${adminQuizId}`],
+    endpoint: `/quiz/admin-quizzes/${adminQuizId}/`,
+    enabled: !isNaN(adminQuizId),
+  });
+
+  const {
+    data: dataSlot,
+    isLoading: isSlotLoading,
+    isError: isSlotError,
+    error: errorSlot,
+  } = useFetchData<AdminQuizSlot[]>({
+    queryKey: [`quiz.admin-quizzes.${adminQuizId}.slots`],
+    endpoint: `/quiz/admin-quizzes/${adminQuizId}/slots/`,
+    enabled: !isNaN(adminQuizId),
+  });
+
+  if (isLoading || !data || isSlotLoading || !dataSlot)
+    return <WaitingLoader />;
+  if (isError) return <div>Error Practice: {error?.message}</div>;
+  if (isSlotError) return <div>Error Practice Slots: {errorSlot?.message}</div>;
+
+  return (
+    <div>
+      <UpdatePracticeForm adminQuiz={data} />
+      <UpdatePracticeQuestionBlocksForm adminQuizSlots={dataSlot} />
+    </div>
+  );
+}
+
+function UpdatePracticeForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
+  const form = useForm<UpdatePractice>({
     resolver: zodResolver(genericCreateTestSchema),
     defaultValues: {
-      name: "",
-      intro: "",
-      time_limit: 0,
-      time_window: 0,
+      name: adminQuiz.name,
+      intro: adminQuiz.intro,
+      open_time_date: DateTimePickerFormat(adminQuiz.open_time_date),
+      time_limit: adminQuiz.time_limit,
+      time_window: adminQuiz.time_window,
     },
   });
 
   const router = useRouter();
-  const { mutate: createCompetition, isPending } = usePostMutation<AdminQuiz>({
-    mutationKey: ["quiz.admin-quizzes.create"],
-    endpoint: "/quiz/admin-quizzes/",
-    onSuccess: (res) => {
-      toast.success(
-        "Competition created successfully! Questions blocks input available below.",
-      );
-      router.push(`/test/competition/${res.data.id}`);
+  const adminQuizId = parseInt(router.query.id as string);
+  const mutationKey = ["quiz.admin-quizzes.update", `${adminQuizId}`];
+  const { mutate: updatePractice, isPending } = usePutMutation({
+    mutationKey: mutationKey,
+    queryKeys: [mutationKey, ["quiz.admin-quizzes"]],
+    endpoint: `/quiz/admin-quizzes/${adminQuizId}/`,
+    onSuccess: () => {
+      toast.success("Practice updated successfully!");
+      router.reload();
     },
   });
 
-  const onSubmit = (data: CreateCompetition) => {
-    createCompetition({
+  const onSubmit = (data: UpdatePractice) => {
+    updatePractice({
       name: data.name,
       intro: data.intro,
       total_marks: data.total_marks,
       open_time_date: data.open_time_date,
       time_limit: data.time_limit,
       time_window: data.time_window,
-      status: 1,
     });
   };
 
@@ -63,12 +112,11 @@ const CreatePage: NextPageWithLayout = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <h1 className="my-4 text-center text-xl font-bold">
-          Create Competition
-        </h1>
+        <h1 className="my-4 text-center text-xl font-bold">Update Practice</h1>
 
-        <div className="mx-auto max-w-3xl space-y-5 rounded-lg bg-gray-50 p-4 shadow-lg">
+        <div className="mx-auto max-w-3xl space-y-6 rounded-lg bg-gray-50 p-4 shadow-lg">
           <h3 className="-mb-2 text-lg">Basic</h3>
+
           <div className="flex gap-4">
             <div className="flex-auto">
               {/* Test Name */}
@@ -100,10 +148,7 @@ const CreatePage: NextPageWithLayout = () => {
                   <FormItem className="mt-2 flex flex-col gap-1.5">
                     <FormLabel>Open Time {requiredStar}</FormLabel>
                     <FormControl>
-                      <DateTimePicker
-                        className="h-80 overflow-scroll"
-                        field={field}
-                      />
+                      <DateTimePicker field={field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -184,10 +229,53 @@ const CreatePage: NextPageWithLayout = () => {
       </form>
     </Form>
   );
-};
+}
 
-CreatePage.getLayout = function getLayout(page) {
-  return <DashboardLayout>{page}</DashboardLayout>;
-};
+function UpdatePracticeQuestionBlocksForm({
+  adminQuizSlots,
+}: {
+  adminQuizSlots: AdminQuizSlot[];
+}) {
+  const router = useRouter();
+  const adminQuizId = parseInt(router.query.id as string);
 
-export default CreatePage;
+  const { mutate: createSlots, isPending } =
+    usePostMutation<AdminQuizSlotRequest>({
+      mutationKey: ["quiz.admin-quizzes.practice.slots.create"],
+      endpoint: `/quiz/admin-quizzes/${adminQuizId}/slots/`,
+      onSuccess: () => {
+        toast.success("Practice question blocks updated successfully!");
+        router.reload();
+      },
+    });
+
+  const form = useForm<UpdatePracticeSlots>({
+    resolver: zodResolver(createSlotsSchema),
+    defaultValues: {
+      blocks: mapSlotsToBlocks(adminQuizSlots),
+    },
+  });
+
+  const onSubmit = (data: UpdatePracticeSlots) => {
+    createSlots([...mapBlocksToSlots(data.blocks, adminQuizId)]);
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="mx-auto flex max-w-3xl items-center gap-4 pt-6 font-bold text-gray-400">
+          <hr className="flex-1 border-2 border-gray-200" />
+          Update Practice Question Blocks Below
+          <hr className="flex-1 border-2 border-gray-200" />
+        </div>
+        {/* Question Blocks */}
+        <div className="mx-auto my-4 max-w-3xl space-y-4 rounded-lg bg-gray-50 p-4 shadow-lg">
+          <QuestionBlockManager formControl={form.control} />
+          <div className="flex justify-end gap-4">
+            <Button type="submit">{isPending ? "Saving..." : "Save"}</Button>
+          </div>
+        </div>
+      </form>
+    </Form>
+  );
+}

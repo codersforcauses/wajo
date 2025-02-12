@@ -53,11 +53,10 @@ type Teacher = z.infer<typeof createTeacherSchema>;
  */
 export function TeacherDataTableForm() {
   const router = useRouter();
-  const { mutate: postTeachers, isPending } = usePostMutation<Teacher[]>(
-    ["teachers", "users"],
-    "/users/teachers/",
-    20000,
-  );
+  const { mutate: postTeachers, isPending } = usePostMutation<Teacher[]>({
+    mutationKey: ["teachers", "users"],
+    endpoint: "/users/teachers/",
+  });
 
   const defaultTeacher: Teacher = {
     first_name: "",

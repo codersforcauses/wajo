@@ -1,74 +1,105 @@
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import React, { Suspense, useEffect, useState } from "react";
 
 import DashboardLayout from "@/components/dashboard-layout";
-import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
+import {
+  Pagination,
+  PaginationSearchParams,
+  SelectRow,
+} from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
 import { LeaderboardDataGrid } from "@/components/ui/Test/leaderboard-data-grid";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import { NextPageWithLayout } from "@/pages/_app";
 import { Leaderboard } from "@/types/leaderboard";
 
 const LeaderboardPage: NextPageWithLayout = () => {
-  const {
-    data: leaderboards,
-    isLoading: isLeaderboardLoading,
-    isError: isLeaderboardError,
-    error: leaderboardError,
-  } = useFetchData<Leaderboard[]>({
-    queryKey: ["leaderboard.individual"],
-    endpoint: "/leaderboard/individual/",
+  const router = useRouter();
+  const { query, isReady, push } = router;
+
+  const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
+    search: "",
+    nrows: 5,
+    page: 1,
   });
 
-  const [page, setPage] = useState<number>(1);
-  const [filteredData, setFilteredData] = useState<Leaderboard[]>([]);
+  const { data, isLoading, error, totalPages } = useFetchDataTable<Leaderboard>(
+    {
+      queryKey: ["leaderboard.team"],
+      endpoint: "/leaderboard/team/",
+      searchParams: searchParams,
+    },
+  );
 
   useEffect(() => {
-    if (leaderboards) {
-      setFilteredData(leaderboards);
+    if (!isLoading) {
+      setSearchParams((prev) => ({
+        search: (query.search as string) || prev.search,
+        nrows: Number(query.nrows) || prev.nrows,
+        page: Number(query.page) || prev.page,
+      }));
     }
-  }, [leaderboards]);
+  }, [query.search, query.nrows, query.page, !isLoading]);
 
-  const handleFilterChange = (value: string) => {
-    if (!leaderboards) return;
-
-    const filtered =
-      value.trim() === ""
-        ? leaderboards
-        : leaderboards.filter((item) => {
-            const query = value.toLowerCase().trim();
-            const isExactMatch = query.startsWith('"') && query.endsWith('"');
-            const normalizedQuery = isExactMatch ? query.slice(1, -1) : query;
-
-            return isExactMatch
-              ? item.name.toLowerCase() === normalizedQuery
-              : item.name.toLowerCase().includes(normalizedQuery);
-          });
-
-    setFilteredData(filtered);
-    setPage(1);
+  const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
+    const updatedParams = { ...searchParams, ...newParams };
+    setSearchParams(updatedParams);
+    push(
+      {
+        pathname: "/test/leaderboard",
+        query: Object.fromEntries(
+          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
+        ),
+      },
+      undefined,
+      { shallow: true },
+    );
   };
 
-  if (isLeaderboardLoading) return <WaitingLoader />;
-  if (isLeaderboardError) return <div>Error: {leaderboardError?.message}</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!isReady || isLoading) return <WaitingLoader />;
 
   return (
     <div className="m-4 space-y-4">
       <div className="flex justify-between">
         <SearchInput
           label=""
-          value={""}
+          value={searchParams.search ?? ""}
           placeholder="Search Leaderboard"
-          onSearch={handleFilterChange}
+          onSearch={(newSearch: string) => {
+            setAndPush({ search: newSearch, page: 1 });
+          }}
         />
       </div>
 
-      <LeaderboardDataGrid
-        datacontext={filteredData}
-        onDataChange={setFilteredData}
-        changePage={page}
-      />
+      <Suspense>
+        <div>
+          <LeaderboardDataGrid datacontext={data ?? []} />
+          <div className="flex items-center justify-between p-4">
+            {/* Rows Per Page Selector */}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Rows per page:</span>
+              <SelectRow
+                className="h-7 w-20"
+                selectedRow={searchParams.nrows}
+                onChange={(newNrows) =>
+                  setAndPush({ nrows: Number(newNrows), page: 1 })
+                }
+              />
+            </div>
+            {/* Pagination Controls */}
+            <Pagination
+              totalPages={totalPages}
+              currentPage={searchParams.page}
+              onPageChange={(newPage: number) =>
+                setAndPush({ page: Math.min(newPage, totalPages) })
+              }
+              className="mr-4 flex"
+            />
+          </div>
+        </div>
+      </Suspense>
     </div>
   );
 };

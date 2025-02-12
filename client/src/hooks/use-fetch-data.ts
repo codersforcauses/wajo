@@ -1,10 +1,12 @@
 import {
+  useMutation,
   useQuery,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 
+import { PaginationSearchParams } from "@/components/ui/pagination";
 import api from "@/lib/api";
 
 /**
@@ -56,5 +58,99 @@ export const useFetchData = <TData, TError = AxiosError>({
       return response.data;
     },
     ...options,
+  });
+};
+
+interface FetchTableDataOptions<T> {
+  queryKey: string[];
+  endpoint: string;
+  searchParams: PaginationSearchParams;
+  pageSize?: number;
+}
+
+/**
+ * Custom hook for fetching paginated table data using React Query and Axios.
+ *
+ * This hook simplifies API calls for data tables by handling pagination, sorting, and searching.
+ * It follows Django's ordering format and integrates with query parameters for flexible filtering.
+ *
+ * @template T - The expected type of the data items in the response.
+ *
+ * @param {Object} options - The options for fetching table data.
+ * @param {string[]} options.queryKey - A unique key for caching and identifying the query in React Query.
+ * @param {string} options.endpoint - The API endpoint from which data is fetched.
+ * @param {PaginationSearchParams} options.searchParams - The search and pagination parameters.
+ * @param {number} [options.pageSize] - Optional page size (number of rows per page). Defaults to `searchParams.nrows`.
+ *
+ * @example
+ * const { data, isLoading, error, totalPages } = useFetchDataTable<User>({
+ *   queryKey: ["users"],
+ *   endpoint: "/api/users",
+ *   searchParams: { search: "john", ordering: "-created_at", nrows: 10, page: 1 },
+ * });
+ *
+ * if (isLoading) return <WaitingLoader />;
+ * if (error) return error.message;
+ *
+ * return (
+ *   <Table>
+ *     {data?.map((user) => (
+ *       <TableRow key={user.id}>{user.name}</TableRow>
+ *     ))}
+ *   </Table>
+ * );
+ */
+export function useFetchDataTable<T>({
+  queryKey,
+  endpoint,
+  searchParams,
+}: FetchTableDataOptions<T>) {
+  // Format sorting for Django's ordering format
+  // https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter
+  const { search, ordering, nrows, page, ...customParams } = searchParams;
+  const offset = (page - 1) * nrows;
+
+  const { data, isLoading, error } = useQuery<{
+    results: T[];
+    count: number;
+  }>({
+    queryKey: [
+      endpoint,
+      offset,
+      queryKey,
+      page,
+      nrows,
+      ordering,
+      search,
+      customParams,
+    ],
+    queryFn: async () => {
+      const response = await api.get(endpoint, {
+        params: {
+          limit: nrows,
+          offset,
+          ...(ordering ? { ordering } : {}),
+          ...(search ? { search } : {}), // Include only if exists,
+          ...(customParams ? { ...customParams } : {}),
+        },
+      });
+      return response.data;
+    },
+  });
+
+  const totalPages = data ? Math.ceil(data.count / nrows) : 1;
+  return { data: data?.results, isLoading, error, totalPages };
+}
+
+export const useMarkCompetition = <TError = AxiosError>({ ...args }) => {
+  return useMutation<void, TError, { quiz_id: number; timeout?: number }>({
+    mutationFn: (param) => {
+      return api.get(`/quiz/admin-quizzes/${param.quiz_id}/marking/`, {
+        timeout: param.timeout,
+      });
+    },
+    onSuccess: (response, details, context) => {
+      if (args?.onSuccess) args.onSuccess(response, details, context);
+    },
   });
 };

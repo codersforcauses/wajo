@@ -57,11 +57,10 @@ type Student = z.infer<typeof createStudentSchema>;
 export function StudentDataTableForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { mutateAsync: postStudents, isPending } = usePostMutation<Student[]>(
-    ["students", "users"],
-    "/users/students/",
-    20000,
-  );
+  const { mutateAsync: postStudents, isPending } = usePostMutation<Student[]>({
+    mutationKey: ["students", "users"],
+    endpoint: "/users/students/",
+  });
 
   const defaultStudent: Student = {
     first_name: "",

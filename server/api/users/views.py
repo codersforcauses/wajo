@@ -189,16 +189,16 @@ class SchoolViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-        try:
-            return super().create(request, *args, **kwargs)
-        except IntegrityError as error:
-            return Response(
-                {
-                    "error": "A school with this name already exists.",
-                    "message": str(error)
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # try:
+        #     return super().create(request, *args, **kwargs)
+        # except IntegrityError as error:
+        #     return Response(
+        #         {
+        #             "error": "A school with this name already exists.",
+        #             "message": str(error)
+        #         },
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
 
     def update(self, request, *args, **kwargs):
         try:
