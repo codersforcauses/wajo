@@ -23,32 +23,59 @@ interface UsePostMutationOptions<
   headers?: Record<string, string>;
 }
 
+interface UsePostMutationOptions<
+  TData,
+  TVariables,
+  TError = AxiosError<{ error: string; message: string }>,
+> extends Omit<
+    UseMutationOptions<TData, TError, TVariables>,
+    "mutationKey" | "mutationFn"
+  > {
+  mutationKey: string[];
+  endpoint: string;
+  timeout?: number;
+  headers?: Record<string, string>;
+}
+
 /**
- * Custom hook for performing a POST request mutation.
+ * Custom hook for performing a POST request mutation using React Query and Axios.
  *
- * This hook provides a wrapper around the `useMutation` hook from React Query to handle POST requests using Axios.
- * It allows you to send data to a specified API endpoint and automatically updates the React Query cache on success.
+ * This hook provides a wrapper around the `useMutation` hook from React Query, allowing
+ * for easy POST requests with automatic cache invalidation upon success.
  *
  * @template TData - The type of the data returned from the API response.
- * @template TError - The type of the error returned from the mutation (default is `AxiosError`).
- * @template TVariables - The type of the variables that will be sent in the request body.
+ * @template TVariables - The type of the variables that will be sent in the request body (default: `unknown`).
+ * @template TError - The type of the error returned from the mutation (default: `AxiosError`).
  *
  * @param {string[]} mutationKey - A unique key for identifying the mutation in React Query.
  * @param {string} endpoint - The API endpoint to which the POST request is sent.
- * @param {number} [timeout=10000] - The timeout for the POST request in milliseconds. Defaults to 10000ms (10 seconds).
- * @param {UseMutationOptions<TData, TError, TVariables>} [args] - Optional configuration options for the mutation. This can include callbacks like `onSuccess`, `onError`, etc.
+ * @param {number} [timeout=10000] - The timeout for the POST request in milliseconds (default: 10 seconds).
+ * @param {Omit<UseMutationOptions<AxiosResponse<TData>, TError, TVariables>, "mutationKey" | "mutationFn">} [args]
+ *   - Optional configuration options for the mutation, such as `onSuccess`, `onError`, etc.
  *
- * @returns {UseMutationResult<TData, TError, TVariables>} The result of the mutation, which includes properties like `mutate`, `isPending`, `isError`, etc.
+ * @returns {UseMutationResult<AxiosResponse<TData>, TError, TVariables>}
+ *   The result of the mutation, which includes:
+ *   - `mutate`: A function to trigger the mutation.
+ *   - `isPending`: A boolean indicating if the mutation is in progress.
+ *   - `isError`: A boolean indicating if the mutation encountered an error.
+ *   - `data`: The response data from the API, if successful.
+ *   - `error`: The error object, if the mutation failed.
  *
  * @example
- * const { mutate, isPending, isError } = usePostMutation(["login"], "/api/login", {
- *   onSuccess: () => {
- *     console.log("Logged in successfully");
+ * // Example usage for a login API call
+ * const { mutate, isPending, isError } = usePostMutation<UserData, LoginCredentials>({
+ *   mutationKey: ["login"],
+ *   endpoint: "/api/login",
+ *   onSuccess: (response) => {
+ *     console.log("Login successful:", response.data);
  *   },
  *   onError: (error) => {
- *     console.error("Login failed", error);
- *   }
+ *     console.error("Login failed:", error);
+ *   },
  * });
+ *
+ * // Trigger login mutation
+ * mutate({ email: "user@example.com", password: "securepassword" });
  */
 export const usePostMutation = <
   TData,

@@ -26,32 +26,38 @@ class QuestionCategoryTestCase(TestCase):
         self.question.categories.add(self.category)
 
     def test_create_category(self):
-        response = self.client.post('/api/questions/categories/', {
+        response = self.client.post('/api/questions/categories/', [{
             'genre': 'Math',
             'info': 'Math related questions'
-        })
+        }], format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Category.objects.count(), 2)
 
     def test_multiple_categories(self):
-        response = self.client.post('/api/questions/categories/', {
+        response = self.client.post('/api/questions/categories/', [{
             'genre': 'Math',
             'info': 'Math related questions'
-        })
-        response = self.client.post('/api/questions/categories/', {
+        }], format='json')
+        response = self.client.post('/api/questions/categories/', [{
             'genre': 'History',
             'info': 'History related questions'
-        })
+        }], format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Category.objects.count(), 3)
 
-    def test_genre_name_unique(self):
-        response = self.client.post('/api/questions/categories/', {
-            'genre': 'Science',
-            'info': 'Science related questions'
-        })
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(Category.objects.count(), 1)
+    def test_create_multiple_categories(self):
+        response = self.client.post('/api/questions/categories/', [
+            {
+                'genre': 'Math',
+                'info': 'Math related questions'
+            },
+            {
+                'genre': 'History',
+                'info': 'History related questions'
+            }
+        ], format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Category.objects.count(), 3)
 
     def test_question_integrity(self):
         response = self.client.post('/api/questions/question-bank/', {

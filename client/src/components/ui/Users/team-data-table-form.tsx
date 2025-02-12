@@ -69,7 +69,7 @@ export function TeamDataTableForm() {
   });
 
   const onSubmit = (data: { teams: Team[] }) => {
-    createTeam({ ...data.teams });
+    createTeam([...data.teams]);
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";

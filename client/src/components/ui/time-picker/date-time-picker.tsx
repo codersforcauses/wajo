@@ -43,7 +43,13 @@ import { TimePickerDemo } from "./time-picker-demo";
  *     />
  *   );
  */
-export function DateTimePicker({ field }: { field: any }) {
+export function DateTimePicker({
+  field,
+  className,
+}: {
+  field: any;
+  className?: string;
+}) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -62,7 +68,7 @@ export function DateTimePicker({ field }: { field: any }) {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
+      <PopoverContent className={cn("w-auto p-0", className)}>
         <Calendar
           mode="single"
           selected={field.value}
@@ -75,4 +81,8 @@ export function DateTimePicker({ field }: { field: any }) {
       </PopoverContent>
     </Popover>
   );
+}
+
+export function DateTimePickerFormat(date: Date) {
+  return new Date(format(date, "EEE MMM dd yyyy HH:mm:ss OOOO"));
 }

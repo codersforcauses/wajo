@@ -53,7 +53,7 @@ export function CategoryDataTableForm() {
     mutationKey: ["categories"],
     endpoint: "/questions/categories/",
     onSuccess: () => {
-      toast.success("Teams created successfully!");
+      toast.success("Categories created successfully!");
       router.push("/question/category/");
     },
   });
