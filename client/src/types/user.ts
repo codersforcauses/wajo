@@ -114,16 +114,18 @@ export const loginSchema = z.object({
  *   email: "user@example.com",
  * });
  */
-export const createUserSchema = loginSchema.extend({
-  userRole: RoleEnum,
-  school_id: z.number({ message: "Required" }),
-
-  //Test use to give school as optional
-  // school_id: z.number().optional(),
-
-  email: z.string().email("Invalid email address").optional(),
+export const createUserSchema = z.object({
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  password: z
+    .string()
+    .min(8)
+    .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/),
+  year_level: z.enum(["7", "8", "9"]),
+  school_id: z.number().int().positive(),
+  attendent_year: z.number().int().min(2024).max(2050),
+  extenstion_time: z.number().int().min(0).optional(),
 });
-
 /**
  * A Zod schema for validating the creation of a school.
  *

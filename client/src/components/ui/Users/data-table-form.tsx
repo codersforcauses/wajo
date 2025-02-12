@@ -49,12 +49,21 @@ type User = z.infer<typeof createUserSchema>;
  * Additional Reference:
  * - {@link https://react-hook-form.com/docs/usefieldarray React Hook Form: useFieldArray}
  */
+
 export function DataTableForm() {
-  const defaultUser = {
-    username: "",
+  // calculate the default year for the attendent_year field
+  const currentYear = new Date().getFullYear();
+  const defaultAttendentYear = Math.max(2024, Math.min(currentYear, 2050));
+
+  const defaultUser: User = {
+    first_name: "",
+    last_name: "",
     password: "",
-    email: "",
-  } as User;
+    year_level: "7", // default year_level is "7"
+    school_id: 1, // default school_id is 1
+    attendent_year: defaultAttendentYear,
+    // extenstion_time is optional, so it can be omitted
+  };
 
   const createUserForm = useForm<{
     users: User[];
@@ -83,9 +92,11 @@ export function DataTableForm() {
     });
 
     const newRecords = data.users.map((user) => ({
-      username: user.username,
+      firstname: user.first_name,
+      lastrname: user.last_name,
+      userRole: user.year_level,
       password: user.password,
-      role: user.userRole,
+
       createdAt: perthTime,
     }));
 
@@ -164,50 +175,71 @@ export function DataTableForm() {
                   No.
                 </TableHead>
                 <TableHead className={commonTableHeadClasses}>
-                  Username*
+                  First Name*
                 </TableHead>
-                <TableHead
-                  className={cn(commonTableHeadClasses, "text-pretty", "w-1/5")}
-                >
+                <TableHead className={commonTableHeadClasses}>
+                  Last Name*
+                </TableHead>
+                <TableHead className={commonTableHeadClasses}>
                   Password*
                   <FormDescription className="text-xs text-white">
                     Minimum 8 characters with letters, numbers, and symbols
                   </FormDescription>
                 </TableHead>
-                <TableHead className={commonTableHeadClasses}>Email</TableHead>
                 <TableHead className={commonTableHeadClasses}>
-                  User Role*
+                  Year Level*
                 </TableHead>
                 <TableHead className={commonTableHeadClasses}>
                   School*
+                </TableHead>
+                <TableHead className={commonTableHeadClasses}>
+                  Attendent Year*
+                </TableHead>
+                <TableHead className={commonTableHeadClasses}>
+                  Extenstion Time
                 </TableHead>
                 <TableHead
                   className={cn(commonTableHeadClasses, "rounded-tr-lg", "w-0")}
                 ></TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {fields.map((field, index) => (
                 <TableRow
                   key={field.id}
-                  className={
-                    "divide-gray-200 border-gray-50 text-sm text-black"
-                  }
+                  className="divide-gray-200 border-gray-50 text-sm text-black"
                 >
                   {/* No. Field */}
                   <TableCell className="text-lg font-semibold">
                     {index + 1}
                   </TableCell>
 
-                  {/* Username Field */}
+                  {/* First Name */}
                   <TableCell className="align-top">
                     <FormField
                       control={createUserForm.control}
-                      name={`users.${index}.username`}
+                      name={`users.${index}.first_name`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
-                            <Input {...field} placeholder="Enter username" />
+                            <Input {...field} placeholder="Enter first name" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TableCell>
+
+                  {/* Last Name */}
+                  <TableCell className="align-top">
+                    <FormField
+                      control={createUserForm.control}
+                      name={`users.${index}.last_name`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                          <FormControl>
+                            <Input {...field} placeholder="Enter last name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -216,21 +248,6 @@ export function DataTableForm() {
                   </TableCell>
 
                   {/* Password Field */}
-                  {/* <TableCell className="align-top">
-                    <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.password`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                          <FormControl>
-                            <Input {...field} placeholder="Enter password" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell> */}
-
                   <TableCell className="align-top">
                     <FormField
                       control={createUserForm.control}
@@ -239,7 +256,6 @@ export function DataTableForm() {
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
                             <div className="relative flex items-center">
-                              {/* input*/}
                               <Input
                                 {...field}
                                 placeholder="Enter password (or Auto Generate)"
@@ -248,7 +264,6 @@ export function DataTableForm() {
                                 type="button"
                                 variant="secondary"
                                 className="ml-2"
-                                // click event to generate random password and pass it to the input field
                                 onClick={() => {
                                   const randomPwd = createRandomPwd();
                                   field.onChange(randomPwd);
@@ -264,34 +279,23 @@ export function DataTableForm() {
                     />
                   </TableCell>
 
-                  {/* Email Field */}
+                  {/* Year Level Field (7/8/9) */}
                   <TableCell className="align-top">
                     <FormField
                       control={createUserForm.control}
-                      name={`users.${index}.email`}
+                      name={`users.${index}.year_level`}
                       render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                        <FormItem className="flex flex-col gap-1.5">
                           <FormControl>
-                            <Input {...field} placeholder="Enter email" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell>
-
-                  {/* User Role Field */}
-                  <TableCell className="align-top">
-                    <FormField
-                      control={createUserForm.control}
-                      name={`users.${index}.userRole`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                          <FormControl>
-                            <SelectRole
-                              selectedRole={field.value}
-                              onChange={field.onChange}
-                            />
+                            <select
+                              className="input rounded border p-2 hover:border-blue-400 focus:outline-none focus:ring-0"
+                              value={field.value}
+                              onChange={(e) => field.onChange(e.target.value)}
+                            >
+                              <option value="7">7</option>
+                              <option value="8">8</option>
+                              <option value="9">9</option>
+                            </select>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -318,6 +322,62 @@ export function DataTableForm() {
                     />
                   </TableCell>
 
+                  {/* Attendent Year Field (2024-2050) */}
+                  <TableCell className="align-top">
+                    <FormField
+                      control={createUserForm.control}
+                      name={`users.${index}.attendent_year`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col gap-1.5">
+                          <FormControl>
+                            <select
+                              className="input rounded border p-2 hover:border-blue-400 focus:outline-none focus:ring-0"
+                              value={field.value}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
+                            >
+                              {Array.from({ length: 2050 - 2024 + 1 }).map(
+                                (_, i) => {
+                                  const y = 2024 + i;
+                                  return (
+                                    <option key={y} value={y}>
+                                      {y}
+                                    </option>
+                                  );
+                                },
+                              )}
+                            </select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TableCell>
+
+                  {/* Extenstion Time (optional) */}
+                  <TableCell className="align-top">
+                    <FormField
+                      control={createUserForm.control}
+                      name={`users.${index}.extenstion_time`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                          <FormControl>
+                            <Input
+                              type="number"
+                              {...field}
+                              placeholder="0"
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TableCell>
+
                   {/* Delete Button */}
                   <TableCell className="w-24 text-right align-top">
                     <Button
@@ -332,6 +392,7 @@ export function DataTableForm() {
               ))}
             </TableBody>
           </Table>
+
           <div className="flex justify-between px-2">
             <Button
               type="button"
