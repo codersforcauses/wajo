@@ -11,7 +11,7 @@ Note: The `DefaultRouter` is included for potential future API extensions.
 """
 
 from django.urls import include, path
-from .views import IndividualLeaderboardViewSet, TeamLeaderboardViewSet
+from .views import IndividualLeaderboardViewSet, TeamLeaderboardViewSet, StudentInsightsViewSet
 from rest_framework.routers import SimpleRouter
 
 app_name = "leaderboard"
@@ -21,6 +21,7 @@ router.register(
     "leaderboard/individual", IndividualLeaderboardViewSet, basename="individual"
 )
 router.register("leaderboard/team", TeamLeaderboardViewSet, basename="team")
+router.register("leaderboard/insight", StudentInsightsViewSet, basename="insight")
 
 urlpatterns = [
     path("", include(router.urls), name="leaderboard"),

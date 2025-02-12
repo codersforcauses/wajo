@@ -1,10 +1,11 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
 from django.db.models import Sum
 from ..quiz.models import Quiz, QuizAttempt
 from .serializers import IndividualLeaderboardSerializer, TeamLeaderboardSerializer
 from ..users.models import School, Student
 from ..team.models import Team
+from rest_framework.response import Response
 
 
 class IndividualLeaderboardFilter(FilterSet):
@@ -84,3 +85,44 @@ class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Team.objects.annotate(total_marks=Sum('quiz_attempts__total_marks')).order_by('id')
     serializer_class = TeamLeaderboardSerializer
     filterset_class = TeamLeaderboardFilter
+
+
+class StudentInsightsViewSet(viewsets.ReadOnlyModelViewSet):
+    # need to define get_queryset, but we don't use
+    def get_queryset(self):
+        return Student.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        all_students = Student.objects.all()
+        scored_students = all_students.filter(quiz_attempts__total_marks__gt=0)
+        all_teams = Team.objects.all()
+        scored_team = all_teams.filter(students__quiz_attempts__total_marks__gt=0).distinct()
+
+        def get_counts(queryset, category, type):
+
+            if type == "student":
+                year_filter = "year_level"
+            elif type == "team":
+                year_filter = "students__year_level"
+
+            return {
+                "category": category,
+                "total": queryset.count(),
+                "public_count": queryset.filter(school__type="Public").count(),
+                "catholic_count": queryset.filter(school__type="Catholic").count(),
+                "independent_count": queryset.filter(school__type="Independent").count(),
+                "allies_count": queryset.filter(school__type="Allies").count(),
+                "country": queryset.filter(school__is_country=True).count(),
+                "year_7": queryset.filter(**{year_filter: "7"}).count(),
+                "year_8": queryset.filter(**{year_filter: "8"}).count(),
+                "year_9": queryset.filter(**{year_filter: "9"}).count(),
+            }
+
+        data = [
+            get_counts(all_students, "All Students", "student"),
+            get_counts(scored_students, "Students with scores", "student"),
+            get_counts(all_teams, "All Teams", "team"),
+            get_counts(scored_team, "Teams with scores", "team")
+        ]
+
+        return Response(data, status=status.HTTP_200_OK)
