@@ -20,16 +20,20 @@ class TeamViewSet(viewsets.ModelViewSet):
     ordering = ["id"]
 
     def create(self, request, *args, **kwargs):
-        try:
-            return super().create(request, *args, **kwargs)
-        except IntegrityError as error:
-            return Response(
-                {
-                    "error": str(error),
-                    "message": "A team with this name may already exist.",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # try:
+        #     return super().create(request, *args, **kwargs)
+        # except IntegrityError as error:
+        #     return Response(
+        #         {
+        #             "error": str(error),
+        #             "message": "A team with this name may already exist.",
+        #         },
+        #         status=status.HTTP_400_BAD_REQUEST,
+        #     )
 
     def update(self, request, *args, **kwargs):
         try:

@@ -1,10 +1,9 @@
-import "katex/dist/katex.min.css";
-
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { AlertTriangle } from "lucide-react";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -15,21 +14,25 @@ import {
 import { useDynamicDeleteMutation } from "@/hooks/use-delete-data";
 import { DeleteModalProps } from "@/types/question";
 
-import { Button } from "../button";
-
-export default function DeleteModal({ children, data }: DeleteModalProps) {
+export default function DeleteModal({
+  baseUrl,
+  id,
+  entity = "data",
+  children,
+}: DeleteModalProps) {
   const router = useRouter();
 
-  const { mutate: deleteQuestion, isPending } = useDynamicDeleteMutation({
-    baseUrl: "/questions/question-bank",
-    mutationKey: ["question_delete"],
+  const { mutate: deleteData, isPending } = useDynamicDeleteMutation({
+    baseUrl: baseUrl,
+    mutationKey: [`${entity}.delete`],
     onSuccess: () => {
+      toast.success(`The ${entity} has been deleted.`);
       router.reload();
-      toast.success("School has been deleted.");
     },
   });
-  const handleDelete = () => {
-    deleteQuestion(data.id);
+
+  const onDelete = () => {
+    deleteData(id);
   };
 
   return (
@@ -45,7 +48,7 @@ export default function DeleteModal({ children, data }: DeleteModalProps) {
 
         <div className="text-center text-gray-900">
           <p className="text-2xl font-semibold">
-            Are you sure you want to permanently delete this question?
+            Are you sure you want to permanently delete this {entity}?
           </p>
           <p className="text-md mt-1 text-gray-500">
             Once deleted, it cannot be recovered.
@@ -61,8 +64,8 @@ export default function DeleteModal({ children, data }: DeleteModalProps) {
               No
             </Button>
           </DialogTrigger>
-          <Button onClick={handleDelete} variant={"secondary"} className="w-36">
-            Yes
+          <Button onClick={onDelete} variant={"secondary"} className="w-36">
+            {isPending ? "Deleting..." : "Yes"}
           </Button>
         </div>
       </DialogContent>
