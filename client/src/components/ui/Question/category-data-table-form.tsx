@@ -49,18 +49,16 @@ export function CategoryDataTableForm() {
   });
 
   const router = useRouter();
-  const { mutate: createTeam, isPending } = usePostMutation<Category[]>(
-    ["categories"],
-    "/questions/categories/",
-    1000,
-    {
-      onSuccess: () => {
-        toast.success("Categories created successfully!");
-        router.push("/question/category/");
-      },
+  const { mutate: createTeam, isPending } = usePostMutation<Category[]>({
+    mutationKey: ["categories"],
+    endpoint: "/questions/categories/",
+    onSuccess: () => {
+      toast.success("Categories created successfully!");
+      router.push("/question/category/");
     },
-  );
+  });
 
+  // Send each category as separate request
   const onSubmit = (data: { categories: Category[] }) => {
     createTeam([...data.categories]);
   };

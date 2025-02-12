@@ -59,7 +59,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { mutateAsync: postLogin } = usePostMutation<
     TokenResponse,
     { username: string; password: string }
-  >(["login"], "/auth/token/", 2000);
+  >({
+    mutationKey: ["login"],
+    endpoint: "/auth/token/",
+    timeout: 2000,
+  });
 
   useEffect(() => {
     if (accessToken) {

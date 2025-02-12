@@ -1,11 +1,12 @@
 from rest_framework import viewsets, filters, status
-from .serializers import QuestionSerializer, CategorySerializer, AnswerSerializer
-from .models import Question, Category, Answer
+from .serializers import QuestionSerializer, CategorySerializer, AnswerSerializer, ImageSerializer
+from .models import Question, Category, Answer, Image
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from django.utils.timezone import now
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 @permission_classes([IsAdminUser])
@@ -44,7 +45,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return Response({'error': 'PATCH method is not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    # override the perform_update method
     def perform_update(self, serializer):
         instance = serializer.save(modified_by=self.request.user)
         instance.time_modified = now()
@@ -119,3 +119,21 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class AnswerViewSet(viewsets.ModelViewSet):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
+
+
+class ImageViewSet(viewsets.ModelViewSet):
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer
+    parser_classes = [MultiPartParser, FormParser]
+
+    def create(self, request, *args, **kwargs):
+        question_id = request.data.get("question")
+
+        # check if the quiz solts already exist, if so, detele them in database
+        if Image.objects.filter(question=question_id).exists():
+            Image.objects.filter(question=question_id).delete()
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

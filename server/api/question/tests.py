@@ -71,17 +71,6 @@ class QuestionCategoryTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Question.objects.count(), 1)
 
-    def test_question_must_have_answers(self):
-        response = self.client.post('/api/questions/question-bank/', {
-            'name': 'What is the boiling point of water?',
-            'question_text': 'At what temperature does water boil?',
-            'solution_text': 'Water boils at 100 degrees Celsius.',
-            'is_comp': False,
-            'diff_level': 1,
-        })
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(Question.objects.count(), 1)
-
     def test_question_must_have_diff_level(self):
         response = self.client.post('/api/questions/question-bank/', {
             'name': 'What is the boiling point of water?',
@@ -89,6 +78,17 @@ class QuestionCategoryTestCase(TestCase):
             'answers': [1],
             'solution_text': 'Water boils at 100 degrees Celsius.',
             'is_comp': False,
+        })
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Question.objects.count(), 1)
+
+    def test_question_must_have_answers(self):
+        response = self.client.post('/api/questions/question-bank/', {
+            'name': 'What is the boiling point of water?',
+            'question_text': 'At what temperature does water boil?',
+            'solution_text': 'Water boils at 100 degrees Celsius.',
+            'is_comp': False,
+            'diff_level': 1,
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Question.objects.count(), 1)

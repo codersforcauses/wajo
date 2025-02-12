@@ -265,17 +265,14 @@ function UpdateCompetitionQuestionBlocksForm({
   const adminQuizId = parseInt(router.query.id as string);
 
   const { mutate: createSlots, isPending } =
-    usePostMutation<AdminQuizSlotRequest>(
-      ["quiz.admin-quizzes.competition.slots.create"],
-      `/quiz/admin-quizzes/${adminQuizId}/slots/`,
-      1000,
-      {
-        onSuccess: () => {
-          toast.success("Competition question blocks updated successfully!");
-          router.reload();
-        },
+    usePostMutation<AdminQuizSlotRequest>({
+      mutationKey: ["quiz.admin-quizzes.competition.slots.create"],
+      endpoint: `/quiz/admin-quizzes/${adminQuizId}/slots/`,
+      onSuccess: () => {
+        toast.success("Competition question blocks updated successfully!");
+        router.reload();
       },
-    );
+    });
 
   const form = useForm<UpdateCompetitionSlots>({
     resolver: zodResolver(createSlotsSchema),

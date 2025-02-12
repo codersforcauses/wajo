@@ -34,19 +34,16 @@ export default function Create() {
   });
 
   const router = useRouter();
-  const { mutate: createCompetition, isPending } = usePostMutation<AdminQuiz>(
-    ["quiz.admin-quizzes.create"],
-    "/quiz/admin-quizzes/",
-    1000,
-    {
-      onSuccess: (res) => {
-        toast.success(
-          "Competition created successfully! Questions blocks input available below.",
-        );
-        router.push(`/test/competition/${res.data.id}`);
-      },
+  const { mutate: createCompetition, isPending } = usePostMutation<AdminQuiz>({
+    mutationKey: ["quiz.admin-quizzes.create"],
+    endpoint: "/quiz/admin-quizzes/",
+    onSuccess: (res) => {
+      toast.success(
+        "Competition created successfully! Questions blocks input available below.",
+      );
+      router.push(`/test/competition/${res.data.id}`);
     },
-  );
+  });
 
   const onSubmit = (data: CreateCompetition) => {
     createCompetition({

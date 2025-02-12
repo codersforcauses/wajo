@@ -29,19 +29,16 @@ export default function Create() {
   });
 
   const router = useRouter();
-  const { mutate: createPractice, isPending } = usePostMutation<AdminQuiz>(
-    ["quiz.admin-quizzes.create"],
-    "/quiz/admin-quizzes/",
-    1000,
-    {
-      onSuccess: (res) => {
-        toast.success(
-          "Practice created successfully! Questions blocks input available below.",
-        );
-        router.push(`/test/${res.data.id}`);
-      },
+  const { mutate: createPractice, isPending } = usePostMutation<AdminQuiz>({
+    mutationKey: ["quiz.admin-quizzes.create"],
+    endpoint: "/quiz/admin-quizzes/",
+    onSuccess: (res) => {
+      toast.success(
+        "Practice created successfully! Questions blocks input available below.",
+      );
+      router.push(`/test/${res.data.id}`);
     },
-  );
+  });
 
   const onSubmit = (data: CreatePractice) => {
     createPractice({

@@ -240,17 +240,14 @@ function UpdatePracticeQuestionBlocksForm({
   const adminQuizId = parseInt(router.query.id as string);
 
   const { mutate: createSlots, isPending } =
-    usePostMutation<AdminQuizSlotRequest>(
-      ["quiz.admin-quizzes.practice.slots.create"],
-      `/quiz/admin-quizzes/${adminQuizId}/slots/`,
-      1000,
-      {
-        onSuccess: () => {
-          toast.success("Practice question blocks updated successfully!");
-          router.reload();
-        },
+    usePostMutation<AdminQuizSlotRequest>({
+      mutationKey: ["quiz.admin-quizzes.practice.slots.create"],
+      endpoint: `/quiz/admin-quizzes/${adminQuizId}/slots/`,
+      onSuccess: () => {
+        toast.success("Practice question blocks updated successfully!");
+        router.reload();
       },
-    );
+    });
 
   const form = useForm<UpdatePracticeSlots>({
     resolver: zodResolver(createSlotsSchema),
