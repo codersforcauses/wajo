@@ -117,11 +117,9 @@ export const loginSchema = z.object({
 export const createUserSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
-  password: z
-    .string()
-    .min(8)
-    .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/),
+  password: z.string().min(1, "Password is required"),
   year_level: z.enum(["7", "8", "9"]),
+  //School ID now is not compuslory, need to modify later
   school_id: z.number().int().positive(),
   attendent_year: z.number().int().min(2024).max(2050),
   extenstion_time: z.number().int().min(0).optional(),

@@ -25,6 +25,35 @@ import { SelectSchool } from "@/components/ui/Users/select-school";
 import { cn } from "@/lib/utils";
 import { createRandomPwd, createUserSchema } from "@/types/user";
 
+// The shape of a single student returned from the backend
+type CreatedStudent = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  student_id: string;
+  year_level: number | string;
+  school: {
+    id: number;
+    name: string;
+    // any other fields your backend returns...
+  };
+  attendent_year: number;
+  created_at: string;
+  extenstion_time: number;
+};
+
+// For localStorage and CSV export
+type StoredRecord = {
+  studentId: string;
+  firstName: string;
+  lastName: string;
+  yearLevel: number | string;
+  schoolId: number;
+  schoolName: string;
+  attendentYear: number;
+  createdAt: string;
+  extensionTime: number;
+};
 type User = z.infer<typeof createUserSchema>;
 
 /**
@@ -60,7 +89,7 @@ export function DataTableForm() {
     last_name: "",
     password: "",
     year_level: "7", // default year_level is "7"
-    school_id: 1, // default school_id is 1
+    school_id: 1, // default school_id is 1, need to be changed later
     attendent_year: defaultAttendentYear,
     // extenstion_time is optional, so it can be omitted
   };
@@ -81,44 +110,68 @@ export function DataTableForm() {
   //   console.log("Submitted data:", data.users);
   // };
 
-  // new onsubmit function to save data to localStorage
-  const onSubmit = (data: { users: User[] }) => {
-    const previousData = JSON.parse(
-      localStorage.getItem("userRecords") || "[]",
-    );
+  /**
+   * When form is submitted:
+   * 1. POST the array of users to /api/users/students/
+   * 2. Store the *response data* in localStorage
+   */
+  const onSubmit = async (data: { users: User[] }) => {
+    try {
+      // POST the array of user objects to your backend
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/users/students/",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data.users), // Send them as an array
+        },
+      );
 
-    const perthTime = new Date().toLocaleString("en-AU", {
-      timeZone: "Australia/Perth",
-    });
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
 
-    const newRecords = data.users.map((user) => ({
-      firstname: user.first_name,
-      lastrname: user.last_name,
-      userRole: user.year_level,
-      password: user.password,
+      // The backend should return an array of created student records:
+      const createdStudents: CreatedStudent[] = await response.json();
 
-      createdAt: perthTime,
-    }));
+      // Build newRecords in the shape you want to store in localStorage
+      const newRecords: StoredRecord[] = createdStudents.map((std) => ({
+        studentId: std.student_id,
+        firstName: std.first_name,
+        lastName: std.last_name,
+        yearLevel: std.year_level,
+        schoolId: std.school.id,
+        schoolName: std.school.name,
+        attendentYear: std.attendent_year,
+        createdAt: std.created_at,
+        extensionTime: std.extenstion_time,
+      }));
 
-    const updatedData = [...previousData, ...newRecords];
+      // Merge with any existing data in localStorage
+      const previousData = JSON.parse(
+        localStorage.getItem("studentRecords") || "[]",
+      );
+      const updatedData = [...previousData, ...newRecords];
 
-    // store in localStorage
-    localStorage.setItem("userRecords", JSON.stringify(updatedData));
+      localStorage.setItem("studentRecords", JSON.stringify(updatedData));
 
-    console.log("Submitted and saved to localStorage:", updatedData);
+      console.log("Submitted and saved to localStorage:", updatedData);
+      alert("Students created successfully!");
+    } catch (error: any) {
+      console.error("Failed to create students:", error);
+      alert("Something went wrong while creating students.");
+    }
   };
 
-  // function to download data as CSV from localStorage
+  /**
+   * Download a CSV file from the localStorage data.
+   * We'll read from "studentRecords" and produce the requested columns:
+   *   Student ID, First Name, Last Name, Year Level, School ID, School Name,
+   *   Attendent Year, Created At, Extension Time
+   */
   const downloadCSV = () => {
-    type UserRecord = {
-      username: string;
-      password: string;
-      role: string;
-      createdAt: string;
-    };
-
-    const storedData: UserRecord[] = JSON.parse(
-      localStorage.getItem("userRecords") || "[]",
+    const storedData: StoredRecord[] = JSON.parse(
+      localStorage.getItem("studentRecords") || "[]",
     );
 
     if (storedData.length === 0) {
@@ -126,31 +179,44 @@ export function DataTableForm() {
       return;
     }
 
-    // generate CSV headers
-    const csvHeaders = ["Username", "Password", "Role", "CreatedAt"];
+    // CSV headers in the order you want them
+    const csvHeaders = [
+      "Student ID",
+      "First Name",
+      "Last Name",
+      "Year Level",
+      "School ID",
+      "School Name",
+      "Attendent Year",
+      "Created At",
+      "Extension Time",
+    ];
 
-    // generate CSV rows
-    const csvRows = storedData.map((user: UserRecord) => [
-      user.username,
-      user.password,
-      user.role,
-      user.createdAt,
+    // Build each row from storedData
+    const csvRows = storedData.map((record) => [
+      record.studentId,
+      record.firstName,
+      record.lastName,
+      record.yearLevel,
+      record.schoolId,
+      record.schoolName,
+      record.attendentYear,
+      record.createdAt,
+      record.extensionTime,
     ]);
 
-    //  convert data to CSV format
+    // Convert to CSV string
     const csvContent = [csvHeaders, ...csvRows]
-      .map((row: string[]) =>
-        row.map((value: string) => `"${value}"`).join(","),
-      ) // make sure values are enclosed in double quotes as strings
+      .map((row) => row.map((value) => `"${value}"`).join(","))
       .join("\n");
 
-    //  create a Blob object with the CSV data and download it
+    // Trigger a download
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
     link.href = url;
-    link.setAttribute("download", "user_data.csv");
+    link.setAttribute("download", "student_data.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

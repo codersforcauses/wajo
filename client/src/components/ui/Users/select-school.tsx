@@ -48,7 +48,7 @@ export function SelectSchool({ selectedId, onChange, className }: Props) {
     isError,
   } = useFetchData<School[]>({
     queryKey: ["users.schools"],
-    endpoint: "/users/schools/",
+    endpoint: "http://127.0.0.1:8000/api/users/schools/",
   });
 
   const onValueChange = (value: string) => {
