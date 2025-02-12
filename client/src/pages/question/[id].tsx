@@ -25,7 +25,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { usePutMutation } from "@/hooks/use-put-data";
-import { createQuestionSchema, Question } from "@/types/question";
+import {
+  createQuestionSchema,
+  Question,
+  QuestionImage,
+} from "@/types/question";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 type UpdateQuestion = z.infer<typeof createQuestionSchema>;
 
@@ -57,7 +63,7 @@ function EditQuestionForm({ question }: { question: Question }) {
     defaultValues: {
       questionName: question.name,
       question: question.question_text,
-      answer: question.answers?.map((a) => a.value).join(",") || "",
+      answers: question.answers?.map((a) => a.value).join(",") || "",
       solution_text: question.solution_text || "",
       mark: question.mark.toString(),
       difficulty: question.diff_level.toString(),
@@ -66,52 +72,90 @@ function EditQuestionForm({ question }: { question: Question }) {
           value: c.id.toString(),
           label: c.genre,
         })) || [],
+      image: "",
     },
   });
+
+  useEffect(() => {
+    form.setValue("image", imageUrl || "");
+    form.trigger("image");
+  }, [imageUrl, form]);
 
   const watchedValues = useWatch<UpdateQuestion>({
     control: form.control,
   });
 
-  const mutationKey = ["question_update", `${question.id}`];
+  const mutationKey = ["question.update", `${question.id}`];
   const { mutate: updateQuestion, isPending } = usePutMutation({
     mutationKey: mutationKey,
     queryKeys: [mutationKey, ["question"]],
     endpoint: `/questions/question-bank/${question.id}/`,
-    onSuccess: () => {
-      router.reload();
-      toast.success("Question has been updated.");
-    },
   });
+
+  const { mutate: updateQuestionImage, isPending: isUploadPending } =
+    usePostMutation<QuestionImage>({
+      mutationKey: ["questions.images.update"],
+      endpoint: "/questions/images/",
+      headers: { "Content-Type": "multipart/form-data" },
+      onSuccess: () => {
+        toast.success("Question image has been updated.");
+        router.reload();
+      },
+    });
 
   function onImageChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file) return;
-    setImageFile(file);
+    if (!file) {
+      setImageFile(null);
+    } else if (file.size > MAX_FILE_SIZE) {
+      toast.error("Image must be less than 5MB");
+    } else {
+      setImageFile(file);
+    }
   }
 
   const handleSubmit = (data: UpdateQuestion) => {
-    updateQuestion({
-      name: data.questionName,
-      category_ids: data.genre.map((g) => parseInt(g.value)),
-      is_comp: false,
-      answers: data.answer.split(",").map((num) => Number(num.trim())),
-      question_text: data.question,
-      note: "note",
-      solution_text: data.solution_text,
-      diff_level: parseInt(data.difficulty),
-      layout: "layout",
-      mark: parseInt(data.mark, 10),
-      image: null,
-    });
+    updateQuestion(
+      {
+        name: data.questionName,
+        category_ids: data.genre.map((g) => parseInt(g.value)),
+        is_comp: false,
+        answers: data.answers.split(",").map((num) => Number(num.trim())), // list of numbers
+        question_text: data.question,
+        note: "note",
+        solution_text: data.solution_text,
+        diff_level: parseInt(data.difficulty),
+        layout: "layout",
+        mark: parseInt(data.mark, 0),
+      },
+      {
+        onSuccess: () => {
+          if (data.image) {
+            updateQuestionImage({
+              url: imageFile,
+              question: question.id,
+            });
+          } else {
+            toast.success("Question has been updated.");
+            router.reload();
+          }
+        },
+      },
+    );
   };
+
+  const isSubmitting = isPending || isUploadPending;
 
   return (
     <div className="mx-auto my-4 max-w-3xl rounded-lg bg-gray-50 p-4 shadow-lg">
       <h1 className="mb-6 text-center text-xl font-bold">Edit Question</h1>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <form
+          encType="multipart/form-data"
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-6"
+        >
           {/* Question Name */}
           <FormField
             name="questionName"
@@ -156,11 +200,11 @@ function EditQuestionForm({ question }: { question: Question }) {
 
           {/* Answer */}
           <FormField
-            name="answer"
+            name="answers"
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="answer">
+                <FormLabel htmlFor="answers">
                   Answer <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormDescription>
@@ -169,7 +213,7 @@ function EditQuestionForm({ question }: { question: Question }) {
                 </FormDescription>
                 <FormControl>
                   <Input
-                    id="answer"
+                    id="answers"
                     placeholder="Please input answer"
                     {...field}
                   />
@@ -280,8 +324,9 @@ function EditQuestionForm({ question }: { question: Question }) {
               accept="image/jpeg, image/png, image/jpg, image/gif"
             />
 
+            {/* Image */}
             <div className="flex flex-1 items-center justify-center">
-              {imageUrl && (
+              {imageUrl ? (
                 <Image
                   src={imageUrl}
                   alt="Question Image"
@@ -289,6 +334,17 @@ function EditQuestionForm({ question }: { question: Question }) {
                   height="0"
                   className="h-auto w-full"
                 />
+              ) : (
+                question.images &&
+                question.images.length > 0 && (
+                  <Image
+                    src={question.images[0].url}
+                    alt="Question Image"
+                    width={200}
+                    height={300}
+                    className="h-auto w-full"
+                  />
+                )
               )}
             </div>
           </div>
@@ -298,7 +354,7 @@ function EditQuestionForm({ question }: { question: Question }) {
               dataContext={{
                 questionName: watchedValues.questionName || "",
                 question: watchedValues.question || "",
-                answer: watchedValues.answer || "",
+                answer: watchedValues.answers || "",
                 solution: watchedValues.solution_text || "",
                 mark: watchedValues.mark || "",
               }}
@@ -308,15 +364,8 @@ function EditQuestionForm({ question }: { question: Question }) {
               </Button>
             </PreviewModal>
 
-            <Button
-              type="submit"
-              variant={"outline"}
-              disabled={isPending}
-              onClick={() => {
-                handleSubmit;
-              }}
-            >
-              Save
+            <Button type="submit" variant={"outline"} disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save"}
             </Button>
           </div>
         </form>

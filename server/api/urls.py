@@ -20,6 +20,8 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 from api.leaderboard import urls as leaderboard_urls
+from django.conf import settings
+from django.conf.urls.static import static
 
 router = DefaultRouter()
 router.registry.extend(leaderboard_urls.router.registry)
@@ -49,4 +51,4 @@ urlpatterns = [
 
     path("api/", include(leaderboard_urls)),
     path(r"api/", include(router.urls)),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
