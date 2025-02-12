@@ -27,6 +27,7 @@ import { usePostMutation } from "@/hooks/use-post-data";
 import { usePutMutation } from "@/hooks/use-put-data";
 import {
   createQuestionSchema,
+  Layout,
   Question,
   QuestionImage,
 } from "@/types/question";
@@ -72,6 +73,8 @@ function EditQuestionForm({ question }: { question: Question }) {
           value: c.id.toString(),
           label: c.genre,
         })) || [],
+      layout: question.layout,
+      note: question.note,
       image: "",
     },
   });
@@ -122,11 +125,12 @@ function EditQuestionForm({ question }: { question: Question }) {
         is_comp: false,
         answers: data.answers.split(",").map((num) => Number(num.trim())), // list of numbers
         question_text: data.question,
-        note: "note",
+        note: data.note,
         solution_text: data.solution_text,
         diff_level: parseInt(data.difficulty),
-        layout: "layout",
+        layout: data.layout,
         mark: parseInt(data.mark, 0),
+        image: data.image,
       },
       {
         onSuccess: () => {
@@ -293,9 +297,7 @@ function EditQuestionForm({ question }: { question: Question }) {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Category <span className="text-red-500">*</span>
-                  </FormLabel>
+                  <FormLabel>Category</FormLabel>
                   <FormControl>
                     <MultipleSelectCategory
                       value={field.value}
@@ -357,7 +359,12 @@ function EditQuestionForm({ question }: { question: Question }) {
                 answer: watchedValues.answers || "",
                 solution: watchedValues.solution_text || "",
                 mark: watchedValues.mark || "",
+                layout: (watchedValues.layout ?? Layout.TOP) as Layout,
+                image: imageUrl,
               }}
+              setLayout={(newLayout: Layout) =>
+                form.setValue("layout", newLayout)
+              }
             >
               <Button type="button" variant={"ghost"} className="bg-gray-200">
                 Preview

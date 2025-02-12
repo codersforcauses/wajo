@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { usePostMutation } from "@/hooks/use-post-data";
 import {
   createQuestionSchema,
+  Layout,
   Question,
   QuestionImage,
 } from "@/types/question";
@@ -50,6 +51,8 @@ export default function Create() {
       mark: "",
       difficulty: "",
       genre: [],
+      note: "some hidden note",
+      layout: Layout.TOP,
       image: "",
     },
   });
@@ -220,10 +223,10 @@ export default function Create() {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="solution">Solution</FormLabel>
+                <FormLabel htmlFor="solution_text">Solution</FormLabel>
                 <FormControl>
                   <Textarea
-                    id="solution"
+                    id="solution_text"
                     placeholder="Please input solution"
                     {...field}
                   />
@@ -284,9 +287,7 @@ export default function Create() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Category <span className="text-red-500">*</span>
-                  </FormLabel>
+                  <FormLabel>Category</FormLabel>
                   <FormControl>
                     <MultipleSelectCategory
                       value={field.value}
@@ -323,7 +324,7 @@ export default function Create() {
               id="imageInput"
               type="file"
               onChange={onImageChange}
-              className="block w-full text-sm text-slate-500 file:ml-0 file:mr-4 file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[#7D916F] hover:cursor-pointer hover:file:bg-violet-100"
+              className="block w-full text-sm text-slate-500 file:ml-0 file:mr-4 file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-secondary hover:cursor-pointer hover:file:bg-violet-100"
               accept="image/jpeg, image/png, image/jpg"
             />
 
@@ -334,7 +335,7 @@ export default function Create() {
                   alt="Question Image"
                   width="0"
                   height="0"
-                  className="h-auto w-full"
+                  className="h-auto w-auto"
                 />
               )}
             </div>
@@ -348,7 +349,12 @@ export default function Create() {
                 answer: watchedValues.answers || "",
                 solution: watchedValues.solution_text || "",
                 mark: watchedValues.mark || "",
+                layout: (watchedValues.layout ?? Layout.TOP) as Layout,
+                image: imageUrl,
               }}
+              setLayout={(newLayout: Layout) =>
+                form.setValue("layout", newLayout)
+              }
             >
               <Button type="button" variant={"ghost"} className="bg-gray-200">
                 Preview
