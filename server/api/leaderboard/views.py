@@ -87,7 +87,7 @@ class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = TeamLeaderboardFilter
 
 
-class StudentInsightsViewSet(viewsets.ReadOnlyModelViewSet):
+class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
     # need to define get_queryset, but we don't use
     def get_queryset(self):
         return Student.objects.none()
