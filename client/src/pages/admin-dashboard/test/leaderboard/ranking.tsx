@@ -1,20 +1,19 @@
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import DashboardLayout from "@/components/dashboard-layout";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
 } from "@/components/ui/pagination";
-import { SearchInput } from "@/components/ui/search";
-import { SchoolDataGrid } from "@/components/ui/Users/school-data-grid";
+import { RankingDataGrid } from "@/components/ui/Test/ranking-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
-import type { School } from "@/types/user";
+import { NextPageWithLayout } from "@/pages/_app";
+import { Ranking } from "@/types/leaderboard";
 
-export default function SchoolList() {
+const RankingPage: NextPageWithLayout = () => {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -24,9 +23,9 @@ export default function SchoolList() {
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<School>({
-    queryKey: ["users.schools"],
-    endpoint: "/users/schools/",
+  const { data, isLoading, error, totalPages } = useFetchDataTable<Ranking>({
+    queryKey: ["leaderboard.team"],
+    endpoint: "/leaderboard/team/",
     searchParams: searchParams,
   });
 
@@ -45,7 +44,7 @@ export default function SchoolList() {
     setSearchParams(updatedParams);
     push(
       {
-        pathname: "/users/school",
+        pathname: "/test/leaderboard/ranking",
         query: Object.fromEntries(
           Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),
@@ -60,23 +59,9 @@ export default function SchoolList() {
 
   return (
     <div className="m-4 space-y-4">
-      <div className="flex justify-between">
-        <SearchInput
-          label=""
-          value={searchParams.search ?? ""}
-          placeholder="Search School"
-          onSearch={(newSearch: string) => {
-            setAndPush({ search: newSearch, page: 1 });
-          }}
-        />
-        <Button asChild className="mr-6 h-auto">
-          <Link href="/users/school/create">Create a School</Link>
-        </Button>
-      </div>
-
       <Suspense>
         <div>
-          <SchoolDataGrid datacontext={data ?? []} />
+          <RankingDataGrid datacontext={data ?? []} />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}
             <div className="flex items-center space-x-2">
@@ -103,4 +88,10 @@ export default function SchoolList() {
       </Suspense>
     </div>
   );
-}
+};
+
+RankingPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default RankingPage;

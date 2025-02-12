@@ -77,7 +77,7 @@ export function SchoolDataGrid({
                     <div className="flex w-full justify-between">
                       <Button
                         className="me-2"
-                        onClick={() => router.push(`/users/school/${item.id}`)}
+                        onClick={() => router.push(`school/${item.id}`)}
                       >
                         View
                       </Button>

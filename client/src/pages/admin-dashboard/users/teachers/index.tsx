@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
+import DashboardLayout from "@/components/dashboard-layout";
+import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
@@ -8,11 +11,12 @@ import {
   SelectRow,
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
-import { LeaderboardDataGrid } from "@/components/ui/Test/leaderboard-data-grid";
+import { DataGrid } from "@/components/ui/Users/data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
-import { Leaderboard } from "@/types/leaderboard";
+import { NextPageWithLayout } from "@/pages/_app";
+import type { Teacher } from "@/types/user";
 
-export default function Index() {
+const TeachersPage: NextPageWithLayout = () => {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -22,13 +26,11 @@ export default function Index() {
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<Leaderboard>(
-    {
-      queryKey: ["leaderboard.team"],
-      endpoint: "/leaderboard/team/",
-      searchParams: searchParams,
-    },
-  );
+  const { data, isLoading, error, totalPages } = useFetchDataTable<Teacher>({
+    queryKey: ["teachers"],
+    endpoint: "/users/teachers/",
+    searchParams: searchParams,
+  });
 
   useEffect(() => {
     if (!isLoading) {
@@ -45,7 +47,7 @@ export default function Index() {
     setSearchParams(updatedParams);
     push(
       {
-        pathname: "/test/leaderboard",
+        pathname: "/admin-dashboard/users/teachers",
         query: Object.fromEntries(
           Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),
@@ -60,20 +62,24 @@ export default function Index() {
 
   return (
     <div className="m-4 space-y-4">
+      <h1 className="pt-1 text-center text-2xl font-semibold">Teacher Users</h1>
       <div className="flex justify-between">
         <SearchInput
           label=""
           value={searchParams.search ?? ""}
-          placeholder="Search Leaderboard"
+          placeholder="Search User"
           onSearch={(newSearch: string) => {
             setAndPush({ search: newSearch, page: 1 });
           }}
         />
+        <Button asChild className="mr-6 h-auto">
+          <Link href={"teachers/create"}>Create a Teacher</Link>
+        </Button>
       </div>
 
       <Suspense>
         <div>
-          <LeaderboardDataGrid datacontext={data ?? []} />
+          <DataGrid datacontext={data ?? []} />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}
             <div className="flex items-center space-x-2">
@@ -100,4 +106,10 @@ export default function Index() {
       </Suspense>
     </div>
   );
-}
+};
+
+TeachersPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default TeachersPage;

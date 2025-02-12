@@ -38,7 +38,7 @@ export default function Layout({ children }: LayoutProps) {
     return (
       <div>
         <Navbar />
-        <main>{children}</main>
+        <main>{children} no access token found</main>
         <Footer />
       </div>
     );
@@ -48,18 +48,11 @@ export default function Layout({ children }: LayoutProps) {
     return (
       <div>
         <Navbar />
-        <main>
-          <div>Failed to get user role.</div>
-        </main>
+        <main>{children}failed to get user role</main>
+        <Footer />
       </div>
     );
   }
 
-  return (
-    <div>
-      <Navbar />
-      <main>{children}</main>
-      <Footer />
-    </div>
-  );
+  return <Sidebar role={role.toLowerCase() as Role}>{children}</Sidebar>;
 }

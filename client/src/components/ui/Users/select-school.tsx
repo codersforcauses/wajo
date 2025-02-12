@@ -56,6 +56,8 @@ export function SelectSchool({ selectedId, onChange, className }: Props) {
     if (parsed) {
       onChange(parsed);
     }
+    console.log("changed value: ", value);
+    console.log("changed int value: ", parsed);
   };
 
   return (
@@ -100,7 +102,7 @@ export function SelectSchoolType({
 
   return (
     <Select
-      value={selectedType ? selectedType.toString() : ""}
+      value={selectedType ? selectedType.toString() : "Public"}
       onValueChange={onValueChange}
     >
       <SelectTrigger className={cn(className)}>

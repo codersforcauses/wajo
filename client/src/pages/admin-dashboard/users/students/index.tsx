@@ -1,17 +1,22 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
+import DashboardLayout from "@/components/dashboard-layout";
+import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
 } from "@/components/ui/pagination";
-import { InsightDataGrid } from "@/components/ui/Test/insight-data-grid";
+import { SearchInput } from "@/components/ui/search";
+import { DataGrid } from "@/components/ui/Users/data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
-import { Insight } from "@/types/leaderboard";
+import { NextPageWithLayout } from "@/pages/_app";
+import type { Student } from "@/types/user";
 
-export default function Index() {
+const StudentsPage: NextPageWithLayout = () => {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -21,9 +26,9 @@ export default function Index() {
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<Insight>({
-    queryKey: ["leaderboard.team"],
-    endpoint: "/leaderboard/team/",
+  const { data, isLoading, error, totalPages } = useFetchDataTable<Student>({
+    queryKey: ["students"],
+    endpoint: "/users/students/",
     searchParams: searchParams,
   });
 
@@ -42,7 +47,7 @@ export default function Index() {
     setSearchParams(updatedParams);
     push(
       {
-        pathname: "/test/leaderboard/insight",
+        pathname: "/admin-dashboard/users/students",
         query: Object.fromEntries(
           Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),
@@ -57,9 +62,24 @@ export default function Index() {
 
   return (
     <div className="m-4 space-y-4">
+      <h1 className="pt-1 text-center text-2xl font-semibold">Student Users</h1>
+      <div className="flex justify-between">
+        <SearchInput
+          label=""
+          value={searchParams.search ?? ""}
+          placeholder="Search User"
+          onSearch={(newSearch: string) => {
+            setAndPush({ search: newSearch, page: 1 });
+          }}
+        />
+        <Button asChild className="mr-6 h-auto">
+          <Link href={"students/create"}>Create a Student</Link>
+        </Button>
+      </div>
+
       <Suspense>
         <div>
-          <InsightDataGrid datacontext={data ?? []} />
+          <DataGrid datacontext={data ?? []} />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}
             <div className="flex items-center space-x-2">
@@ -86,4 +106,10 @@ export default function Index() {
       </Suspense>
     </div>
   );
-}
+};
+
+StudentsPage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default StudentsPage;

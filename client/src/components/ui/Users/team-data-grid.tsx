@@ -88,7 +88,7 @@ export function TeamDataGrid({
                     <div className="flex w-full justify-between">
                       <Button
                         className="me-2"
-                        onClick={() => router.push(`/users/team/${item.id}`)}
+                        onClick={() => router.push(`team/${item.id}`)}
                       >
                         View
                       </Button>

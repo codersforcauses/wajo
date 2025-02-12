@@ -7,6 +7,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,6 +23,7 @@ import PreviewModal from "@/components/ui/Question/preview-modal";
 import { MultipleSelectCategory } from "@/components/ui/Question/select-category";
 import { Textarea } from "@/components/ui/textarea";
 import { usePostMutation } from "@/hooks/use-post-data";
+import { NextPageWithLayout } from "@/pages/_app";
 import {
   createQuestionSchema,
   Layout,
@@ -33,7 +35,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 type FormValues = z.infer<typeof createQuestionSchema>;
 
-export default function Create() {
+const CreatePage: NextPageWithLayout = () => {
   const router = useRouter();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const imageUrl = useMemo(
@@ -369,4 +371,10 @@ export default function Create() {
       </Form>
     </div>
   );
-}
+};
+
+CreatePage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default CreatePage;

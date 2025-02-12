@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,11 +19,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DateTimePicker } from "@/components/ui/time-picker/date-time-picker";
 import { usePostMutation } from "@/hooks/use-post-data";
+import { NextPageWithLayout } from "@/pages/_app";
 import { AdminQuiz, genericCreateTestSchema } from "@/types/quiz";
 
 type CreateCompetition = z.infer<typeof genericCreateTestSchema>;
 
-export default function Create() {
+const CreatePage: NextPageWithLayout = () => {
   const form = useForm<CreateCompetition>({
     resolver: zodResolver(genericCreateTestSchema),
     defaultValues: {
@@ -182,4 +184,10 @@ export default function Create() {
       </form>
     </Form>
   );
-}
+};
+
+CreatePage.getLayout = function getLayout(page) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default CreatePage;
