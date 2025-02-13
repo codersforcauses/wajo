@@ -43,6 +43,7 @@ export const navData: NavigationData = {
       title: "Question Management",
       icon: FileJson,
       items: [
+        { title: "Categories", url: "/dashboard/question/category" },
         { title: "Create Question", url: "/dashboard/question/create" },
         { title: "Question Bank", url: "/dashboard/question" },
       ],
@@ -53,10 +54,7 @@ export const navData: NavigationData = {
       items: [
         { title: "Practice Test", url: "/dashboard/test" },
         { title: "Competitions", url: "/dashboard/test/competition" },
-        {
-          title: "Results & Rankings",
-          url: "/dashboard/test/leaderboard",
-        },
+        { title: "Results & Rankings", url: "/dashboard/test/leaderboard" },
       ],
     },
     {
