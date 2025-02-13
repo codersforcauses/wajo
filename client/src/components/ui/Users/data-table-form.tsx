@@ -35,7 +35,6 @@ type StoredRecord = {
   schoolId: number;
   schoolName: string;
   attendentYear: number;
-  createdAt: string;
   extensionTime: number;
 };
 type User = z.infer<typeof createUserSchema>;
@@ -90,6 +89,16 @@ export function DataTableForm() {
     name: "users",
   });
 
+  const clearHistory = () => {
+    const userConfirmed = window.confirm(
+      "Are you sure you want to clear all creation history in this browser? This cannot be undone. We recommend exporting the data first.",
+    );
+    if (userConfirmed) {
+      localStorage.removeItem("studentRecords");
+      toast.success("Creation history cleared from this browser.");
+    }
+  };
+
   const { mutate: createUser, isPending } = usePostMutation<Student[]>({
     mutationKey: ["students"],
     endpoint: "/users/students/",
@@ -107,7 +116,6 @@ export function DataTableForm() {
           schoolId: std.school.id,
           schoolName: std.school.name,
           attendentYear: std.attendent_year,
-          createdAt: std.created_at.toString(),
           extensionTime: std.extenstion_time || 0,
         }));
 
@@ -118,7 +126,9 @@ export function DataTableForm() {
         const updatedData = [...previousData, ...newRecords];
 
         localStorage.setItem("studentRecords", JSON.stringify(updatedData));
-        toast.success("Please Click Export CSV button to download data.");
+        toast.success(
+          "You can click Export CSV button to download the historical user creation data.",
+        );
       } catch (error) {
         toast.error(`Error when update data for Export CSV. ${error}`);
       }
@@ -154,7 +164,6 @@ export function DataTableForm() {
       "School ID",
       "School Name",
       "Attendent Year",
-      "Created At",
       "Extension Time",
     ];
 
@@ -167,7 +176,6 @@ export function DataTableForm() {
       record.schoolId,
       record.schoolName,
       record.attendentYear,
-      record.createdAt,
       record.extensionTime,
     ]);
 
@@ -182,7 +190,7 @@ export function DataTableForm() {
     const link = document.createElement("a");
 
     link.href = url;
-    link.setAttribute("download", "student_data.csv");
+    link.setAttribute("download", "Student_Create_Data.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -451,6 +459,16 @@ export function DataTableForm() {
               Add Row
             </Button>
             <div className="flex gap-2">
+              {/* 新增的按钮 */}
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={clearHistory}
+                title="Click to clear all creation history from this browser (cannot be undone)"
+              >
+                Clear History
+              </Button>
+
               <Button
                 type="button"
                 variant="outline"
