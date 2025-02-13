@@ -2,7 +2,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
-import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -13,10 +12,9 @@ import {
 import { SearchInput } from "@/components/ui/search";
 import { TeamDataGrid } from "@/components/ui/Users/team-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
-import { NextPageWithLayout } from "@/pages/_app";
 import type { Team } from "@/types/team";
 
-const TeamPage: NextPageWithLayout = () => {
+export default function TeamList() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -105,10 +103,4 @@ const TeamPage: NextPageWithLayout = () => {
       </Suspense>
     </div>
   );
-};
-
-TeamPage.getLayout = function getLayout(page) {
-  return <DashboardLayout>{page}</DashboardLayout>;
-};
-
-export default TeamPage;
+}

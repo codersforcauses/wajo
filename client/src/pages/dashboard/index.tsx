@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 
-import DashboardLayout from "@/components/dashboard-layout";
-import { NextPageWithLayout } from "@/pages/_app";
 import { useTokenStore } from "@/store/token-store";
 
-const DashboardPage: NextPageWithLayout = () => {
+export default function Dashboard() {
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const { access } = useTokenStore(); // access the JWT token
   const [role, setRole] = useState<string | undefined>(undefined);
@@ -23,14 +21,9 @@ const DashboardPage: NextPageWithLayout = () => {
   return (
     <div className="flex h-[90vh] items-center justify-center">
       <h1>
-        {role && `${role.charAt(0).toUpperCase()}${role.slice(1)}`} Dashboard
+        Welcome to {role && `${role.charAt(0).toUpperCase()}${role.slice(1)}`}{" "}
+        Dashboard
       </h1>
     </div>
   );
-};
-
-DashboardPage.getLayout = function getLayout(page) {
-  return <DashboardLayout>{page}</DashboardLayout>;
-};
-
-export default DashboardPage;
+}

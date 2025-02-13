@@ -92,13 +92,13 @@ export const navData: NavigationData = {
     },
   ],
   student: [
-    {
-      title: "Student Menu",
-      icon: SquareDashedMousePointer,
-      items: [
-        { title: "Student Menu Items 1", url: "#" },
-        { title: "Student Menu Items 2", url: "#" },
-      ],
-    },
+    // {
+    //   title: "Student Menu",
+    //   icon: SquareDashedMousePointer,
+    //   items: [
+    //     { title: "Student Menu Items 1", url: "#" },
+    //     { title: "Student Menu Items 2", url: "#" },
+    //   ],
+    // },
   ],
 };

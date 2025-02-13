@@ -77,11 +77,7 @@ export function DataGrid({
         <Table className="w-full border-collapse text-left shadow-md">
           <TableHeader className="w-full bg-black text-lg font-semibold">
             <TableRow className="hover:bg-muted/0">
-              <TableHead
-                className={cn(commonTableHeadClasses, "rounded-tl-lg")}
-              >
-                User Id
-              </TableHead>
+              <TableHead className={commonTableHeadClasses}>User Id</TableHead>
               <TableHead className={commonTableHeadClasses}>
                 User Name
               </TableHead>
@@ -91,16 +87,8 @@ export function DataGrid({
               <TableHead className={commonTableHeadClasses}>
                 Last Name
               </TableHead>
-              {role == "all" && (
-                <TableHead className={commonTableHeadClasses}>
-                  User Role
-                </TableHead>
-              )}
-              {role != "admin" && (
+              {role === "admin" && (
                 <TableHead className={commonTableHeadClasses}>School</TableHead>
-              )}
-              {role != "student" && role != "all" && (
-                <TableHead className={commonTableHeadClasses}>Email</TableHead>
               )}
               <TableHead
                 className={cn(commonTableHeadClasses, "rounded-tr-lg")}
@@ -119,42 +107,24 @@ export function DataGrid({
                   }
                 >
                   <TableCell className="w-1/4">{item.id}</TableCell>
-                  {
-                    <TableCell className="w-1/4">
-                      {!item.id
-                        ? ""
-                        : item.username
-                          ? item.username
-                          : item.student_id
-                            ? item.student_id
-                            : "-"}
-                    </TableCell>
-                  }
-                  {
-                    <TableCell className="w-1/4">
-                      {!item.id ? "" : item.first_name ? item.first_name : "-"}
-                    </TableCell>
-                  }
-                  {
-                    <TableCell className="w-1/4">
-                      {!item.id ? "" : item.last_name ? item.last_name : "-"}
-                    </TableCell>
-                  }
-                  {role == "all" && (
-                    <TableCell className="w-1/4">{item.role}</TableCell>
-                  )}
-                  {role != "admin" && item.id && (
+                  <TableCell className="w-1/4">
+                    {!item.id
+                      ? ""
+                      : item.username
+                        ? item.username
+                        : item.student_id
+                          ? item.student_id
+                          : "-"}
+                  </TableCell>
+                  <TableCell className="w-1/4">
+                    {!item.id ? "" : item.first_name ? item.first_name : "-"}
+                  </TableCell>
+                  <TableCell className="w-1/4">
+                    {!item.id ? "" : item.last_name ? item.last_name : "-"}
+                  </TableCell>
+                  {role === "admin" && item.id && (
                     <TableCell className="w-1/4">
                       {item.school?.name ? item.school.name : "-"}
-                    </TableCell>
-                  )}
-                  {role != "student" && role != "all" && item.id && (
-                    <TableCell className="w-1/4">
-                      {item.email
-                        ? item.email
-                        : role == "teacher"
-                          ? item.email
-                          : "-"}
                     </TableCell>
                   )}
                   <TableCell className="flex py-4">

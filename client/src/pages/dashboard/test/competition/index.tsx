@@ -2,7 +2,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
-import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -14,7 +13,6 @@ import { SearchInput } from "@/components/ui/search";
 import { CompetitionDataGrid } from "@/components/ui/Test/competition-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import { pickKeys } from "@/lib/utils";
-import { NextPageWithLayout } from "@/pages/_app";
 import {
   OrderingItem,
   orderingToString,
@@ -26,7 +24,7 @@ type CustomSearchParams = PaginationSearchParams & {
   status: QuizStatus;
 };
 
-const IndexPage: NextPageWithLayout = () => {
+export default function Index() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -146,10 +144,4 @@ const IndexPage: NextPageWithLayout = () => {
       </Suspense>
     </div>
   );
-};
-
-IndexPage.getLayout = function getLayout(page) {
-  return <DashboardLayout>{page}</DashboardLayout>;
-};
-
-export default IndexPage;
+}

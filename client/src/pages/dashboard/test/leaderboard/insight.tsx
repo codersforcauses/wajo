@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
-import DashboardLayout from "@/components/dashboard-layout";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
@@ -10,10 +9,9 @@ import {
 } from "@/components/ui/pagination";
 import { InsightDataGrid } from "@/components/ui/Test/insight-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
-import { NextPageWithLayout } from "@/pages/_app";
 import { Insight } from "@/types/leaderboard";
 
-const InsightPage: NextPageWithLayout = () => {
+export default function Index() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -88,10 +86,4 @@ const InsightPage: NextPageWithLayout = () => {
       </Suspense>
     </div>
   );
-};
-
-InsightPage.getLayout = function getLayout(page) {
-  return <DashboardLayout>{page}</DashboardLayout>;
-};
-
-export default InsightPage;
+}

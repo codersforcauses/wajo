@@ -45,6 +45,7 @@ export function SchoolDataTableForm() {
   const defaultSchool = {
     name: "",
     is_country: true,
+    type: "Public",
     abbreviation: "",
   } as School;
 

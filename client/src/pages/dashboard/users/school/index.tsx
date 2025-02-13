@@ -2,7 +2,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
-import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -13,10 +12,9 @@ import {
 import { SearchInput } from "@/components/ui/search";
 import { SchoolDataGrid } from "@/components/ui/Users/school-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
-import { NextPageWithLayout } from "@/pages/_app";
 import type { School } from "@/types/user";
 
-const SchoolsPage: NextPageWithLayout = () => {
+export default function SchoolList() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -105,10 +103,4 @@ const SchoolsPage: NextPageWithLayout = () => {
       </Suspense>
     </div>
   );
-};
-
-SchoolsPage.getLayout = function getLayout(page) {
-  return <DashboardLayout>{page}</DashboardLayout>;
-};
-
-export default SchoolsPage;
+}

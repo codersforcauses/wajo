@@ -2,7 +2,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
-import DashboardLayout from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -13,10 +12,9 @@ import {
 import { SearchInput } from "@/components/ui/search";
 import { DataGrid } from "@/components/ui/Users/data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
-import { NextPageWithLayout } from "@/pages/_app";
 import type { User } from "@/types/user";
 
-const StaffsPage: NextPageWithLayout = () => {
+export default function Staffs() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -106,10 +104,4 @@ const StaffsPage: NextPageWithLayout = () => {
       </Suspense>
     </div>
   );
-};
-
-StaffsPage.getLayout = function getLayout(page) {
-  return <DashboardLayout>{page}</DashboardLayout>;
-};
-
-export default StaffsPage;
+}

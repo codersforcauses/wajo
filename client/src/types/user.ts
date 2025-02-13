@@ -1,4 +1,3 @@
-import { PassThrough } from "stream";
 import { z } from "zod";
 
 /**
@@ -27,12 +26,9 @@ export type Role = z.infer<typeof RoleEnum>;
  * @example
  * const school: School = "public";
  */
-export const SchoolTypeEnum = z.enum(
-  ["public", "independent", "catholic", ""],
-  {
-    errorMap: () => ({ message: "Invalid School Type" }),
-  },
-);
+export const SchoolTypeEnum = z.enum(["Public", "Independent", "Catholic"], {
+  errorMap: () => ({ message: "Invalid School Type" }),
+});
 
 /**
  * Type representing a school type. Can be one of the following:

@@ -9,6 +9,7 @@ import Footer from "./ui/footer";
 
 interface LayoutProps {
   children: React.ReactNode;
+  isPublic?: boolean;
 }
 
 /**
@@ -18,7 +19,7 @@ interface LayoutProps {
  * @param {React.ReactNode} props.children - The child components to render within the layout.
  *
  */
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children, isPublic = false }: LayoutProps) {
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const { access } = useTokenStore(); // access the JWT token
   const [role, setRole] = useState<string | undefined>(undefined);
@@ -34,7 +35,7 @@ export default function Layout({ children }: LayoutProps) {
 
   if (!isAuthChecked) return null;
 
-  if (!access) {
+  if (!access || isPublic) {
     return (
       <div>
         <Navbar />
@@ -47,19 +48,18 @@ export default function Layout({ children }: LayoutProps) {
   if (!role) {
     return (
       <div>
-        <Navbar />
         <main>
           <div>Failed to get user role.</div>
         </main>
       </div>
     );
   }
-
   return (
-    <div>
-      <Navbar />
-      <main>{children}</main>
-      <Footer />
-    </div>
+    <Sidebar
+      role={role.toLowerCase() as Role}
+      isShowBreadcrumb={role === "student" ? false : true}
+    >
+      {children}
+    </Sidebar>
   );
 }
