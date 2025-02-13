@@ -70,14 +70,14 @@ class TeamViewSet(viewsets.ModelViewSet):
             if not all([student_id, team_id]):
                 return Response({"error": "Missing required fields: student_id or team."}, status=status.HTTP_400_BAD_REQUEST)
             student = Student.objects.filter(id=student_id).first()
-            team = Team.objects.filter(id=team_id).first()
             team_member = TeamMember.objects.filter(student_id=student_id).first()
             if teacher_school_id and student.school.id != teacher_school_id:
                 return Response({"error": "Teacher can only manage students from their school."}, status=status.HTTP_400_BAD_REQUEST)
             if student.school.id != team.school.id:
                 return Response({"error": "Student must belong to the same school as the team."}, status=status.HTTP_400_BAD_REQUEST)
             if team_member and team_member.team.id != int(pk):
-                return Response({"error": f"Student:{student.user.get_username()} exists in team:{team.name}."}, status=status.HTTP_400_BAD_REQUEST)
+                team_name = Team.objects.filter(id=team_member.team.id).first().name
+                return Response({"error": f"Student:{student.user.get_username()} exists in team:{team_name}."}, status=status.HTTP_400_BAD_REQUEST)
             return None
 
         if request.method == 'GET':
