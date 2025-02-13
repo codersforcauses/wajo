@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import { SortIcon } from "@/components/ui/icon";
 import { Pagination } from "@/components/ui/pagination";
 import {
   Table,
@@ -10,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { DatagridProps } from "@/types/data-grid";
+import { DatagridProps, sortData } from "@/types/data-grid";
 import { TeamLeaderboard } from "@/types/leaderboard";
 
 /**
@@ -39,10 +40,18 @@ export function TeamDataGrid({
   onDataChange,
   changePage,
 }: DatagridProps<TeamLeaderboard>) {
+  const [isAscending, setIsAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [paddedData, setPaddedData] = useState<TeamLeaderboard[]>([]);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
+
+  const sortByColumn = (column: keyof TeamLeaderboard) => {
+    const sortedData = sortData(datacontext, column, isAscending);
+    setCurrentPage(1);
+    onDataChange(sortedData);
+    setIsAscending(!isAscending);
+  };
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -78,13 +87,25 @@ export function TeamDataGrid({
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>Id</TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
-              Total Marks
+              <div className="flex items-center text-white">
+              <span>Total Marks</span>
+              <span className="ml-2 cursor-pointer"
+              onClick={() => sortByColumn("total_marks")}>
+                <SortIcon />
+              </span>
+              </div>
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
               Is Country?
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
-              Max Year
+            <div className="flex items-center text-white">
+              <span>Max Year</span>
+              <span className="ml-2 cursor-pointer"
+              onClick={() => sortByColumn("max_year")}>
+                <SortIcon />
+              </span>
+              </div>
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
               Student 1

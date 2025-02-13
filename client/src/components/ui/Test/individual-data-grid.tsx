@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import { SortIcon } from "@/components/ui/icon";
 import { Pagination } from "@/components/ui/pagination";
 import {
   Table,
@@ -10,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { DatagridProps } from "@/types/data-grid";
+import { DatagridProps, sortData } from "@/types/data-grid";
 import { IndividualLeaderboard, Ranking } from "@/types/leaderboard";
 
 /**
@@ -39,10 +40,18 @@ export function IndividualDataGrid({
   onDataChange,
   changePage,
 }: DatagridProps<IndividualLeaderboard>) {
+  const [isAscending, setIsAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [paddedData, setPaddedData] = useState<IndividualLeaderboard[]>([]);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(datacontext.length / itemsPerPage);
+
+  const sortByColumn = (column: keyof IndividualLeaderboard) => {
+    const sortedData = sortData(datacontext, column, isAscending);
+    setCurrentPage(1);
+    onDataChange(sortedData);
+    setIsAscending(!isAscending);
+  };
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -77,7 +86,13 @@ export function IndividualDataGrid({
               Student Name
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
-              Year Level
+              <div className="flex items-center text-white">
+                <span>Year Level</span>
+                <span className="ml-2 cursor-pointer"
+                onClick={() => sortByColumn("year_level")}>
+                  <SortIcon />
+                </span>
+                </div>
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>School</TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
@@ -87,7 +102,13 @@ export function IndividualDataGrid({
               Is Country?
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
-              Total Marks
+              <div className="flex items-center text-white">
+                <span>Total Marks</span>
+                <span className="ml-2 cursor-pointer"
+                onClick={() => sortByColumn("total_marks")}>
+                  <SortIcon />
+                </span>
+                </div>
             </TableHead>
           </TableRow>
         </TableHeader>
