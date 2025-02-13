@@ -116,7 +116,6 @@ class TeacherViewSet(viewsets.ModelViewSet):
         if request.user.is_staff:
             return super().retrieve(request, *args, **kwargs)
         elif hasattr(request.user, "teacher"):
-            print(kwargs["pk"])
             if request.user.teacher.id == int(kwargs["pk"]):
                 return super().retrieve(request, *args, **kwargs)
             else:

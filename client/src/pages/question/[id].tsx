@@ -360,7 +360,11 @@ function EditQuestionForm({ question }: { question: Question }) {
                 solution: watchedValues.solution_text || "",
                 mark: watchedValues.mark || "",
                 layout: (watchedValues.layout ?? Layout.TOP) as Layout,
-                image: imageUrl,
+                image: imageUrl
+                  ? imageUrl
+                  : question.images && question.images.length > 0
+                    ? question.images[0].url
+                    : null,
               }}
               setLayout={(newLayout: Layout) =>
                 form.setValue("layout", newLayout)

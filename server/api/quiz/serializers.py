@@ -1,9 +1,13 @@
 from rest_framework import serializers
 from api.question.models import Question, Category
+from api.question.serializers import AnswerSerializer
 from api.quiz.models import Quiz, QuizSlot, QuizAttempt, QuestionAttempt
 
 
 class QuestionSerializer(serializers.ModelSerializer):
+    # answers is a foreign key field, so we need to use a nested serializer
+    answers = AnswerSerializer(many=True)
+
     class Meta:
         model = Question
         fields = '__all__'
