@@ -1,9 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { AlertTriangle } from "lucide-react";
+import { ReactNode } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -89,16 +99,6 @@ export function DataTableForm() {
     name: "users",
   });
 
-  const clearHistory = () => {
-    const userConfirmed = window.confirm(
-      "Are you sure you want to clear all creation history in this browser? This cannot be undone. We recommend exporting the data first.",
-    );
-    if (userConfirmed) {
-      localStorage.removeItem("studentRecords");
-      toast.success("Creation history cleared from this browser.");
-    }
-  };
-
   const { mutate: createUser, isPending } = usePostMutation<Student[]>({
     mutationKey: ["students"],
     endpoint: "/users/students/",
@@ -151,7 +151,7 @@ export function DataTableForm() {
     );
 
     if (storedData.length === 0) {
-      alert("No data available to export.");
+      toast.warning("No data available to export.");
       return;
     }
 
@@ -459,15 +459,11 @@ export function DataTableForm() {
               Add Row
             </Button>
             <div className="flex gap-2">
-              {/* 新增的按钮 */}
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={clearHistory}
-                title="Click to clear all creation history from this browser (cannot be undone)"
-              >
-                Clear History
-              </Button>
+              <ClearHistoryModal>
+                <Button type="button" variant={"destructive"}>
+                  Clear History
+                </Button>
+              </ClearHistoryModal>
 
               <Button
                 type="button"
@@ -486,5 +482,53 @@ export function DataTableForm() {
         </form>
       </Form>
     </div>
+  );
+}
+
+function ClearHistoryModal({ children }: { children: ReactNode }) {
+  const onClearHistory = () => {
+    localStorage.removeItem("studentRecords");
+    toast.success("Creation history cleared from this browser.");
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className="flex h-auto w-[95%] max-w-[400px] flex-col items-center rounded-lg bg-[--nav-background] p-6 shadow-xl">
+        <VisuallyHidden.Root>
+          <DialogTitle>Delete Confirmation</DialogTitle>
+          <DialogDescription></DialogDescription>
+        </VisuallyHidden.Root>
+
+        <AlertTriangle className="mb-4 h-12 w-12 text-red-500" />
+
+        <div className="text-center text-gray-900">
+          <p className="text-2xl font-semibold">
+            Are you sure you want to clear all creation history in this browser?
+          </p>
+          <p className="text-md mt-1 text-gray-500">
+            This cannot be undone. We recommend exporting the data first.
+          </p>
+        </div>
+
+        <div className="mt-6 flex gap-10">
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              className="w-36 border border-black bg-white"
+            >
+              No
+            </Button>
+          </DialogTrigger>
+          <Button
+            onClick={onClearHistory}
+            variant={"secondary"}
+            className="w-36"
+          >
+            Yes
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
