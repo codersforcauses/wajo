@@ -122,7 +122,24 @@ const createTeamMemberSchema = z.object({
 });
 
 export const createMembersSchema = z.object({
-  members: z
-    .array(createTeamMemberSchema)
-    .min(1, "At least one member is required"),
+  members: z.array(createTeamMemberSchema).superRefine((members, ctx) => {
+    // ref: https://zod.dev/?id=superrefine
+    if (members.length > 4) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.too_big,
+        maximum: 4,
+        type: "array",
+        inclusive: true,
+        message: "Only 4 at max allowed for team members.",
+      });
+    }
+
+    const uniqueIds = new Set(members.map((m) => m.student_id));
+    if (uniqueIds.size !== members.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Duplicates StudentId found.",
+      });
+    }
+  }),
 });
