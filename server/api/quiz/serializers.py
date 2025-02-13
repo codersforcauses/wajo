@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from api.question.models import Question, Category
+from api.question.serializers import ImageSerializer
 from api.quiz.models import Quiz, QuizSlot, QuizAttempt, QuestionAttempt
 
 
@@ -13,6 +14,8 @@ class CompQuestionSerializer(serializers.ModelSerializer):
     """
     Serializer for the Question model with no answer field.
     """
+    images = ImageSerializer(read_only=True, many=True)
+
     class Meta:
         model = Question
         fields = ['id', 'name', 'question_text', 'layout', 'images', 'mark']

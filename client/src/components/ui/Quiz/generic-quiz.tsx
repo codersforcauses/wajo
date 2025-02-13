@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { set } from "zod";
 
@@ -25,6 +26,8 @@ export default function GenericQuiz({
   const [currentQuestion, setCurrentQuestion] = useState<Question>(
     questions[currentPage - 1],
   );
+
+  // console.log(currentQuestion.image.url);
 
   useEffect(() => {
     setQuestionNumber(currentPage);
@@ -89,6 +92,14 @@ export default function GenericQuiz({
             {currentQuestion.mark === 1 ? "Mark" : "Marks"}]
           </h2>
         </div>
+        {process.env.NEXT_PUBLIC_BACKEND_URL && (
+          <Image
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL.replace("/api", "")}${currentQuestion.image.url}`}
+            alt="Question Image"
+            width={200}
+            height={100}
+          />
+        )}
         <p>{currentQuestion.question_text}</p>
         {/* <p className="mb-6 mt-4">{currentQuestion.mathJax}</p> */}
         <br />

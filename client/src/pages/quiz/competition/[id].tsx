@@ -36,7 +36,7 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
     queryKey: [`quiz.competition.${id}/slots`],
     endpoint: `/quiz/competition/${id}/slots/`,
   });
-  console.log(quizQuestionData);
+  // console.log(quizQuestionData);
 
   const endTime = new Date(quizQuestionData?.end_time);
   const now = new Date(); // Get current time (local to your system)
@@ -50,6 +50,7 @@ const CompetitionQuizPage: NextPageWithLayout = () => {
   }));
 
   // console.log(questionData);
+  // console.log(questionData[0].image.url);
 
   // console.log("Quiz Data: ", quizData);
   // console.log("2024 Quiz Data: ", quizData ? quizData[0] : "No data available");
