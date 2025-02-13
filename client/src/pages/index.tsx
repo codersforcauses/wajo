@@ -79,9 +79,8 @@ export default function Home() {
             </ul>
             <p className="body-2-bold inline-block">You need:</p> Pens, pencils,
             and if you wish, ruler and compass. Special
-            <p className="body-2-bold inline-block">
-              conditions:
-            </p> No calculators. Brains only.
+            <p className="body-2-bold inline-block">conditions:</p> No
+            calculators. Brains only.
           </div>
           <div>
             {" "}
@@ -102,7 +101,8 @@ export default function Home() {
                 {" "}
                 Venue:{" "}
                 <p className="body-2-bold inline-block">
-                  Social Sciences Lecture Theatre, near Hackett Entrance No. 1{" "}
+                  Social Sciences Lecture Theatre, near Hackett Entrance No.
+                  1{" "}
                 </p>
                 (see campus map - in SEARCH enter: Social Sciences Lecture T One
                 selection will come up. Click on it, and a balloon will
