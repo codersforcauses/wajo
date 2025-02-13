@@ -1,6 +1,8 @@
+from django.db.models import BigIntegerField
 from rest_framework import viewsets
 from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
 from django.db.models import Sum, Max
+from django.db.models.functions import Cast
 from ..quiz.models import Quiz, QuizAttempt
 from .serializers import IndividualLeaderboardSerializer, TeamLeaderboardSerializer
 from ..users.models import School, Student
@@ -81,8 +83,9 @@ class TeamLeaderboardFilter(FilterSet):
 
 
 class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Team.objects.annotate(total_marks=Sum('quiz_attempts__total_marks')
-                                     ).annotate(max_year=Max('students__year_level')
-                                                ).order_by('id')
+    queryset = Team.objects.annotate(
+        total_marks=Sum('quiz_attempts__total_marks'),
+        max_year=Max(Cast('students__year_level', output_field=BigIntegerField()))
+    ).order_by('id')
     serializer_class = TeamLeaderboardSerializer
     filterset_class = TeamLeaderboardFilter
