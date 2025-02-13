@@ -14,9 +14,9 @@ import { SearchInput } from "@/components/ui/search";
 import { DataGrid } from "@/components/ui/Users/data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import { NextPageWithLayout } from "@/pages/_app";
-import type { Teacher } from "@/types/user";
+import type { User } from "@/types/user";
 
-const TeachersPage: NextPageWithLayout = () => {
+const StaffsPage: NextPageWithLayout = () => {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -26,9 +26,9 @@ const TeachersPage: NextPageWithLayout = () => {
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<Teacher>({
-    queryKey: ["teachers"],
-    endpoint: "/users/teachers/",
+  const { data, isLoading, error, totalPages } = useFetchDataTable<User>({
+    queryKey: ["staffs"],
+    endpoint: "/users/staffs/",
     searchParams: searchParams,
   });
 
@@ -47,7 +47,7 @@ const TeachersPage: NextPageWithLayout = () => {
     setSearchParams(updatedParams);
     push(
       {
-        pathname: "/admin-dashboard/users/teachers",
+        pathname: "/dashboard/users/staffs",
         query: Object.fromEntries(
           Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),
@@ -62,7 +62,7 @@ const TeachersPage: NextPageWithLayout = () => {
 
   return (
     <div className="m-4 space-y-4">
-      <h1 className="pt-1 text-center text-2xl font-semibold">Teacher Users</h1>
+      <h1 className="pt-1 text-center text-2xl font-semibold">Staff Users</h1>
       <div className="flex justify-between">
         <SearchInput
           label=""
@@ -73,7 +73,7 @@ const TeachersPage: NextPageWithLayout = () => {
           }}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"teachers/create"}>Create a Teacher</Link>
+          <Link href={"staffs/create"}>Create a Staff user</Link>
         </Button>
       </div>
 
@@ -108,8 +108,8 @@ const TeachersPage: NextPageWithLayout = () => {
   );
 };
 
-TeachersPage.getLayout = function getLayout(page) {
+StaffsPage.getLayout = function getLayout(page) {
   return <DashboardLayout>{page}</DashboardLayout>;
 };
 
-export default TeachersPage;
+export default StaffsPage;

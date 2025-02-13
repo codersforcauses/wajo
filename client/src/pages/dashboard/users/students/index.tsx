@@ -47,7 +47,7 @@ const StudentsPage: NextPageWithLayout = () => {
     setSearchParams(updatedParams);
     push(
       {
-        pathname: "/admin-dashboard/users/students",
+        pathname: "/dashboard/users/students",
         query: Object.fromEntries(
           Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),

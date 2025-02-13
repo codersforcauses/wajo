@@ -4,12 +4,12 @@ from .models import Question, Category, Answer, Image
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from django.utils.timezone import now
 from rest_framework.parsers import MultiPartParser, FormParser
 
 
-@permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated])
 class QuestionViewSet(viewsets.ModelViewSet):
     """
     A viewset for viewing and editing Question instances.Not supported for PATCH requests.
@@ -26,6 +26,16 @@ class QuestionViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['name']
     filterset_fields = ['mark', 'answers__value']
+
+    # override the list method
+    def list(self, request, *args, **kwargs):
+        # Check if the user is an admin
+        if not request.user.is_staff:
+            return Response({'error': 'You do not have permission to perform this action.'}, status=status.HTTP_403_FORBIDDEN)
+
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     # override the create method
     def create(self, request, *args, **kwargs):

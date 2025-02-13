@@ -163,7 +163,7 @@ export function DataGrid({
                         className="me-2"
                         onClick={() =>
                           router.push(
-                            `/admin-dashboard/users/${item.id}?entity=${entityName}`,
+                            `/dashboard/users/${item.id}?entity=${entityName}`,
                           )
                         }
                       >

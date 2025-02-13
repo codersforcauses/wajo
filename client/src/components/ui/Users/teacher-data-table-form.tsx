@@ -88,7 +88,7 @@ export function TeacherDataTableForm() {
           // queryClient.invalidateQueries({ queryKey: ["users"] });
           toast.success("Teacher created successfully");
           console.log("Response:", response);
-          router.push("/admin-dashboard/users/teachers");
+          router.push("/dashboard/users/teachers");
         },
         onError: (error) => {
           toast.error("Failed to create teacher");

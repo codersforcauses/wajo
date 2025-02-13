@@ -76,13 +76,7 @@ export function LoginModal({ children }: LoginFormProps) {
       toast.success("You are now logged in.");
       const userRole = Cookies.get("user_role");
       const pathName =
-        userRole === "admin"
-          ? "/admin-dashboard"
-          : userRole === "teacher"
-            ? "/teacher-dashboard"
-            : userRole === "student"
-              ? "/student-dashboard"
-              : "/";
+        userRole === "admin" || userRole === "teacher" ? "/dashboard" : "/";
       replace(pathName);
     } else {
       toast.error(error || "Something went wrong.");

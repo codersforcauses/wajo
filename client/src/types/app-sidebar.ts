@@ -43,19 +43,19 @@ export const navData: NavigationData = {
       title: "Question Management",
       icon: FileJson,
       items: [
-        { title: "Create Question", url: "/admin-dashboard/question/create" },
-        { title: "Question Bank", url: "/admin-dashboard/question" },
+        { title: "Create Question", url: "/dashboard/question/create" },
+        { title: "Question Bank", url: "/dashboard/question" },
       ],
     },
     {
       title: "Test Management",
       icon: BookType,
       items: [
-        { title: "Practice Test", url: "/admin-dashboard/test" },
-        { title: "Competitions", url: "/admin-dashboard/test/competition" },
+        { title: "Practice Test", url: "/dashboard/test" },
+        { title: "Competitions", url: "/dashboard/test/competition" },
         {
           title: "Results & Rankings",
-          url: "/admin-dashboard/test/leaderboard",
+          url: "/dashboard/test/leaderboard",
         },
       ],
     },
@@ -63,28 +63,31 @@ export const navData: NavigationData = {
       title: "User Management",
       icon: UserRoundCog,
       items: [
-        { title: "Schools", url: "/admin-dashboard/users/school" },
+        { title: "Schools", url: "/dashboard/users/school" },
         {
           title: "Users",
-          url: "/admin-dashboard/users",
+          url: "/dashboard/users",
           items: [
-            { title: "Teachers", url: "/admin-dashboard/users/teachers" },
-            { title: "Students", url: "/admin-dashboard/users/students" },
-            { title: "Staff", url: "/admin-dashboard/users/staffs" },
+            { title: "Teachers", url: "/dashboard/users/teachers" },
+            { title: "Students", url: "/dashboard/users/students" },
+            { title: "Staff", url: "/dashboard/users/staffs" },
           ],
         },
-        { title: "Teams", url: "/admin-dashboard/users/team" },
+        { title: "Teams", url: "/dashboard/users/team" },
         { title: "Admin Portal", url: `${backendURL}admin`, isNewTab: true },
       ],
     },
   ],
   teacher: [
     {
-      title: "Teacher Menu",
-      icon: SquareDashedMousePointer,
+      title: "Student Management",
+      icon: UserRoundCog,
       items: [
-        { title: "Teacher Menu Items 1", url: "#" },
-        { title: "Teacher Menu Items 2", url: "#" },
+        {
+          title: "Students",
+          url: "/dashboard/users/students",
+        },
+        { title: "Teams", url: "/dashboard/users/team" },
       ],
     },
   ],

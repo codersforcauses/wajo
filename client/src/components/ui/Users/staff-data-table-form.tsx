@@ -85,7 +85,7 @@ export function StaffDataTableForm() {
         queryClient.invalidateQueries();
         toast.success("Staffs created successfully");
         console.log("Response:", response);
-        router.push("/admin-dashboard/users/staffs");
+        router.push("/dashboard/users/staffs");
       },
       onError: (error) => {
         toast.error("Failed to create staffs");
