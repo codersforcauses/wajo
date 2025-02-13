@@ -92,7 +92,7 @@ export default function Index() {
           }}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"/question/category/create"}>Create a Category</Link>
+          <Link href={`${router.pathname}/create`}>Create a Category</Link>
         </Button>
       </div>
 

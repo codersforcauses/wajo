@@ -64,7 +64,7 @@ export function TeamDataTableForm() {
     endpoint: "/team/teams/",
     onSuccess: () => {
       toast.success("Teams created successfully!");
-      router.push("/users/team/");
+      router.push("/dashboard/users/team/");
     },
   });
 

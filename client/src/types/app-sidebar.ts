@@ -44,7 +44,6 @@ export const navData: NavigationData = {
       icon: FileJson,
       items: [
         { title: "Categories", url: "/dashboard/question/category" },
-        { title: "Create Question", url: "/dashboard/question/create" },
         { title: "Question Bank", url: "/dashboard/question" },
       ],
     },
@@ -81,10 +80,7 @@ export const navData: NavigationData = {
       title: "Student Management",
       icon: UserRoundCog,
       items: [
-        {
-          title: "Students",
-          url: "/dashboard/users/students",
-        },
+        { title: "Students", url: "/dashboard/users/students" },
         { title: "Teams", url: "/dashboard/users/team" },
       ],
     },
@@ -99,4 +95,77 @@ export const navData: NavigationData = {
     //   ],
     // },
   ],
+};
+
+// Find best matching URL at the same menu level
+const findBestMatchAtLevel = (
+  items: MenuItem[],
+  currentPath: string,
+): string | null => {
+  // Sort items by URL length descending to get most specific match first
+  const sortedItems = [...items].sort((a, b) => b.url.length - a.url.length);
+
+  // Find the longest matching URL at this level
+  const match = sortedItems.find((item) => currentPath.startsWith(item.url));
+  console.log(match?.url || null);
+  return match?.url || null;
+};
+
+// Process items based on matching strategy
+const processMenuItems = (
+  items: MenuItem[],
+  currentPath: string,
+): MenuItem[] => {
+  // Find the best match at this level
+  const bestMatchUrl = findBestMatchAtLevel(items, currentPath);
+
+  return items.map((item) => {
+    // Item is active if it's the best match at this level
+    const isActiveAtThisLevel = item.url === bestMatchUrl;
+
+    // Process nested items if they exist
+    let nestedItems: MenuItem[] | undefined;
+    if (item.items) {
+      // Only process nested items if this is the active parent
+      if (currentPath.startsWith(item.url)) {
+        nestedItems = processMenuItems(item.items, currentPath);
+      } else {
+        nestedItems = item.items.map((subItem) => ({
+          ...subItem,
+          isActive: false,
+        }));
+      }
+    }
+
+    return {
+      ...item,
+      isActive: isActiveAtThisLevel,
+      items: nestedItems,
+    };
+  });
+};
+
+// Main function to process the menu sections
+const processMenuSections = (
+  sections: MenuSection[],
+  currentPath: string,
+): MenuSection[] => {
+  return sections.map((section) => {
+    const processedItems = processMenuItems(section.items, currentPath);
+    const hasActiveItem = processedItems.some((item) => item.isActive);
+
+    return {
+      ...section,
+      isActive: hasActiveItem,
+      items: processedItems,
+    };
+  });
+};
+
+export const updateSidebarMenu = (
+  sections: MenuSection[],
+  currentPath: string,
+): MenuSection[] => {
+  const normalizedPath = currentPath.replace(/\/$/, "");
+  return processMenuSections(sections, normalizedPath);
 };

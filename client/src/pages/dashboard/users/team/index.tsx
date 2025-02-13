@@ -70,7 +70,7 @@ export default function TeamList() {
           }}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"/users/team/create"}>Create a Team</Link>
+          <Link href={`${router.pathname}/create`}>Create a Team</Link>
         </Button>
       </div>
 

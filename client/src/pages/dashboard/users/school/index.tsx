@@ -70,7 +70,7 @@ export default function SchoolList() {
           }}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"school/create"}>Create a School</Link>
+          <Link href={`${router.pathname}/create`}>Create a School</Link>
         </Button>
       </div>
 

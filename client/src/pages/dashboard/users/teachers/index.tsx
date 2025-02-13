@@ -60,7 +60,6 @@ export default function Teachers() {
 
   return (
     <div className="m-4 space-y-4">
-      <h1 className="pt-1 text-center text-2xl font-semibold">Teacher Users</h1>
       <div className="flex justify-between">
         <SearchInput
           label=""
@@ -71,7 +70,7 @@ export default function Teachers() {
           }}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"teachers/create"}>Create a Teacher</Link>
+          <Link href={`${router.pathname}/create`}>Create a Teacher</Link>
         </Button>
       </div>
 

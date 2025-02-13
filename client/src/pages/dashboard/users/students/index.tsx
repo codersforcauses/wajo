@@ -60,7 +60,6 @@ export default function UserList() {
 
   return (
     <div className="m-4 space-y-4">
-      <h1 className="pt-1 text-center text-2xl font-semibold">Student Users</h1>
       <div className="flex justify-between">
         <SearchInput
           label=""
@@ -71,7 +70,7 @@ export default function UserList() {
           }}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"students/create"}>Create a Student</Link>
+          <Link href={`${router.pathname}/create`}>Create a Student</Link>
         </Button>
       </div>
 

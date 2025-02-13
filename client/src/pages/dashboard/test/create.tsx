@@ -36,7 +36,7 @@ export default function Create() {
       toast.success(
         "Practice created successfully! Questions blocks input available below.",
       );
-      router.push(`/test/${res.data.id}`);
+      router.push(`/dashboard/test/${res.data.id}`);
     },
   });
 

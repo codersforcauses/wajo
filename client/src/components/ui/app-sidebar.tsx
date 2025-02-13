@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/context/auth-provider";
 import { cn } from "@/lib/utils";
-import { navData } from "@/types/app-sidebar";
+import { navData, updateSidebarMenu } from "@/types/app-sidebar";
 import { Role } from "@/types/user";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
@@ -59,31 +59,7 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
   // Memoize role-based navigation data to avoid recalculating on every render.
   const roleNavData = useMemo(() => {
     if (!Role) return [];
-
-    const isPathActive = (path: string) => {
-      const regex = new RegExp(`^${path.replace(/\[.*?\]/g, ".*")}$`);
-      return regex.test(router.pathname);
-    };
-
-    return navData[Role].map((section) => ({
-      ...section,
-      isActive:
-        section.items.some((item) => isPathActive(item.url)) ||
-        section.items.some(
-          (item) =>
-            item.items && item.items.some((inner) => isPathActive(inner.url)),
-        ),
-      items: section.items.map((item) => ({
-        ...item,
-        isActive: isPathActive(item.url),
-        items:
-          item.items &&
-          item.items.map((inner) => ({
-            ...inner,
-            isActive: isPathActive(inner.url),
-          })),
-      })),
-    }));
+    return updateSidebarMenu(navData[Role], router.pathname);
   }, [Role, router.pathname]);
 
   const handleMenuToggle = (sectionTitle: string | null) => {

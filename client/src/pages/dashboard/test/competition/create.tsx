@@ -41,7 +41,7 @@ export default function Create() {
       toast.success(
         "Competition created successfully! Questions blocks input available below.",
       );
-      router.push(`/test/competition/${res.data.id}`);
+      router.push(`/dashboard/test/competition/${res.data.id}`);
     },
   });
 

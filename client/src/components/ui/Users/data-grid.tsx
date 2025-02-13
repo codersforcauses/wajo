@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
@@ -12,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAuth } from "@/context/auth-provider";
 import { cn } from "@/lib/utils";
 import { useTokenStore } from "@/store/token-store";
 import { DatagridProps } from "@/types/data-grid";
@@ -52,6 +54,7 @@ export function DataGrid({
   datacontext,
   onOrderingChange,
 }: DatagridProps<User | Student | Teacher>) {
+  const { userId } = useAuth();
   const router = useRouter();
   const pathSegments = router.pathname.split("/");
   const entityName =
@@ -129,30 +132,29 @@ export function DataGrid({
                   )}
                   <TableCell className="flex py-4">
                     <div className={cn("flex", { invisible: !item.id })}>
-                      <Button
-                        className="me-2"
-                        onClick={() =>
-                          router.push(
-                            `/dashboard/users/${item.id}?entity=${entityName}`,
-                          )
-                        }
-                      >
-                        View
-                      </Button>
-                      <DeleteModal
-                        baseUrl={`/users/${entityName}`}
-                        entity={entityName.replace(/s$/, "")}
-                        id={item.id}
-                      >
-                        <Button
-                          variant={"destructive"}
-                          className={cn("", {
-                            invisible: role !== "admin",
-                          })}
+                      <Button asChild className="me-2">
+                        <Link
+                          href={`${router.pathname}/${item.id}?entity=${entityName}`}
                         >
-                          Delete
-                        </Button>
-                      </DeleteModal>
+                          View
+                        </Link>
+                      </Button>
+                      {item.id.toString() === userId && (
+                        <DeleteModal
+                          baseUrl={`/users/${entityName}`}
+                          entity={entityName.replace(/s$/, "")}
+                          id={item.id}
+                        >
+                          <Button
+                            variant={"destructive"}
+                            className={cn("", {
+                              invisible: role !== "admin",
+                            })}
+                          >
+                            Delete
+                          </Button>
+                        </DeleteModal>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

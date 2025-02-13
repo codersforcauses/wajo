@@ -67,7 +67,7 @@ export function SchoolDataTableForm() {
     endpoint: "/users/schools/",
     onSuccess: () => {
       toast.success("Schools created successfully!");
-      router.push("/users/school/");
+      router.push("/dashboard/users/school/");
     },
   });
 

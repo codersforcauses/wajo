@@ -108,7 +108,7 @@ export default function Index() {
           }}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"competition/create"}>Create a Competition</Link>
+          <Link href={`${router.pathname}/create`}>Create a Competition</Link>
         </Button>
       </div>
 
