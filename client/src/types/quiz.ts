@@ -74,22 +74,28 @@ export interface Competition {
   status: QuizStatus; // ask: to be discuss
 }
 
-export interface CompetitionSlot {
+export interface CompetitionSlotData {
   id: number;
-  name: string;
-  intro: string;
-  total_marks: string;
-  open_time_date: Date;
-  time_limit: number;
-  time_window: number;
+  question: Question;
+  slot_index: number;
+  block: number;
+  quiz: number;
 }
 
-export interface QuestionAttempt {
+export interface CompetitionSlot {
+  data: CompetitionSlotData[];
+  end_time: Date;
+}
+
+export interface QuestionAnswer {
+  question: number;
+  answer_student: string;
+}
+
+export interface QuestionAttempt extends QuestionAnswer {
   id: number;
-  answer_student: number;
   is_correct: boolean;
   student: number;
-  question: number;
   quiz_attempt: number;
 }
 

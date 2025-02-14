@@ -6,6 +6,7 @@ import { useTokenStore } from "@/store/token-store";
 
 type AuthContextType = {
   userId: string | null;
+  primaryId: string | null;
   isLoggedIn: boolean;
   login: (
     username: string,
@@ -54,6 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearTokens = useTokenStore((state) => state.clear);
 
   const userId = accessToken?.decoded.user_id ?? null;
+  const primaryId = accessToken?.decoded.primary_id ?? null;
   const isLoggedIn = userId !== null;
 
   const { mutateAsync: postLogin } = usePostMutation<
@@ -115,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearTokens();
   };
 
-  const context = { userId, isLoggedIn, login, logout };
+  const context = { userId, primaryId, isLoggedIn, login, logout };
 
   return (
     <AuthContext.Provider value={context}>{children}</AuthContext.Provider>

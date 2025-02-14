@@ -144,7 +144,6 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
-@permission_classes([IsAuthenticated])
 class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
     """
     A viewset for retrieving competition quizzes that are visible and have a status of 1.
@@ -156,38 +155,49 @@ class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Quiz.objects.filter(status=1, visible=True)
     serializer_class = UserQuizSerializer
 
+    def get_permissions(self):
+        """Allow public access for GET requests, require authentication for others."""
+        if self.action in ['list', 'retrieve']:  # Allow unauthenticated GET requests
+            return [AllowAny()]
+        return [IsAuthenticated()]  # Require authentication for other actions
+
     @action(detail=True, methods=['get'])
     def slots(self, request, pk=None):
         """
         Only allow the user to access the slots(competition questions) if the quiz is available.
-        api:
-        /api/quiz/competition/1/slots/
+        api: /api/quiz/competition/1/slots/
         data shape: {"data":[ ], "end_time": "2025-01-29T00:49:17.015606Z"}
-
-    {"data": [
-        {
-            "id": 1,
-            "question": {
-                "id": 12,
-                "name": "question_1",
-                "question_text": "question_text_1",
-                "layout": "left",
-                "image": null,
-                "mark": 2
-            },
-            "slot_index": 1,
-            "block": 1,
-            "quiz": 2
-        }
-    ],
-    "end_time": "2025-01-29T00:49:17.015606Z"}
-
+        ```
+            {
+              "data":[
+                {
+                "id":1,
+                "question":{
+                    "id":12,
+                    "name":"question_1",
+                    "question_text":"question_text_1",
+                    "layout":"left",
+                    "image":null,
+                    "mark":2
+                },
+                "slot_index":1,
+                "block":1,
+                "quiz":2
+                }
+              ],
+              "end_time":"2025-01-29T00:49:17.015606Z"
+            }
+        ```
         """
         try:
             quiz_instance = Quiz.objects.get(pk=pk)
         except Quiz.DoesNotExist:
             return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
+
         user = request.user
+        if not hasattr(user, "student"):
+            return Response({'error': 'Only student can access this endpoint.'}, status=status.HTTP_404_NOT_FOUND)
+
         student_id = user.student.id
         existing_attempt = QuizAttempt.objects.filter(
             quiz_id=pk, student_id=student_id).first()
@@ -286,6 +296,8 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
     """
     queryset = QuizAttempt.objects.all()
     serializer_class = QuizAttemptSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['state', 'student']
 
     def get_queryset(self):
         if hasattr(self.request.user, "student"):
@@ -371,7 +383,7 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
         attempt.state = QuizAttempt.State.SUBMITTED
         attempt.time_finish = now()
         attempt.save()
-        return Response({'status': 'Quiz attempt submitted successfully.'})
+        return Response({'message': 'Quiz attempt submitted successfully.'})
 
 
 @permission_classes([IsAuthenticated])

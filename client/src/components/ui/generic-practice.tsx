@@ -86,7 +86,6 @@ export default function GenericPractice({
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    console.log("saved: ", saved);
     const timer = setTimeout(() => {
       localStorage.setItem("answer", answer);
       setSaved(true);

@@ -1,138 +1,212 @@
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { set } from "zod";
+import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Question } from "@/types/question";
-
-import AutoSavingAnswer from "./auto-saving";
+import { usePostMutation } from "@/hooks/use-post-data";
+import {
+  CompetitionSlotData,
+  QuestionAnswer,
+  QuestionAttempt,
+  QuizAttempt,
+} from "@/types/quiz";
 
 interface GenericQuizProps {
   currentPage: number;
   setCurrentPage: (page: number) => void;
   totalQuestions: number;
-  questions: Question[];
+  slots: CompetitionSlotData[];
+  quizAttempt: QuizAttempt;
 }
+
+const AUTOSAVE_DELAY = 1000;
+const STORAGE_KEY = "quizAnswers";
 
 export default function GenericQuiz({
   currentPage,
   setCurrentPage,
   totalQuestions,
-  questions,
+  slots,
+  quizAttempt,
 }: GenericQuizProps) {
-  const headingStyle = `text-xl sm:text-2xl md:text-3xl text-slate-800 font-bold`;
+  // Save answer mutation
+  const { mutate: saveAnswer, isPending: isSaving } =
+    usePostMutation<QuestionAttempt>({
+      mutationKey: ["quiz.answer"],
+      endpoint: "/quiz/question-attempts/",
+      onSuccess: () => {
+        setIsSaved(true);
+      },
+      onError: () => {
+        toast.error("Failed to save answer");
+      },
+    });
 
-  const [questionNumber, setQuestionNumber] = useState(currentPage);
-  const [currentQuestion, setCurrentQuestion] = useState<Question>(
-    questions[currentPage - 1],
-  );
-
-  // console.log(currentQuestion.image.url);
-
-  useEffect(() => {
-    setQuestionNumber(currentPage);
-    setCurrentQuestion(questions[currentPage - 1]);
-  }, [currentPage]);
-
-  const handlePrevious = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-      setCurrentQuestion(questions[currentPage - 1]);
+  const [answers, setAnswers] = useState<QuestionAnswer[]>(() => {
+    try {
+      const savedAnswers = localStorage.getItem(STORAGE_KEY);
+      return savedAnswers
+        ? JSON.parse(savedAnswers)
+        : slots.map((s) => ({ questionId: s.question.id, answer: "" }));
+    } catch (error) {
+      console.error("Error loading saved answers:", error);
+      return slots.map((s) => ({ questionId: s.question.id, answer: "" }));
     }
-  };
-
-  const handleNext = () => {
-    if (currentPage < totalQuestions) {
-      setCurrentPage(currentPage + 1);
-      setCurrentQuestion(questions[currentPage - 1]);
-    }
-  };
-
-  const [answers, setAnswers] = useState<string[]>(() => {
-    const savedAnswers = localStorage.getItem("quizAnswers");
-    return savedAnswers
-      ? JSON.parse(savedAnswers)
-      : Array(totalQuestions).fill("");
   });
 
+  const [isSaved, setIsSaved] = useState(true);
+  const currentQuestion = slots[currentPage - 1].question;
+
+  const saveAnswers = useCallback(
+    (newAnswers: QuestionAnswer[]) => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newAnswers));
+        const currentAnswer = newAnswers.find(
+          (a) => a.question === currentQuestion.id,
+        );
+        if (currentAnswer) {
+          saveAnswer({
+            student: quizAttempt.student,
+            question: currentAnswer.question,
+            answer_student: currentAnswer.answer_student,
+            quiz_attempt: quizAttempt.id,
+            // IntegrityError null value in column "is_correct" of relation "quiz_questionattempt" violates not-null constraint
+            is_correct: false,
+          });
+        }
+      } catch (error) {
+        console.error("Error saving answers:", error);
+        toast.error("Failed to save answers");
+      }
+    },
+    [currentQuestion.id, quizAttempt.id, saveAnswer],
+  );
+
   const handleAnswerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newAnswers = [...answers];
-    newAnswers[currentPage - 1] = e.target.value;
-    setAnswers(newAnswers);
+    const newAnswer = e.target.value.replace(/[^0-9,\s]/g, ""); // Only allow numbers, commas, and spaces
+    setAnswers((prev) => {
+      const newAnswers = prev.map((a) =>
+        a.question === currentQuestion.id ? { ...a, answer: newAnswer } : a,
+      );
+      return newAnswers;
+    });
+    setIsSaved(false);
   };
 
-  function onSave() {
-    // save the answer
-    localStorage.setItem("quizAnswers", JSON.stringify(answers));
-    console.log("Answers saved", answers);
-  }
-
-  const [saved, setSaved] = useState(false);
-
   useEffect(() => {
-    console.log("saved: ", saved);
-    const timer = setTimeout(() => {
-      localStorage.setItem("answer", answers[questionNumber - 1]);
-      setSaved(true);
-    }, 2000); // Auto-save after 2 seconds
-    console.log("answers: ", answers);
-    return () => {
-      clearTimeout(timer);
-      setSaved(false);
-    }; // Cleanup previous timer
-  }, [answers]); // Runs when `answers` changes
+    if (!isSaved) {
+      const timer = setTimeout(() => {
+        saveAnswers(answers);
+      }, AUTOSAVE_DELAY);
+
+      return () => clearTimeout(timer);
+    }
+  }, [answers, isSaved, saveAnswers]);
+
+  const handleNavigation = (direction: "prev" | "next") => {
+    if (!isSaved) {
+      saveAnswers(answers);
+    }
+
+    if (direction === "prev" && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    } else if (direction === "next" && currentPage < totalQuestions) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const getCurrentAnswer = useCallback(() => {
+    return (
+      answers.find((a) => a.question === currentQuestion.id)?.answer_student ||
+      ""
+    );
+  }, [answers, currentQuestion.id]);
 
   return (
     <div className="flex w-full items-center justify-center">
-      <div className="min-h-64 w-3/4 rounded-lg border-8 border-[#FFE8A3] p-10">
+      <div className="min-h-[16rem] w-3/4 rounded-lg border-8 border-[#FFE8A3] p-10">
         <div className="mb-2 flex items-center justify-between">
-          <h2 className={headingStyle}>Question {questionNumber}</h2>
-          <h2 className={headingStyle}>
+          <h2 className="text-xl font-bold text-slate-800 sm:text-2xl md:text-3xl">
+            Question {currentPage}
+          </h2>
+          <h2 className="text-xl font-bold text-slate-800 sm:text-2xl md:text-3xl">
             [{currentQuestion.mark}{" "}
             {currentQuestion.mark === 1 ? "Mark" : "Marks"}]
           </h2>
         </div>
-        {process.env.NEXT_PUBLIC_BACKEND_URL && (
-          <Image
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL.replace("/api", "")}${currentQuestion.image.url}`}
-            alt="Question Image"
-            width={200}
-            height={100}
-          />
-        )}
-        <p>{currentQuestion.question_text}</p>
-        {/* <p className="mb-6 mt-4">{currentQuestion.mathJax}</p> */}
-        <br />
-        <h3 className="mt-8 text-lg text-slate-800 sm:text-xl md:text-2xl">
-          Your Answer
-        </h3>
-        <p className="text-slate-400">
-          Must be an integer from 1-999, use "," to seperate multiple answers
-        </p>
-        <div>
-          {/* <AutoSavingAnswer answer={answer} setAnswer={setAnswer} />{" "} */}
-          <input
-            type="text"
-            value={answers[currentPage - 1]}
-            onChange={handleAnswerChange}
-            placeholder="Enter your answer"
-            className="mt-4 h-10 w-full min-w-64 rounded-sm border border-slate-500 px-2"
-          />
-          {saved == true && <p className="text-gray-500">✅ Saved!</p>}
-        </div>
-        <div className="mt-6 flex flex-col items-center justify-center">
-          <br />
-          <div className="flex space-x-2">
-            <Button variant="outline" size="lg" onClick={handlePrevious}>
-              Previous
-            </Button>
-            <Button size="lg" onClick={onSave}>
-              Save
-            </Button>
-            <Button variant="outline" size="lg" onClick={handleNext}>
-              Next
-            </Button>
+
+        {currentQuestion.images?.[0]?.url && (
+          <div className="my-4">
+            <Image
+              src={`${process.env.NEXT_PUBLIC_BACKEND_URL?.replace("/api", "")}${currentQuestion.images[0].url}`}
+              alt="Question Image"
+              width={400}
+              height={200}
+              className="object-contain"
+              priority
+            />
           </div>
+        )}
+
+        <div className="mt-4 whitespace-pre-wrap text-lg">
+          {currentQuestion.question_text}
+        </div>
+
+        <div className="mt-8">
+          <h3 className="text-lg text-slate-800 sm:text-xl md:text-2xl">
+            Your Answer
+          </h3>
+          <p className="mb-2 text-sm text-slate-400">
+            Must be an integer from 1-999, use "," to separate multiple answers
+          </p>
+          <div className="space-y-2">
+            <input
+              type="text"
+              value={getCurrentAnswer()}
+              onChange={handleAnswerChange}
+              placeholder="Enter your answer"
+              className="h-10 w-full min-w-64 rounded-sm border border-slate-500 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              pattern="[0-9,\s]*"
+              title="Please enter numbers separated by commas"
+            />
+            <div className="h-4">
+              {isSaving ? (
+                <p className="text-sm text-blue-600">Saving...</p>
+              ) : (
+                isSaved && (
+                  <p className="flex items-center text-sm text-green-600">
+                    <span className="mr-1">✓</span> Saved
+                  </p>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-center space-x-4">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => handleNavigation("prev")}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <Button
+            size="lg"
+            onClick={() => saveAnswers(answers)}
+            disabled={isSaved || isSaving}
+          >
+            {isSaving ? "Saving..." : "Save"}
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => handleNavigation("next")}
+            disabled={currentPage === totalQuestions}
+          >
+            Next
+          </Button>
         </div>
       </div>
     </div>

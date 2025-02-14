@@ -79,9 +79,9 @@ export const navData: NavigationData = {
   ],
   student: [
     {
-      title: "Practice",
-      icon: SquareDashedMousePointer,
-      items: [{ title: "Practice Result", url: "/practice/result" }],
+      title: "Quiz",
+      icon: BookType,
+      items: [{ title: "All Quizzes", url: "/quiz" }],
     },
   ],
 };
