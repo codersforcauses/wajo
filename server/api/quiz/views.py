@@ -137,14 +137,14 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
         if quiz.visible and quiz.status == 0:
             self.serializer_class = QuizSlotSerializer
-            instance = QuizSlot.objects.filter(quiz_id=pk)
-            serializer = QuizSlotSerializer(instance, many=True)
+            instances = QuizSlot.objects.filter(quiz_id=pk)
+            serializer = QuizSlotSerializer(instances, many=True)
             return Response(serializer.data)
         else:
             return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
-class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
+class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
     """
     A viewset for retrieving competition quizzes that are visible and have a status of 1.
     Need to be tested.
@@ -160,6 +160,18 @@ class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action in ['list', 'retrieve']:  # Allow unauthenticated GET requests
             return [AllowAny()]
         return [IsAuthenticated()]  # Require authentication for other actions
+
+    @action(detail=True, methods=['get'])
+    def submit(self, request, pk=None):
+        """
+        Submit the quiz attempt, changing its state to 2 (submitted).
+        """
+        user = request.user.student
+        attempt = user.quiz_attempts.get(quiz_id=pk)
+        attempt.state = QuizAttempt.State.SUBMITTED
+        attempt.time_finish = now()
+        attempt.save()
+        return Response({'status': 'Quiz attempt submitted successfully.'})
 
     @action(detail=True, methods=['get'])
     def slots(self, request, pk=None):
@@ -203,6 +215,11 @@ class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
             quiz_id=pk, student_id=student_id).first()
         # if attempt after the quiz has finished:
         is_available = self._is_available(quiz_instance, existing_attempt)
+
+        user = request.user.student
+        if existing_attempt is not None and user.quiz_attempts.get(pk=pk).state == QuizAttempt.State.SUBMITTED:
+            return Response({'error': 'Quiz has submitted '}, status=status.HTTP_400_BAD_REQUEST)
+
         if quiz_instance.status == 3 and existing_attempt is None:
             return Response({'error': 'Quiz has finished'}, status=status.HTTP_404_NOT_FOUND)
         # check the attemt is available or not
@@ -266,10 +283,12 @@ class CompetistionQuizViewSet(viewsets.ReadOnlyModelViewSet):
             quiz_attempt_serializer = QuizAttemptSerializer(data={
                 'quiz': quiz_id,
                 'student': user.student.id,
-                'state': 2,
+                'state': QuizAttempt.State.IN_PROGRESS,
             })
             quiz_attempt_serializer.is_valid(raise_exception=True)
             attempt = quiz_attempt_serializer.save()
+
+            # run attempt.is_available to update the dead_line
             attempt.is_available
             end_time = attempt.dead_line
         else:
@@ -324,13 +343,12 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
         student_id = request.data.get('student')
         existing_attempt = QuizAttempt.objects.filter(
             quiz_id=quiz_id, student_id=student_id).first()
-        print(existing_attempt)
 
         if existing_attempt:
             serializer = self.get_serializer(existing_attempt)
             data = serializer.data
             if not data.is_available:
-                return Response({'error': 'Quiz has finished3'}, status=status.HTTP_403_FORBIDDEN)
+                return Response({'error': 'Quiz has finished'}, status=status.HTTP_403_FORBIDDEN)
 
             # switch cases by state
             match existing_attempt.state:
@@ -349,9 +367,9 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         match instance.state:
-            case 2:
+            case QuizAttempt.State.IN_PROGRESS:
                 data = request.data.copy()
-                if int(data.get('state')) == 3:
+                if int(data.get('state')) == QuizAttempt.State.SUBMITTED:
                     # set the time_finish to the current time
                     data['time_finish'] = now()
 
@@ -361,24 +379,21 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
 
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
-            case 3:
+            case QuizAttempt.State.SUBMITTED:
                 return Response({'error': 'You have already submitted this quiz.'}, status=status.HTTP_403_FORBIDDEN)
-            case 4:
+            case QuizAttempt.State.COMPLETED:
                 return Response({'error': 'The competition has ended.'}, status=status.HTTP_403_FORBIDDEN)
 
-        # if existing_attempt.state == 2:
-        #     existing_attempt.state = 0
-        #     existing_attempt.save()
-        # existing_attempt.save()
-        # return Response({'message': 'Answer updated successfully.'}, status=status.HTTP_200_OK)
-
-        return super().create(request, *args, **kwargs)
+        return super().update(request, *args, **kwargs)
 
     @action(detail=True, methods=['get'])
     def submit(self, request, pk=None):
         """
         Submit the quiz attempt, changing its state to 2 (submitted).
         """
+        user = request.user
+        if self.student != user.student:
+            return Response({'error': 'You are not authorized to perform this action.'}, status=status.HTTP_403_FORBIDDEN)
         attempt = self.get_object()
         attempt.state = QuizAttempt.State.SUBMITTED
         attempt.time_finish = now()
