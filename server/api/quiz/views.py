@@ -298,7 +298,10 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         instances = QuizSlot.objects.filter(quiz_id=quiz_id)
         serializer = CompQuizSlotSerializer(instances, many=True)
 
-        return Response({'data': serializer.data, 'end_time': end_time}, status=status.HTTP_200_OK)
+        return Response({'data': serializer.data,
+                         'end_time': end_time,
+                         'quiz_attempt_id': existing_attempt.id
+                         }, status=status.HTTP_200_OK)
 
 
 class QuizSlotViewSet(viewsets.ModelViewSet):
