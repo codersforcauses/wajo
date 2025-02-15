@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ProtectedPage } from "@/components/page-config";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -21,11 +22,20 @@ import { WaitingLoader } from "@/components/ui/loading";
 import { SelectSchoolType } from "@/components/ui/Users/select-school";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePutMutation } from "@/hooks/use-put-data";
-import { createSchoolSchema, School, SchoolType } from "@/types/user";
+import { createSchoolSchema, Role, School, SchoolType } from "@/types/user";
+
+export default function PageConfig() {
+  const roles = [Role.ADMIN, Role.TEACHER];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Edit />
+    </ProtectedPage>
+  );
+}
 
 type UpdateSchool = z.infer<typeof createSchoolSchema>;
 
-export default function Edit() {
+function Edit() {
   const router = useRouter();
   const schoolId = parseInt(router.query.id as string);
 

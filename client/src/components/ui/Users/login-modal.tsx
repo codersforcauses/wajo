@@ -56,7 +56,7 @@ interface UserLogin {
  * @param {React.ReactNode} children - The child components to trigger the login modal.
  */
 export function LoginModal({ children }: LoginFormProps) {
-  const { replace } = useRouter();
+  const { query, push } = useRouter();
 
   const [passwordVisibility, setPasswordVisibility] = useState(false);
 
@@ -74,9 +74,9 @@ export function LoginModal({ children }: LoginFormProps) {
     const { success, error } = await login(data.username, data.password);
     if (success) {
       toast.success("You are now logged in.");
-      const userRole = Cookies.get("user_role");
-      const pathName = userRole ? "/dashboard" : "/";
-      replace(pathName);
+      // const userRole = Cookies.get("user_role");
+      // const pathName = userRole ? "/dashboard" : "/";
+      push(query.next ? query.next.toString() : "/");
     } else {
       toast.error(error || "Something went wrong.");
     }

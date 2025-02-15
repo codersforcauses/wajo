@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ProtectedPage } from "@/components/page-config";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,10 +20,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { DateTimePicker } from "@/components/ui/time-picker/date-time-picker";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { AdminQuiz, genericCreateTestSchema } from "@/types/quiz";
+import { Role } from "@/types/user";
+
+export default function PageConfig() {
+  const roles = [Role.ADMIN];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Create />
+    </ProtectedPage>
+  );
+}
 
 type CreateCompetition = z.infer<typeof genericCreateTestSchema>;
 
-export default function Create() {
+function Create() {
   const form = useForm<CreateCompetition>({
     resolver: zodResolver(genericCreateTestSchema),
     defaultValues: {

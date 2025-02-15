@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ProtectedPage } from "@/components/page-config";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,11 +21,20 @@ import { WaitingLoader } from "@/components/ui/loading";
 import { SelectSchool } from "@/components/ui/Users/select-school";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePatchMutation } from "@/hooks/use-put-data";
-import { Student, updateStudentSchema } from "@/types/user";
+import { Role, Student, updateStudentSchema } from "@/types/user";
+
+export default function PageConfig() {
+  const roles = [Role.ADMIN, Role.TEACHER];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Edit />
+    </ProtectedPage>
+  );
+}
 
 type UpdateStudent = z.infer<typeof updateStudentSchema>;
 
-export default function Edit() {
+function Edit() {
   const router = useRouter();
   const studentId = parseInt(router.query.id as string);
   const entity = router.query.entity as string;

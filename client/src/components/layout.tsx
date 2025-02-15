@@ -57,7 +57,7 @@ export default function Layout({ children, isPublic = false }: LayoutProps) {
   return (
     <Sidebar
       role={role.toLowerCase() as Role}
-      isShowBreadcrumb={role === "student" ? false : true}
+      isShowBreadcrumb={role === Role.STUDENT ? false : true}
     >
       {children}
     </Sidebar>

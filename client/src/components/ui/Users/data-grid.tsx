@@ -17,7 +17,7 @@ import { useAuth } from "@/context/auth-provider";
 import { cn } from "@/lib/utils";
 import { useTokenStore } from "@/store/token-store";
 import { DatagridProps } from "@/types/data-grid";
-import { Student, Teacher, User } from "@/types/user";
+import { Role, Student, Teacher, User } from "@/types/user";
 
 /**
  * Renders a paginated data grid for displaying user information.
@@ -90,7 +90,7 @@ export function DataGrid({
               <TableHead className={commonTableHeadClasses}>
                 Last Name
               </TableHead>
-              {role === "admin" && (
+              {role === Role.ADMIN && (
                 <TableHead className={commonTableHeadClasses}>School</TableHead>
               )}
               <TableHead
@@ -125,7 +125,7 @@ export function DataGrid({
                   <TableCell className="w-1/4">
                     {!item.id ? "" : item.last_name ? item.last_name : "-"}
                   </TableCell>
-                  {role === "admin" && item.id && (
+                  {role === Role.ADMIN && item.id && (
                     <TableCell className="w-1/4">
                       {item.school?.name ? item.school.name : "-"}
                     </TableCell>
@@ -148,7 +148,7 @@ export function DataGrid({
                           <Button
                             variant={"destructive"}
                             className={cn("", {
-                              invisible: role !== "admin",
+                              invisible: role !== Role.ADMIN,
                             })}
                           >
                             Delete

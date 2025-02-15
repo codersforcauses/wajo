@@ -41,9 +41,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const myLayout = Component.getLayout ? (
     Component.getLayout(<Component {...pageProps} />)
   ) : (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
+    <Component {...pageProps} />
+    // <Layout>
+    //   <Component {...pageProps} />
+    // </Layout>
   );
 
   return (

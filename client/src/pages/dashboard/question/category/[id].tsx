@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ProtectedPage } from "@/components/page-config";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,10 +22,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePutMutation } from "@/hooks/use-put-data";
 import { Category, createCategorySchema } from "@/types/question";
+import { Role } from "@/types/user";
+
+export default function PageConfig() {
+  const roles = [Role.ADMIN];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Edit />
+    </ProtectedPage>
+  );
+}
 
 type UpdateCategory = z.infer<typeof createCategorySchema>;
 
-export default function Edit() {
+function Edit() {
   const router = useRouter();
   const categoryId = parseInt(router.query.id as string);
 

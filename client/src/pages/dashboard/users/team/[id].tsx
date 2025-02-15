@@ -6,6 +6,7 @@ import { Control, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ProtectedPage } from "@/components/page-config";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -37,12 +38,21 @@ import {
   Team,
   TeamMember,
 } from "@/types/team";
-import { Student } from "@/types/user";
+import { Role, Student } from "@/types/user";
+
+export default function PageConfig() {
+  const roles = [Role.ADMIN, Role.TEACHER];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Edit />
+    </ProtectedPage>
+  );
+}
 
 type UpdateTeam = z.infer<typeof createTeamSchema>;
 type UpdateTeamMembers = z.infer<typeof createMembersSchema>;
 
-export default function Edit() {
+function Edit() {
   const router = useRouter();
   const teamId = parseInt(router.query.id as string);
 

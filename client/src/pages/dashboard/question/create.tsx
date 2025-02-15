@@ -7,6 +7,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ProtectedPage } from "@/components/page-config";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -28,12 +29,22 @@ import {
   Question,
   QuestionImage,
 } from "@/types/question";
+import { Role } from "@/types/user";
+
+export default function PageConfig() {
+  const roles = [Role.ADMIN];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Create />
+    </ProtectedPage>
+  );
+}
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 type FormValues = z.infer<typeof createQuestionSchema>;
 
-export default function Create() {
+function Create() {
   const router = useRouter();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const imageUrl = useMemo(

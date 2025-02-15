@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
+import { ProtectedPage } from "@/components/page-config";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -19,12 +20,22 @@ import {
   stringToOrdering,
 } from "@/types/data-grid";
 import { AdminQuiz, QuizStatus } from "@/types/quiz";
+import { Role } from "@/types/user";
+
+export default function PageConfig() {
+  const roles = [Role.ADMIN];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Index />
+    </ProtectedPage>
+  );
+}
 
 type CustomSearchParams = PaginationSearchParams & {
   status: QuizStatus;
 };
 
-export default function Index() {
+function Index() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
