@@ -50,13 +50,18 @@ export default function Layout({ children, isPublic = false }: LayoutProps) {
   if (!role) {
     return (
       <div>
-        <Navbar />
         <main>
           <div>Failed to get user role.</div>
         </main>
       </div>
     );
   }
-
-  return <Sidebar role={role.toLowerCase() as Role}>{children}</Sidebar>;
+  return (
+    <Sidebar
+      role={role.toLowerCase() as Role}
+      isShowBreadcrumb={role === "student" ? false : true}
+    >
+      {children}
+    </Sidebar>
+  );
 }

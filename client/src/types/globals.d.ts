@@ -31,5 +31,7 @@ declare module "jwt-decode" {
     user_id: string;
     primary_id: string;
     role: string | undefined;
+    school_id: number | undefined;
+    sub_id: number | undefined;
   }
 }

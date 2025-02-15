@@ -13,6 +13,7 @@ interface MenuItem {
   url: string; // need to be unique
   isActive?: boolean;
   isNewTab?: boolean;
+  items?: MenuItem[]; // nested menu items
 }
 
 interface MenuSection {
@@ -42,38 +43,45 @@ export const navData: NavigationData = {
       title: "Question Management",
       icon: FileJson,
       items: [
-        { title: "Categories", url: "/question/category" },
-        { title: "Create Question", url: "/question/create" },
-        { title: "Question Bank", url: "/question" },
+        { title: "Categories", url: "/dashboard/question/category" },
+        { title: "Question Bank", url: "/dashboard/question" },
       ],
     },
     {
       title: "Test Management",
       icon: BookType,
       items: [
-        { title: "Practice Test", url: "/test" },
-        { title: "Competitions", url: "/test/competition" },
-        { title: "Results & Rankings", url: "/test/leaderboard" },
+        { title: "Practice Test", url: "/dashboard/test" },
+        { title: "Competitions", url: "/dashboard/test/competition" },
+        { title: "Results & Rankings", url: "/dashboard/test/leaderboard" },
       ],
     },
     {
       title: "User Management",
       icon: UserRoundCog,
       items: [
-        { title: "Schools", url: "/users/school" },
-        { title: "Users", url: "/users" },
-        { title: "Teams", url: "/users/team" },
+        { title: "Schools", url: "/dashboard/users/school" },
+        {
+          title: "Users",
+          url: "/dashboard/users",
+          items: [
+            { title: "Teachers", url: "/dashboard/users/teachers" },
+            { title: "Students", url: "/dashboard/users/students" },
+            { title: "Staff", url: "/dashboard/users/staffs" },
+          ],
+        },
+        { title: "Teams", url: "/dashboard/users/team" },
         { title: "Admin Portal", url: `${backendURL}admin`, isNewTab: true },
       ],
     },
   ],
   teacher: [
     {
-      title: "Teacher Menu",
-      icon: SquareDashedMousePointer,
+      title: "Student Management",
+      icon: UserRoundCog,
       items: [
-        { title: "Teacher Menu Items 1", url: "#" },
-        { title: "Teacher Menu Items 2", url: "#" },
+        { title: "Students", url: "/dashboard/users/students" },
+        { title: "Teams", url: "/dashboard/users/team" },
       ],
     },
   ],
@@ -84,4 +92,77 @@ export const navData: NavigationData = {
       items: [{ title: "All Quizzes", url: "/quiz" }],
     },
   ],
+};
+
+// Find best matching URL at the same menu level
+const findBestMatchAtLevel = (
+  items: MenuItem[],
+  currentPath: string,
+): string | null => {
+  // Sort items by URL length descending to get most specific match first
+  const sortedItems = [...items].sort((a, b) => b.url.length - a.url.length);
+
+  // Find the longest matching URL at this level
+  const match = sortedItems.find((item) => currentPath.startsWith(item.url));
+  console.log(match?.url || null);
+  return match?.url || null;
+};
+
+// Process items based on matching strategy
+const processMenuItems = (
+  items: MenuItem[],
+  currentPath: string,
+): MenuItem[] => {
+  // Find the best match at this level
+  const bestMatchUrl = findBestMatchAtLevel(items, currentPath);
+
+  return items.map((item) => {
+    // Item is active if it's the best match at this level
+    const isActiveAtThisLevel = item.url === bestMatchUrl;
+
+    // Process nested items if they exist
+    let nestedItems: MenuItem[] | undefined;
+    if (item.items) {
+      // Only process nested items if this is the active parent
+      if (currentPath.startsWith(item.url)) {
+        nestedItems = processMenuItems(item.items, currentPath);
+      } else {
+        nestedItems = item.items.map((subItem) => ({
+          ...subItem,
+          isActive: false,
+        }));
+      }
+    }
+
+    return {
+      ...item,
+      isActive: isActiveAtThisLevel,
+      items: nestedItems,
+    };
+  });
+};
+
+// Main function to process the menu sections
+const processMenuSections = (
+  sections: MenuSection[],
+  currentPath: string,
+): MenuSection[] => {
+  return sections.map((section) => {
+    const processedItems = processMenuItems(section.items, currentPath);
+    const hasActiveItem = processedItems.some((item) => item.isActive);
+
+    return {
+      ...section,
+      isActive: hasActiveItem,
+      items: processedItems,
+    };
+  });
+};
+
+export const updateSidebarMenu = (
+  sections: MenuSection[],
+  currentPath: string,
+): MenuSection[] => {
+  const normalizedPath = currentPath.replace(/\/$/, "");
+  return processMenuSections(sections, normalizedPath);
 };
