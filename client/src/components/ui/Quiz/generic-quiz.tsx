@@ -49,10 +49,13 @@ export default function GenericQuiz({
       const savedAnswers = localStorage.getItem(STORAGE_KEY);
       return savedAnswers
         ? JSON.parse(savedAnswers)
-        : slots.map((s) => ({ questionId: s.question.id, answer: "" }));
+        : slots.map((s) => ({ question: s.question.id, answer_student: "" }));
     } catch (error) {
       console.error("Error loading saved answers:", error);
-      return slots.map((s) => ({ questionId: s.question.id, answer: "" }));
+      return slots.map((s) => ({
+        question: s.question.id,
+        answer_student: "",
+      }));
     }
   });
 
@@ -88,7 +91,9 @@ export default function GenericQuiz({
     const newAnswer = e.target.value.replace(/[^0-9,\s]/g, ""); // Only allow numbers, commas, and spaces
     setAnswers((prev) => {
       const newAnswers = prev.map((a) =>
-        a.question === currentQuestion.id ? { ...a, answer: newAnswer } : a,
+        a.question === currentQuestion.id
+          ? { ...a, answer_student: newAnswer }
+          : a,
       );
       return newAnswers;
     });
