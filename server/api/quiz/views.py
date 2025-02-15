@@ -265,7 +265,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         else:
             return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-    def _get_slots_response(self, quiz_id, existing_attempt, user):
+    def _get_slots_response(self, quiz_id, existing_attempt, student):
         """
         Get the response containing the slosts data.
         The slots are corresponding sorted questions of the quiz.
@@ -282,7 +282,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         if existing_attempt is None:
             quiz_attempt_serializer = QuizAttemptSerializer(data={
                 'quiz': quiz_id,
-                'student': user.student.id,
+                'student': student.id,
                 'state': QuizAttempt.State.IN_PROGRESS,
             })
             quiz_attempt_serializer.is_valid(raise_exception=True)
