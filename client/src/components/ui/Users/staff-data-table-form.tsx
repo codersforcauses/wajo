@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { useRouter } from "next/router";
-import { useFieldArray, useForm } from "react-hook-form";
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -8,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormMessage,
@@ -21,64 +24,83 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Textarea } from "@/components/ui/textarea";
-import { SelectSchool } from "@/components/ui/Users/select-school";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { cn } from "@/lib/utils";
-import { createTeamSchema } from "@/types/team";
+import { createUserSchema } from "@/types/user";
 
-type Team = z.infer<typeof createTeamSchema>;
+type User = z.infer<typeof createUserSchema>;
 
 /**
- * Renders a data table form for managing team information with dynamic rows.
+ * Renders a data table form for managing staff information with a dynamic table structure.
  *
- * @function TeamDataTableForm
+ * The `StaffDataTableForm` component allows users to add, and delete rows of staff data.
+ * It uses `react-hook-form` with Zod schema validation to manage and validate the form state.
+ * Each row includes fields for `Firstname`, `Lastname`, `Password`, `School` and `Year level`.
+ *
+ * @function StaffDataTableForm
  *
  * @description
- * This component provides a table-based form for managing teams. It allows users to dynamically add, remove, and edit team entries.
+ * The component utilizes the following libraries and components:
+ * - `react-hook-form` for form state management.
+ * - `zod` for schema validation.
  *
- * Similar Implementation:
- * @see [UserDataTableForm](./data-table-form.tsx) for reference.
+ * Features:
+ * - Dynamically adds or removes rows with staff data.
+ * - Provides validation for all input fields.
+ * - Submits the collected data as an array of staffs.
+ *
+ * Additional Reference:
+ * - {@link https://react-hook-form.com/docs/usefieldarray React Hook Form: useFieldArray}
  */
-export function TeamDataTableForm() {
-  const defaultTeam = {
-    name: "",
-    description: "",
-  } as Team;
+export function StaffDataTableForm() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { mutateAsync: postStaffs, isPending } = usePostMutation<User[]>({
+    mutationKey: ["staffs", "users"],
+    endpoint: "/users/staffs/",
+  });
 
-  const createTeamForm = useForm<{
-    teams: Team[];
+  const defaultStaff: User = {
+    first_name: "",
+    last_name: "",
+    password: "",
+  };
+
+  const createStaffForm = useForm<{
+    staffs: User[];
   }>({
-    resolver: zodResolver(z.object({ teams: z.array(createTeamSchema) })),
-    defaultValues: { teams: [defaultTeam] },
+    resolver: zodResolver(z.object({ staffs: z.array(createUserSchema) })),
+    defaultValues: { staffs: [defaultStaff] },
   });
 
   const { fields, append, remove } = useFieldArray({
-    control: createTeamForm.control,
-    name: "teams",
+    control: createStaffForm.control,
+    name: "staffs",
   });
 
-  const router = useRouter();
-  const { mutate: createTeam, isPending } = usePostMutation<Team[]>({
-    mutationKey: ["teams"],
-    endpoint: "/team/teams/",
-    onSuccess: () => {
-      toast.success("Teams created successfully!");
-      router.push("/dashboard/users/team/");
-    },
-  });
-
-  const onSubmit = (data: { teams: Team[] }) => {
-    createTeam([...data.teams]);
+  const onSubmit = async (data: { staffs: User[] }) => {
+    console.log("inside onSubmit", data);
+    await postStaffs(data.staffs, {
+      onSuccess: (response) => {
+        queryClient.invalidateQueries();
+        toast.success("Staffs created successfully");
+        console.log("Response:", response);
+        router.push("/dashboard/users/staffs");
+      },
+      onError: (error) => {
+        toast.error("Failed to create staffs");
+        console.error("Error creating staffs", error);
+      },
+    });
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
     <div className="space-y-4 p-4">
-      <Form {...createTeamForm}>
+      <Form {...createStaffForm}>
         <form
-          id="create_team_form"
-          onSubmit={createTeamForm.handleSubmit(onSubmit)}
+          id="create_user_form"
+          onSubmit={createStaffForm.handleSubmit(onSubmit)}
           className="space-y-4"
         >
           <Table className="w-full border-collapse text-left shadow-md">
@@ -89,12 +111,22 @@ export function TeamDataTableForm() {
                 >
                   No.
                 </TableHead>
-                <TableHead className={commonTableHeadClasses}>Name*</TableHead>
                 <TableHead className={commonTableHeadClasses}>
-                  Description*
+                  Firstname*
                 </TableHead>
                 <TableHead className={commonTableHeadClasses}>
-                  School*
+                  Lastname*
+                </TableHead>
+                {/* <TableHead className={commonTableHeadClasses}>
+                  Username*
+                </TableHead> */}
+                <TableHead
+                  className={cn(commonTableHeadClasses, "text-pretty", "w-1/5")}
+                >
+                  Password*
+                  <FormDescription className="text-xs text-white">
+                    Minimum 8 characters with letters, numbers, and symbols
+                  </FormDescription>
                 </TableHead>
                 <TableHead
                   className={cn(commonTableHeadClasses, "rounded-tr-lg", "w-0")}
@@ -114,15 +146,15 @@ export function TeamDataTableForm() {
                     {index + 1}
                   </TableCell>
 
-                  {/* Name Field */}
+                  {/* Firstname Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createTeamForm.control}
-                      name={`teams.${index}.name`}
+                      control={createStaffForm.control}
+                      name={`staffs.${index}.first_name`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
-                            <Input {...field} placeholder="Enter team name" />
+                            <Input {...field} placeholder="Enter first_name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -130,19 +162,15 @@ export function TeamDataTableForm() {
                     />
                   </TableCell>
 
-                  {/* Description Field */}
+                  {/* Lastname Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createTeamForm.control}
-                      name={`teams.${index}.description`}
+                      control={createStaffForm.control}
+                      name={`staffs.${index}.last_name`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
-                            <Textarea
-                              {...field}
-                              className="min-h-10"
-                              placeholder="Enter description"
-                            />
+                            <Input {...field} placeholder="Enter last name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -150,18 +178,15 @@ export function TeamDataTableForm() {
                     />
                   </TableCell>
 
-                  {/* School Field */}
+                  {/* Password Field */}
                   <TableCell className="align-top">
                     <FormField
-                      control={createTeamForm.control}
-                      name={`teams.${index}.school_id`}
+                      control={createStaffForm.control}
+                      name={`staffs.${index}.password`}
                       render={({ field }) => (
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
-                            <SelectSchool
-                              selectedId={field.value}
-                              onChange={field.onChange}
-                            />
+                            <Input {...field} placeholder="Enter password" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -187,7 +212,7 @@ export function TeamDataTableForm() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => append(defaultTeam)}
+              onClick={() => append(defaultStaff)}
             >
               Add Row
             </Button>

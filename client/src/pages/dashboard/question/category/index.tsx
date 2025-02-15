@@ -9,20 +9,15 @@ import {
   PaginationSearchParams,
   SelectRow,
 } from "@/components/ui/pagination";
+import { CategoryDataGrid } from "@/components/ui/Question/category-data-grid";
 import { SearchInput } from "@/components/ui/search";
-import { PracticeDataGrid } from "@/components/ui/Test/practice-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
-import { pickKeys } from "@/lib/utils";
 import {
   OrderingItem,
   orderingToString,
   stringToOrdering,
 } from "@/types/data-grid";
-import { AdminQuiz, QuizStatus } from "@/types/quiz";
-
-type CustomSearchParams = PaginationSearchParams & {
-  status: QuizStatus;
-};
+import { Category } from "@/types/question";
 
 export default function Index() {
   const router = useRouter();
@@ -30,28 +25,22 @@ export default function Index() {
 
   const [orderings, setOrderings] = useState<OrderingItem>({});
 
-  const defaultSearchParams: PaginationSearchParams = {
+  const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
     ordering: orderingToString(orderings),
     search: "",
     nrows: 5,
     page: 1,
-  };
-
-  const [searchParams, setSearchParams] = useState<CustomSearchParams>({
-    status: QuizStatus.NormalPractice,
-    ...defaultSearchParams,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<AdminQuiz>({
-    queryKey: ["quiz.admin-quizzes"],
-    endpoint: "/quiz/admin-quizzes/",
+  const { data, isLoading, error, totalPages } = useFetchDataTable<Category>({
+    queryKey: ["questions.categories"],
+    endpoint: "/questions/categories/",
     searchParams: searchParams,
   });
 
   useEffect(() => {
     if (!isLoading) {
       setSearchParams((prev) => ({
-        ...prev,
         ordering: (query.ordering as string) || prev.ordering,
         search: (query.search as string) || prev.search,
         nrows: Number(query.nrows) || prev.nrows,
@@ -61,19 +50,14 @@ export default function Index() {
     }
   }, [query.ordering, query.search, query.nrows, query.page, !isLoading]);
 
-  const setAndPush = (newParams: Partial<CustomSearchParams>) => {
+  const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-
-    const queryParams = pickKeys(
-      updatedParams,
-      ...(Object.keys(defaultSearchParams) as []),
-    );
     push(
       {
-        pathname: "/test",
+        pathname: "/question/category",
         query: Object.fromEntries(
-          Object.entries(queryParams).filter(([_, v]) => Boolean(v)),
+          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),
       },
       undefined,
@@ -102,19 +86,19 @@ export default function Index() {
         <SearchInput
           label=""
           value={searchParams.search ?? ""}
-          placeholder="Search Practice"
+          placeholder="Search Genre"
           onSearch={(newSearch: string) => {
             setAndPush({ search: newSearch, page: 1 });
           }}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"test/create"}>Create a Practice</Link>
+          <Link href={`${router.pathname}/create`}>Create a Category</Link>
         </Button>
       </div>
 
       <Suspense>
         <div>
-          <PracticeDataGrid
+          <CategoryDataGrid
             datacontext={data ?? []}
             onOrderingChange={onOrderingChange}
           />

@@ -121,17 +121,17 @@ export default function Create() {
               {
                 onSuccess: () => {
                   toast.success("Question and image created successfully!");
-                  router.push(`/question/${questionId}`);
+                  router.push(`/dashboard/question/${questionId}`);
                 },
                 onError: () => {
                   toast.error("Image upload failed, but question was created");
-                  router.push(`/question/${questionId}`);
+                  router.push(`/dashboard/question/${questionId}`);
                 },
               },
             );
           } else {
             toast.success("Question created successfully!");
-            router.push(`/question/${questionId}`);
+            router.push(`/dashboard/question/${questionId}`);
           }
         },
       },

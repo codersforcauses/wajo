@@ -20,9 +20,24 @@ export const RoleEnum = z.enum(["admin", "teacher", "student"], {
  */
 export type Role = z.infer<typeof RoleEnum>;
 
+/**
+ * Defines the possible schools.
+ *
+ * @example
+ * const school: School = "public";
+ */
 export const SchoolTypeEnum = z.enum(["Public", "Independent", "Catholic"], {
   errorMap: () => ({ message: "Invalid School Type" }),
 });
+
+/**
+ * Type representing a school type. Can be one of the following:
+ * - "public"
+ * - "independent"
+ * - "catholic"
+ *
+ * @type {SchoolType}
+ */
 export type SchoolType = z.infer<typeof SchoolTypeEnum>;
 
 /**
@@ -39,12 +54,14 @@ export type SchoolType = z.infer<typeof SchoolTypeEnum>;
  */
 export interface User {
   id: number;
-  username: string;
-  email: string;
+  username?: string;
   first_name: string;
   last_name: string;
+  password: string;
   role: Role;
-  school: School;
+  school?: School;
+  student_id?: string;
+  email?: string;
 }
 
 export interface Student {
@@ -54,9 +71,9 @@ export interface Student {
   password: string; //this field is only for save the password back to the front end
   student_id: string;
   year_level: number;
-  school: School;
   quiz_attempts: number[];
   attendent_year: number;
+  school: School;
   created_at: Date;
   extenstion_time: number;
 }
@@ -69,21 +86,17 @@ export interface Student {
  * @property {string} name - The name of the school.
  * @property {Date} time_created - The timestamp of when the school was created.
  */
-export interface School {
+export type School = {
   id: number;
   name: string;
-  type: SchoolType;
+  type: string;
   is_country: boolean;
-  created_at: Date; // ask: need from server
+  created_at?: Date; // need from server
   abbreviation: string;
-}
+};
 
-export interface Teacher {
-  id: number;
-  first_name: string;
-  last_name: string;
+export interface Teacher extends User {
   school: School;
-  email: string;
   phone: string;
   created_at: Date;
 }
@@ -131,6 +144,19 @@ export const createUserSchema = z.object({
   school_id: z.number().int().positive("Required"),
   attendent_year: z.number().int().min(2024).max(2050),
   extenstion_time: z.number().int().min(0).optional(),
+});
+
+export const createStudentSchema = createUserSchema.extend({
+  school_id: z.number().int(),
+  year_level: z.number().int().positive(),
+  attendent_year: z.number().int().positive().optional(),
+  extension_time: z.number().int().optional(),
+});
+
+export const createTeacherSchema = createUserSchema.extend({
+  school_id: z.number().int(),
+  email: z.string().email("Invalid email address").optional(),
+  phone: z.string().optional(),
 });
 
 export const updateStudentSchema = z.object({

@@ -3,9 +3,11 @@ import { createContext, useContext, useEffect } from "react";
 
 import { usePostMutation } from "@/hooks/use-post-data";
 import { useTokenStore } from "@/store/token-store";
+import { Role } from "@/types/user";
 
 type AuthContextType = {
   userId: string | null;
+  userRole: Role;
   isLoggedIn: boolean;
   login: (
     username: string,
@@ -52,8 +54,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const accessToken = useTokenStore((state) => state.access);
   const setTokens = useTokenStore((state) => state.setTokens);
   const clearTokens = useTokenStore((state) => state.clear);
-
   const userId = accessToken?.decoded.user_id ?? null;
+  const userRole = accessToken?.decoded.role as Role;
+
   const isLoggedIn = userId !== null;
 
   const { mutateAsync: postLogin } = usePostMutation<
@@ -67,7 +70,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (accessToken) {
-      Cookies.set("user_role", "user", { sameSite: "strict", secure: true });
+      const newRole = accessToken?.decoded.role as Role;
+      Cookies.set("user_role", newRole, {
+        sameSite: "strict",
+        secure: true,
+      });
     } else {
       Cookies.remove("user_role");
     }
@@ -115,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearTokens();
   };
 
-  const context = { userId, isLoggedIn, login, logout };
+  const context = { userId, userRole, isLoggedIn, login, logout };
 
   return (
     <AuthContext.Provider value={context}>{children}</AuthContext.Provider>
