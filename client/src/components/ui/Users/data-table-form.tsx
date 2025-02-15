@@ -41,6 +41,7 @@ type StoredRecord = {
   studentId: string;
   firstName: string;
   lastName: string;
+  password: string;
   yearLevel: number | string;
   schoolId: number;
   schoolName: string;
@@ -112,6 +113,7 @@ export function DataTableForm() {
           studentId: std.student_id,
           firstName: std.first_name,
           lastName: std.last_name,
+          password: std.password,
           yearLevel: std.year_level,
           schoolId: std.school.id,
           schoolName: std.school.name,
@@ -129,6 +131,7 @@ export function DataTableForm() {
         toast.success(
           "You can click Export CSV button to download the historical user creation data.",
         );
+        createUserForm.reset({ users: [defaultUser] });
       } catch (error) {
         toast.error(`Error when update data for Export CSV. ${error}`);
       }
@@ -160,6 +163,7 @@ export function DataTableForm() {
       "Student ID",
       "First Name",
       "Last Name",
+      "Password",
       "Year Level",
       "School ID",
       "School Name",
@@ -172,6 +176,7 @@ export function DataTableForm() {
       record.studentId,
       record.firstName,
       record.lastName,
+      record.password,
       record.yearLevel,
       record.schoolId,
       record.schoolName,
