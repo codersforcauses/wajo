@@ -44,7 +44,7 @@ function Search({ children, title }: SearchProps): JSX.Element {
 }
 
 interface SearchInputProps {
-  label: string;
+  label?: string;
   value: string;
   placeholder?: string;
   onSearch: (value: string) => void; // Trigger searching on focus out

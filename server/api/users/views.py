@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets, filters
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAdminUser)
+from api.permissions import IsTeacher, IsAdmin
 from django.contrib.auth.models import User
 from .models import Student, Teacher, School
 from .serializers import StudentSerializer, SchoolSerializer, TeacherSerializer, UserSerializer
@@ -167,7 +168,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
                 {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
 
 
-@permission_classes([IsAdminUser])
+@permission_classes([IsTeacher | IsAdmin | IsAdminUser])
 class SchoolViewSet(viewsets.ModelViewSet):
     """
     A viewset for managing schools.
@@ -178,26 +179,27 @@ class SchoolViewSet(viewsets.ModelViewSet):
         filter_backends: Filters applied to the viewset.
         search_fields: Fields that can be searched.
     """
-    queryset = School.objects.all()
     serializer_class = SchoolSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'abbreviation', 'type', 'is_country']
 
+    def get_queryset(self):
+        """Filter based on user role."""
+        user = self.request.user
+        queryset = School.objects.all()
+        if hasattr(user, "teacher"):
+            return queryset.filter(id=user.teacher.school_id)
+        return queryset.order_by("id")
+
     def create(self, request, *args, **kwargs):
+        user = self.request.user
+        if hasattr(user, "teacher"):
+            return Response({'error': 'Teacher cannot create school.'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # try:
-        #     return super().create(request, *args, **kwargs)
-        # except IntegrityError as error:
-        #     return Response(
-        #         {
-        #             "error": "A school with this name already exists.",
-        #             "message": str(error)
-        #         },
-        #         status=status.HTTP_400_BAD_REQUEST
-        #     )
 
     def update(self, request, *args, **kwargs):
         try:
