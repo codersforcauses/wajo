@@ -85,6 +85,7 @@ export interface CompetitionSlotData {
 export interface CompetitionSlot {
   data: CompetitionSlotData[];
   end_time: Date;
+  quiz_attempt_id: number;
 }
 
 export interface QuestionAnswer {
