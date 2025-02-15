@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import DateTimeDisplay from "@/components/ui/date-format";
 
 interface Props {
   onStart: () => void;
@@ -26,9 +27,13 @@ export default function QuizStartPage({
     <div className="flex w-full items-center justify-center">
       <div className="min-h-64 w-3/4 rounded-lg border-8 border-[#FFE8A3] bg-[#FFE8A3] p-10">
         <h2 className={headingStyle}>{quizName}</h2>
-        <h5 className="my-4">
-          Competition will start at {startTime.toString()}
-        </h5>
+        <div className="my-4 flex gap-2">
+          Competition will start at{" "}
+          <DateTimeDisplay
+            date={startTime}
+            className="flex-row gap-1 font-bold"
+          />
+        </div>
         <div className="mb-2 flex items-center justify-between">
           <h2 className={headingStyle}>Individual Quiz</h2>
           <h2 className={headingStyle}>{quizDuration} minutes</h2>
