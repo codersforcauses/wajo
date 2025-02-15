@@ -2,6 +2,8 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+# import logging
+# logger = logging.getLogger(__name__)
 
 
 def main():
@@ -16,6 +18,7 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
     execute_from_command_line(sys.argv)
+    # logging.basicConfig(filename='myapp.log', level=logging.INFO)
 
 
 if __name__ == "__main__":

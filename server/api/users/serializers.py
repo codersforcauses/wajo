@@ -25,6 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(required=True)
     username = serializers.CharField(required=True)
     password = serializers.CharField(write_only=True)
+    role = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -45,6 +46,26 @@ class UserSerializer(serializers.ModelSerializer):
             instance.save()
             validated_data['password'] = instance.password
         return super().update(instance, validated_data)
+
+    def get_role(self, obj):
+        if hasattr(obj, 'student'):
+            return 'student'
+        elif hasattr(obj, 'teacher'):
+            return 'teacher'
+        return 'user'
+
+    def get_school(self, obj):
+        if hasattr(obj, 'student'):
+            return SchoolSerializer(obj.student.school).data if obj.student.school else None
+        elif hasattr(obj, 'teacher'):
+            return SchoolSerializer(obj.teacher.school).data if obj.teacher.school else None
+        return None
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['role'] = self.get_role(instance)
+        representation['school'] = self.get_school(instance)
+        return representation
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -170,6 +191,11 @@ class StudentSerializer(serializers.ModelSerializer):
         model = Student
         exclude = ['user']
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['role'] = 'student'
+        return representation
+
 
 class TeacherSerializer(serializers.ModelSerializer):
     """
@@ -270,3 +296,8 @@ class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teacher
         exclude = ['user']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['role'] = 'teacher'
+        return representation

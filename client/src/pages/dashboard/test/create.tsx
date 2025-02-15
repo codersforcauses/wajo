@@ -20,40 +20,35 @@ import { DateTimePicker } from "@/components/ui/time-picker/date-time-picker";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { AdminQuiz, genericCreateTestSchema } from "@/types/quiz";
 
-type CreateCompetition = z.infer<typeof genericCreateTestSchema>;
+type CreatePractice = z.infer<typeof genericCreateTestSchema>;
 
 export default function Create() {
-  const form = useForm<CreateCompetition>({
+  const form = useForm<CreatePractice>({
     resolver: zodResolver(genericCreateTestSchema),
-    defaultValues: {
-      name: "",
-      intro: "",
-      time_limit: 0,
-      time_window: 0,
-    },
+    defaultValues: {} as CreatePractice,
   });
 
   const router = useRouter();
-  const { mutate: createCompetition, isPending } = usePostMutation<AdminQuiz>({
+  const { mutate: createPractice, isPending } = usePostMutation<AdminQuiz>({
     mutationKey: ["quiz.admin-quizzes.create"],
     endpoint: "/quiz/admin-quizzes/",
     onSuccess: (res) => {
       toast.success(
-        "Competition created successfully! Questions blocks input available below.",
+        "Practice created successfully! Questions blocks input available below.",
       );
-      router.push(`/test/competition/${res.data.id}`);
+      router.push(`/dashboard/test/${res.data.id}`);
     },
   });
 
-  const onSubmit = (data: CreateCompetition) => {
-    createCompetition({
+  const onSubmit = (data: CreatePractice) => {
+    createPractice({
       name: data.name,
       intro: data.intro,
       total_marks: data.total_marks,
       open_time_date: data.open_time_date,
       time_limit: data.time_limit,
       time_window: data.time_window,
-      status: 1,
+      status: 0,
     });
   };
 
@@ -61,10 +56,7 @@ export default function Create() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <h1 className="my-4 text-center text-xl font-bold">
-          Create Competition
-        </h1>
-
+        <h1 className="my-4 text-center text-xl font-bold">Create Practice</h1>
         <div className="mx-auto max-w-3xl space-y-5 rounded-lg bg-gray-50 p-4 shadow-lg">
           <h3 className="-mb-2 text-lg">Basic</h3>
           <div className="flex gap-4">

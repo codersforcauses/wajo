@@ -21,7 +21,7 @@ import { WaitingLoader } from "@/components/ui/loading";
 import { SelectSchoolType } from "@/components/ui/Users/select-school";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePutMutation } from "@/hooks/use-put-data";
-import { createSchoolSchema, School } from "@/types/user";
+import { createSchoolSchema, School, SchoolType } from "@/types/user";
 
 type UpdateSchool = z.infer<typeof createSchoolSchema>;
 
@@ -58,7 +58,7 @@ function EditSchoolForm({ school }: { school: School }) {
     resolver: zodResolver(createSchoolSchema),
     defaultValues: {
       name: school.name,
-      type: school.type,
+      type: school.type as SchoolType,
       is_country: school.is_country,
       abbreviation: school.abbreviation,
     },
@@ -103,7 +103,12 @@ function EditSchoolForm({ school }: { school: School }) {
                 <FormLabel>Type {requiredStar}</FormLabel>
                 <FormControl>
                   <SelectSchoolType
-                    selectedType={field.value}
+                    selectedType={
+                      typeof field.value === "string" &&
+                      field.value.length === 0
+                        ? field.value
+                        : "Public"
+                    }
                     onChange={field.onChange}
                   />
                 </FormControl>
