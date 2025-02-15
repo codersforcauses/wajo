@@ -25,7 +25,7 @@ export default function UserList() {
   });
 
   const { data, isLoading, error, totalPages } = useFetchDataTable<Student>({
-    queryKey: ["users.students"],
+    queryKey: ["students"],
     endpoint: "/users/students/",
     searchParams: searchParams,
   });
@@ -45,7 +45,7 @@ export default function UserList() {
     setSearchParams(updatedParams);
     push(
       {
-        pathname: "/users",
+        pathname: "/dashboard/users/students",
         query: Object.fromEntries(
           Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),
@@ -70,7 +70,7 @@ export default function UserList() {
           }}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"users/create"}>Create a User</Link>
+          <Link href={`${router.pathname}/create`}>Create a Student</Link>
         </Button>
       </div>
 

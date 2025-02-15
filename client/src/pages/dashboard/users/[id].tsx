@@ -27,41 +27,42 @@ type UpdateStudent = z.infer<typeof updateStudentSchema>;
 export default function Edit() {
   const router = useRouter();
   const studentId = parseInt(router.query.id as string);
+  const entity = router.query.entity as string;
 
   const { data, isLoading, isError, error } = useFetchData<Student>({
-    queryKey: [`users.students.${studentId}`],
-    endpoint: `/users/students/${studentId}/`,
+    queryKey: [`users.${entity}.${studentId}`],
+    endpoint: `/users/${entity}/${studentId}/`,
     enabled: !isNaN(studentId),
   });
 
   if (isLoading || !data) return <WaitingLoader />;
   else if (isError) return <div>Error: {error?.message}</div>;
-  else return <EditStudentForm student={data} />;
+  else return <EditUserForm user={data} entity={entity} />;
 }
 
-function EditStudentForm({ student }: { student: Student }) {
+function EditUserForm({ user, entity }: { user: Student; entity: string }) {
   const router = useRouter();
 
-  const mutationKey = ["student.update", `${student.id}`];
+  const mutationKey = ["student.update", `${user.id}`];
   const { mutate: updateStudent, isPending } = usePatchMutation({
     mutationKey: mutationKey,
-    queryKeys: [mutationKey, ["users.students"]],
-    endpoint: `/users/students/${student.id}/`,
+    queryKeys: [mutationKey, [`users.${entity}`]],
+    endpoint: `/users/${entity}/${user.id}/`,
     onSuccess: () => {
       router.reload();
-      toast.success("Student has been updated.");
+      toast.success(`${entity} has been updated.`);
     },
   });
 
   const updateForm = useForm<UpdateStudent>({
     resolver: zodResolver(updateStudentSchema),
     defaultValues: {
-      first_name: student.first_name,
-      last_name: student.last_name,
-      year_level: student.year_level,
-      school_id: student.school.id,
-      attendent_year: student.attendent_year,
-      extension_time: student.extenstion_time,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      year_level: user.year_level,
+      school_id: user.school?.id,
+      attendent_year: user.attendent_year,
+      extension_time: user.extenstion_time,
     },
   });
 

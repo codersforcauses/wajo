@@ -10,87 +10,49 @@ import {
   SelectRow,
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
-import { CompetitionDataGrid } from "@/components/ui/Test/competition-data-grid";
+import { SchoolDataGrid } from "@/components/ui/Users/school-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
-import { pickKeys } from "@/lib/utils";
-import {
-  OrderingItem,
-  orderingToString,
-  stringToOrdering,
-} from "@/types/data-grid";
-import { AdminQuiz, QuizStatus } from "@/types/quiz";
+import type { School } from "@/types/user";
 
-type CustomSearchParams = PaginationSearchParams & {
-  status: QuizStatus;
-};
-
-export default function Index() {
+export default function SchoolList() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
-  const [orderings, setOrderings] = useState<OrderingItem>({});
-
-  const defaultSearchParams: PaginationSearchParams = {
-    ordering: orderingToString(orderings),
+  const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
     search: "",
     nrows: 5,
     page: 1,
-  };
-
-  const [searchParams, setSearchParams] = useState<CustomSearchParams>({
-    status: QuizStatus.Upcoming,
-    ...defaultSearchParams,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<AdminQuiz>({
-    queryKey: ["quiz.admin-quizzes"],
-    endpoint: "/quiz/admin-quizzes/",
+  const { data, isLoading, error, totalPages } = useFetchDataTable<School>({
+    queryKey: ["users.schools"],
+    endpoint: "/users/schools/",
     searchParams: searchParams,
   });
 
   useEffect(() => {
     if (!isLoading) {
       setSearchParams((prev) => ({
-        ...prev,
-        ordering: (query.ordering as string) || prev.ordering,
         search: (query.search as string) || prev.search,
         nrows: Number(query.nrows) || prev.nrows,
         page: Number(query.page) || prev.page,
       }));
-      setOrderings(stringToOrdering(query.ordering as string));
     }
-  }, [query.ordering, query.search, query.nrows, query.page, !isLoading]);
+  }, [query.search, query.nrows, query.page, !isLoading]);
 
-  const setAndPush = (newParams: Partial<CustomSearchParams>) => {
+  const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-
-    const queryParams = pickKeys(
-      updatedParams,
-      ...(Object.keys(defaultSearchParams) as []),
-    );
     push(
       {
-        pathname: "/test/competition",
+        pathname: "/users/school",
         query: Object.fromEntries(
-          Object.entries(queryParams).filter(([_, v]) => Boolean(v)),
+          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),
       },
       undefined,
       { shallow: true },
     );
-  };
-
-  const onOrderingChange = (field: keyof OrderingItem) => {
-    setOrderings((prevOrderings) => {
-      const newOrder = prevOrderings[field] === "asc" ? "desc" : "asc";
-      const newOrderings = {
-        ...prevOrderings,
-        [field]: newOrder,
-      } as OrderingItem;
-      setAndPush({ ordering: orderingToString(newOrderings) });
-      return newOrderings;
-    });
   };
 
   if (error) return <div>Error: {error.message}</div>;
@@ -102,22 +64,19 @@ export default function Index() {
         <SearchInput
           label=""
           value={searchParams.search ?? ""}
-          placeholder="Search Competition"
+          placeholder="Search School"
           onSearch={(newSearch: string) => {
             setAndPush({ search: newSearch, page: 1 });
           }}
         />
         <Button asChild className="mr-6 h-auto">
-          <Link href={"competition/create"}>Create a Competition</Link>
+          <Link href={`${router.pathname}/create`}>Create a School</Link>
         </Button>
       </div>
 
       <Suspense>
         <div>
-          <CompetitionDataGrid
-            datacontext={data ?? []}
-            onOrderingChange={onOrderingChange}
-          />
+          <SchoolDataGrid datacontext={data ?? []} />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}
             <div className="flex items-center space-x-2">

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { toast } from "sonner";
@@ -148,13 +149,8 @@ export function CompetitionDataGrid({
                             ? "Withdraw"
                             : "Publish"}
                       </Button>
-                      <Button
-                        className="me-1"
-                        onClick={() =>
-                          router.push(`/test/competition/${item.id}`)
-                        }
-                      >
-                        View
+                      <Button asChild className="me-1">
+                        <Link href={`${router.pathname}/${item.id}`}>View</Link>
                       </Button>
                       <DeleteModal
                         baseUrl="/quiz/admin-quizzes"
