@@ -71,6 +71,9 @@ class StudentViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(data=data, many=True)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
+            for i, student in enumerate(serializer.data):
+                student["password"] = request.data[i]["password"]
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(
