@@ -37,8 +37,7 @@ import { IndividualLeaderboard, Ranking } from "@/types/leaderboard";
  */
 export function IndividualDataGrid({
   datacontext,
-  onDataChange,
-  changePage,
+  onOrderingChange
 }: DatagridProps<IndividualLeaderboard>) {
   const [isAscending, setIsAscending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,7 +48,7 @@ export function IndividualDataGrid({
   const sortByColumn = (column: keyof IndividualLeaderboard) => {
     const sortedData = sortData(datacontext, column, isAscending);
     setCurrentPage(1);
-    onDataChange(sortedData);
+    onOrderingChange(sortedData);
     setIsAscending(!isAscending);
   };
 

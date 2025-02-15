@@ -1,4 +1,3 @@
-import { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import { createContext, useContext, useEffect } from "react";
 
@@ -58,9 +57,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isLoggedIn = userId !== null;
 
   const { mutateAsync: postLogin } = usePostMutation<
-    AxiosResponse<TokenResponse>,
+    TokenResponse,
     { username: string; password: string }
-  >(["login"], "/auth/token/", 2000);
+  >({
+    mutationKey: ["login"],
+    endpoint: "/auth/token/",
+    timeout: 2000,
+  });
 
   useEffect(() => {
     if (accessToken) {

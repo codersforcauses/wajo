@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
-import { Pagination } from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -39,37 +38,9 @@ import { IndividualLeaderboard } from "@/types/leaderboard";
  */
 export function LeaderboardDataGrid({
   datacontext,
-  onDataChange,
-  changePage,
+  onOrderingChange = () => {},
 }: DatagridProps<IndividualLeaderboard>) {
   const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<IndividualLeaderboard[]>([]);
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(datacontext.length / itemsPerPage);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  useEffect(() => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = datacontext.slice(indexOfFirstItem, indexOfLastItem);
-
-    const updatedPaddedData = [...currentData];
-    while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as IndividualLeaderboard);
-    }
-
-    setPaddedData(updatedPaddedData);
-  }, [datacontext, currentPage]);
-
-  useEffect(() => {
-    setCurrentPage(changePage);
-  }, [datacontext]);
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
@@ -91,8 +62,8 @@ export function LeaderboardDataGrid({
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {paddedData.map((item, index) => (
+          <TableBody>
+          {datacontext.map((item, index) => (
             <TableRow
               key={index}
               className={"divide-gray-200 border-gray-50 text-sm text-black"}
@@ -122,14 +93,7 @@ export function LeaderboardDataGrid({
             </TableRow>
           ))}
         </TableBody>
-      </Table>
-
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={(page: number) => handlePageChange(page)}
-        className="mr-20 mt-5 flex justify-end"
-      />
+        </Table>
     </div>
   );
 }
