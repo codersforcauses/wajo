@@ -1,6 +1,9 @@
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import Latex from "react-latex-next";
 
 import { Button } from "@/components/ui/button";
+import { Layout } from "@/types/question";
 import { AdminQuizSlot } from "@/types/quiz";
 
 import AutoSavingAnswer from "./Quiz/auto-saving";
@@ -96,6 +99,28 @@ export default function GenericPractice({
     }; // Cleanup previous timer
   }, [answer]); // Runs when `answers` changes
 
+  const renderImage = () => {
+    console.log(currentQuestion.question.images[0].url);
+    if (currentQuestion.question.images?.[0]?.url) {
+      return (
+        <div className="my-4">
+          <Image
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL_BASE}/${currentQuestion.question.images[0].url}`}
+            alt="Question Image"
+            width={400}
+            height={200}
+            className="h-auto max-h-[30vh] w-auto max-w-[30vw]"
+            priority
+          />
+        </div>
+      );
+    }
+    return "";
+  };
+  const isHorizontalLayout =
+    currentQuestion.question.layout === Layout.LEFT ||
+    currentQuestion.question.layout === Layout.RIGHT;
+
   return (
     <div className="flex w-full items-center justify-center">
       <div className="min-h-64 w-3/4 rounded-lg border-8 border-[#FFE8A3] p-10">
@@ -106,7 +131,29 @@ export default function GenericPractice({
             {currentQuestion.question.mark === 1 ? "Mark" : "Marks"}]
           </h2>
         </div>
-        <p>{currentQuestion.question.question_text}</p>
+        <div className="flex flex-col items-center space-y-4">
+          {currentQuestion.question.layout === Layout.TOP
+            ? renderImage()
+            : null}
+
+          <div
+            className={`flex ${isHorizontalLayout ? "flex-row items-center space-x-4" : "flex-col items-center space-y-4"}`}
+          >
+            {currentQuestion.question.layout === Layout.LEFT
+              ? renderImage()
+              : null}
+            <div className="flex h-auto w-auto items-center justify-center text-pretty p-4">
+              <Latex>{currentQuestion.question.question_text}</Latex>
+            </div>
+            {currentQuestion.question.layout === Layout.RIGHT
+              ? renderImage()
+              : null}
+          </div>
+          {currentQuestion.question.layout === Layout.BOTTOM
+            ? renderImage()
+            : null}
+        </div>
+
         {/* <p className="mb-6 mt-4">{currentQuestion.mathJax}</p> */}
         <br />
         <h3 className="mt-8 text-lg text-slate-800 sm:text-xl md:text-2xl">
