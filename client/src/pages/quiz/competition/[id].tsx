@@ -18,7 +18,6 @@ export default function CompetitionQuizPage() {
   const router = useRouter();
   const compId = parseInt(router.query.id as string);
   const { primaryId } = useAuth();
-
   const [quizState, setQuizState] = useState({
     isDisplayQuiz: false,
     isQuizAttempt: false,
@@ -61,7 +60,7 @@ export default function CompetitionQuizPage() {
     error: quizAttemptError,
   } = useFetchData<QuizAttempt[]>({
     queryKey: [`quiz.quiz-attempts.${compId}.${primaryId}`],
-    endpoint: `/quiz/quiz-attempts/?state=2&student=${primaryId}`,
+    endpoint: `/quiz/quiz-attempts/?state=2`,
     enabled: !!quizSlot && quizState.isDisplayQuiz,
   });
 

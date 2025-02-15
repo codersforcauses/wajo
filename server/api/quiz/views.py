@@ -207,7 +207,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
-        if not hasattr(user, "student"):
+        if not hasattr(request.user, "student"):
             return Response({'error': 'Only student can access this endpoint.'}, status=status.HTTP_404_NOT_FOUND)
 
         student_id = user.student.id
@@ -217,7 +217,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         is_available = self._is_available(quiz_instance, existing_attempt)
 
         user = request.user.student
-        if existing_attempt is not None and user.quiz_attempts.get(pk=pk).state == QuizAttempt.State.SUBMITTED:
+        if existing_attempt is not None and user.quiz_attempts.get(quiz_id=pk).state == QuizAttempt.State.SUBMITTED:
             return Response({'error': 'Quiz has submitted '}, status=status.HTTP_400_BAD_REQUEST)
 
         if quiz_instance.status == 3 and existing_attempt is None:
@@ -316,7 +316,7 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
     queryset = QuizAttempt.objects.all()
     serializer_class = QuizAttemptSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['state', 'student']
+    filterset_fields = ['state']
 
     def get_queryset(self):
         if hasattr(self.request.user, "student"):
