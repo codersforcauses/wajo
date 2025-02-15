@@ -64,12 +64,7 @@ export interface User {
   email?: string;
 }
 
-export interface Student {
-  id: number;
-  first_name: string;
-  last_name: string;
-  password: string; //this field is only for save the password back to the front end
-  student_id: string;
+export interface Student extends User {
   year_level: number;
   quiz_attempts: number[];
   attendent_year: number;

@@ -60,11 +60,11 @@ export function StaffDataTableForm() {
     endpoint: "/users/staffs/",
   });
 
-  const defaultStaff: User = {
+  const defaultStaff = {
     first_name: "",
     last_name: "",
     password: "",
-  };
+  } as User;
 
   const createStaffForm = useForm<{
     staffs: User[];

@@ -58,14 +58,14 @@ export function TeacherDataTableForm() {
     endpoint: "/users/teachers/",
   });
 
-  const defaultTeacher: Teacher = {
+  const defaultTeacher = {
     first_name: "",
     last_name: "",
     password: "",
     email: "",
     phone: "",
     school_id: 0,
-  };
+  } as Teacher;
 
   const createTeacherForm = useForm<{
     teachers: Teacher[];

@@ -110,12 +110,12 @@ export function DataTableForm() {
       try {
         // Build newRecords in the shape you want to store in localStorage
         const newRecords: StoredRecord[] = res.data.map((std) => ({
-          studentId: std.student_id,
+          studentId: std.student_id!,
           firstName: std.first_name,
           lastName: std.last_name,
           password: std.password,
           yearLevel: std.year_level,
-          schoolId: std.school.id,
+          schoolId: std.school!.id,
           schoolName: std.school.name,
           attendentYear: std.attendent_year,
           extensionTime: std.extenstion_time || 0,
