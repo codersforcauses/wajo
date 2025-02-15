@@ -1,9 +1,11 @@
 import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
+import Latex from "react-latex-next";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { usePostMutation } from "@/hooks/use-post-data";
+import { Layout } from "@/types/question";
 import {
   CompetitionSlotData,
   QuestionAnswer,
@@ -122,6 +124,27 @@ export default function GenericQuiz({
     );
   }, [answers, currentQuestion.id]);
 
+  const renderImage = () => {
+    if (currentQuestion.images?.[0]?.url) {
+      return (
+        <div className="my-4">
+          <Image
+            src={currentQuestion.images[0].url}
+            alt="Question Image"
+            width={400}
+            height={200}
+            className="object-contain"
+            priority
+          />
+        </div>
+      );
+    }
+    return "";
+  };
+  const isHorizontalLayout =
+    currentQuestion.layout === Layout.LEFT ||
+    currentQuestion.layout === Layout.RIGHT;
+
   return (
     <div className="flex w-full items-center justify-center">
       <div className="min-h-[16rem] w-3/4 rounded-lg border-8 border-[#FFE8A3] p-10">
@@ -135,18 +158,20 @@ export default function GenericQuiz({
           </h2>
         </div>
 
-        {currentQuestion.images?.[0]?.url && (
-          <div className="my-4">
-            <Image
-              src={`${process.env.NEXT_PUBLIC_BACKEND_URL?.replace("/api", "")}${currentQuestion.images[0].url}`}
-              alt="Question Image"
-              width={400}
-              height={200}
-              className="object-contain"
-              priority
-            />
+        <div className="flex flex-col items-center space-y-4">
+          {currentQuestion.layout === Layout.TOP ? renderImage() : null}
+
+          <div
+            className={`flex ${isHorizontalLayout ? "flex-row items-center space-x-4" : "flex-col items-center space-y-4"}`}
+          >
+            {currentQuestion.layout === Layout.LEFT ? renderImage() : null}
+            <div className="flex h-auto w-auto items-center justify-center text-pretty p-4">
+              <Latex>{currentQuestion.question_text}</Latex>
+            </div>
+            {currentQuestion.layout === Layout.RIGHT ? renderImage() : null}
           </div>
-        )}
+          {currentQuestion.layout === Layout.BOTTOM ? renderImage() : null}
+        </div>
 
         <div className="mt-4 whitespace-pre-wrap text-lg">
           {currentQuestion.question_text}
