@@ -329,7 +329,8 @@ function MemberBlock({ school_id, formControl }: EditMembersProps) {
           (student) =>
             student.first_name.toLowerCase().includes(value.toLowerCase()) ||
             student.last_name.toLowerCase().includes(value.toLowerCase()) ||
-            student.student_id.toLowerCase().includes(value.toLowerCase()),
+            (student.student_id &&
+              student.student_id.toLowerCase().includes(value.toLowerCase())),
         )
       : [];
     setSearchResults(filtered as Student[]);
