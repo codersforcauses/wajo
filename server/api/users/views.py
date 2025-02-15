@@ -71,20 +71,25 @@ class StudentViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()  # Create a mutable copy of request.data
-        if hasattr(self.request.user, "teacher"):
+        if hasattr(request.user, "teacher"):
             # teacher can only create students for their school
             for student in data:
-                student["school_id"] = self.request.user.teacher.school.id
+                student["school_id"] = request.user.teacher.school.id
 
             serializer = self.get_serializer(data=data, many=True)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
+            for i, student in enumerate(serializer.data):
+                student["password"] = request.data[i]["password"]
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif self.request.user.is_staff:
             # allow bulk creation of students by admin
             serializer = self.get_serializer(data=data, many=True)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
+            for i, student in enumerate(serializer.data):
+                student["password"] = request.data[i]["password"]
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(

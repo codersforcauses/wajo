@@ -131,20 +131,14 @@ export const loginSchema = z.object({
  * });
  */
 export const createUserSchema = z.object({
-  username: z.string().optional(),
-  first_name: z.string().optional(),
-  last_name: z.string().optional(),
-  password: z.string().optional(),
-  // .min(8, "Password must be at least 8 characters")
-  // .regex(/[A-Za-z]/, "Password must contain letters")
-  // .regex(/[0-9]/, "Password must contain numbers")
-  // .regex(/[^A-Za-z0-9]/, "Password must contain symbols"),
-
-  //Test use to give school as optional
-  school_id: z.number().optional(),
-  userRole: RoleEnum.optional(),
-
-  email: z.string().email("Invalid email address").optional(),
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  password: z.string().min(1, "Password is required"),
+  year_level: z.enum(["7", "8", "9"]),
+  //School ID now is not compuslory, need to modify later
+  school_id: z.number().int().positive("Required"),
+  attendent_year: z.number().int().min(2024).max(2050),
+  extenstion_time: z.number().int().min(0).optional(),
 });
 
 export const createStudentSchema = createUserSchema.extend({

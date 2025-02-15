@@ -1,5 +1,5 @@
-import { StudentDataTableForm } from "@/components/ui/Users/student-data-table-form";
+import { DataTableForm } from "@/components/ui/Users/data-table-form";
 
 export default function CreateStudent() {
-  return <StudentDataTableForm />;
+  return <DataTableForm />;
 }
