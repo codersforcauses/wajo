@@ -25,12 +25,13 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     Methods:
         slots: Retrieve or create slots for a specific quiz.
     """
-    queryset = Quiz.objects.all()
+    queryset = Quiz.objects.all().order_by("-time_created")
     serializer_class = AdminQuizSerializer
     status = serializers.IntegerField(default=0, required=False)
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
     filterset_fields = ['is_comp', 'status']
+    ordering_fields = ['time_created']
 
     @action(detail=True, methods=['get', 'post'])
     def slots(self, request, pk=None):
