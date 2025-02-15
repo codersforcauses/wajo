@@ -7,6 +7,7 @@ from api.quiz.models import Quiz, QuizSlot, QuizAttempt, QuestionAttempt
 class QuestionSerializer(serializers.ModelSerializer):
     # answers is a foreign key field, so we need to use a nested serializer
     answers = AnswerSerializer(many=True)
+    images = ImageSerializer(read_only=True, many=True)
 
     class Meta:
         model = Question
