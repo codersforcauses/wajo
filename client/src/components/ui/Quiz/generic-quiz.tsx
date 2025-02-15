@@ -125,15 +125,16 @@ export default function GenericQuiz({
   }, [answers, currentQuestion.id]);
 
   const renderImage = () => {
+    console.log(currentQuestion.images[0].url);
     if (currentQuestion.images?.[0]?.url) {
       return (
         <div className="my-4">
           <Image
-            src={currentQuestion.images[0].url}
+            src={`${process.env.NEXT_PUBLIC_BACKEND_URL_BASE}/${currentQuestion.images[0].url}`}
             alt="Question Image"
             width={400}
             height={200}
-            className="object-contain"
+            className="h-auto max-h-[30vh] w-auto max-w-[30vw]"
             priority
           />
         </div>
@@ -171,10 +172,6 @@ export default function GenericQuiz({
             {currentQuestion.layout === Layout.RIGHT ? renderImage() : null}
           </div>
           {currentQuestion.layout === Layout.BOTTOM ? renderImage() : null}
-        </div>
-
-        <div className="mt-4 whitespace-pre-wrap text-lg">
-          {currentQuestion.question_text}
         </div>
 
         <div className="mt-8">
