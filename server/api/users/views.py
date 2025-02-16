@@ -173,7 +173,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
                 {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
 
 
-@permission_classes([IsTeacher or IsAdmin or IsAdminUser])
+@permission_classes([IsTeacher | IsAdmin | IsAdminUser])
 class SchoolViewSet(viewsets.ModelViewSet):
     """
     A viewset for managing schools.
