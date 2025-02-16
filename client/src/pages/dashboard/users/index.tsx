@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ProtectedPage } from "@/components/page-config";
+import { ProtectedPage } from "@/components/layout";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {

@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 
-import { PublicPage } from "@/components/page-config";
+import { PublicPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import Sponsor from "@/components/ui/sponsor";
 

@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
+import DateTimeDisplay from "@/components/ui/date-format";
 import DeleteModal from "@/components/ui/delete-modal";
 import {
   Table,
@@ -15,8 +16,6 @@ import {
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
 import { Team } from "@/types/team";
-
-import DateTimeDisplay from "../date-format";
 
 /**
  * Renders a paginated data grid for displaying team information.

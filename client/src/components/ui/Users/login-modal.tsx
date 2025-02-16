@@ -19,7 +19,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -27,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/auth-provider";
-import { loginSchema } from "@/types/user";
+import { loginSchema, Role } from "@/types/user";
 
 interface LoginFormProps {
   children: ReactNode;
@@ -74,9 +73,14 @@ export function LoginModal({ children }: LoginFormProps) {
     const { success, error } = await login(data.username, data.password);
     if (success) {
       toast.success("You are now logged in.");
-      // const userRole = Cookies.get("user_role");
-      // const pathName = userRole ? "/dashboard" : "/";
-      push(query.next ? query.next.toString() : "/");
+      const userRole = Cookies.get("user_role");
+      const pathName =
+        userRole === Role.STUDENT
+          ? "/quiz"
+          : query.next
+            ? query.next.toString()
+            : "/dashboard";
+      push(pathName);
     } else {
       toast.error(error || "Something went wrong.");
     }

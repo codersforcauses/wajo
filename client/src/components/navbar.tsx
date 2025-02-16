@@ -8,9 +8,7 @@ import { Button } from "@/components/ui/button";
 import MobileNav from "@/components/ui/mobilenav";
 import { LoginModal } from "@/components/ui/Users/login-modal";
 import { useAuth } from "@/context/auth-provider";
-
-import logo from "../../public/wajo_white.svg";
-import styles from "../styles/modules/navbar.module.css";
+import styles from "@/styles/modules/navbar.module.css";
 
 export default function Navbar() {
   const router = useRouter();
@@ -20,7 +18,7 @@ export default function Navbar() {
       <div className="container mx-auto flex items-center">
         <div className="flex-auto">
           <Image
-            src={logo}
+            src="/wajo_white.svg"
             alt="WAJO logo with white background"
             width={105}
             height={105}

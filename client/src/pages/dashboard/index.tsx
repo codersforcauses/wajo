@@ -1,10 +1,10 @@
 import Cookies from "js-cookie";
 
-import { ProtectedPage } from "@/components/page-config";
+import { ProtectedPage } from "@/components/layout";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
-  const roles = [Role.ADMIN];
+  const roles = [Role.ADMIN, Role.TEACHER, Role.STUDENT];
   return (
     <ProtectedPage requiredRoles={roles}>
       <Dashboard />

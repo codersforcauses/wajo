@@ -5,7 +5,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useFetchData } from "@/hooks/use-fetch-data";
 import { cn } from "@/lib/utils";
 
 type Props = {

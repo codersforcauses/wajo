@@ -25,8 +25,6 @@ import { useTokenStore } from "@/store/token-store";
 import { Team } from "@/types/team";
 import { Student } from "@/types/user";
 
-import AddItems from "../../../public/Add-items.svg";
-
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
@@ -197,8 +195,8 @@ export default function TeamViewPage() {
                   onClick={openModal}
                   className="mb-4 w-min"
                 >
-                  <Image src={AddItems} alt={`Icon of Adding Items`} /> Select
-                  Team Members
+                  <Image src="/Add-items.svg" alt={`Icon of Adding Items`} />{" "}
+                  Select Team Members
                 </Button>
                 <h2 className="text-lg font-semibold">Selected Members:</h2>
                 <ul className="ml-6 list-disc">
@@ -210,8 +208,8 @@ export default function TeamViewPage() {
             ) : (
               <div className="flex justify-center rounded-lg border border-dashed border-input">
                 <Button type="button" onClick={openModal} className="my-8">
-                  <Image src={AddItems} alt={`Icon of Adding Items`} /> Select
-                  Team Members
+                  <Image src="/Add-items.svg" alt={`Icon of Adding Items`} />{" "}
+                  Select Team Members
                 </Button>
               </div>
             )}

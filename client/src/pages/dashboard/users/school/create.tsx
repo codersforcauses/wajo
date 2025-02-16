@@ -1,4 +1,4 @@
-import { ProtectedPage } from "@/components/page-config";
+import { ProtectedPage } from "@/components/layout";
 import { SchoolDataTableForm } from "@/components/ui/Users/school-data-table-form";
 import { Role } from "@/types/user";
 

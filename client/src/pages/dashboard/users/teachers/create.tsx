@@ -1,4 +1,4 @@
-import { ProtectedPage } from "@/components/page-config";
+import { ProtectedPage } from "@/components/layout";
 import { DataTableForm } from "@/components/ui/Users/data-table-form";
 import { Role } from "@/types/user";
 

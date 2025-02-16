@@ -1,65 +1,66 @@
-import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 import Navbar from "@/components/navbar";
-import { useTokenStore } from "@/store/token-store";
+import Sidebar from "@/components/sidebar";
+import Footer from "@/components/ui/footer";
+import { WaitingLoader } from "@/components/ui/loading";
+import { useAuth } from "@/context/auth-provider";
 import { Role } from "@/types/user";
 
-import Sidebar from "./sidebar";
-import Footer from "./ui/footer";
-
-interface LayoutProps {
+interface ProtectedPageProps {
   children: React.ReactNode;
-  isPublic?: boolean;
+  requiredRoles: Role[];
 }
 
-/**
- * Layout component that wraps the application with a Navbar or Sidebar based on user authentication status.
- *
- * @param {LayoutProps} props - The component props.
- * @param {React.ReactNode} props.children - The child components to render within the layout.
- *
- */
-export default function Layout({ children, isPublic = false }: LayoutProps) {
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
-  const { access } = useTokenStore(); // access the JWT token
-  const [role, setRole] = useState<string | undefined>(undefined);
+export function ProtectedPage({ children, requiredRoles }: ProtectedPageProps) {
+  const { userRole, isLoggedIn } = useAuth();
+  const router = useRouter();
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    if (access?.decoded) {
-      const userRole = access.decoded["role"];
-      setRole(userRole);
-    }
-    // wait for auth to be checked before rendering
-    setIsAuthChecked(true);
-  }, [access]);
+    // Wait for one tick to ensure auth state is properly initialized
+    const timer = setTimeout(() => {
+      setIsInitializing(false);
+      if (!isLoggedIn || !requiredRoles.includes(userRole)) {
+        router.replace(`/not-authorized?next=${router.pathname}`);
+      }
+    }, 0);
 
-  if (!isAuthChecked) return null;
+    return () => clearTimeout(timer);
+  }, [isLoggedIn, userRole, requiredRoles, router]);
 
-  if (!access || isPublic) {
-    return (
-      <div>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
-      </div>
-    );
-  }
+  if (isInitializing) return <WaitingLoader />;
+  if (!isLoggedIn || !requiredRoles.includes(userRole))
+    return <WaitingLoader />;
 
-  if (!role) {
-    return (
-      <div>
-        <main>
-          <div>Failed to get user role.</div>
-        </main>
-      </div>
-    );
-  }
+  // Render authorized content
   return (
     <Sidebar
-      role={role.toLowerCase() as Role}
-      isShowBreadcrumb={role === Role.STUDENT ? false : true}
+      role={userRole.toLowerCase() as Role}
+      isShowBreadcrumb={userRole !== Role.STUDENT}
     >
       {children}
     </Sidebar>
+  );
+}
+
+interface PublicPageProps {
+  children: React.ReactNode;
+  isNavBar?: boolean;
+  isFooter?: boolean;
+}
+
+export function PublicPage({
+  children,
+  isNavBar = true,
+  isFooter = true,
+}: PublicPageProps) {
+  return (
+    <div>
+      {isNavBar ? <Navbar /> : null}
+      <main>{children}</main>
+      {isFooter ? <Footer /> : null}
+    </div>
   );
 }
