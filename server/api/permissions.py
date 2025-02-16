@@ -14,7 +14,7 @@ from users.models import School
 class SchoolViewSet(viewsets.ModelViewSet):
     queryset = School.objects.all()
     serializer_class = SchoolSerializer
-    permission_classes = [IsAuthenticated | IsStudent | IsTeacher | IsAdmin]
+    permission_classes = [IsAuthenticated or IsStudent or IsTeacher or IsAdmin]
 
 
 '''

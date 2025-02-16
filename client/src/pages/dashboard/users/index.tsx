@@ -4,7 +4,7 @@ import { ProtectedPage } from "@/components/layout";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
-  const roles = [Role.ADMIN, Role.TEACHER];
+  const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
       <Create />

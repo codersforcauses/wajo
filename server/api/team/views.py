@@ -9,7 +9,7 @@ from .models import Team, TeamMember, Student
 from .serializers import TeamSerializer, TeamMemberSerializer
 
 
-@permission_classes([IsTeacher | IsAdmin | IsAdminUser])
+@permission_classes([IsTeacher or IsAdmin or IsAdminUser])
 class TeamViewSet(viewsets.ModelViewSet):
     serializer_class = TeamSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]

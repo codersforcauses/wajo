@@ -15,7 +15,7 @@ export default function PageConfig() {
 function Dashboard() {
   const userRole = Cookies.get("user_role");
   return (
-    <div className="flex h-[90vh] items-center justify-center">
+    <div className="container flex h-[90vh] items-center justify-center text-balance">
       <h1>
         Welcome to{" "}
         {userRole && `${userRole.charAt(0).toUpperCase()}${userRole.slice(1)}`}{" "}
