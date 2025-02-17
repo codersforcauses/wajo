@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import * as React from "react";
 
@@ -65,13 +66,8 @@ export function CategoryDataGrid({
                   </TableCell>
                   <TableCell className="sticky right-0 flex bg-white">
                     <div className="flex w-full justify-between">
-                      <Button
-                        className="me-2"
-                        onClick={() =>
-                          router.push(`/question/category/${item.id}`)
-                        }
-                      >
-                        View
+                      <Button asChild className="me-2">
+                        <Link href={`${router.pathname}/${item.id}`}>View</Link>
                       </Button>
                       <DeleteModal
                         baseUrl="/questions/categories"
