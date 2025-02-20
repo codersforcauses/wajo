@@ -9,11 +9,11 @@ import GenericQuiz from "@/components/ui/Quiz/generic-quiz";
 import QuizStartPage from "@/components/ui/Quiz/quiz-start-page";
 import SubmissionPopup from "@/components/ui/submission-popup";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import type { NextPageWithLayout } from "@/pages/_app";
+// import type { NextPageWithLayout } from "@/pages/_app";
 import { Question } from "@/types/question";
 import { Competition, Quiz } from "@/types/quiz";
 
-const CompetitionQuizPage: NextPageWithLayout = () => {
+const CompetitionQuizPage = () => {
   // Fetches the quiz data using the custom hook.
   const router = useRouter();
   let { id }: { id?: string | string[] | undefined | Number } = router.query;

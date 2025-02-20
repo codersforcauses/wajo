@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Question, Category, Answer
+from .models import Question, Category, Answer, Image
+
+
+@admin.register(Image)
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'url')
 
 
 @admin.register(Category)

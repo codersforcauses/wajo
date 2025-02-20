@@ -1,4 +1,12 @@
-import { PaginationProps } from "@/types/question";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { PaginationProps } from "@/types/data-grid";
 
 export default function Pagination({
   totalPages,
@@ -129,3 +137,48 @@ export default function Pagination({
     </nav>
   );
 }
+
+type RowProps = {
+  selectedRow: string | number;
+  options?: number[];
+  onChange: (role: string) => void;
+  className?: string;
+};
+
+export function SelectRow({
+  selectedRow,
+  options = [5, 7, 10, 15, 20, 50, 100],
+  onChange,
+  className,
+}: RowProps) {
+  const onValueChange = (value: string) => {
+    onChange(value);
+  };
+
+  return (
+    <Select
+      value={selectedRow ? selectedRow.toString() : ""}
+      onValueChange={onValueChange}
+    >
+      <SelectTrigger className={cn(className)}>
+        <SelectValue placeholder="Type" />
+      </SelectTrigger>
+      <SelectContent>
+        {[...new Set([...options, Number(selectedRow)])]
+          .sort((a, b) => a - b)
+          .map((row) => (
+            <SelectItem key={row} value={row.toString()}>
+              {row}
+            </SelectItem>
+          ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+export type PaginationSearchParams = {
+  search?: string;
+  ordering?: string;
+  nrows: number;
+  page: number;
+};

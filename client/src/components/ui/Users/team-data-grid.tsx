@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
-import Pagination from "@/components/ui/pagination";
+import DateTimeDisplay from "@/components/ui/date-format";
+import DeleteModal from "@/components/ui/delete-modal";
 import {
   Table,
   TableBody,
@@ -12,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useDynamicDeleteMutation } from "@/hooks/use-delete-data";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
 import { Team } from "@/types/team";
@@ -30,123 +30,89 @@ import { Team } from "@/types/team";
  */
 export function TeamDataGrid({
   datacontext,
-  onDataChange,
-  changePage,
+  onOrderingChange,
 }: DatagridProps<Team>) {
   const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<Team[]>([]);
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(datacontext.length / itemsPerPage);
-
-  const { mutate: deleteTeam, isPending } = useDynamicDeleteMutation({
-    baseUrl: "/team/teams",
-    mutationKey: ["team_delete"],
-    onSuccess: () => {
-      router.reload();
-      toast.success("Team has been deleted.");
-    },
-  });
-
-  const onDelete = (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this team?")) {
-      return;
-    }
-    deleteTeam(id);
-  };
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  useEffect(() => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = datacontext.slice(indexOfFirstItem, indexOfLastItem);
-
-    const updatedPaddedData = [...currentData];
-    while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as Team);
-    }
-
-    setPaddedData(updatedPaddedData);
-  }, [datacontext, currentPage]);
-
-  useEffect(() => {
-    setCurrentPage(changePage);
-  }, [datacontext]);
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
-    <div>
-      <Table className="w-full border-collapse text-left shadow-md">
-        <TableHeader className="bg-black text-lg font-semibold">
-          <TableRow className="hover:bg-muted/0">
-            <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
-              Team Id
-            </TableHead>
-            <TableHead className={commonTableHeadClasses}>Team Name</TableHead>
-            <TableHead className={commonTableHeadClasses}>School</TableHead>
-            <TableHead className={commonTableHeadClasses}>
-              Description
-            </TableHead>
-            <TableHead className={commonTableHeadClasses}>Created On</TableHead>
-            <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
-              Actions
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paddedData.map((item, index) => (
-            <TableRow
-              key={index}
-              className={"divide-gray-200 border-gray-50 text-sm text-black"}
-            >
-              <TableCell className="w-1/4">{item.id}</TableCell>
-              <TableCell className="w-1/4">{item.name}</TableCell>
-              <TableCell className="w-1/4">{item.school?.name}</TableCell>
-              <TableCell className="w-1/4">{item.description}</TableCell>
-              <TableCell className="w-1/4">
-                {item.time_created ? (
-                  <>
-                    <div className="text-nowrap">
-                      {new Date(item.time_created).toLocaleDateString()}
-                    </div>
-                    <div className="text-nowrap">
-                      {new Date(item.time_created).toLocaleTimeString()}
-                    </div>
-                  </>
-                ) : null}
-              </TableCell>
-              <TableCell className="flex py-4">
-                <div className={cn("flex", { invisible: !item.id })}>
-                  <Button
-                    className="me-2"
-                    onClick={() => router.push(`/users/team/${item.id}`)}
-                  >
-                    View
-                  </Button>
-                  <Button
-                    variant={"destructive"}
-                    onClick={() => onDelete(item.id)}
-                  >
-                    {isPending ? "Deleting..." : "Delete"}
-                  </Button>
-                </div>
-              </TableCell>
+    <div className="grid">
+      <div className="overflow-hidden rounded-lg border">
+        <Table className="w-full border-collapse text-left shadow-md">
+          <TableHeader className="bg-black text-lg font-semibold">
+            <TableRow className="hover:bg-muted/0">
+              <TableHead className={commonTableHeadClasses}>Team Id</TableHead>
+              <TableHead className={commonTableHeadClasses}>
+                Team Name
+              </TableHead>
+              <TableHead className={commonTableHeadClasses}>School</TableHead>
+              <TableHead className={commonTableHeadClasses}>
+                Description
+              </TableHead>
+              <TableHead className={commonTableHeadClasses}>
+                Created On
+              </TableHead>
+              <TableHead
+                className={cn(
+                  commonTableHeadClasses,
+                  "sticky right-0 bg-black",
+                )}
+              >
+                Actions
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={(page: number) => handlePageChange(page)}
-        className="mr-20 mt-5 flex justify-end"
-      />
+          </TableHeader>
+          <TableBody>
+            {datacontext.length > 0 ? (
+              datacontext.map((item, index) => (
+                <TableRow
+                  key={index}
+                  className={
+                    "divide-gray-200 border-gray-50 text-sm text-black"
+                  }
+                >
+                  <TableCell className="w-0">{item.id}</TableCell>
+                  <TableCell className="w-1/3 max-w-80 truncate">
+                    {item.name}
+                  </TableCell>
+                  <TableCell className="w-1/3 max-w-80 truncate">
+                    {item.school?.name}
+                  </TableCell>
+                  <TableCell className="w-1/3 max-w-80 truncate">
+                    {item.description}
+                  </TableCell>
+                  <TableCell className="w-0">
+                    <DateTimeDisplay date={item.time_created} />
+                  </TableCell>
+                  <TableCell className="sticky right-0 flex bg-white">
+                    <div className="flex w-full justify-between">
+                      <Button asChild className="me-2">
+                        <Link href={`${router.pathname}/${item.id}`}>View</Link>
+                      </Button>
+                      <DeleteModal
+                        baseUrl="/team/teams"
+                        entity="team"
+                        id={item.id}
+                      >
+                        <Button variant={"destructive"}>Delete</Button>
+                      </DeleteModal>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="py-4 text-center text-gray-500"
+                >
+                  No Results Found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

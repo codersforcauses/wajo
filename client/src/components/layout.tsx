@@ -1,61 +1,120 @@
-import React, { useEffect, useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 import Navbar from "@/components/navbar";
-import { useTokenStore } from "@/store/token-store";
+import Sidebar from "@/components/sidebar";
+import { Button } from "@/components/ui/button";
+import Footer from "@/components/ui/footer";
+import { WaitingLoader } from "@/components/ui/loading";
+import { useAuth } from "@/context/auth-provider";
 import { Role } from "@/types/user";
 
-import Sidebar from "./sidebar";
-import Footer from "./ui/footer";
-
-interface LayoutProps {
+interface ProtectedPageProps {
   children: React.ReactNode;
+  requiredRoles: Role[];
 }
 
-/**
- * Layout component that wraps the application with a Navbar or Sidebar based on user authentication status.
- *
- * @param {LayoutProps} props - The component props.
- * @param {React.ReactNode} props.children - The child components to render within the layout.
- *
- */
-export default function Layout({ children }: LayoutProps) {
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
-  const { access } = useTokenStore(); // access the JWT token
-  const [role, setRole] = useState<string | undefined>(undefined);
+export function ProtectedPage({ children, requiredRoles }: ProtectedPageProps) {
+  const { userRole, isLoggedIn } = useAuth();
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [authState, setAuthState] = useState<
+    "initializing" | "authorized" | "unauthorized" | "wrong-role"
+  >("initializing");
 
   useEffect(() => {
-    if (access?.decoded) {
-      const userRole = access.decoded["role"];
-      setRole(userRole);
-    }
-    // wait for auth to be checked before rendering
-    setIsAuthChecked(true);
-  }, [access]);
+    const timer = setTimeout(() => {
+      setIsInitializing(false);
+      if (!isLoggedIn || !userRole) {
+        setAuthState("unauthorized");
+      } else if (!requiredRoles.includes(userRole)) {
+        setAuthState("wrong-role");
+      } else {
+        setAuthState("authorized");
+      }
+    }, 0);
 
-  if (!isAuthChecked) return null;
+    return () => clearTimeout(timer);
+  }, [isLoggedIn, userRole, requiredRoles]);
 
-  if (!access) {
-    return (
-      <div>
-        <Navbar />
-        <main className="flex min-h-[100vh] flex-grow flex-col">
+  if (isInitializing) return <WaitingLoader />;
+  console.log(userRole);
+  switch (authState) {
+    case "unauthorized":
+      return (
+        <PublicPage>
+          <NotAuthorizedPage />
+        </PublicPage>
+      );
+    case "wrong-role":
+      return (
+        <Sidebar
+          role={userRole.toLowerCase() as Role}
+          isShowBreadcrumb={userRole !== Role.STUDENT}
+        >
+          <PublicPage isNavBar={false} isFooter={false}>
+            <NotAuthorizedPage />
+          </PublicPage>
+        </Sidebar>
+      );
+    case "authorized":
+      return (
+        <Sidebar
+          role={userRole.toLowerCase() as Role}
+          isShowBreadcrumb={userRole !== Role.STUDENT}
+        >
           {children}
-        </main>
-        <Footer isCompetition={false} />
-      </div>
-    );
+        </Sidebar>
+      );
+    default:
+      return <WaitingLoader />;
   }
+}
 
-  if (!role) {
-    return (
-      <div>
-        <Navbar />
-        <main>
-          <div>Failed to get user role.</div>
-        </main>
-      </div>
-    );
-  }
+interface PublicPageProps {
+  children: React.ReactNode;
+  isNavBar?: boolean;
+  isFooter?: boolean;
+}
 
-  return <Sidebar role={role.toLowerCase() as Role}>{children}</Sidebar>;
+export function PublicPage({
+  children,
+  isNavBar = true,
+  isFooter = true,
+}: PublicPageProps) {
+  return (
+    <div>
+      {isNavBar ? <Navbar /> : null}
+      <main>{children}</main>
+      {isFooter ? <Footer /> : null}
+    </div>
+  );
+}
+
+function NotAuthorizedPage() {
+  const router = useRouter();
+  const { userRole, logout } = useAuth();
+
+  const handleLogout = () => {
+    router.push("/").then(() => logout());
+  };
+
+  return (
+    <div className="animate-fade-in flex min-h-[50vh] flex-col items-center justify-center gap-5 py-4 text-center">
+      <h1 className="font-black text-red-600">Access Denied</h1>
+      <p className="text-lg font-bold text-gray-600">
+        {userRole
+          ? `Role[${userRole}] do not have permission to view this page.`
+          : `Unabled to identify user.`}
+      </p>
+      <Button
+        onClick={userRole ? () => router.push("/dashboard") : handleLogout}
+        variant="outline"
+        className="mt-6 flex animate-bounce items-center gap-2"
+      >
+        <ArrowLeft size={18} />
+        {userRole ? "Back to Dashboard" : "Logout"}
+      </Button>
+    </div>
+  );
 }

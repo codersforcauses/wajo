@@ -4,9 +4,7 @@ import Link from "next/link";
 import { Drawer } from "vaul";
 
 import { Button } from "@/components/ui/button";
-
-import logo from "../../../public/wajo_white.svg";
-import { LoginModal } from "./Users/login-modal";
+import { LoginModal } from "@/components/ui/Users/login-modal";
 
 export default function MobileNav() {
   return (
@@ -28,7 +26,7 @@ export default function MobileNav() {
             {/* <div className="mx-auto"> */}
             <Drawer.Title className="mx-5 flex justify-between border border-green-500 text-base text-zinc-900">
               <Image
-                src={logo}
+                src="wajo_white.svg"
                 alt="WAJO logo with white background"
                 width={105}
                 height={105}

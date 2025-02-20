@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import * as React from "react";
 
-import Pagination from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -45,84 +44,67 @@ import { Insight } from "@/types/leaderboard";
  */
 export function InsightDataGrid({
   datacontext,
-  onDataChange,
-  changePage,
+  onOrderingChange = () => {},
 }: DatagridProps<Insight>) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<Insight[]>([]);
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(datacontext.length / itemsPerPage);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  useEffect(() => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = datacontext.slice(indexOfFirstItem, indexOfLastItem);
-
-    const updatedPaddedData = [...currentData];
-    while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as Insight);
-    }
-
-    setPaddedData(updatedPaddedData);
-  }, [datacontext, currentPage]);
-
-  useEffect(() => {
-    setCurrentPage(changePage);
-  }, [datacontext]);
-
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
-    <div>
-      <Table className="w-full border-collapse text-left shadow-md">
-        <TableHeader className="bg-black text-lg font-semibold">
-          <TableRow className="hover:bg-muted/0">
-            <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
-              Qeustion Name
-            </TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Genre</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>
-              Difficulty
-            </TableHead>
-            <TableHead
-              className={cn(
-                commonTableHeadClasses,
-                "text-center",
-                "rounded-tr-lg",
-              )}
-            >
-              Correct Rate
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paddedData.map((item, index) => (
-            <TableRow
-              key={index}
-              className={"divide-gray-200 border-gray-50 text-sm text-black"}
-            >
-              <TableCell className="w-1/2">{item.question_name}</TableCell>
-              <TableCell className="w-1/4">{item.genre}</TableCell>
-              <TableCell className="">{item.difficulty}</TableCell>
-              <TableCell className="w-1/4 text-center">
-                {item.correct_rate}
-              </TableCell>
+    <div className="grid">
+      <div className="overflow-hidden rounded-lg border">
+        <Table className="w-full border-collapse text-left shadow-md">
+          <TableHeader className="bg-black text-lg font-semibold">
+            <TableRow className="hover:bg-muted/0">
+              <TableHead
+                className={cn(commonTableHeadClasses, "rounded-tl-lg")}
+              >
+                Qeustion Name
+              </TableHead>
+              <TableHead className={cn(commonTableHeadClasses)}>
+                Genre
+              </TableHead>
+              <TableHead className={cn(commonTableHeadClasses)}>
+                Difficulty
+              </TableHead>
+              <TableHead
+                className={cn(
+                  commonTableHeadClasses,
+                  "text-center",
+                  "rounded-tr-lg",
+                )}
+              >
+                Correct Rate
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={(page: number) => handlePageChange(page)}
-        className="mr-20 mt-5 flex justify-end"
-      />
+          </TableHeader>
+          <TableBody>
+            {datacontext.length > 0 ? (
+              datacontext.map((item, index) => (
+                <TableRow
+                  key={index}
+                  className={
+                    "divide-gray-200 border-gray-50 text-sm text-black"
+                  }
+                >
+                  <TableCell className="w-1/2">{item.question_name}</TableCell>
+                  <TableCell className="w-1/4">{item.genre}</TableCell>
+                  <TableCell className="">{item.difficulty}</TableCell>
+                  <TableCell className="w-1/4 text-center">
+                    {item.correct_rate}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="py-4 text-center text-gray-500"
+                >
+                  No Results Found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
