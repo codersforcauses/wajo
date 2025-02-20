@@ -34,8 +34,6 @@ export default function App({ Component, pageProps }: AppProps) {
         <AuthProvider>
           <ReactQueryDevtools initialIsOpen={false} />
           <Component {...pageProps} />
-          <Toaster closeButton position="bottom-center" richColors />
-          <div>{getLayout(<Component {...pageProps} />)}</div>
           <Toaster position="bottom-center" richColors />
         </AuthProvider>
       </QueryClientProvider>

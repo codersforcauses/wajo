@@ -36,8 +36,8 @@ function HomePage() {
         <div className="body-2">
           The Western Australian Junior Mathematics Olympiad is an annual
           competition celebrating top young mathematicians. Open to students in
-          Years 7-9 (exceptional younger students may apply), it consists of two
-          parts: an online individual paper and an in-person team paper.
+          Years 7-9, it consists of two parts: an online individual paper and an
+          in-person team paper.
         </div>
       </div>
 
