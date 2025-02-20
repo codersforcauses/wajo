@@ -44,7 +44,10 @@ interface QueryConfig<TData, TError = AxiosError>
  *
  * @returns {UseQueryResult<TData, TError>} The result from `useQuery`, including data, error, and loading state.
  */
-export const useFetchData = <TData, TError = AxiosError>({
+export const useFetchData = <
+  TData,
+  TError = AxiosError<{ error: string; message: string }>,
+>({
   queryKey,
   endpoint,
   params,

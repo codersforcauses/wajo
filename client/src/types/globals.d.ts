@@ -29,7 +29,8 @@ declare module "jwt-decode" {
    */
   export interface JwtPayload extends OriginalJwtPayload {
     user_id: string;
-    role: Role | undefined;
+    primary_id: string;
+    role: string | undefined;
     school_id: number | undefined;
     sub_id: number | undefined;
   }

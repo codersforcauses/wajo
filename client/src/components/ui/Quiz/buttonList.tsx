@@ -13,59 +13,53 @@ const ButtonList: React.FC<ButtonListProps> = ({
   setCurrentPage,
   totalQuestions,
 }) => {
-  const [startIndex, setStartIndex] = useState(0);
-  const [endIndex, setEndIndex] = useState(10);
   const buttonsPerPage = 10;
-
-  const updateIndexes = () => {
-    // if (currentPage > endIndex) {
-    //   setStartIndex(currentPage - 1);
-    //   setEndIndex(currentPage + 9);
-    // } else if (currentPage < startIndex) {
-    //   setStartIndex(currentPage - 1);
-    //   setEndIndex(currentPage + 9);
-    // }
-    if (startIndex === 0) {
-      if (currentPage < 10) {
-        setStartIndex(0);
-        setEndIndex(10);
-      } else if (currentPage >= 10) {
-        setStartIndex(6);
-        setEndIndex(16);
-      }
-    } else if (currentPage === 7) {
-      setStartIndex(0);
-      setEndIndex(10);
-    }
-  };
-
-  const handleClick = (num: number) => {
-    setCurrentPage(num);
-    updateIndexes();
-
-    console.log(startIndex);
-    console.log(endIndex);
-  };
+  const [startIndex, setStartIndex] = useState(0);
+  const [endIndex, setEndIndex] = useState(
+    Math.min(buttonsPerPage, totalQuestions),
+  );
 
   useEffect(() => {
-    updateIndexes();
-  }, [currentPage]);
+    if (totalQuestions <= buttonsPerPage) {
+      // If totalQuestions is less than buttonsPerPage, just show all buttons
+      setStartIndex(0);
+      setEndIndex(totalQuestions);
+      return;
+    }
+
+    const halfButtons = Math.floor(buttonsPerPage / 2);
+
+    if (currentPage <= halfButtons) {
+      // When at the start of the list
+      setStartIndex(0);
+      setEndIndex(buttonsPerPage);
+    } else if (currentPage >= totalQuestions - halfButtons) {
+      // When at the end of the list
+      setStartIndex(totalQuestions - buttonsPerPage);
+      setEndIndex(totalQuestions);
+    } else {
+      // Normal pagination case
+      setStartIndex(currentPage - halfButtons);
+      setEndIndex(currentPage + halfButtons);
+    }
+  }, [currentPage, totalQuestions]);
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-1">
-        {Array.from({ length: endIndex - startIndex }, (_, i) => (
+    <div className="flex flex-wrap gap-1">
+      {Array.from({ length: endIndex - startIndex }, (_, i) => {
+        const pageNumber = startIndex + i + 1;
+        return (
           <Button
+            key={pageNumber}
             className="m-2"
-            variant={startIndex + i + 1 === currentPage ? "default" : "outline"}
+            variant={pageNumber === currentPage ? "default" : "outline"}
             size="icon"
-            onClick={() => handleClick(startIndex + i + 1)}
-            key={startIndex + i}
+            onClick={() => setCurrentPage(pageNumber)}
           >
-            {startIndex + i + 1}
+            {pageNumber}
           </Button>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 };
