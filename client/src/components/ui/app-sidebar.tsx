@@ -67,8 +67,7 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
   };
 
   const handleLogout = () => {
-    router.push("/");
-    logout();
+    router.push("/").then(() => logout());
   };
 
   const handleBack = () => {

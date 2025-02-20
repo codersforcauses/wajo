@@ -1,16 +1,6 @@
 import { z } from "zod";
 
 /**
- * Defines the possible user roles.
- *
- * @example
- * const role: Role = "student";
- */
-export const RoleEnum = z.enum(["admin", "teacher", "student"], {
-  errorMap: () => ({ message: "Invalid User Role" }),
-});
-
-/**
  * Type representing a user role. Can be one of the following:
  * - "admin"
  * - "teacher"
@@ -18,7 +8,22 @@ export const RoleEnum = z.enum(["admin", "teacher", "student"], {
  *
  * @type {Role}
  */
-export type Role = z.infer<typeof RoleEnum>;
+// export type Role = z.infer<typeof RoleEnum>;
+export enum Role {
+  ADMIN = "admin",
+  STUDENT = "student",
+  TEACHER = "teacher",
+}
+
+/**
+ * Defines the possible user roles.
+ *
+ * @example
+ * const role: Role = "student";
+ */
+export const RoleEnum = z.enum([Role.ADMIN, Role.TEACHER, Role.STUDENT], {
+  errorMap: () => ({ message: "Invalid User Role" }),
+});
 
 /**
  * Defines the possible schools.

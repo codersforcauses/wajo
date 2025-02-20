@@ -1,13 +1,18 @@
 import { useRouter } from "next/router";
-import { ReactElement } from "react";
 
-import Layout from "@/components/layout";
+import { PublicPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import Sponsor from "@/components/ui/sponsor";
 
-import { NextPageWithLayout } from "./_app";
+export default function PageConfig() {
+  return (
+    <PublicPage>
+      <HomePage />
+    </PublicPage>
+  );
+}
 
-const HomePage: NextPageWithLayout = () => {
+function HomePage() {
   const router = useRouter();
 
   return (
@@ -154,10 +159,4 @@ const HomePage: NextPageWithLayout = () => {
       </div>
     </main>
   );
-};
-
-HomePage.getLayout = (page: ReactElement) => {
-  return <Layout isPublic={true}>{page}</Layout>;
-};
-
-export default HomePage;
+}

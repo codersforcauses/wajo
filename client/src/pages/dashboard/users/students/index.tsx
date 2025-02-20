@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
+import { ProtectedPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -13,8 +14,18 @@ import { SearchInput } from "@/components/ui/search";
 import { DataGrid } from "@/components/ui/Users/data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import type { Student } from "@/types/user";
+import { Role } from "@/types/user";
 
-export default function UserList() {
+export default function PageConfig() {
+  const roles = [Role.ADMIN, Role.TEACHER];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <UserList />
+    </ProtectedPage>
+  );
+}
+
+function UserList() {
   const router = useRouter();
   const { query, isReady, push } = router;
 

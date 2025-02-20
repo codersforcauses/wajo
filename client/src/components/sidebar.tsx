@@ -3,6 +3,13 @@ import { useRouter } from "next/router";
 import React from "react";
 
 import AppSidebar from "@/components/ui/app-sidebar";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -10,14 +17,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Role } from "@/types/user";
-
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "./ui/breadcrumb";
 
 interface LayoutProps {
   children: React.ReactNode;

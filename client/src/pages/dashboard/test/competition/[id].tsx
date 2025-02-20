@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ProtectedPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -35,11 +36,21 @@ import {
   mapBlocksToSlots,
   mapSlotsToBlocks,
 } from "@/types/quiz";
+import { Role } from "@/types/user";
+
+export default function PageConfig() {
+  const roles = [Role.ADMIN];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Create />
+    </ProtectedPage>
+  );
+}
 
 type UpdateCompetition = z.infer<typeof genericCreateTestSchema>;
 type UpdateCompetitionSlots = z.infer<typeof createSlotsSchema>;
 
-export default function Create() {
+function Create() {
   const router = useRouter();
   const adminQuizId = parseInt(router.query.id as string);
 

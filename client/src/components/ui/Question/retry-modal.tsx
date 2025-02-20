@@ -2,6 +2,7 @@ import "katex/dist/katex.min.css";
 
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,8 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-import { Button } from "../button";
 
 export default function RetryModal({
   children,

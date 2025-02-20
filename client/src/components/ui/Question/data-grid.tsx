@@ -3,7 +3,9 @@ import { useRouter } from "next/router";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
+import DateTimeDisplay from "@/components/ui/date-format";
 import DeleteModal from "@/components/ui/delete-modal";
+import { SortIcon } from "@/components/ui/icon";
 import {
   Table,
   TableBody,
@@ -15,9 +17,6 @@ import {
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
 import { Question } from "@/types/question";
-
-import DateTimeDisplay from "../date-format";
-import { SortIcon } from "../icon";
 
 /**
  * The Datagrid component is a flexible, paginated data table with sorting and navigation features.

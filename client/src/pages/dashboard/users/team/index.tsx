@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
+import { ProtectedPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -13,8 +14,18 @@ import { SearchInput } from "@/components/ui/search";
 import { TeamDataGrid } from "@/components/ui/Users/team-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import type { Team } from "@/types/team";
+import { Role } from "@/types/user";
 
-export default function TeamList() {
+export default function PageConfig() {
+  const roles = [Role.ADMIN, Role.TEACHER];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <TeamList />
+    </ProtectedPage>
+  );
+}
+
+function TeamList() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
