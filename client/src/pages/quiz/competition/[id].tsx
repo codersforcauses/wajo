@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
-import ButtonList from "@/components/ui/Quiz/buttonList";
+import ButtonList from "@/components/ui/Quiz/button-list";
 import CountdownDisplay from "@/components/ui/Quiz/countdown-display";
 import GenericQuiz from "@/components/ui/Quiz/generic-quiz";
 import QuizStartPage from "@/components/ui/Quiz/quiz-start-page";

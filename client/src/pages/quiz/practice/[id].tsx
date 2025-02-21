@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import GenericPractice from "@/components/ui/generic-practice";
 import PracticeStartPage from "@/components/ui/practice-start-page";
-import ButtonList from "@/components/ui/Quiz/buttonList";
+import ButtonList from "@/components/ui/Quiz/button-list";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { AdminQuizSlot } from "@/types/quiz";
 
