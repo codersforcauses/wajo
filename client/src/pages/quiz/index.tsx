@@ -1,13 +1,11 @@
-import { ReactElement } from "react";
-
-import Layout from "@/components/layout";
+// import Layout from "@/components/layout";
 import DateTimeDisplay from "@/components/ui/date-format";
 import HorizontalCard from "@/components/ui/horizontal-card";
 import { WaitingLoader } from "@/components/ui/loading";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { Competition, Quiz } from "@/types/quiz";
 
-import { NextPageWithLayout } from "../_app";
+// import { NextPageWithLayout } from "../_app";
 
 /**
  * The `QuizPage` component is the page that displays the lists of all quizzes admins have published.
@@ -15,7 +13,7 @@ import { NextPageWithLayout } from "../_app";
  * The list of quizzes are fetched from the database as an array of JSONs.
  * Each quiz is one of three categories: upcoming competition, past questions and solutions, and practice tests.
  */
-const QuizPage: NextPageWithLayout = () => {
+const QuizPage = () => {
   const {
     data: quizData,
     isLoading: isQuizDataLoading,
@@ -124,8 +122,8 @@ function QuizCard({
   );
 }
 
-QuizPage.getLayout = (page: ReactElement) => {
-  return <Layout isPublic={true}>{page}</Layout>;
-};
+// QuizPage.getLayout = (page: ReactElement) => {
+//   return <Layout isPublic={true}>{page}</Layout>;
+// };
 
 export default QuizPage;
