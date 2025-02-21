@@ -44,7 +44,7 @@ export default function MobileNav() {
                 <Button
                   variant={"outline"}
                   size={"lg"}
-                  className="font-roboto border-2 border-black text-lg"
+                  className="border-2 border-black font-roboto text-lg"
                 >
                   Login
                 </Button>

@@ -29,6 +29,7 @@ class Quiz(models.Model):
     open_time_date = models.DateTimeField(default=None)
     time_limit = models.IntegerField(default=120)
     time_window = models.IntegerField(default=10)
+    time_created = models.DateTimeField(auto_now_add=True, null=True)
 
     # 0 for normal practice, 1 for upcoming, 2 for ongoing, 3 for finished
     status = models.IntegerField(default=0)

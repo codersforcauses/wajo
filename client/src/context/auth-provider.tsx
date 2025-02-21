@@ -9,6 +9,7 @@ import { Role } from "@/types/user";
 type AuthContextType = {
   userId: string | null;
   userRole: Role;
+  primaryId: string | null;
   isLoggedIn: boolean;
   login: (
     username: string,
@@ -58,6 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const userId = accessToken?.decoded.user_id ?? null;
   const userRole = accessToken?.decoded.role as Role;
 
+  const primaryId = accessToken?.decoded.primary_id ?? null;
   const isLoggedIn = userId !== null;
 
   const { mutateAsync: postLogin } = usePostMutation<
@@ -124,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     toast.success("Successfully logout");
   };
 
-  const context = { userId, userRole, isLoggedIn, login, logout };
+  const context = { userId, userRole, primaryId, isLoggedIn, login, logout };
 
   return (
     <AuthContext.Provider value={context}>{children}</AuthContext.Provider>
