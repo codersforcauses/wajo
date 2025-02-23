@@ -5,6 +5,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import DateTimeDisplay from "@/components/ui/date-format";
 import DeleteModal from "@/components/ui/delete-modal";
+import { WaitingLoader } from "@/components/ui/loading";
 import {
   Table,
   TableBody,
@@ -30,6 +31,9 @@ import { Team } from "@/types/team";
  */
 export function TeamDataGrid({
   datacontext,
+  isLoading,
+  startIdx,
+  onDeleteSuccess,
   onOrderingChange,
 }: DatagridProps<Team>) {
   const router = useRouter();
@@ -41,7 +45,7 @@ export function TeamDataGrid({
         <Table className="w-full border-collapse text-left shadow-md">
           <TableHeader className="bg-black text-lg font-semibold">
             <TableRow className="hover:bg-muted/0">
-              <TableHead className={commonTableHeadClasses}>Team Id</TableHead>
+              <TableHead className={commonTableHeadClasses}>No.</TableHead>
               <TableHead className={commonTableHeadClasses}>
                 Team Name
               </TableHead>
@@ -63,7 +67,7 @@ export function TeamDataGrid({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {datacontext.length > 0 ? (
+            {!isLoading && datacontext.length > 0 ? (
               datacontext.map((item, index) => (
                 <TableRow
                   key={index}
@@ -71,7 +75,9 @@ export function TeamDataGrid({
                     "divide-gray-200 border-gray-50 text-sm text-black"
                   }
                 >
-                  <TableCell className="w-0">{item.id}</TableCell>
+                  <TableCell className="w-0">
+                    {startIdx ? startIdx + index : item.id}
+                  </TableCell>
                   <TableCell className="w-1/3 max-w-80 truncate">
                     {item.name}
                   </TableCell>
@@ -93,6 +99,7 @@ export function TeamDataGrid({
                         baseUrl="/team/teams"
                         entity="team"
                         id={item.id}
+                        onSuccess={onDeleteSuccess}
                       >
                         <Button variant={"destructive"}>Delete</Button>
                       </DeleteModal>
@@ -106,7 +113,11 @@ export function TeamDataGrid({
                   colSpan={6}
                   className="py-4 text-center text-gray-500"
                 >
-                  No Results Found
+                  {isLoading ? (
+                    <WaitingLoader className="p-0" />
+                  ) : (
+                    "No Results Found"
+                  )}
                 </TableCell>
               </TableRow>
             )}

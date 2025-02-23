@@ -4,11 +4,11 @@ import React, { Suspense, useEffect, useState } from "react";
 
 import { ProtectedPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
+  toQueryString,
 } from "@/components/ui/pagination";
 import { CategoryDataGrid } from "@/components/ui/Question/category-data-grid";
 import { SearchInput } from "@/components/ui/search";
@@ -43,11 +43,12 @@ function Index() {
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<Category>({
-    queryKey: ["questions.categories"],
-    endpoint: "/questions/categories/",
-    searchParams: searchParams,
-  });
+  const { data, isLoading, error, totalPages, refetch } =
+    useFetchDataTable<Category>({
+      queryKey: ["questions.categories"],
+      endpoint: "/questions/categories/",
+      searchParams: searchParams,
+    });
 
   useEffect(() => {
     if (!isLoading) {
@@ -64,16 +65,7 @@ function Index() {
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push(
-      {
-        pathname: "/question/category",
-        query: Object.fromEntries(
-          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
-        ),
-      },
-      undefined,
-      { shallow: true },
-    );
+    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
   };
 
   const onOrderingChange = (field: keyof OrderingItem) => {
@@ -89,7 +81,6 @@ function Index() {
   };
 
   if (error) return <div>Error: {error.message}</div>;
-  if (!isReady || isLoading) return <WaitingLoader />;
 
   return (
     <div className="m-4 space-y-4">
@@ -111,7 +102,10 @@ function Index() {
         <div>
           <CategoryDataGrid
             datacontext={data ?? []}
+            isLoading={!isReady || isLoading}
+            startIdx={(searchParams.page - 1) * searchParams.nrows + 1}
             onOrderingChange={onOrderingChange}
+            onDeleteSuccess={refetch}
           />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}

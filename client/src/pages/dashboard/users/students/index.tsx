@@ -4,11 +4,11 @@ import React, { Suspense, useEffect, useState } from "react";
 
 import { ProtectedPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
+  toQueryString,
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
 import { DataGrid } from "@/components/ui/Users/data-grid";
@@ -35,11 +35,12 @@ function UserList() {
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<Student>({
-    queryKey: ["students"],
-    endpoint: "/users/students/",
-    searchParams: searchParams,
-  });
+  const { data, isLoading, error, totalPages, refetch } =
+    useFetchDataTable<Student>({
+      queryKey: ["students"],
+      endpoint: "/users/students/",
+      searchParams: searchParams,
+    });
 
   useEffect(() => {
     if (!isLoading) {
@@ -54,20 +55,10 @@ function UserList() {
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push(
-      {
-        pathname: "/dashboard/users/students",
-        query: Object.fromEntries(
-          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
-        ),
-      },
-      undefined,
-      { shallow: true },
-    );
+    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
   };
 
   if (error) return <div>Error: {error.message}</div>;
-  if (!isReady || isLoading) return <WaitingLoader />;
 
   return (
     <div className="m-4 space-y-4">
@@ -87,7 +78,12 @@ function UserList() {
 
       <Suspense>
         <div>
-          <DataGrid datacontext={data ?? []} />
+          <DataGrid
+            datacontext={data ?? []}
+            isLoading={!isReady || isLoading}
+            startIdx={(searchParams.page - 1) * searchParams.nrows + 1}
+            onDeleteSuccess={refetch}
+          />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}
             <div className="flex items-center space-x-2">

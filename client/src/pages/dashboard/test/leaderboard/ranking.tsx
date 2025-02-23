@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
-import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
+  toQueryString,
 } from "@/components/ui/pagination";
 import { RankingDataGrid } from "@/components/ui/Test/ranking-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
@@ -40,26 +40,19 @@ export default function Index() {
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push(
-      {
-        pathname: "/test/leaderboard/ranking",
-        query: Object.fromEntries(
-          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
-        ),
-      },
-      undefined,
-      { shallow: true },
-    );
+    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
   };
 
   if (error) return <div>Error: {error.message}</div>;
-  if (!isReady || isLoading) return <WaitingLoader />;
 
   return (
     <div className="m-4 space-y-4">
       <Suspense>
         <div>
-          <RankingDataGrid datacontext={data ?? []} />
+          <RankingDataGrid
+            datacontext={data ?? []}
+            isLoading={!isReady || isLoading}
+          />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}
             <div className="flex items-center space-x-2">

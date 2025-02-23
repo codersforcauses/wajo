@@ -1,6 +1,7 @@
 import { Loader } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 /**
  * WaitingLoader component displays a loading spinner inside a disabled button, indicating that content is being loaded.
@@ -11,9 +12,9 @@ import { Button } from "@/components/ui/button";
  * @example
  * if (isLoading) return <WaitingLoader />;
  */
-export function WaitingLoader() {
+export function WaitingLoader({ className }: { className?: string }) {
   return (
-    <div className="flex justify-center pt-20">
+    <div className={cn("flex justify-center pt-20", className)}>
       <Button className="bg-transparent text-2xl" disabled>
         <Loader className="mr-2 animate-spin" /> Loading...
       </Button>

@@ -165,6 +165,7 @@ export interface DeleteModalProps {
   id: number;
   entity: string;
   children: ReactNode;
+  onSuccess?: () => void;
 }
 
 export const createCategorySchema = z.object({
