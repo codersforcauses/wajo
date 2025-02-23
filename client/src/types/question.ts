@@ -36,11 +36,16 @@ export interface Question {
   note: string;
   solution_text: string;
   diff_level: number;
-  layout: string;
+  layout: Layout;
   mark: number;
   time_created: Date;
   time_modified: Date;
-  image: number;
+  images: QuestionImage[];
+}
+
+export interface QuestionImage {
+  url: string;
+  question: number;
 }
 
 export interface Answer {
@@ -122,6 +127,8 @@ export interface PreviewModalDataContext {
   answer: string;
   solution: string;
   mark: string;
+  image: string | null;
+  layout: Layout;
 }
 
 /**
@@ -150,11 +157,14 @@ export interface PreviewModalDataContext {
 export interface PreviewModalProps {
   children: ReactNode;
   dataContext: PreviewModalDataContext;
+  setLayout: (layout: Layout) => void; // Function to update form state
 }
 
 export interface DeleteModalProps {
+  baseUrl: string;
+  id: number;
+  entity: string;
   children: ReactNode;
-  data: Question;
 }
 
 export const createCategorySchema = z.object({
@@ -170,11 +180,22 @@ export const createCategorySchema = z.object({
  * @constant
  */
 
+export const LayoutEnum = z.enum(["top", "bottom", "left", "right"], {
+  errorMap: () => ({ message: "Invalid Layout" }),
+});
+
+export enum Layout {
+  TOP = "top",
+  BOTTOM = "bottom",
+  LEFT = "left",
+  RIGHT = "right",
+}
+
 // Define the schema for the request payload
 export const createQuestionSchema = z.object({
   questionName: z.string().min(1, "Question Name is required"),
   question: z.string().min(1, "Question is required"),
-  answer: z
+  answers: z
     .string()
     .min(1, "Answer is required")
     .refine(
@@ -203,14 +224,16 @@ export const createQuestionSchema = z.object({
     .refine((val) => /^[1-9]$|^10$/.test(val), {
       message: "Difficulty must be a number between 1 and 10",
     }),
-  genre: z
-    .array(
-      z.object({
-        value: z.string(),
-        label: z.string(),
-      }),
-    )
-    .min(1, "Genre is required"),
+  genre: z.array(
+    z.object({
+      value: z.string(),
+      label: z.string(),
+    }),
+  ),
+  // .min(1, "Genre is required"),
+  note: z.string().optional(),
+  image: z.string().optional(),
+  layout: LayoutEnum.optional().default("top"),
 });
 
 /**

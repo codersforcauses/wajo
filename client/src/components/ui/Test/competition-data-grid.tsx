@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import * as React from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import DateTimeDisplay from "@/components/ui/date-format";
+import DeleteModal from "@/components/ui/delete-modal";
 import { SortIcon } from "@/components/ui/icon";
-import { Pagination } from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -11,9 +15,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useDynamicPatchMutation } from "@/hooks/use-put-data";
 import { cn } from "@/lib/utils";
-import { DatagridProps, sortData } from "@/types/data-grid";
-import { Competition, QuizStatus } from "@/types/quiz";
+import { DatagridProps } from "@/types/data-grid";
+import { AdminQuiz } from "@/types/quiz";
 
 /**
  * Renders a paginated data grid for displaying competition information.
@@ -47,121 +52,130 @@ import { Competition, QuizStatus } from "@/types/quiz";
  */
 export function CompetitionDataGrid({
   datacontext,
-  onDataChange,
-  changePage,
-}: DatagridProps<Competition>) {
-  const [isAscending, setIsAscending] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<Competition[]>([]);
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(datacontext.length / itemsPerPage);
+  onOrderingChange = () => {},
+}: DatagridProps<AdminQuiz>) {
+  const router = useRouter();
 
-  const sortByColumn = (column: keyof Competition) => {
-    const sortedData = sortData(datacontext, column, isAscending);
-    setCurrentPage(1);
-    onDataChange(sortedData);
-    setIsAscending(!isAscending);
+  const { mutate: setVisible, isPending } = useDynamicPatchMutation({
+    baseUrl: "/quiz/admin-quizzes",
+    queryKeys: [["quiz.admin-quizzes"], ["competition.visible"]],
+    mutationKey: ["competition.visible"],
+    onSuccess: () => {
+      toast.success(`The competition has been updated.`);
+      router.reload();
+    },
+  });
+
+  const onVisible = (id: number, visible: boolean) => {
+    setVisible({
+      id: id,
+      data: { visible },
+    });
   };
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  useEffect(() => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = datacontext.slice(indexOfFirstItem, indexOfLastItem);
-
-    const updatedPaddedData = [...currentData];
-    while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as Competition);
-    }
-
-    setPaddedData(updatedPaddedData);
-  }, [datacontext, currentPage]);
-
-  useEffect(() => {
-    setCurrentPage(changePage);
-  }, [datacontext]);
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
-    <div>
-      <Table className="w-full border-collapse text-left shadow-md">
-        <TableHeader className="bg-black text-lg font-semibold">
-          <TableRow className="hover:bg-muted/0">
-            <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
-              Name
-            </TableHead>
-            <TableHead className={commonTableHeadClasses}>
-              Competition Time
-            </TableHead>
-            <TableHead className={commonTableHeadClasses}>
-              <div className="flex items-center text-white">
-                <span>Status</span>
-                <span
-                  className="ml-2 cursor-pointer"
-                  onClick={() => sortByColumn("status")}
-                >
-                  <SortIcon />
-                </span>
-              </div>
-            </TableHead>
-            <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
-              Actions
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paddedData.map((item, index) => (
-            <TableRow
-              key={index}
-              className={"divide-gray-200 border-gray-50 text-sm text-black"}
-            >
-              <TableCell className="w-1/2">{item.name}</TableCell>
-              <TableCell className="w-1/4">
-                {item.open_time_date ? (
-                  <>
-                    <div className="text-nowrap">
-                      {new Date(item.open_time_date).toLocaleDateString()}
-                    </div>
-                    <div className="text-nowrap">
-                      {new Date(item.open_time_date).toLocaleTimeString()}
-                    </div>
-                  </>
-                ) : null}
-              </TableCell>
-              <TableCell className="w-1/2">{item.status}</TableCell>
-              <TableCell className="flex py-4">
-                <div
-                  className={cn("flex w-full justify-between", {
-                    invisible: !item.name,
-                  })}
-                >
-                  <Button className="me-2">View</Button>
-                  <Button className="me-2">
-                    {item.status === QuizStatus.Finished ? (
-                      <a href="/withdraw">Withdraw</a>
-                    ) : (
-                      <a href="/publish">Publish</a>
-                    )}
-                  </Button>
-                  <Button variant={"destructive"}>Delete</Button>
-                </div>
-              </TableCell>
+    <div className="grid">
+      <div className="overflow-hidden rounded-lg border">
+        <Table className="w-full border-collapse text-left shadow-md">
+          <TableHeader className="bg-black text-lg font-semibold">
+            <TableRow className="hover:bg-muted/0">
+              <TableHead className={commonTableHeadClasses}>Id</TableHead>
+              <TableHead
+                className={commonTableHeadClasses}
+                onClick={() => onOrderingChange("name")}
+              >
+                <SortIcon title="Name" />
+              </TableHead>
+              <TableHead className={commonTableHeadClasses}>Intro</TableHead>
+              <TableHead className={commonTableHeadClasses}>
+                Total Marks
+              </TableHead>
+              <TableHead className={commonTableHeadClasses}>
+                Open Date
+              </TableHead>
+              <TableHead className={commonTableHeadClasses}>
+                Time Limit
+              </TableHead>
+              <TableHead className={commonTableHeadClasses}>
+                Time Window
+              </TableHead>
+              <TableHead
+                className={cn(
+                  commonTableHeadClasses,
+                  "sticky right-0 bg-black",
+                )}
+              >
+                Actions
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={(page: number) => handlePageChange(page)}
-        className="mr-20 mt-5 flex justify-end"
-      />
+          </TableHeader>
+          <TableBody>
+            {datacontext.length > 0 ? (
+              datacontext.map((item, index) => (
+                <TableRow
+                  key={item.id}
+                  className={
+                    "divide-gray-200 border-gray-50 text-sm text-black"
+                  }
+                >
+                  <TableCell className="w-0">{item.id}</TableCell>
+                  <TableCell className="w-1/4">{item.name}</TableCell>
+                  <TableCell className="w-1/2 max-w-80 truncate">
+                    {item.intro}
+                  </TableCell>
+                  <TableCell className="w-0">{item.total_marks}</TableCell>
+                  <TableCell className="w-0">
+                    <DateTimeDisplay date={item.open_time_date} />
+                  </TableCell>
+                  <TableCell className="w-0">{item.time_limit}</TableCell>
+                  <TableCell className="w-0">{item.time_window}</TableCell>
+                  <TableCell className="sticky right-0 bg-white">
+                    <div className="flex w-full justify-between">
+                      <Button
+                        className={cn(
+                          "me-1",
+                          item.visible
+                            ? "border-red-500 text-red-500 hover:border-red-500"
+                            : "bg-green-500 text-white hover:bg-green-500",
+                        )}
+                        onClick={() => onVisible(item.id, !item.visible)}
+                        disabled={isPending}
+                        variant={item.visible ? "outline" : "default"}
+                      >
+                        {isPending
+                          ? "Processing..."
+                          : item.visible
+                            ? "Withdraw"
+                            : "Publish"}
+                      </Button>
+                      <Button asChild className="me-1">
+                        <Link href={`${router.pathname}/${item.id}`}>View</Link>
+                      </Button>
+                      <DeleteModal
+                        baseUrl="/quiz/admin-quizzes"
+                        entity="competition"
+                        id={item.id}
+                      >
+                        <Button variant={"destructive"}>Delete</Button>
+                      </DeleteModal>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={8}
+                  className="py-4 text-center text-gray-500"
+                >
+                  No Results Found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Question, Category, Answer
+from .models import Question, Category, Answer, Image
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -16,6 +16,13 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = "__all__"
+
+
+class ImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Image
+        fields = ['url', 'question']
 
 
 class AnswerSerializer(serializers.ModelSerializer):
@@ -47,6 +54,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     categories = CategorySerializer(read_only=True, many=True)
     is_comp = serializers.BooleanField(required=False, default=False)
     answers = AnswerSerializer(required=False, many=True)
+    images = ImageSerializer(read_only=True, many=True)
 
     def create(self, validated_data):
         """
@@ -58,6 +66,8 @@ class QuestionSerializer(serializers.ModelSerializer):
         validated_data['modified_by'] = request.user
 
         answers_data = validated_data.pop('answers', [])
+
+        # image_data = validated_data.pop('image')
 
         question = super().create(validated_data)
 

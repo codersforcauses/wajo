@@ -59,20 +59,19 @@ export function TeamDataTableForm() {
   });
 
   const router = useRouter();
-  const { mutate: createTeam, isPending } = usePostMutation<Team[]>(
-    ["teams"],
-    "/team/teams/",
-    1000,
-    {
-      onSuccess: () => {
-        toast.success("Teams created successfully!");
-        router.push("/users/team/");
-      },
+  const { mutate: createTeam, isPending } = usePostMutation<Team[]>({
+    mutationKey: ["teams"],
+    endpoint: "/team/teams/",
+    onSuccess: () => {
+      toast.success(
+        "Teams created successfully! Team members can be add from edit page.",
+      );
+      router.push("/users/team/");
     },
-  );
+  });
 
   const onSubmit = (data: { teams: Team[] }) => {
-    createTeam({ ...data.teams });
+    createTeam([...data.teams]);
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
