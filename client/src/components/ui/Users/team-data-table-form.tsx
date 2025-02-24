@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SelectSchool } from "@/components/ui/Users/select-school";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { cn } from "@/lib/utils";
-import { createTeamSchema } from "@/types/team";
+import { createTeamSchema, Team as TeamType } from "@/types/team";
 
 type Team = z.infer<typeof createTeamSchema>;
 
@@ -59,14 +59,18 @@ export function TeamDataTableForm() {
   });
 
   const router = useRouter();
-  const { mutate: createTeam, isPending } = usePostMutation<Team[]>({
+  const { mutate: createTeam, isPending } = usePostMutation<TeamType[]>({
     mutationKey: ["teams"],
     endpoint: "/team/teams/",
-    onSuccess: () => {
+    onSuccess: (response) => {
       toast.success(
         "Teams created successfully! Team members can be add from edit page.",
       );
-      router.push("/users/team/");
+      const pathName =
+        response.data && response.data.length == 1
+          ? `/dashboard/users/team/${response.data[0].id}`
+          : "/dashboard/users/team/";
+      router.push(pathName);
     },
   });
 

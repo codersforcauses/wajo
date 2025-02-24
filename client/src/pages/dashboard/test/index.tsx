@@ -4,11 +4,11 @@ import React, { Suspense, useEffect, useState } from "react";
 
 import { ProtectedPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
+  toQueryString,
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
 import { PracticeDataGrid } from "@/components/ui/Test/practice-data-grid";
@@ -53,11 +53,12 @@ function Index() {
     ...defaultSearchParams,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<AdminQuiz>({
-    queryKey: ["quiz.admin-quizzes"],
-    endpoint: "/quiz/admin-quizzes/",
-    searchParams: searchParams,
-  });
+  const { data, isLoading, error, totalPages, refetch } =
+    useFetchDataTable<AdminQuiz>({
+      queryKey: ["quiz.admin-quizzes"],
+      endpoint: "/quiz/admin-quizzes/",
+      searchParams: searchParams,
+    });
 
   useEffect(() => {
     if (!isLoading) {
@@ -80,16 +81,7 @@ function Index() {
       updatedParams,
       ...(Object.keys(defaultSearchParams) as []),
     );
-    push(
-      {
-        pathname: "/test",
-        query: Object.fromEntries(
-          Object.entries(queryParams).filter(([_, v]) => Boolean(v)),
-        ),
-      },
-      undefined,
-      { shallow: true },
-    );
+    push({ query: toQueryString(queryParams) }, undefined, { shallow: true });
   };
 
   const onOrderingChange = (field: keyof OrderingItem) => {
@@ -105,7 +97,6 @@ function Index() {
   };
 
   if (error) return <div>Error: {error.message}</div>;
-  if (!isReady || isLoading) return <WaitingLoader />;
 
   return (
     <div className="m-4 space-y-4">
@@ -127,7 +118,10 @@ function Index() {
         <div>
           <PracticeDataGrid
             datacontext={data ?? []}
+            isLoading={!isReady || isLoading}
+            startIdx={(searchParams.page - 1) * searchParams.nrows + 1}
             onOrderingChange={onOrderingChange}
+            onDeleteSuccess={refetch}
           />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}
