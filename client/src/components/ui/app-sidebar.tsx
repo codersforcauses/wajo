@@ -2,7 +2,7 @@ import { ArrowLeft, ChevronRight, Command, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 
 import {
   Collapsible,
