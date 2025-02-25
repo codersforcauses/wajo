@@ -54,16 +54,29 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
   const { logout } = useAuth();
   const router = useRouter();
 
-  const [openSection, setOpenSection] = useState<string | null>(null);
-
   // Memoize role-based navigation data to avoid recalculating on every render.
   const roleNavData = useMemo(() => {
     if (!Role) return [];
     return updateSidebarMenu(navData[Role], router.pathname);
   }, [Role, router.pathname]);
 
-  const handleMenuToggle = (sectionTitle: string | null) => {
-    setOpenSection((prev) => (prev === sectionTitle ? null : sectionTitle));
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(
+    () => {
+      return roleNavData.reduce(
+        (acc, section) => {
+          acc[section.title] = section.isActive || false;
+          return acc;
+        },
+        {} as Record<string, boolean>,
+      );
+    },
+  );
+
+  const handleMenuToggle = (sectionTitle: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [sectionTitle]: !prev[sectionTitle],
+    }));
   };
 
   const handleLogout = () => {
@@ -77,7 +90,7 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
   return (
     <Sidebar {...props}>
       <div className="flex h-full flex-col justify-between">
-        <ScrollArea>
+        <ScrollArea className="pe-1">
           <SidebarContent className="no-scrollbar gap-0 overflow-y-scroll">
             <div className="flex items-center justify-center pt-2">
               <Link href="/dashboard">
@@ -98,10 +111,8 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
                     asChild
                     key={section.title}
                     title={section.title}
-                    open={openSection === section.title || section.isActive}
-                    onOpenChange={(isOpen) =>
-                      handleMenuToggle(isOpen ? section.title : null)
-                    }
+                    open={openSections[section.title]}
+                    onOpenChange={() => handleMenuToggle(section.title)}
                     className="group/collapsible"
                   >
                     <SidebarMenuItem>
@@ -113,6 +124,7 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
                           className={cn(
                             "data-[active=true]:bg-black data-[active=true]:text-white",
                             "data-[active=true]:hover:bg-black data-[active=true]:hover:text-white",
+                            "data-[state=open]:bg-black data-[state=open]:text-white",
                             "data-[state=open]:hover:bg-black data-[state=open]:hover:text-white",
                           )}
                         >
@@ -122,14 +134,13 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
-                        <SidebarMenuSub>
+                        <SidebarMenuSub className="border-l-2">
                           {section.items.map((item) => (
                             <SidebarMenuSubItem key={item.title}>
                               <SidebarMenuSubButton
                                 asChild
                                 isActive={item.isActive}
                                 className="hover:bg-yellow data-[active=true]:bg-yellow"
-                                onClick={() => handleMenuToggle(section.title)}
                               >
                                 <Link
                                   href={item.url}
@@ -142,16 +153,13 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
                                 </Link>
                               </SidebarMenuSubButton>
                               {item.items && item.items.length > 0 && (
-                                <SidebarMenuSub>
+                                <SidebarMenuSub className="border-l-2">
                                   {item.items.map((subitem) => (
                                     <SidebarMenuSubItem key={subitem.title}>
                                       <SidebarMenuSubButton
                                         asChild
                                         isActive={subitem.isActive}
                                         className="hover:bg-yellow data-[active=true]:bg-yellow"
-                                        onClick={() =>
-                                          handleMenuToggle(section.title)
-                                        }
                                       >
                                         <Link
                                           href={subitem.url}
