@@ -94,7 +94,7 @@ export function DataGrid({
               <TableHead className={commonTableHeadClasses}>
                 Last Name
               </TableHead>
-              {role === Role.ADMIN && (
+              {role !== Role.ADMIN && (
                 <TableHead className={commonTableHeadClasses}>School</TableHead>
               )}
               <TableHead
@@ -119,11 +119,13 @@ export function DataGrid({
                   <TableCell className="w-1/4">
                     {!item.id
                       ? ""
-                      : item.username
-                        ? item.username
-                        : item.student_id
-                          ? item.student_id
-                          : "-"}
+                      : item.student_id
+                        ? item.student_id
+                        : item.username
+                          ? item.username
+                          : item.last_name && item.first_name
+                            ? `${item.last_name}${item.first_name}`
+                            : "-"}
                   </TableCell>
                   <TableCell className="w-1/4">
                     {!item.id ? "" : item.first_name ? item.first_name : "-"}
@@ -131,21 +133,23 @@ export function DataGrid({
                   <TableCell className="w-1/4">
                     {!item.id ? "" : item.last_name ? item.last_name : "-"}
                   </TableCell>
-                  {role === Role.ADMIN && item.id && (
+                  {role !== Role.ADMIN && item.id && (
                     <TableCell className="w-1/4">
                       {item.school?.name ? item.school.name : "-"}
                     </TableCell>
                   )}
                   <TableCell className="flex py-4">
                     <div className={cn("flex", { invisible: !item.id })}>
-                      <Button asChild className="me-2">
-                        <Link
-                          href={`${router.pathname}/${item.id}?entity=${entityName}`}
-                        >
-                          View
-                        </Link>
-                      </Button>
-                      {item.id.toString() === userId && (
+                      {(entityName !== "staffs" ||
+                        (entityName === "staffs" &&
+                          item.id.toString() === userId?.toString())) && (
+                        <Button asChild className="me-2">
+                          <Link href={`${router.pathname}/${item.id}`}>
+                            View
+                          </Link>
+                        </Button>
+                      )}
+                      {entityName !== "staffs" && (
                         <DeleteModal
                           baseUrl={`/users/${entityName}`}
                           entity={entityName.replace(/s$/, "")}

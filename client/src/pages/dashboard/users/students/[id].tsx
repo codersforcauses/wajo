@@ -37,30 +37,29 @@ type UpdateStudent = z.infer<typeof updateStudentSchema>;
 function Edit() {
   const router = useRouter();
   const studentId = parseInt(router.query.id as string);
-  const entity = router.query.entity as string;
 
   const { data, isLoading, isError, error } = useFetchData<Student>({
-    queryKey: [`users.${entity}.${studentId}`],
-    endpoint: `/users/${entity}/${studentId}/`,
+    queryKey: [`users.students.${studentId}`],
+    endpoint: `/users/students/${studentId}/`,
     enabled: !isNaN(studentId),
   });
 
   if (isLoading || !data) return <WaitingLoader />;
   else if (isError) return <div>Error: {error?.message}</div>;
-  else return <EditUserForm user={data} entity={entity} />;
+  else return <EditUserForm user={data} />;
 }
 
-function EditUserForm({ user, entity }: { user: Student; entity: string }) {
+function EditUserForm({ user }: { user: Student }) {
   const router = useRouter();
 
   const mutationKey = ["student.update", `${user.id}`];
   const { mutate: updateStudent, isPending } = usePatchMutation({
     mutationKey: mutationKey,
-    queryKeys: [mutationKey, [`users.${entity}`]],
-    endpoint: `/users/${entity}/${user.id}/`,
+    queryKeys: [mutationKey, [`users.students`]],
+    endpoint: `/users/students/${user.id}/`,
     onSuccess: () => {
       router.reload();
-      toast.success(`${entity} has been updated.`);
+      toast.success(`Student has been updated.`);
     },
   });
 

@@ -38,7 +38,7 @@ export function ProtectedPage({ children, requiredRoles }: ProtectedPageProps) {
   }, [isLoggedIn, userRole, requiredRoles]);
 
   if (isInitializing) return <WaitingLoader />;
-  console.log(userRole);
+
   switch (authState) {
     case "unauthorized":
       return (

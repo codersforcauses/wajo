@@ -66,7 +66,7 @@ function Teachers() {
         <SearchInput
           label=""
           value={searchParams.search ?? ""}
-          placeholder="Search User"
+          placeholder="Search Teacher"
           onSearch={(newSearch: string) => {
             setAndPush({ search: newSearch, page: 1 });
           }}
