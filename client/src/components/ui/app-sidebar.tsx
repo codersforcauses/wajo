@@ -2,7 +2,7 @@ import { ArrowLeft, ChevronRight, Command, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 import {
   Collapsible,
@@ -60,6 +60,25 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
     return updateSidebarMenu(navData[Role], router.pathname);
   }, [Role, router.pathname]);
 
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(
+    () => {
+      return roleNavData.reduce(
+        (acc, section) => {
+          acc[section.title] = section.isActive || false;
+          return acc;
+        },
+        {} as Record<string, boolean>,
+      );
+    },
+  );
+
+  const handleMenuToggle = (sectionTitle: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [sectionTitle]: !prev[sectionTitle],
+    }));
+  };
+
   const handleLogout = () => {
     router.push("/").then(() => logout());
   };
@@ -90,8 +109,11 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
                 <SidebarMenu>
                   <Collapsible
                     asChild
+                    key={section.title}
+                    title={section.title}
+                    open={openSections[section.title]}
+                    onOpenChange={() => handleMenuToggle(section.title)}
                     className="group/collapsible"
-                    open={section.isActive || undefined}
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
