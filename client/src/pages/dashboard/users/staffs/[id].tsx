@@ -86,7 +86,7 @@ function EditUserForm({ user }: { user: User }) {
   return (
     <Form {...updateForm}>
       <form className="px-4" onSubmit={updateForm.handleSubmit(onSubmit)}>
-        <h1 className="my-4 text-center text-xl font-bold">Update Student</h1>
+        <h1 className="my-4 text-center text-xl font-bold">Update Staff</h1>
 
         <div className="mx-auto max-w-3xl space-y-6 rounded-lg bg-gray-50 p-4 shadow-lg">
           {/* First Name */}
