@@ -159,9 +159,18 @@ export const createTeacherSchema = createUserSchema.extend({
   phone: z.string().optional(),
 });
 
-export const updateStudentSchema = z.object({
+export const updateStaffSchema = z.object({
   first_name: z.string().min(1, "Required"),
   last_name: z.string().min(1, "Required"),
+  email: z.string().email("Invalid email address").optional(),
+});
+
+export const updateTeacherSchema = updateStaffSchema.extend({
+  school_id: z.number({ invalid_type_error: "Required" }),
+  phone: z.string().min(1, "Required"),
+});
+
+export const updateStudentSchema = updateStaffSchema.extend({
   year_level: z
     .number({ invalid_type_error: "Year Level must be a number" })
     .min(0, "Year must be at least 0")
@@ -176,6 +185,7 @@ export const updateStudentSchema = z.object({
     .default(new Date().getFullYear()),
   extension_time: z.number({ invalid_type_error: "Required" }).default(0),
 });
+
 /**
  * A Zod schema for validating the creation of a school.
  *
