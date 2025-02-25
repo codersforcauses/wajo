@@ -116,7 +116,7 @@ export default function PreviewModal({
               <p>
                 Answer: <span className="font-bold">{answer}</span>
               </p>
-              <p>{solution}</p>
+              <Latex>{solution}</Latex>
             </div>
 
             <div className="mt-auto flex justify-center pb-4">
