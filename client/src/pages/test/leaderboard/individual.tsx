@@ -27,7 +27,7 @@ export default function Index() {
 
   if (isRankingLoading) return <WaitingLoader />;
   if (isRankingError) return <div>Error: {rankingError?.message}</div>;
-
+// TODO: add filter to this page
   return (
     <div className="m-4 space-y-4">
       <IndividualDataGrid
