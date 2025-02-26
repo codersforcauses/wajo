@@ -153,7 +153,16 @@ export const createStudentSchema = createUserSchema.extend({
   extension_time: z.number().int().optional(),
 });
 
+// need to exclude the year level of a teacher
 export const createTeacherSchema = createUserSchema.extend({
+  school_id: z.number().int(),
+  email: z.string().email("Invalid email address").optional(),
+  phone: z.string().optional(),
+  year_level: z.undefined(),
+  attendent_year: z.undefined(),
+});
+
+export const createTeacherSchema3 = createUserSchema.extend({
   school_id: z.number().int(),
   email: z.string().email("Invalid email address").optional(),
   phone: z.string().optional(),

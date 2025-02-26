@@ -137,13 +137,13 @@ class TeacherAPITestCase(APITestCase):
         self.user = User.objects.create_superuser(
             username="admin", password="Password123")
         self.school = School.objects.create(name="Test School")
-        self.teacher_data = {
+        self.teacher_data = [{
             "first_name": "Abc",
             "last_name": "De",
             'password': 'password2', 'email': 'newteacher@example.com',
             'school_id': self.school.id,
             'phone': '1234567890'
-        }
+        }]
         # Generate JWT token
         refresh = RefreshToken.for_user(self.user)
         self.access_token = str(refresh.access_token)
