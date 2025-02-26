@@ -1,12 +1,15 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Pagination } from "@/components/ui/pagination";
+import { SearchInput } from "@/components/ui/search";
 import {
   Table,
   TableBody,
@@ -20,10 +23,6 @@ import api from "@/lib/api";
 import { useTokenStore } from "@/store/token-store";
 import { Team, TeamDatagridProps } from "@/types/team";
 import { School, Student } from "@/types/user";
-
-import { Button } from "../button";
-import { Pagination } from "../pagination";
-import { SearchInput } from "../search";
 
 export function TeamDatagrid({
   datacontext,

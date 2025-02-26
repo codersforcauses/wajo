@@ -1,6 +1,18 @@
 import Link from "next/link";
 
-export default function Create() {
+import { ProtectedPage } from "@/components/layout";
+import { Role } from "@/types/user";
+
+export default function PageConfig() {
+  const roles = [Role.ADMIN];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Create />
+    </ProtectedPage>
+  );
+}
+
+function Create() {
   const links = [
     { href: "users/students", label: "students" },
     { href: "users/teachers", label: "teachers" },

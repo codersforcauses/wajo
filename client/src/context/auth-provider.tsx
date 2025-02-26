@@ -1,12 +1,13 @@
 import Cookies from "js-cookie";
 import { createContext, useContext, useEffect } from "react";
+import { toast } from "sonner";
 
 import { usePostMutation } from "@/hooks/use-post-data";
 import { useTokenStore } from "@/store/token-store";
 import { Role } from "@/types/user";
 
 type AuthContextType = {
-  userId: string | null;
+  userId: string | number | null;
   userRole: Role;
   isLoggedIn: boolean;
   login: (
@@ -120,6 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const logout = async () => {
     clearTokens();
+    toast.success("Successfully logout");
   };
 
   const context = { userId, userRole, isLoggedIn, login, logout };

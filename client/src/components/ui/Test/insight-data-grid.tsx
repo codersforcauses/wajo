@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { WaitingLoader } from "@/components/ui/loading";
 import {
   Table,
   TableBody,
@@ -42,10 +43,12 @@ import { Insight } from "@/types/leaderboard";
  *     />
  *   );
  */
-
-export function InsightDataGrid({ datacontext }: DatagridProps<Insight>) {
-  const commonTableHeadClasses = "w-1/10 text-white text-nowrap text-center ";
-
+export function InsightDataGrid({
+  datacontext,
+  isLoading,
+  onOrderingChange = () => {},
+}: DatagridProps<Insight>) {
+  const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
     <div className="grid">
       <div className="overflow-hidden rounded-lg border">
@@ -83,7 +86,7 @@ export function InsightDataGrid({ datacontext }: DatagridProps<Insight>) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {datacontext.length > 0 ? (
+            {!isLoading && datacontext.length > 0 ? (
               datacontext.map((item, index) => (
                 <TableRow
                   key={index}
@@ -109,7 +112,11 @@ export function InsightDataGrid({ datacontext }: DatagridProps<Insight>) {
                   colSpan={2}
                   className="py-4 text-center text-gray-500"
                 >
-                  No Results Found
+                  {isLoading ? (
+                    <WaitingLoader className="p-0" />
+                  ) : (
+                    "No Results Found"
+                  )}
                 </TableCell>
               </TableRow>
             )}

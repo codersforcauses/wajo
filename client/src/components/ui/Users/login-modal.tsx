@@ -19,7 +19,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -27,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/auth-provider";
-import { loginSchema } from "@/types/user";
+import { loginSchema, Role } from "@/types/user";
 
 interface LoginFormProps {
   children: ReactNode;
@@ -56,7 +55,7 @@ interface UserLogin {
  * @param {React.ReactNode} children - The child components to trigger the login modal.
  */
 export function LoginModal({ children }: LoginFormProps) {
-  const { replace } = useRouter();
+  const { query, push } = useRouter();
 
   const [passwordVisibility, setPasswordVisibility] = useState(false);
 
@@ -75,8 +74,13 @@ export function LoginModal({ children }: LoginFormProps) {
     if (success) {
       toast.success("You are now logged in.");
       const userRole = Cookies.get("user_role");
-      const pathName = userRole ? "/dashboard" : "/";
-      replace(pathName);
+      const pathName =
+        userRole === Role.STUDENT
+          ? "/quiz"
+          : query.next
+            ? query.next.toString()
+            : "/dashboard";
+      push(pathName);
     } else {
       toast.error(error || "Something went wrong.");
     }

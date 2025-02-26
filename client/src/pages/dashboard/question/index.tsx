@@ -2,12 +2,13 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
+import { ProtectedPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
+  toQueryString,
 } from "@/components/ui/pagination";
 import { Datagrid } from "@/components/ui/Question/data-grid";
 import { SearchInput } from "@/components/ui/search";
@@ -18,8 +19,18 @@ import {
   stringToOrdering,
 } from "@/types/data-grid";
 import { Question } from "@/types/question";
+import { Role } from "@/types/user";
 
-export default function Index() {
+export default function PageConfig() {
+  const roles = [Role.ADMIN];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Index />
+    </ProtectedPage>
+  );
+}
+
+function Index() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -32,11 +43,12 @@ export default function Index() {
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<Question>({
-    queryKey: ["questions.question-bank"],
-    endpoint: "/questions/question-bank/",
-    searchParams: searchParams,
-  });
+  const { data, isLoading, error, totalPages, refetch } =
+    useFetchDataTable<Question>({
+      queryKey: ["questions.question-bank"],
+      endpoint: "/questions/question-bank/",
+      searchParams: searchParams,
+    });
 
   useEffect(() => {
     if (!isLoading) {
@@ -53,16 +65,7 @@ export default function Index() {
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push(
-      {
-        pathname: "/question",
-        query: Object.fromEntries(
-          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
-        ),
-      },
-      undefined,
-      { shallow: true },
-    );
+    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
   };
 
   const onOrderingChange = (field: keyof OrderingItem) => {
@@ -78,7 +81,6 @@ export default function Index() {
   };
 
   if (error) return <div>Error: {error.message}</div>;
-  if (!isReady || isLoading) return <WaitingLoader />;
 
   // Renders the main content, including the search bar and data grid.
   return (
@@ -103,7 +105,10 @@ export default function Index() {
         <div>
           <Datagrid
             datacontext={data ?? []}
+            isLoading={!isReady || isLoading}
+            startIdx={(searchParams.page - 1) * searchParams.nrows + 1}
             onOrderingChange={onOrderingChange}
+            onDeleteSuccess={refetch}
           />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}

@@ -2,19 +2,30 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
+import { ProtectedPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
+  toQueryString,
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
 import { DataGrid } from "@/components/ui/Users/data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import type { Teacher } from "@/types/user";
+import { Role } from "@/types/user";
 
-export default function Teachers() {
+export default function PageConfig() {
+  const roles = [Role.ADMIN];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Teachers />
+    </ProtectedPage>
+  );
+}
+
+function Teachers() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -24,11 +35,12 @@ export default function Teachers() {
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<Teacher>({
-    queryKey: ["teachers"],
-    endpoint: "/users/teachers/",
-    searchParams: searchParams,
-  });
+  const { data, isLoading, error, totalPages, refetch } =
+    useFetchDataTable<Teacher>({
+      queryKey: ["teachers"],
+      endpoint: "/users/teachers/",
+      searchParams: searchParams,
+    });
 
   useEffect(() => {
     if (!isLoading) {
@@ -43,20 +55,10 @@ export default function Teachers() {
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push(
-      {
-        pathname: "/dashboard/users/teachers",
-        query: Object.fromEntries(
-          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
-        ),
-      },
-      undefined,
-      { shallow: true },
-    );
+    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
   };
 
   if (error) return <div>Error: {error.message}</div>;
-  if (!isReady || isLoading) return <WaitingLoader />;
 
   return (
     <div className="m-4 space-y-4">
@@ -64,7 +66,7 @@ export default function Teachers() {
         <SearchInput
           label=""
           value={searchParams.search ?? ""}
-          placeholder="Search User"
+          placeholder="Search Teacher"
           onSearch={(newSearch: string) => {
             setAndPush({ search: newSearch, page: 1 });
           }}
@@ -76,7 +78,12 @@ export default function Teachers() {
 
       <Suspense>
         <div>
-          <DataGrid datacontext={data ?? []} />
+          <DataGrid
+            datacontext={data ?? []}
+            isLoading={!isReady || isLoading}
+            startIdx={(searchParams.page - 1) * searchParams.nrows + 1}
+            onDeleteSuccess={refetch}
+          />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}
             <div className="flex items-center space-x-2">

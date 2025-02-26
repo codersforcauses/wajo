@@ -1,13 +1,18 @@
 import { useRouter } from "next/router";
-import { ReactElement } from "react";
 
-import Layout from "@/components/layout";
+import { PublicPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import Sponsor from "@/components/ui/sponsor";
 
-import { NextPageWithLayout } from "./_app";
+export default function PageConfig() {
+  return (
+    <PublicPage>
+      <HomePage />
+    </PublicPage>
+  );
+}
 
-const HomePage: NextPageWithLayout = () => {
+function HomePage() {
   const router = useRouter();
 
   return (
@@ -83,8 +88,9 @@ const HomePage: NextPageWithLayout = () => {
             </ul>
             <p className="body-2-bold inline-block">You need:</p> Pens, pencils,
             and if you wish, ruler and compass. Special
-            <p className="body-2-bold inline-block">conditions:</p> No
-            calculators. Brains only.
+            <p className="body-2-bold inline-block">
+              conditions:
+            </p> No calculators. Brains only.
           </div>
           <div>
             {" "}
@@ -105,8 +111,7 @@ const HomePage: NextPageWithLayout = () => {
                 {" "}
                 Venue:{" "}
                 <p className="body-2-bold inline-block">
-                  Social Sciences Lecture Theatre, near Hackett Entrance No.
-                  1{" "}
+                  Social Sciences Lecture Theatre, near Hackett Entrance No. 1{" "}
                 </p>
                 (see campus map - in SEARCH enter: Social Sciences Lecture T One
                 selection will come up. Click on it, and a balloon will
@@ -154,10 +159,4 @@ const HomePage: NextPageWithLayout = () => {
       </div>
     </main>
   );
-};
-
-HomePage.getLayout = (page: ReactElement) => {
-  return <Layout isPublic={true}>{page}</Layout>;
-};
-
-export default HomePage;
+}

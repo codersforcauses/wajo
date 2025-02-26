@@ -1,16 +1,6 @@
 import { z } from "zod";
 
 /**
- * Defines the possible user roles.
- *
- * @example
- * const role: Role = "student";
- */
-export const RoleEnum = z.enum(["admin", "teacher", "student"], {
-  errorMap: () => ({ message: "Invalid User Role" }),
-});
-
-/**
  * Type representing a user role. Can be one of the following:
  * - "admin"
  * - "teacher"
@@ -18,7 +8,22 @@ export const RoleEnum = z.enum(["admin", "teacher", "student"], {
  *
  * @type {Role}
  */
-export type Role = z.infer<typeof RoleEnum>;
+// export type Role = z.infer<typeof RoleEnum>;
+export enum Role {
+  ADMIN = "admin",
+  STUDENT = "student",
+  TEACHER = "teacher",
+}
+
+/**
+ * Defines the possible user roles.
+ *
+ * @example
+ * const role: Role = "student";
+ */
+export const RoleEnum = z.enum([Role.ADMIN, Role.TEACHER, Role.STUDENT], {
+  errorMap: () => ({ message: "Invalid User Role" }),
+});
 
 /**
  * Defines the possible schools.
@@ -148,15 +153,33 @@ export const createStudentSchema = createUserSchema.extend({
   extension_time: z.number().int().optional(),
 });
 
+// need to exclude the year level of a teacher
 export const createTeacherSchema = createUserSchema.extend({
+  school_id: z.number().int(),
+  email: z.string().email("Invalid email address").optional(),
+  phone: z.string().optional(),
+  year_level: z.undefined(),
+  attendent_year: z.undefined(),
+});
+
+export const createTeacherSchema3 = createUserSchema.extend({
   school_id: z.number().int(),
   email: z.string().email("Invalid email address").optional(),
   phone: z.string().optional(),
 });
 
-export const updateStudentSchema = z.object({
+export const updateStaffSchema = z.object({
   first_name: z.string().min(1, "Required"),
   last_name: z.string().min(1, "Required"),
+  email: z.string().email("Invalid email address").optional(),
+});
+
+export const updateTeacherSchema = updateStaffSchema.extend({
+  school_id: z.number({ invalid_type_error: "Required" }),
+  phone: z.string().min(1, "Required"),
+});
+
+export const updateStudentSchema = updateStaffSchema.extend({
   year_level: z
     .number({ invalid_type_error: "Year Level must be a number" })
     .min(0, "Year must be at least 0")
@@ -171,6 +194,7 @@ export const updateStudentSchema = z.object({
     .default(new Date().getFullYear()),
   extension_time: z.number({ invalid_type_error: "Required" }).default(0),
 });
+
 /**
  * A Zod schema for validating the creation of a school.
  *

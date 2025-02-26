@@ -1,9 +1,21 @@
 import Cookies from "js-cookie";
 
-export default function Dashboard() {
+import { ProtectedPage } from "@/components/layout";
+import { Role } from "@/types/user";
+
+export default function PageConfig() {
+  const roles = [Role.ADMIN, Role.TEACHER, Role.STUDENT];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Dashboard />
+    </ProtectedPage>
+  );
+}
+
+function Dashboard() {
   const userRole = Cookies.get("user_role");
   return (
-    <div className="flex h-[90vh] items-center justify-center">
+    <div className="container flex h-[90vh] items-center justify-center text-balance">
       <h1>
         Welcome to{" "}
         {userRole && `${userRole.charAt(0).toUpperCase()}${userRole.slice(1)}`}{" "}

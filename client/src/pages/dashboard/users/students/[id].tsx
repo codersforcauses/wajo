@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ProtectedPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,37 +21,45 @@ import { WaitingLoader } from "@/components/ui/loading";
 import { SelectSchool } from "@/components/ui/Users/select-school";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePatchMutation } from "@/hooks/use-put-data";
-import { Student, updateStudentSchema } from "@/types/user";
+import { Role, Student, updateStudentSchema } from "@/types/user";
+
+export default function PageConfig() {
+  const roles = [Role.ADMIN, Role.TEACHER];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Edit />
+    </ProtectedPage>
+  );
+}
 
 type UpdateStudent = z.infer<typeof updateStudentSchema>;
 
-export default function Edit() {
+function Edit() {
   const router = useRouter();
   const studentId = parseInt(router.query.id as string);
-  const entity = router.query.entity as string;
 
   const { data, isLoading, isError, error } = useFetchData<Student>({
-    queryKey: [`users.${entity}.${studentId}`],
-    endpoint: `/users/${entity}/${studentId}/`,
+    queryKey: [`users.students.${studentId}`],
+    endpoint: `/users/students/${studentId}/`,
     enabled: !isNaN(studentId),
   });
 
   if (isLoading || !data) return <WaitingLoader />;
   else if (isError) return <div>Error: {error?.message}</div>;
-  else return <EditUserForm user={data} entity={entity} />;
+  else return <EditUserForm user={data} />;
 }
 
-function EditUserForm({ user, entity }: { user: Student; entity: string }) {
+function EditUserForm({ user }: { user: Student }) {
   const router = useRouter();
 
   const mutationKey = ["student.update", `${user.id}`];
   const { mutate: updateStudent, isPending } = usePatchMutation({
     mutationKey: mutationKey,
-    queryKeys: [mutationKey, [`users.${entity}`]],
-    endpoint: `/users/${entity}/${user.id}/`,
+    queryKeys: [mutationKey, [`users.students`]],
+    endpoint: `/users/students/${user.id}/`,
     onSuccess: () => {
       router.reload();
-      toast.success(`${entity} has been updated.`);
+      toast.success(`Student has been updated.`);
     },
   });
 

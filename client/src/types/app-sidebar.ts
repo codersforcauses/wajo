@@ -108,7 +108,6 @@ const findBestMatchAtLevel = (
 
   // Find the longest matching URL at this level
   const match = sortedItems.find((item) => currentPath.startsWith(item.url));
-  console.log(match?.url || null);
   return match?.url || null;
 };
 
