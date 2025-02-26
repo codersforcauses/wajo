@@ -56,3 +56,16 @@ export interface Insight {
   difficulty: string;
   correct_rate: number;
 }
+
+export interface Insight {
+  category: string;
+  total: number;
+  public_count: number;
+  catholic_count: number;
+  independent_count: number;
+  allies_count: number;
+  country: number;
+  year_7: number;
+  year_8: number;
+  year_9: number;
+}

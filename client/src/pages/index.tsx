@@ -26,8 +26,6 @@ function HomePage() {
       >
         <h1>WAJO Olympiads will be back next year!</h1>
         <Button variant="inactive" onClick={() => router.push("/quiz")}>
-          {" "}
-          {/* the url needs to be changed */}
           <p className="body-1 px-10">Start Quiz</p>
         </Button>
       </div>
@@ -46,24 +44,23 @@ function HomePage() {
         <div className="body-2 flex flex-col gap-4">
           <div className="body-2-bold px-4">
             WAJO is over for 2024, but we'll be back again in 2025, with similar
-            dates to below!{" "}
+            dates to below!
           </div>
           <div>
             <p className="body-2-bold inline-block">2024 format:</p> combination
-            of online and paper-based formats.{" "}
+            of online and paper-based formats.
             <p className="body-2-bold">Confirmed Dates:</p>
             <ul className="list-inside list-disc">
-              {" "}
               <li>
-                Individual paper:{" "}
-                <p className="body-2-bold inline-block">
+                Individual paper:
+                <p className="body-2-bold ms-1 inline-block">
                   Tuesday, 15 October, 2024 for 100 minutes starting between
                   2:30pm and 4pm, online at your school
                 </p>
-              </li>{" "}
+              </li>
               <li>
-                Team paper:{" "}
-                <p className="body-2-bold inline-block">
+                Team paper:
+                <p className="body-2-bold ms-1 inline-block">
                   Saturday, 19 October, 2024 for 50 minutes. Registration at
                   9:00am. Prize Ceremony finishes 12:30pm.
                 </p>
@@ -73,14 +70,12 @@ function HomePage() {
           <div>
             <p className="body-2-bold">At two venues:</p>
             <ul className="list-inside list-disc">
-              {" "}
               <li>
                 <p className="body-2-bold inline-block">Perth:</p> UWA, in Arts
                 Building centred around Alexander Lecture Theatre (Search for:
                 Alex).
               </li>
               <li>
-                {" "}
                 <p className="body-2-bold inline-block">Bunbury:</p> Building 6,
                 Edith Cowan University – Bunbury Campus (Grid Reference: E4),
                 585 Robertson Drive, Bunbury WA 6230.
@@ -93,25 +88,24 @@ function HomePage() {
             </p> No calculators. Brains only.
           </div>
           <div>
-            {" "}
             <p className="body-2-bold">Prize Ceremony (Perth):</p>
             <ul className="list-inside list-disc">
               <li>
-                Date:{" "}
-                <p className="body-2-bold inline-block">
+                Date:
+                <p className="body-2-bold ms-1 inline-block">
                   Saturday, 19 October 2024
                 </p>
               </li>
               <li>
-                {" "}
-                Time:{" "}
-                <p className="body-2-bold inline-block">11:30am – 12:30pm</p>
+                Time:
+                <p className="body-2-bold ms-1 inline-block">
+                  11:30am – 12:30pm
+                </p>
               </li>
               <li>
-                {" "}
-                Venue:{" "}
-                <p className="body-2-bold inline-block">
-                  Social Sciences Lecture Theatre, near Hackett Entrance No. 1{" "}
+                Venue:
+                <p className="body-2-bold mx-1 inline-block">
+                  Social Sciences Lecture Theatre, near Hackett Entrance No. 1
                 </p>
                 (see campus map - in SEARCH enter: Social Sciences Lecture T One
                 selection will come up. Click on it, and a balloon will
