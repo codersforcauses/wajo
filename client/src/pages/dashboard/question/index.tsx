@@ -97,7 +97,7 @@ function Index() {
         />
         {/* Button to navigate to the create quiz page */}
         <Button asChild className="mr-6">
-          <Link href={`${router.pathname}/create`}>Create a Quiz</Link>
+          <Link href={`${router.pathname}/create`}>Create a Question</Link>
         </Button>
       </div>
 
