@@ -1,5 +1,6 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import BigIntegerField
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
 from django.db.models import Sum, Max
 from django.db.models.functions import Cast
@@ -49,9 +50,16 @@ class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
         - get(request): Handles GET requests. Returns sample data for the leaderboard.
     """
 
-    queryset = QuizAttempt.objects.all()
+    queryset = QuizAttempt.objects.select_related("quiz", "student__school")
     serializer_class = IndividualLeaderboardSerializer
     filterset_class = IndividualLeaderboardFilter
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = [
+        "student__year_level",
+        "total_marks",
+        "student__school__type",
+    ]
+    ordering = ["-student__year_level"]
 
 
 class TeamLeaderboardFilter(FilterSet):
@@ -86,6 +94,14 @@ class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Team.objects.annotate(
         total_marks=Sum('quiz_attempts__total_marks'),
         max_year=Max(Cast('students__year_level', output_field=BigIntegerField()))
-    ).order_by('id')
+    )
     serializer_class = TeamLeaderboardSerializer
     filterset_class = TeamLeaderboardFilter
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = [
+        "total_marks",
+        "max_year",
+        "id",
+        "school__name"
+    ]
+    ordering = ["-total_marks"]

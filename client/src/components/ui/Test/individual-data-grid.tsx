@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { SortIcon } from "@/components/ui/icon";
-import { Pagination } from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -11,71 +10,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { DatagridProps, sortData } from "@/types/data-grid";
-import { IndividualLeaderboard, Ranking } from "@/types/leaderboard";
+import { DatagridProps } from "@/types/data-grid";
+import { IndividualLeaderboard } from "@/types/leaderboard";
 
-/**
- * Renders a paginated data grid for displaying ranking data.
- *
- * The `RankingDataGrid` component displays a table with columns for student name, team, school, marks,
- * and response time. The data is paginated, and pagination controls are provided to navigate through
- * the data.
- *
- * @function RankingDataGrid
- * @template T - The type of data being displayed in the grid, in this case, `Ranking`.
- * @param {Object} props - The props object.
- * @param {Ranking[]} props.datacontext - The array of ranking data to be displayed in the grid.
- * @param {function(Ranking[]): void} props.onDataChange - Callback triggered when the data changes.
- * @param {number} props.changePage - The page number to navigate to when the data changes.
- *
- * @example
- * <RankingDataGrid
- *   datacontext={rankingData}
- *   onDataChange={handleRankingDataChange}
- *   changePage={currentPage}
- * />
- */
 export function IndividualDataGrid({
   datacontext,
-  onOrderingChange
+  onOrderingChange = () => {},
 }: DatagridProps<IndividualLeaderboard>) {
-  const [isAscending, setIsAscending] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paddedData, setPaddedData] = useState<IndividualLeaderboard[]>([]);
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(datacontext.length / itemsPerPage);
-
-  const sortByColumn = (column: keyof IndividualLeaderboard) => {
-    const sortedData = sortData(datacontext, column, isAscending);
-    setCurrentPage(1);
-    onOrderingChange(sortedData);
-    setIsAscending(!isAscending);
-  };
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  useEffect(() => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = datacontext.slice(indexOfFirstItem, indexOfLastItem);
-
-    const updatedPaddedData = [...currentData];
-    while (updatedPaddedData.length < itemsPerPage) {
-      updatedPaddedData.push({} as IndividualLeaderboard);
-    }
-
-    setPaddedData(updatedPaddedData);
-  }, [datacontext, currentPage]);
-
-  useEffect(() => {
-    setCurrentPage(changePage);
-  }, [datacontext]);
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
+
   return (
     <div>
       <Table className="w-full border-collapse text-left shadow-md">
@@ -87,59 +31,60 @@ export function IndividualDataGrid({
             <TableHead className={cn(commonTableHeadClasses)}>
               <div className="flex items-center text-white">
                 <span>Year Level</span>
-                <span className="ml-2 cursor-pointer"
-                onClick={() => sortByColumn("year_level")}>
+                <span
+                  className="ml-2 cursor-pointer"
+                  onClick={() => onOrderingChange("student__year_level")}
+                >
                   <SortIcon />
                 </span>
-                </div>
+              </div>
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>School</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>
-              School Type
-            </TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>
-              Is Country?
-            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>School Type</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>Is Country?</TableHead>
             <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
               <div className="flex items-center text-white">
                 <span>Total Marks</span>
-                <span className="ml-2 cursor-pointer"
-                onClick={() => sortByColumn("total_marks")}>
+                <span
+                  className="ml-2 cursor-pointer"
+                  onClick={() => onOrderingChange("total_marks")}
+                >
                   <SortIcon />
                 </span>
-                </div>
+              </div>
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {paddedData.map((item, index) => (
-            <TableRow
-              key={index}
-              className={"divide-gray-200 border-gray-50 text-sm text-black"}
-            >
-              <TableCell className="w-1/4">{item.name}</TableCell>
-              <TableCell className="text-center">{item.year_level}</TableCell>
-              <TableCell className="w-1/4">{item.school}</TableCell>
-              <TableCell className="w-1/4">{item.school_type}</TableCell>
-              <TableCell className="text-center">
-                {item.is_country === true
-                  ? "Yes"
-                  : item.is_country === false
+          {datacontext.length > 0 ? (
+            datacontext.map((item, index) => (
+              <TableRow
+                key={index}
+                className={"divide-gray-200 border-gray-50 text-sm text-black"}
+              >
+                <TableCell className="w-1/4">{item.name}</TableCell>
+                <TableCell className="text-center">{item.year_level}</TableCell>
+                <TableCell className="w-1/4">{item.school}</TableCell>
+                <TableCell className="w-1/4">{item.school_type}</TableCell>
+                <TableCell className="text-center">
+                  {item.is_country === true
+                    ? "Yes"
+                    : item.is_country === false
                     ? "No"
                     : ""}
+                </TableCell>
+                <TableCell className="text-center">{item.total_marks}</TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={6} className="py-4 text-center text-gray-500">
+                No Results Found
               </TableCell>
-              <TableCell className="text-center">{item.total_marks}</TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
-
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={(page: number) => handlePageChange(page)}
-        className="mr-20 mt-5 flex justify-end"
-      />
     </div>
   );
 }
