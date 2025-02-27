@@ -83,9 +83,8 @@ function HomePage() {
             </ul>
             <p className="body-2-bold inline-block">You need:</p> Pens, pencils,
             and if you wish, ruler and compass. Special
-            <p className="body-2-bold inline-block">
-              conditions:
-            </p> No calculators. Brains only.
+            <p className="body-2-bold inline-block">conditions:</p> No
+            calculators. Brains only.
           </div>
           <div>
             <p className="body-2-bold">Prize Ceremony (Perth):</p>
