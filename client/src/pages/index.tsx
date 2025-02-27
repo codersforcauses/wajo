@@ -77,7 +77,7 @@ function HomePage() {
               </li>
               <li>
                 <p className="body-2-bold inline-block">Bunbury:</p> Building 6,
-                Edith Cowan University – Bunbury Campus (Grid Reference: E4),
+                Edith Cowan University - Bunbury Campus (Grid Reference: E4),
                 585 Robertson Drive, Bunbury WA 6230.
               </li>
             </ul>
@@ -99,7 +99,7 @@ function HomePage() {
               <li>
                 Time:
                 <p className="body-2-bold ms-1 inline-block">
-                  11:30am – 12:30pm
+                  11:30am - 12:30pm
                 </p>
               </li>
               <li>
@@ -125,16 +125,16 @@ function HomePage() {
       <div className="m-4 flex flex-col items-center gap-8 text-center md:w-3/4 lg:w-1/2">
         <h1>🏅 Major Prizes 🏆</h1>
         <ul className="list-inside list-disc">
-          <li>UWA Mathematics & Statistics Prize – Best Year 9 student</li>
-          <li>MAWA "Jack Bana Award" – Best Year 9 team</li>
-          <li>Curtin Mathematics & Statistics Prize – Best Year 8 student</li>
-          <li>ECU "David McDougall Award" – Best Year 8 team</li>
+          <li>UWA Mathematics & Statistics Prize - Best Year 9 student</li>
+          <li>MAWA "Jack Bana Award" - Best Year 9 team</li>
+          <li>Curtin Mathematics & Statistics Prize - Best Year 8 student</li>
+          <li>ECU "David McDougall Award" - Best Year 8 team</li>
           <li>
-            Department of Education Gifted & Talented Awards – Top public school
+            Department of Education Gifted & Talented Awards - Top public school
             individual & team
           </li>
           <li>
-            Awards of Excellence – Sponsored by New Edition Bookshop, Data
+            Awards of Excellence - Sponsored by New Edition Bookshop, Data
             Analysis Australia, Murdoch University, Dept. of Education, and
             Optiver
           </li>
