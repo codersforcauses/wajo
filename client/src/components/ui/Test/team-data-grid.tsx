@@ -27,14 +27,21 @@ export function TeamDataGrid({
           <TableRow className="hover:bg-muted/0">
             <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
             <div className="flex items-center text-white">
-              <span>School</span>
+              <span>School Name</span>
               <span className="ml-2 cursor-pointer"
               onClick={() => onOrderingChange("school__name")}>
                 <SortIcon />
                 </span>
               </div>
               </TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Id</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              <div className="flex items-center text-white">
+              <span>Team I.D.</span>
+              <span className="ml-2 cursor-pointer"
+              onClick={() => onOrderingChange("id")}>
+                <SortIcon />
+                </span>
+              </div></TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
               <div className="flex items-center text-white">
               <span>Total Marks</span>
@@ -45,7 +52,7 @@ export function TeamDataGrid({
               </div>
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
-              Is Country?
+              Country School
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
             <div className="flex items-center text-white">
@@ -77,7 +84,7 @@ export function TeamDataGrid({
     const studentCells = Array(4)
       .fill(null)
       .map((_, i) => (
-        <TableCell key={i} className="">
+        <TableCell key={i} className="whitespace-nowrap">
           {item.students?.[i]
             ? `${item.students[i].name} (${item.students[i].year_level})`
             : ""}
@@ -89,9 +96,9 @@ export function TeamDataGrid({
         key={index}
         className="divide-gray-200 border-gray-50 text-sm text-black"
       >
-        <TableCell className="w-1/4">{item.school}</TableCell>
+        <TableCell className="w-1/4 ">{item.school}</TableCell>
         <TableCell className="w-1/4">{item.id}</TableCell>
-        <TableCell className="text-center">{item.total_marks}</TableCell>
+        <TableCell className="w-1/4">{item.total_marks}</TableCell>
         <TableCell className="w-1/4">
           {item.is_country === true
             ? "Yes"
@@ -99,14 +106,14 @@ export function TeamDataGrid({
             ? "No"
             : ""}
         </TableCell>
-        <TableCell className="text-center">{item.max_year}</TableCell>
+        <TableCell className="w-1/4">{item.max_year}</TableCell>
         {studentCells}
       </TableRow>
     );
   })
 ) : (
   <TableRow>
-    <TableCell colSpan={4} className="py-4 text-center text-gray-500">
+    <TableCell colSpan={9} className="py-4 text-center text-gray-500">
       No Results Found
     </TableCell>
   </TableRow>

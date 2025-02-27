@@ -54,10 +54,13 @@ class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IndividualLeaderboardSerializer
     filterset_class = IndividualLeaderboardFilter
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ["student__user__first_name", "student__user__last_name"]
     ordering_fields = [
         "student__year_level",
         "total_marks",
         "student__school__type",
+        "student__school__name",
+        "student__user__first_name",
     ]
     ordering = ["-student__year_level"]
 
@@ -97,7 +100,8 @@ class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     )
     serializer_class = TeamLeaderboardSerializer
     filterset_class = TeamLeaderboardFilter
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ["school__name", "id"]
     ordering_fields = [
         "total_marks",
         "max_year",

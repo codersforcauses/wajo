@@ -67,7 +67,6 @@ export default function TeamLeaderboardIndex() {
     setOrderings((prevOrderings) => {
       const newOrder = prevOrderings[field] === "asc" ? "desc" : "asc";
       const newOrderings = {
-        ...prevOrderings,
         [field]: newOrder,
       } as OrderingItem;
       setAndPush({ ordering: orderingToString(newOrderings) });
@@ -84,7 +83,7 @@ export default function TeamLeaderboardIndex() {
             <SearchInput
               label=""
               value={searchParams.search ?? ""}
-              placeholder="Search Students"
+              placeholder="Search Schools and Teams"
               onSearch={(newSearch: string) => {
                 setAndPush({ search: newSearch, page: 1 });
               }}

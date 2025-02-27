@@ -26,7 +26,16 @@ export function IndividualDataGrid({
         <TableHeader className="bg-black text-lg font-semibold">
           <TableRow className="hover:bg-muted/0">
             <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
-              Student Name
+            <div className="flex items-center text-white">
+                <span>Student Name</span>
+                <span
+                  className="ml-2 cursor-pointer"
+                  onClick={() => onOrderingChange("student__user__first_name")}
+                >
+                  <SortIcon />
+                </span>
+              </div>
+              
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
               <div className="flex items-center text-white">
@@ -39,7 +48,16 @@ export function IndividualDataGrid({
                 </span>
               </div>
             </TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>School</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+            <div className="flex items-center text-white">
+                <span>School Name</span>
+                <span
+                  className="ml-2 cursor-pointer"
+                  onClick={() => onOrderingChange("student__school__name")}
+                >
+                  <SortIcon />
+                </span>
+              </div></TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>School Type</TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>Is Country?</TableHead>
             <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
@@ -62,11 +80,11 @@ export function IndividualDataGrid({
                 key={index}
                 className={"divide-gray-200 border-gray-50 text-sm text-black"}
               >
-                <TableCell className="w-1/4">{item.name}</TableCell>
-                <TableCell className="text-center">{item.year_level}</TableCell>
+                <TableCell className="w-1/4 whitespace-nowrap">{item.name}</TableCell>
+                <TableCell className="w-1/4">{item.year_level}</TableCell>
                 <TableCell className="w-1/4">{item.school}</TableCell>
                 <TableCell className="w-1/4">{item.school_type}</TableCell>
-                <TableCell className="text-center">
+                <TableCell className="w-1/4">
                   {item.is_country === true
                     ? "Yes"
                     : item.is_country === false
