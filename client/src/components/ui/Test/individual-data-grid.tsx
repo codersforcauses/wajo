@@ -13,6 +13,21 @@ import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
 import { IndividualLeaderboard } from "@/types/leaderboard";
 
+/**
+ * Renders a paginated data grid for displaying leaderboard information for individuals.
+ *
+ * The `IndividualDataGrid` component displays a table with columns for student name, year level,
+ * school information, and total marks. Users can sort the data by clicking on each sortable column’s
+ * heading. The grid is updated whenever the `datacontext` prop changes or a column is re-sorted.
+ *
+ * @function IndividualDataGrid
+ * @template T - The type of data being displayed in the grid, in this case, `IndividualLeaderboard`.
+ * @param {Object} props - The props object.
+ * @param {IndividualLeaderboard[]} props.datacontext - The array of individual leaderboard data items to be displayed.
+ * @param {function(IndividualLeaderboard[]): void} [props.onOrderingChange] - Callback triggered when a user clicks a sortable column header. Receives the field name to sort by.
+ *
+ */
+
 export function IndividualDataGrid({
   datacontext,
   onOrderingChange = () => {},

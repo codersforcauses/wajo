@@ -51,6 +51,7 @@ export interface Student {
   id: number;
   first_name: string;
   last_name: string;
+  name: string;
   student_id: string;
   year_level: number;
   school: School;

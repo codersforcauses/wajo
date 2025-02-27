@@ -13,6 +13,22 @@ import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
 import { TeamLeaderboard } from "@/types/leaderboard";
 
+/**
+ * Renders a paginated data grid for displaying leaderboard information for teams.
+ *
+ * The `TeamDataGrid` component displays a table with columns for school name, team ID,
+ * total team marks, country school, maximum year level, and the names of each team member.
+ * Users can sort the data by clicking on each sortable column. The grid is updated whenever
+ * the `datacontext` prop changes or a column is re-sorted.
+ *
+ * @function TeamDataGrid
+ * @template T - The type of data being displayed in the grid, in this case, `TeamLeaderboard`.
+ * @param {Object} props - The props object.
+ * @param {TeamLeaderboard[]} props.datacontext - The array of team leaderboard data items to be displayed.
+ * @param {function(TeamLeaderboard[]): void} [props.onOrderingChange] - Callback triggered when a user clicks a sortable column header. Receives the field name to sort by.
+ *
+ */
+
 export function TeamDataGrid({
   datacontext,
   onOrderingChange = () => {},
