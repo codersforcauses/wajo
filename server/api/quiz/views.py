@@ -25,7 +25,7 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     Methods:
         slots: Retrieve or create slots for a specific quiz.
     """
-    queryset = Quiz.objects.all()
+    queryset = Quiz.objects.all().order_by('-created_at')
     serializer_class = AdminQuizSerializer
     status = serializers.IntegerField(default=0, required=False)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
@@ -116,7 +116,7 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
     Methods:
         slots: Retrieve slots for a specific quiz.
     """
-    queryset = Quiz.objects.filter(status=0, visible=True)
+    queryset = Quiz.objects.filter(status=0, visible=True).order_by('-created_at')
     serializer_class = QuizSerializer
 
     @action(detail=True, methods=['get'])
@@ -153,7 +153,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
     Methods:
         slots: Retrieve slots for a specific competition quiz.
     """
-    queryset = Quiz.objects.filter(status=1, visible=True)
+    queryset = Quiz.objects.filter(status=1, visible=True).order_by('-created_at')
     serializer_class = UserQuizSerializer
 
     @action(detail=True, methods=['get'])

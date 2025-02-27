@@ -110,7 +110,7 @@ export function useFetchDataTable<T>({
   const { search, ordering, nrows, page, ...customParams } = searchParams;
   const offset = (page - 1) * nrows;
 
-  const { data, isLoading, error } = useQuery<{
+  const { data, isLoading, isError, error, refetch } = useQuery<{
     results: T[];
     count: number;
   }>({
@@ -139,7 +139,14 @@ export function useFetchDataTable<T>({
   });
 
   const totalPages = data ? Math.ceil(data.count / nrows) : 1;
-  return { data: data?.results, isLoading, error, totalPages };
+  return {
+    data: data?.results,
+    isLoading,
+    isError,
+    error,
+    totalPages,
+    refetch,
+  };
 }
 
 export const useMarkCompetition = <TError = AxiosError>({ ...args }) => {

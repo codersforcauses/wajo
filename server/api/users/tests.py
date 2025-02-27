@@ -120,6 +120,16 @@ class StudentAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_create_student_plain_text(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
+        response = self.client.post(
+            '/api/users/students/', self.student_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response_content = response.content.decode()
+        self.assertIn('password', response_content)
+        self.assertIn('password2', response_content)
+
 
 class TeacherAPITestCase(APITestCase):
 
@@ -127,13 +137,13 @@ class TeacherAPITestCase(APITestCase):
         self.user = User.objects.create_superuser(
             username="admin", password="Password123")
         self.school = School.objects.create(name="Test School")
-        self.teacher_data = {
+        self.teacher_data = [{
             "first_name": "Abc",
             "last_name": "De",
             'password': 'password2', 'email': 'newteacher@example.com',
             'school_id': self.school.id,
             'phone': '1234567890'
-        }
+        }]
         # Generate JWT token
         refresh = RefreshToken.for_user(self.user)
         self.access_token = str(refresh.access_token)

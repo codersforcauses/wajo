@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import Cookies from "js-cookie";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -17,7 +19,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/auth-provider";
-import { loginSchema } from "@/types/user";
+import { loginSchema, Role } from "@/types/user";
 
 interface LoginFormProps {
   children: ReactNode;
@@ -54,6 +55,8 @@ interface UserLogin {
  * @param {React.ReactNode} children - The child components to trigger the login modal.
  */
 export function LoginModal({ children }: LoginFormProps) {
+  const { query, push } = useRouter();
+
   const [passwordVisibility, setPasswordVisibility] = useState(false);
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
@@ -70,6 +73,14 @@ export function LoginModal({ children }: LoginFormProps) {
     const { success, error } = await login(data.username, data.password);
     if (success) {
       toast.success("You are now logged in.");
+      const userRole = Cookies.get("user_role");
+      const pathName =
+        userRole === Role.STUDENT
+          ? "/quiz"
+          : query.next
+            ? query.next.toString()
+            : "/dashboard";
+      push(pathName);
     } else {
       toast.error(error || "Something went wrong.");
     }

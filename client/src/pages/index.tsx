@@ -1,9 +1,18 @@
 import { useRouter } from "next/router";
 
+import { PublicPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import Sponsor from "@/components/ui/sponsor";
 
-export default function Home() {
+export default function PageConfig() {
+  return (
+    <PublicPage>
+      <HomePage />
+    </PublicPage>
+  );
+}
+
+function HomePage() {
   const router = useRouter();
 
   return (

@@ -54,7 +54,7 @@ export function CategoryDataTableForm() {
     endpoint: "/questions/categories/",
     onSuccess: () => {
       toast.success("Categories created successfully!");
-      router.push("/question/category/");
+      router.push("/dashboard/question/category/");
     },
   });
 

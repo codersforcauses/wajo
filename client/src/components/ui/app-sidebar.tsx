@@ -1,4 +1,4 @@
-import { ChevronRight, Command, LogOut } from "lucide-react";
+import { ArrowLeft, ChevronRight, Command, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -9,6 +9,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/context/auth-provider";
 import { cn } from "@/lib/utils";
-import { navData } from "@/types/app-sidebar";
+import { navData, updateSidebarMenu } from "@/types/app-sidebar";
 import { Role } from "@/types/user";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
@@ -53,126 +54,168 @@ export default function AppSidebar({ Role, ...props }: AppSidebarProps) {
   const { logout } = useAuth();
   const router = useRouter();
 
-  const [openSection, setOpenSection] = useState<string | null>(null);
-
   // Memoize role-based navigation data to avoid recalculating on every render.
   const roleNavData = useMemo(() => {
     if (!Role) return [];
-
-    const isPathActive = (path: string) => {
-      const regex = new RegExp(`^${path.replace(/\[.*?\]/g, ".*")}$`);
-      return regex.test(router.pathname);
-    };
-
-    return navData[Role].map((section) => ({
-      ...section,
-      isActive: section.items.some((item) => isPathActive(item.url)),
-      items: section.items.map((item) => ({
-        ...item,
-        isActive: isPathActive(item.url),
-      })),
-    }));
+    return updateSidebarMenu(navData[Role], router.pathname);
   }, [Role, router.pathname]);
 
-  const handleMenuToggle = (sectionTitle: string | null) => {
-    setOpenSection((prev) => (prev === sectionTitle ? null : sectionTitle));
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(
+    () => {
+      return roleNavData.reduce(
+        (acc, section) => {
+          acc[section.title] = section.isActive || false;
+          return acc;
+        },
+        {} as Record<string, boolean>,
+      );
+    },
+  );
+
+  const handleMenuToggle = (sectionTitle: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [sectionTitle]: !prev[sectionTitle],
+    }));
   };
 
   const handleLogout = () => {
+    router.push("/").then(() => logout());
+  };
+
+  const handleBack = () => {
     router.push("/");
-    logout();
   };
 
   return (
     <Sidebar {...props}>
-      <SidebarContent className="no-scrollbar gap-0 overflow-y-scroll">
-        <div className="flex items-center justify-center pt-2">
-          <Link href="/">
-            <Image
-              src="/wajo_white.svg"
-              alt="logo with white background"
-              width={100}
-              height={100}
-              className="cursor-pointer"
-              priority
-            />
-          </Link>
-        </div>
-        {roleNavData.map((section) => (
-          <SidebarGroup key={section.title} className="p-1.5 pb-0">
-            <SidebarMenu>
-              <Collapsible
-                asChild
-                key={section.title}
-                title={section.title}
-                open={openSection === section.title || section.isActive}
-                onOpenChange={(isOpen) =>
-                  handleMenuToggle(isOpen ? section.title : null)
-                }
-                className="group/collapsible"
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton
-                      size="lg"
-                      tooltip={section.title}
-                      isActive={section.isActive}
-                      className={cn(
-                        "data-[active=true]:bg-black data-[active=true]:text-white",
-                        "data-[active=true]:hover:bg-black data-[active=true]:hover:text-white",
-                        "data-[state=open]:hover:bg-black data-[state=open]:hover:text-white",
-                      )}
-                    >
-                      {section.icon && <section.icon />}
-                      <span>{section.title}</span>
-                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {section.items.map((item) => (
-                        <SidebarMenuSubItem key={item.title}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={item.isActive}
-                            className="hover:bg-yellow data-[active=true]:bg-yellow"
-                            onClick={() => handleMenuToggle(section.title)}
-                          >
-                            <Link
-                              href={item.url}
-                              target={item.isNewTab ? "_blank" : "_self"}
-                              rel={item.isNewTab ? "noopener noreferrer" : ""} // add security for _blank only
-                            >
-                              <span>{item.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
-            </SidebarMenu>
-          </SidebarGroup>
-        ))}
-      </SidebarContent>
-      <SidebarFooter className="gap-0">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} aria-label="Logout">
-              <LogOut /> Logout
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        <SidebarGroupLabel>
-          Ctrl /
-          <span className="mx-1 font-bold">
-            <Command size={12} />
-          </span>{" "}
-          + b to hide me
-        </SidebarGroupLabel>
-      </SidebarFooter>
-      {/* <SidebarRail /> */}
+      <div className="flex h-full flex-col justify-between">
+        <ScrollArea className="pe-1">
+          <SidebarContent className="no-scrollbar gap-0 overflow-y-scroll">
+            <div className="flex items-center justify-center pt-2">
+              <Link href="/dashboard">
+                <Image
+                  src="/wajo_white.svg"
+                  alt="logo with white background"
+                  width={100}
+                  height={100}
+                  className="cursor-pointer"
+                  priority
+                />
+              </Link>
+            </div>
+            {roleNavData.map((section) => (
+              <SidebarGroup key={section.title} className="p-1.5 pb-0">
+                <SidebarMenu>
+                  <Collapsible
+                    asChild
+                    key={section.title}
+                    title={section.title}
+                    open={openSections[section.title]}
+                    onOpenChange={() => handleMenuToggle(section.title)}
+                    className="group/collapsible"
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton
+                          size="lg"
+                          tooltip={section.title}
+                          isActive={section.isActive}
+                          className={cn(
+                            "data-[active=true]:bg-black data-[active=true]:text-white",
+                            "data-[active=true]:hover:bg-black data-[active=true]:hover:text-white",
+                            "data-[state=open]:bg-black data-[state=open]:text-white",
+                            "data-[state=open]:hover:bg-black data-[state=open]:hover:text-white",
+                          )}
+                        >
+                          {section.icon && <section.icon />}
+                          <span>{section.title}</span>
+                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub className="border-l-2">
+                          {section.items.map((item) => (
+                            <SidebarMenuSubItem key={item.title}>
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={item.isActive}
+                                className="hover:bg-yellow data-[active=true]:bg-yellow"
+                              >
+                                <Link
+                                  href={item.url}
+                                  target={item.isNewTab ? "_blank" : "_self"}
+                                  rel={
+                                    item.isNewTab ? "noopener noreferrer" : ""
+                                  } // add security for _blank only
+                                >
+                                  <span>{item.title}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                              {item.items && item.items.length > 0 && (
+                                <SidebarMenuSub className="border-l-2">
+                                  {item.items.map((subitem) => (
+                                    <SidebarMenuSubItem key={subitem.title}>
+                                      <SidebarMenuSubButton
+                                        asChild
+                                        isActive={subitem.isActive}
+                                        className="hover:bg-yellow data-[active=true]:bg-yellow"
+                                      >
+                                        <Link
+                                          href={subitem.url}
+                                          target={
+                                            subitem.isNewTab
+                                              ? "_blank"
+                                              : "_self"
+                                          }
+                                          rel={
+                                            subitem.isNewTab
+                                              ? "noopener noreferrer"
+                                              : ""
+                                          } // add security for _blank only
+                                        >
+                                          <span>{subitem.title}</span>
+                                        </Link>
+                                      </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                  ))}
+                                </SidebarMenuSub>
+                              )}
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                </SidebarMenu>
+              </SidebarGroup>
+            ))}
+          </SidebarContent>
+        </ScrollArea>
+
+        <SidebarFooter className="gap-0">
+          <SidebarMenu className="gap-2">
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={handleBack} aria-label="Back">
+                <ArrowLeft /> Public Page
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={handleLogout} aria-label="Logout">
+                <LogOut /> Logout
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          <SidebarGroupLabel>
+            Ctrl /
+            <span className="mx-1 font-bold">
+              <Command size={12} />
+            </span>{" "}
+            + b to hide me
+          </SidebarGroupLabel>
+        </SidebarFooter>
+        {/* <SidebarRail /> */}
+      </div>
     </Sidebar>
   );
 }

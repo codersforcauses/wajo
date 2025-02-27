@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { WaitingLoader } from "@/components/ui/loading";
 import {
   Table,
   TableBody,
@@ -44,6 +45,7 @@ import { Insight } from "@/types/leaderboard";
  */
 export function InsightDataGrid({
   datacontext,
+  isLoading,
   onOrderingChange = () => {},
 }: DatagridProps<Insight>) {
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
@@ -76,7 +78,7 @@ export function InsightDataGrid({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {datacontext.length > 0 ? (
+            {!isLoading && datacontext.length > 0 ? (
               datacontext.map((item, index) => (
                 <TableRow
                   key={index}
@@ -98,7 +100,11 @@ export function InsightDataGrid({
                   colSpan={4}
                   className="py-4 text-center text-gray-500"
                 >
-                  No Results Found
+                  {isLoading ? (
+                    <WaitingLoader className="p-0" />
+                  ) : (
+                    "No Results Found"
+                  )}
                 </TableCell>
               </TableRow>
             )}

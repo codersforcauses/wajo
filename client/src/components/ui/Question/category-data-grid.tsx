@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import DeleteModal from "@/components/ui/delete-modal";
 import { SortIcon } from "@/components/ui/icon";
+import { WaitingLoader } from "@/components/ui/loading";
 import {
   Table,
   TableBody,
@@ -18,7 +20,10 @@ import { Category } from "@/types/question";
 
 export function CategoryDataGrid({
   datacontext,
+  isLoading,
+  startIdx,
   onOrderingChange = () => {},
+  onDeleteSuccess,
 }: DatagridProps<Category>) {
   const router = useRouter();
 
@@ -29,9 +34,7 @@ export function CategoryDataGrid({
         <Table className="w-full border-collapse text-left shadow-md">
           <TableHeader className="bg-black text-lg font-semibold">
             <TableRow className="hover:bg-muted/0">
-              <TableHead className={commonTableHeadClasses}>
-                Category Id
-              </TableHead>
+              <TableHead className={commonTableHeadClasses}>No.</TableHead>
               <TableHead
                 className={commonTableHeadClasses}
                 onClick={() => onOrderingChange("genre")}
@@ -50,7 +53,7 @@ export function CategoryDataGrid({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {datacontext.length > 0 ? (
+            {!isLoading && datacontext.length > 0 ? (
               datacontext.map((item, index) => (
                 <TableRow
                   key={item.id}
@@ -58,25 +61,23 @@ export function CategoryDataGrid({
                     "divide-gray-200 border-gray-50 text-sm text-black"
                   }
                 >
-                  <TableCell className="w-0">{item.id}</TableCell>
+                  <TableCell className="w-0">
+                    {startIdx ? startIdx + index : item.id}
+                  </TableCell>
                   <TableCell className="w-1/4">{item.genre}</TableCell>
                   <TableCell className="w-3/4 max-w-80 truncate">
                     {item.info}
                   </TableCell>
                   <TableCell className="sticky right-0 flex bg-white">
                     <div className="flex w-full justify-between">
-                      <Button
-                        className="me-2"
-                        onClick={() =>
-                          router.push(`/question/category/${item.id}`)
-                        }
-                      >
-                        View
+                      <Button asChild className="me-2">
+                        <Link href={`${router.pathname}/${item.id}`}>View</Link>
                       </Button>
                       <DeleteModal
                         baseUrl="/questions/categories"
                         entity="category"
                         id={item.id}
+                        onSuccess={onDeleteSuccess}
                       >
                         <Button variant={"destructive"}>Delete</Button>
                       </DeleteModal>
@@ -90,7 +91,11 @@ export function CategoryDataGrid({
                   colSpan={4}
                   className="py-4 text-center text-gray-500"
                 >
-                  No Results Found
+                  {isLoading ? (
+                    <WaitingLoader className="p-0" />
+                  ) : (
+                    "No Results Found"
+                  )}
                 </TableCell>
               </TableRow>
             )}

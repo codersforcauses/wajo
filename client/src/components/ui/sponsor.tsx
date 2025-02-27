@@ -1,21 +1,41 @@
 import Image from "next/image";
 
-import Casio from "../../../public/sponsor-logos/Casio.svg";
-import DoE from "../../../public/sponsor-logos/DoE.svg";
-import ECU from "../../../public/sponsor-logos/ECU.svg";
-import MAWA from "../../../public/sponsor-logos/MAWA.svg";
-import Murdoch from "../../../public/sponsor-logos/Murdoch.svg";
-import NewEdition from "../../../public/sponsor-logos/New-Edition.svg";
-import UWA from "../../../public/sponsor-logos/UWA.svg";
-
 const images = [
-  { src: DoE, href: "https://www.education.wa.edu.au/", name: "DoE" },
-  { src: UWA, href: "https://www.uwa.edu.au/", name: "UWA" },
-  { src: MAWA, href: "https://mawainc.org.au/", name: "MAWA" },
-  { src: ECU, href: "https://www.ecu.edu.au/", name: "ECU" },
-  { src: NewEdition, href: "https://newedition.com.au", name: "NewEdition" },
-  { src: Murdoch, href: "https://www.murdoch.edu.au/", name: "Murdoch" },
-  { src: Casio, href: "https://casioeducation.com.au/", name: "Casio" },
+  {
+    src: "/sponsor-logos/DoE.svg",
+    href: "https://www.education.wa.edu.au/",
+    name: "DoE",
+  },
+  {
+    src: "/sponsor-logos/UWA.svg",
+    href: "https://www.uwa.edu.au/",
+    name: "UWA",
+  },
+  {
+    src: "/sponsor-logos/MAWA.svg",
+    href: "https://mawainc.org.au/",
+    name: "MAWA",
+  },
+  {
+    src: "/sponsor-logos/ECU.svg",
+    href: "https://www.ecu.edu.au/",
+    name: "ECU",
+  },
+  {
+    src: "/sponsor-logos/New-Edition.svg",
+    href: "https://newedition.com.au",
+    name: "NewEdition",
+  },
+  {
+    src: "/sponsor-logos/Murdoch.svg",
+    href: "https://www.murdoch.edu.au/",
+    name: "Murdoch",
+  },
+  {
+    src: "/sponsor-logos/Casio.svg",
+    href: "https://casioeducation.com.au/",
+    name: "Casio",
+  },
 ];
 
 export default function Sponsor() {
@@ -30,7 +50,13 @@ export default function Sponsor() {
             rel="noopener noreferrer"
             className="h-28 flex-shrink-0"
           >
-            <Image src={item.src} alt={`Logo of ${item.name}`} height={100} />
+            <Image
+              src={item.src}
+              alt={`Logo of ${item.name}`}
+              height={100}
+              width={0}
+              className="w-auto"
+            />
           </a>
         ))}
       </div>

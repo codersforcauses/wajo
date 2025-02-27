@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import {
   Select,
   SelectContent,
@@ -5,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import { cn } from "@/lib/utils";
 import { School, SchoolTypeEnum } from "@/types/user";
 
@@ -42,14 +44,21 @@ type Props = {
  * />
  */
 export function SelectSchool({ selectedId, onChange, className }: Props) {
-  const {
-    data: schools,
-    isPending,
-    isError,
-  } = useFetchData<School[]>({
+  const { data, isLoading, error, totalPages } = useFetchDataTable<School>({
     queryKey: ["users.schools"],
     endpoint: "/users/schools/",
+    searchParams: {
+      nrows: 999999, // to get all with some large number
+      page: 1,
+    },
   });
+
+  // Auto Select when only 1 data
+  useEffect(() => {
+    if (data?.length === 1 && !selectedId) {
+      onChange(data[0].id);
+    }
+  }, [data, selectedId, onChange]);
 
   const onValueChange = (value: string) => {
     const parsed = parseInt(value);
@@ -58,21 +67,23 @@ export function SelectSchool({ selectedId, onChange, className }: Props) {
     }
   };
 
+  const value = selectedId ? selectedId.toString() : "";
   return (
-    <Select
-      value={selectedId ? selectedId.toString() : ""}
-      onValueChange={onValueChange}
-    >
+    <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger className={cn(className)}>
         <SelectValue placeholder="School" />
       </SelectTrigger>
       <SelectContent>
-        {isPending || isError ? (
+        {isLoading || error ? (
           <SelectItem value="NaN" disabled>
-            Loading...
+            {isLoading ? "Loading..." : "Error"}
+          </SelectItem>
+        ) : !data || !data.length ? (
+          <SelectItem value="NaN" disabled>
+            No Data Found
           </SelectItem>
         ) : (
-          schools.map((school) => (
+          data.map((school) => (
             <SelectItem value={school.id.toString()} key={school.id}>
               {school.name}
             </SelectItem>

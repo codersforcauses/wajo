@@ -18,7 +18,10 @@
  */
 export interface DatagridProps<T> {
   datacontext: T[];
+  isLoading: boolean;
   onOrderingChange?: (column: string) => void;
+  onDeleteSuccess?: () => void;
+  startIdx?: number;
 }
 
 /**

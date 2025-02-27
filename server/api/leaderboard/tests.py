@@ -94,7 +94,7 @@ class LeaderboardAPITest(APITestCase):
 
         # Assert
         self.assertEqual(response.status_code, 200)
-        data = response.json()
+        data = response.json()["results"]
         self.assertEqual(len(data), 3)
         self.assertDictEqual(
             data[0],
@@ -112,10 +112,9 @@ class LeaderboardAPITest(APITestCase):
         # Act
         url = reverse("leaderboard:individual-list")
         response = self.client.get(url, {"school_type": "Public"})
-
         # Assert
         self.assertEqual(response.status_code, 200)
-        data = response.json()
+        data = response.json()["results"]
         self.assertEqual(len(data), 2)
 
     def test_individual_leaderboard_should_filter_by_year_level(self):
@@ -125,7 +124,7 @@ class LeaderboardAPITest(APITestCase):
 
         # Assert
         self.assertEqual(response.status_code, 200)
-        data = response.json()
+        data = response.json()["results"]
         self.assertEqual(len(data), 2)
 
     def test_team_leaderboard_should_list_results(self):
@@ -135,7 +134,7 @@ class LeaderboardAPITest(APITestCase):
 
         # Assert
         self.assertEqual(response.status_code, 200)
-        data = response.json()
+        data = response.json()["results"]
         self.assertEqual(len(data), 2)
         self.assertEqual(data[0]["id"], self.team1.id)
         self.assertEqual(data[0]["school"], "City High")
@@ -155,6 +154,6 @@ class LeaderboardAPITest(APITestCase):
 
         # Assert
         self.assertEqual(response.status_code, 200)
-        data = response.json()
+        data = response.json()["results"]
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["school"], "Outback School")

@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import DateTimeDisplay from "@/components/ui/date-format";
 import DeleteModal from "@/components/ui/delete-modal";
+import { WaitingLoader } from "@/components/ui/loading";
 import {
   Table,
   TableBody,
@@ -12,9 +14,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAuth } from "@/context/auth-provider";
 import { cn } from "@/lib/utils";
+import { useTokenStore } from "@/store/token-store";
 import { DatagridProps } from "@/types/data-grid";
-import { Student } from "@/types/user";
+import { Role, Student, Teacher, User } from "@/types/user";
 
 /**
  * Renders a paginated data grid for displaying user information.
@@ -49,18 +53,38 @@ import { Student } from "@/types/user";
  */
 export function DataGrid({
   datacontext,
+  isLoading,
+  startIdx,
+  onDeleteSuccess,
   onOrderingChange,
-}: DatagridProps<Student>) {
+}: DatagridProps<User | Student | Teacher>) {
+  const { userId } = useAuth();
   const router = useRouter();
+  const pathSegments = router.pathname.split("/");
+  const entityName =
+    pathSegments.find((segment) =>
+      ["staffs", "students", "teachers"].includes(segment),
+    ) || "users";
+
+  const { access } = useTokenStore(); // access the JWT token
+
+  const [role, setRole] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (access?.decoded) {
+      const userRole = access.decoded["role"];
+      setRole(userRole);
+    }
+  }, [access]);
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
     <div className="grid">
       <div className="overflow-hidden rounded-lg border">
         <Table className="w-full border-collapse text-left shadow-md">
-          <TableHeader className="bg-black text-lg font-semibold">
+          <TableHeader className="w-full bg-black text-lg font-semibold">
             <TableRow className="hover:bg-muted/0">
-              <TableHead className={commonTableHeadClasses}>User Id</TableHead>
+              <TableHead className={commonTableHeadClasses}>No.</TableHead>
               <TableHead className={commonTableHeadClasses}>
                 User Name
               </TableHead>
@@ -70,64 +94,78 @@ export function DataGrid({
               <TableHead className={commonTableHeadClasses}>
                 Last Name
               </TableHead>
-              <TableHead className={commonTableHeadClasses}>
-                School Name
-              </TableHead>
-              <TableHead className={commonTableHeadClasses}>
-                Year Level
-              </TableHead>
-              <TableHead className={commonTableHeadClasses}>
-                Extension Time
-              </TableHead>
-              <TableHead className={commonTableHeadClasses}>
-                Created At
-              </TableHead>
+              {role !== Role.ADMIN && (
+                <TableHead className={commonTableHeadClasses}>School</TableHead>
+              )}
               <TableHead
-                className={cn(
-                  commonTableHeadClasses,
-                  "sticky right-0 bg-black",
-                )}
+                className={cn(commonTableHeadClasses, "rounded-tr-lg")}
               >
                 Actions
               </TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {datacontext.length > 0 ? (
+          <TableBody className="w-full">
+            {!isLoading && datacontext.length > 0 ? (
               datacontext.map((item, index) => (
                 <TableRow
-                  key={item.id}
+                  key={index}
                   className={
                     "divide-gray-200 border-gray-50 text-sm text-black"
                   }
                 >
-                  <TableCell className="w-0">{item.id}</TableCell>
-                  <TableCell className="w-0">{item.student_id}</TableCell>
-                  <TableCell className="w-1/3">{item.first_name}</TableCell>
-                  <TableCell className="w-1/3">{item.last_name}</TableCell>
-                  <TableCell className="w-1/3 max-w-80 truncate">
-                    {item.school?.name}
+                  <TableCell className="w-1/4">
+                    {startIdx ? startIdx + index : item.id}
                   </TableCell>
-                  <TableCell className="w-0">{item.year_level}</TableCell>
-                  <TableCell className="w-0">{item.extenstion_time}</TableCell>
-                  <TableCell className="w-0">
-                    <DateTimeDisplay date={item.created_at} />
+                  <TableCell className="w-1/4">
+                    {!item.id
+                      ? ""
+                      : item.student_id
+                        ? item.student_id
+                        : item.username
+                          ? item.username
+                          : item.last_name && item.first_name
+                            ? `${item.last_name}${item.first_name}`
+                            : "-"}
                   </TableCell>
-                  <TableCell className="sticky right-0 flex bg-white">
-                    <div className="flex w-full justify-between">
-                      <Button
-                        className="me-2"
-                        onClick={() => router.push(`/users/${item.id}`)}
-                      >
-                        View
-                      </Button>
-                      <DeleteModal
-                        baseUrl="/users"
-                        entity="student"
-                        id={item.id}
-                      >
-                        <Button variant={"destructive"}>Delete</Button>
-                      </DeleteModal>
+                  <TableCell className="w-1/4">
+                    {!item.id ? "" : item.first_name ? item.first_name : "-"}
+                  </TableCell>
+                  <TableCell className="w-1/4">
+                    {!item.id ? "" : item.last_name ? item.last_name : "-"}
+                  </TableCell>
+                  {role !== Role.ADMIN && item.id && (
+                    <TableCell className="w-1/4">
+                      {item.school?.name ? item.school.name : "-"}
+                    </TableCell>
+                  )}
+                  <TableCell className="flex py-4">
+                    <div className={cn("flex", { invisible: !item.id })}>
+                      {(entityName !== "staffs" ||
+                        (entityName === "staffs" &&
+                          item.id.toString() === userId?.toString())) && (
+                        <Button asChild className="me-2">
+                          <Link href={`${router.pathname}/${item.id}`}>
+                            View
+                          </Link>
+                        </Button>
+                      )}
+                      {entityName !== "staffs" && (
+                        <DeleteModal
+                          baseUrl={`/users/${entityName}`}
+                          entity={entityName.replace(/s$/, "")}
+                          id={item.id}
+                          onSuccess={onDeleteSuccess}
+                        >
+                          <Button
+                            variant={"destructive"}
+                            className={cn("", {
+                              invisible: role !== Role.ADMIN,
+                            })}
+                          >
+                            Delete
+                          </Button>
+                        </DeleteModal>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -138,7 +176,11 @@ export function DataGrid({
                   colSpan={6}
                   className="py-4 text-center text-gray-500"
                 >
-                  No Results Found
+                  {isLoading ? (
+                    <WaitingLoader className="p-0" />
+                  ) : (
+                    "No Results Found"
+                  )}
                 </TableCell>
               </TableRow>
             )}

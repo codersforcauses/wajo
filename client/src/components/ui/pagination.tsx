@@ -182,3 +182,11 @@ export type PaginationSearchParams = {
   nrows: number;
   page: number;
 };
+
+export function toQueryString(params: PaginationSearchParams) {
+  // Create a new object without undefined/null values
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(([_, v]) => Boolean(v)),
+  );
+  return cleanParams;
+}

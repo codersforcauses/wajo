@@ -1,11 +1,12 @@
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { AlertTriangle } from "lucide-react";
-import { useRouter } from "next/router";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
@@ -18,16 +19,18 @@ export default function DeleteModal({
   baseUrl,
   id,
   entity = "data",
+  onSuccess,
   children,
 }: DeleteModalProps) {
-  const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   const { mutate: deleteData, isPending } = useDynamicDeleteMutation({
     baseUrl: baseUrl,
     mutationKey: [`${entity}.delete`],
     onSuccess: () => {
       toast.success(`The ${entity} has been deleted.`);
-      router.reload();
+      setOpen(false);
+      onSuccess?.();
     },
   });
 
@@ -36,7 +39,7 @@ export default function DeleteModal({
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="flex h-auto w-[95%] max-w-[400px] flex-col items-center rounded-lg bg-[--nav-background] p-6 shadow-xl">
         <VisuallyHidden.Root>
@@ -56,14 +59,14 @@ export default function DeleteModal({
         </div>
 
         <div className="mt-6 flex gap-10">
-          <DialogTrigger asChild>
+          <DialogClose asChild>
             <Button
               variant="ghost"
               className="w-36 border border-black bg-white"
             >
               No
             </Button>
-          </DialogTrigger>
+          </DialogClose>
           <Button onClick={onDelete} variant={"secondary"} className="w-36">
             {isPending ? "Deleting..." : "Yes"}
           </Button>

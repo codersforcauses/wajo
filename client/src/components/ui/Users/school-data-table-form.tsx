@@ -45,6 +45,7 @@ export function SchoolDataTableForm() {
   const defaultSchool = {
     name: "",
     is_country: true,
+    type: "Public",
     abbreviation: "",
   } as School;
 
@@ -66,7 +67,7 @@ export function SchoolDataTableForm() {
     endpoint: "/users/schools/",
     onSuccess: () => {
       toast.success("Schools created successfully!");
-      router.push("/users/school/");
+      router.push("/dashboard/users/school/");
     },
   });
 
