@@ -43,6 +43,13 @@ export interface Quiz {
   status: number;
 }
 
+export interface QuizResponse {
+  count: number;
+  next: string;
+  previous: string;
+  results: Quiz[];
+}
+
 export interface QuizSlot {
   id: number;
   name: string;
@@ -72,6 +79,13 @@ export interface Competition {
   time_limit: number;
   time_window: number;
   status: QuizStatus; // ask: to be discuss
+}
+
+export interface CompetitionResponse {
+  count: number;
+  next: string;
+  previous: string;
+  results: Competition[];
 }
 
 export interface CompetitionSlotData {
@@ -118,6 +132,13 @@ export interface QuizAttempt {
   quiz: number;
   student: number;
   team: number;
+}
+
+export interface QuizAttemptResponse {
+  count: number;
+  next: string;
+  previous: string;
+  results: QuizAttempt[];
 }
 
 export interface QuizSlot {

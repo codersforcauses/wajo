@@ -5,12 +5,14 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { usePostMutation } from "@/hooks/use-post-data";
+import { backendURL } from "@/lib/api";
 import { Layout } from "@/types/question";
 import {
   CompetitionSlotData,
   QuestionAnswer,
   QuestionAttempt,
   QuizAttempt,
+  QuizAttemptResponse,
 } from "@/types/quiz";
 
 interface GenericQuizProps {
@@ -18,7 +20,7 @@ interface GenericQuizProps {
   setCurrentPage: (page: number) => void;
   totalQuestions: number;
   slots: CompetitionSlotData[];
-  quizAttempt: QuizAttempt;
+  quizAttempt: QuizAttemptResponse;
 }
 
 const AUTOSAVE_DELAY = 1000;
@@ -39,14 +41,25 @@ export default function GenericQuiz({
       onSuccess: () => {
         setIsSaved(true);
       },
-      onError: () => {
+      onError: (err) => {
         toast.error("Failed to save answer");
+        console.log("Error saving answer:", err);
       },
     });
+
+  // useEffect(() => {
+  //   console.log("quizAttempt", quizAttempt);
+  //   // get most recent quiz attempt
+  //   if (quizAttempt.results.length > 0) {
+  //     const mostRecentAttempt = quizAttempt.results[0];
+  //   }
+  // }, [quizAttempt]);
 
   const [answers, setAnswers] = useState<QuestionAnswer[]>(() => {
     try {
       const savedAnswers = localStorage.getItem(STORAGE_KEY);
+      // console.log("initial savedAnswers: ", savedAnswers);
+      // console.log("slots: ", slots);
       return savedAnswers
         ? JSON.parse(savedAnswers)
         : slots.map((s) => ({ question: s.question.id, answer_student: "" }));
@@ -64,35 +77,38 @@ export default function GenericQuiz({
 
   const saveAnswers = useCallback(
     (newAnswers: QuestionAnswer[]) => {
+      // console.log("newAnswers", newAnswers);
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newAnswers));
         const currentAnswer = newAnswers.find(
           (a) => a.question === currentQuestion.id,
         );
+        // console.log("currentAnswer", currentAnswer);
         if (currentAnswer) {
           saveAnswer({
-            student: quizAttempt.student,
+            student: quizAttempt.results[0].student,
             question: currentAnswer.question,
             answer_student: currentAnswer.answer_student,
-            quiz_attempt: quizAttempt.id,
+            quiz_attempt: quizAttempt ? quizAttempt.results[0].id : null,
             // IntegrityError null value in column "is_correct" of relation "quiz_questionattempt" violates not-null constraint
             is_correct: false,
           });
         }
+        // setAnswers(newAnswers);
       } catch (error) {
         console.error("Error saving answers:", error);
         toast.error("Failed to save answers");
       }
     },
-    [currentQuestion.id, quizAttempt.id, saveAnswer],
+    [currentQuestion.id, saveAnswer],
   );
 
   const handleAnswerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newAnswer = e.target.value.replace(/[^0-9,\s]/g, ""); // Only allow numbers, commas, and spaces
+    // const newAnswer = e.target.value.replace(/[^0-9,\s]/g, ""); // Only allow numbers, commas, and spaces
     setAnswers((prev) => {
       const newAnswers = prev.map((a) =>
         a.question === currentQuestion.id
-          ? { ...a, answer_student: newAnswer }
+          ? { ...a, answer_student: e.target.value }
           : a,
       );
       return newAnswers;
@@ -123,6 +139,8 @@ export default function GenericQuiz({
   };
 
   const getCurrentAnswer = useCallback(() => {
+    // console.log(answers[currentQuestion.id]);
+    // console.log("answers: ", answers);
     return (
       answers.find((a) => a.question === currentQuestion.id)?.answer_student ||
       ""
@@ -130,8 +148,8 @@ export default function GenericQuiz({
   }, [answers, currentQuestion.id]);
 
   const renderImage = () => {
-    console.log(currentQuestion.images[0].url);
     if (currentQuestion.images?.[0]?.url) {
+      // console.log(currentQuestion.images[0].url);
       return (
         <div className="my-4">
           <Image
@@ -184,17 +202,15 @@ export default function GenericQuiz({
             Your Answer
           </h3>
           <p className="mb-2 text-sm text-slate-400">
-            Must be an integer from 1-999, use "," to separate multiple answers
+            Must be an integer from 1-999
           </p>
           <div className="space-y-2">
             <input
-              type="text"
+              type="number"
               value={getCurrentAnswer()}
               onChange={handleAnswerChange}
               placeholder="Enter your answer"
               className="h-10 w-full min-w-64 rounded-sm border border-slate-500 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              pattern="[0-9,\s]*"
-              title="Please enter numbers separated by commas"
             />
             <div className="h-4">
               {isSaving ? (

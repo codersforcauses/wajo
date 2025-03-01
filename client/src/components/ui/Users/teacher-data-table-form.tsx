@@ -53,7 +53,7 @@ type Teacher = z.infer<typeof createTeacherSchema>;
  */
 export function TeacherDataTableForm() {
   const router = useRouter();
-  const { mutate: postTeachers, isPending } = usePostMutation<Teacher[]>({
+  const { mutateAsync: postTeachers, isPending } = usePostMutation<Teacher[]>({
     mutationKey: ["teachers", "users"],
     endpoint: "/users/teachers/",
   });
@@ -79,16 +79,20 @@ export function TeacherDataTableForm() {
     name: "teachers",
   });
 
-  const onSubmit = (data: { teachers: Teacher[] }) => {
+  const onSubmit = async (data: { teachers: Teacher[] }) => {
     console.log("Inside onSubmit");
     console.log("Submitting data:", data);
-    data.teachers.forEach((teacher) => {
+    await data.teachers.forEach((teacher) => {
+      if (teacher.email == "") {
+        teacher.email = "example@gmail.com";
+      }
+      if (teacher.phone == "") {
+        teacher.phone = "0";
+      }
       postTeachers(teacher, {
         onSuccess: (response) => {
-          // queryClient.invalidateQueries({ queryKey: ["users"] });
           toast.success("Teacher created successfully");
           console.log("Response:", response);
-          router.push("/dashboard/users/teachers");
         },
         onError: (error) => {
           toast.error("Failed to create teacher");
@@ -121,9 +125,6 @@ export function TeacherDataTableForm() {
                 <TableHead className={commonTableHeadClasses}>
                   Lastname*
                 </TableHead>
-                {/* <TableHead className={commonTableHeadClasses}>
-                  Username*
-                </TableHead> */}
                 <TableHead
                   className={cn(commonTableHeadClasses, "text-pretty", "w-1/5")}
                 >

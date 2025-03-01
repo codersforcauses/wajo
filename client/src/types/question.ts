@@ -7,6 +7,12 @@ export interface Category {
   info: string;
 }
 
+export interface CategoryResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Category[];
+}
 /**
  * Represents a Question object with its properties.
  *
@@ -41,6 +47,13 @@ export interface Question {
   time_created: Date;
   time_modified: Date;
   images: QuestionImage[];
+}
+
+export interface QuestionResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Question[];
 }
 
 export interface QuestionImage {

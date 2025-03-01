@@ -104,9 +104,9 @@ function Index() {
             setAndPush({ search: newSearch, page: 1 });
           }}
         />
-        {/* Button to navigate to the create quiz page */}
+        {/* Button to navigate to the create question page */}
         <Button asChild className="mr-6">
-          <Link href={`${router.pathname}/create`}>Create a Quiz</Link>
+          <Link href={`${router.pathname}/create`}>Create a Question</Link>
         </Button>
       </div>
 

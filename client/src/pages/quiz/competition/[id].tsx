@@ -12,7 +12,13 @@ import QuizStartPage from "@/components/ui/Quiz/quiz-start-page";
 import SubmissionPopup from "@/components/ui/submission-popup";
 import { useAuth } from "@/context/auth-provider";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import { Competition, CompetitionSlot, QuizAttempt } from "@/types/quiz";
+import { usePostMutation } from "@/hooks/use-post-data";
+import {
+  Competition,
+  CompetitionSlot,
+  QuizAttempt,
+  QuizAttemptResponse,
+} from "@/types/quiz";
 
 export default function CompetitionQuizPage() {
   const router = useRouter();
@@ -58,7 +64,7 @@ export default function CompetitionQuizPage() {
     isLoading: isQuizAttemptDataLoading,
     isError: isQuizAttemptDataError,
     error: quizAttemptError,
-  } = useFetchData<QuizAttempt[]>({
+  } = useFetchData<QuizAttemptResponse>({
     queryKey: [`quiz.quiz-attempts.${compId}.${primaryId}`],
     endpoint: `/quiz/quiz-attempts/?state=2`,
     enabled: !!quizSlot && quizState.isDisplayQuiz,
@@ -79,6 +85,13 @@ export default function CompetitionQuizPage() {
     const endTime = new Date(quizSlot.end_time);
     return Math.max(0, Math.floor((endTime.getTime() - now.getTime()) / 1000));
   };
+
+  useEffect(() => {
+    console.log("Quiz Attempt Data: ", quizAttemptData);
+    if (quizAttemptData && quizAttemptData.results.length > 0) {
+      setQuizState((prev) => ({ ...prev, isQuizAttempt: true }));
+    }
+  }, [quizAttemptData]);
 
   useEffect(() => {
     setQuizState((prev) => ({ ...prev, timeLeft: calculateTimeLeft() }));
@@ -209,7 +222,7 @@ export default function CompetitionQuizPage() {
               }
               totalQuestions={numberOfQuestions}
               slots={quizSlot.data}
-              quizAttempt={quizAttemptData[0]}
+              quizAttempt={quizAttemptData}
             />
           )}
 
@@ -217,9 +230,9 @@ export default function CompetitionQuizPage() {
             <SubmissionPopup
               popUpStyle="showSubmit"
               isOpen={quizState.isSubmitted}
-              onClose={() => {}}
-              // onClose={() => setQuizState(prev => ({ ...prev, isSubmitted: false }))}
-              onTry={() => router.push("/competitions")}
+              onClose={() => {
+                router.push("/quiz");
+              }}
             />
           )}
         </div>

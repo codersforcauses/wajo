@@ -1,7 +1,7 @@
 import MultipleSelector, { Option } from "@/components/ui/multiple-select";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { cn } from "@/lib/utils";
-import { Category } from "@/types/question";
+import { CategoryResponse } from "@/types/question";
 
 type Props = {
   value?: Option[];
@@ -14,7 +14,7 @@ export function MultipleSelectCategory({ value, onChange, className }: Props) {
     data: categories,
     isPending,
     isError,
-  } = useFetchData<Category[]>({
+  } = useFetchData<CategoryResponse>({
     queryKey: ["questions.categories"],
     endpoint: "/questions/categories/",
   });
@@ -24,7 +24,7 @@ export function MultipleSelectCategory({ value, onChange, className }: Props) {
   const categoryOptions =
     isPending || isError
       ? []
-      : categories?.map((cat) => ({
+      : categories.results?.map((cat) => ({
           label: cat.genre,
           value: cat.id.toString(),
         }));

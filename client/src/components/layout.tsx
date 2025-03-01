@@ -27,10 +27,13 @@ export function ProtectedPage({ children, requiredRoles }: ProtectedPageProps) {
       setIsInitializing(false);
       if (!isLoggedIn || !userRole) {
         setAuthState("unauthorized");
+        // console.log("authState", authState);
       } else if (!requiredRoles.includes(userRole)) {
         setAuthState("wrong-role");
+        // console.log("authState", authState);
       } else {
         setAuthState("authorized");
+        // console.log("authState", authState);
       }
     }, 0);
 
@@ -38,7 +41,8 @@ export function ProtectedPage({ children, requiredRoles }: ProtectedPageProps) {
   }, [isLoggedIn, userRole, requiredRoles]);
 
   if (isInitializing) return <WaitingLoader />;
-  console.log(userRole);
+  // console.log(userRole);
+  // console.log(authState);
   switch (authState) {
     case "unauthorized":
       return (
@@ -58,6 +62,7 @@ export function ProtectedPage({ children, requiredRoles }: ProtectedPageProps) {
         </Sidebar>
       );
     case "authorized":
+      // console.log("inside authorized");
       return (
         <Sidebar
           role={userRole.toLowerCase() as Role}

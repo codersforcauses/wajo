@@ -1,12 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { useRouter } from "next/router";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -26,9 +26,9 @@ import {
 } from "@/components/ui/table";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { cn } from "@/lib/utils";
-import { createUserSchema } from "@/types/user";
+import { createStaffSchema } from "@/types/user";
 
-type User = z.infer<typeof createUserSchema>;
+type Staff = z.infer<typeof createStaffSchema>;
 
 /**
  * Renders a data table form for managing staff information with a dynamic table structure.
@@ -55,7 +55,7 @@ type User = z.infer<typeof createUserSchema>;
 export function StaffDataTableForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { mutateAsync: postStaffs, isPending } = usePostMutation<User[]>({
+  const { mutateAsync: postStaffs, isPending } = usePostMutation<Staff[]>({
     mutationKey: ["staffs", "users"],
     endpoint: "/users/staffs/",
   });
@@ -63,13 +63,17 @@ export function StaffDataTableForm() {
   const defaultStaff = {
     first_name: "",
     last_name: "",
+    username: "",
     password: "",
-  } as User;
+    is_superuser: true,
+    email: "",
+    is_staff: true,
+  } as Staff;
 
   const createStaffForm = useForm<{
-    staffs: User[];
+    staffs: Staff[];
   }>({
-    resolver: zodResolver(z.object({ staffs: z.array(createUserSchema) })),
+    resolver: zodResolver(z.object({ staffs: z.array(createStaffSchema) })),
     defaultValues: { staffs: [defaultStaff] },
   });
 
@@ -78,20 +82,21 @@ export function StaffDataTableForm() {
     name: "staffs",
   });
 
-  const onSubmit = async (data: { staffs: User[] }) => {
+  const onSubmit = async (data: { staffs: Staff[] }) => {
     console.log("inside onSubmit", data);
-    await postStaffs(data.staffs, {
-      onSuccess: (response) => {
-        queryClient.invalidateQueries();
-        toast.success("Staffs created successfully");
-        console.log("Response:", response);
-        router.push("/dashboard/users/staffs");
-      },
-      onError: (error) => {
-        toast.error("Failed to create staffs");
-        console.error("Error creating staffs", error);
-      },
+    await data.staffs.forEach((staff) => {
+      postStaffs(staff, {
+        onSuccess: (response) => {
+          toast.success("Staff created successfully");
+          console.log("Response:", response);
+        },
+        onError: (error) => {
+          toast.error("Failed to create staff");
+          console.error("Error creating staff", error);
+        },
+      });
     });
+    router.push("/dashboard/users/staffs");
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
@@ -117,9 +122,9 @@ export function StaffDataTableForm() {
                 <TableHead className={commonTableHeadClasses}>
                   Lastname*
                 </TableHead>
-                {/* <TableHead className={commonTableHeadClasses}>
+                <TableHead className={commonTableHeadClasses}>
                   Username*
-                </TableHead> */}
+                </TableHead>
                 <TableHead
                   className={cn(commonTableHeadClasses, "text-pretty", "w-1/5")}
                 >
@@ -127,6 +132,13 @@ export function StaffDataTableForm() {
                   <FormDescription className="text-xs text-white">
                     Minimum 8 characters with letters, numbers, and symbols
                   </FormDescription>
+                </TableHead>
+                <TableHead className={commonTableHeadClasses}>
+                  IsSuperUser?*
+                </TableHead>
+                <TableHead className={commonTableHeadClasses}>Email?</TableHead>
+                <TableHead className={commonTableHeadClasses}>
+                  IsStaff?*
                 </TableHead>
                 <TableHead
                   className={cn(commonTableHeadClasses, "rounded-tr-lg", "w-0")}
@@ -178,6 +190,22 @@ export function StaffDataTableForm() {
                     />
                   </TableCell>
 
+                  {/* Username Field */}
+                  <TableCell className="align-top">
+                    <FormField
+                      control={createStaffForm.control}
+                      name={`staffs.${index}.username`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                          <FormControl>
+                            <Input {...field} placeholder="Enter username" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TableCell>
+
                   {/* Password Field */}
                   <TableCell className="align-top">
                     <FormField
@@ -187,6 +215,60 @@ export function StaffDataTableForm() {
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
                             <Input {...field} placeholder="Enter password" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TableCell>
+
+                  {/* IsSuperUser Field */}
+                  <TableCell className="align-center">
+                    <FormField
+                      control={createStaffForm.control}
+                      name={`staffs.${index}.is_superuser`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col items-center justify-center gap-1.5 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TableCell>
+
+                  {/* Email Field */}
+                  <TableCell className="align-top">
+                    <FormField
+                      control={createStaffForm.control}
+                      name={`staffs.${index}.email`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                          <FormControl>
+                            <Input {...field} placeholder="Enter email" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TableCell>
+
+                  {/* IsStaff Field */}
+                  <TableCell className="align-center">
+                    <FormField
+                      control={createStaffForm.control}
+                      name={`staffs.${index}.is_staff`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col items-center justify-center gap-1.5 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

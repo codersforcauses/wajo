@@ -146,6 +146,16 @@ export const createUserSchema = z.object({
   extenstion_time: z.number().int().min(0).optional(),
 });
 
+export const createStaffSchema = z.object({
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+  is_superuser: z.boolean(),
+  email: z.string().email().optional(),
+  is_staff: z.boolean(),
+});
+
 export const createStudentSchema = createUserSchema.extend({
   school_id: z.number().int(),
   year_level: z.number().int().positive(),
@@ -153,9 +163,12 @@ export const createStudentSchema = createUserSchema.extend({
   extension_time: z.number().int().optional(),
 });
 
-export const createTeacherSchema = createUserSchema.extend({
+export const createTeacherSchema = z.object({
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  password: z.string().min(1, "Password is required"),
   school_id: z.number().int(),
-  email: z.string().email("Invalid email address").optional(),
+  email: z.string().email().optional(),
   phone: z.string().optional(),
 });
 
