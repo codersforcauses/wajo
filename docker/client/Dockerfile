@@ -1,4 +1,4 @@
-FROM node:20-slim as client-prod
+FROM node:20-slim
 
 # SET WORKING DIRECTORY
 WORKDIR /app
@@ -9,11 +9,12 @@ COPY /docker/client/entrypoint.sh /entrypoint.sh
 # Make the script executable
 RUN chmod +x /entrypoint.sh
 
+# Copy package.json and package-lock.json
+COPY ./client/package.json ./client/package-lock.json ./
+
+RUN npm install
 # Copy Application code into a directory called `app`
 COPY ./client ./
-
-# Install dependencies without dev dependencies
-RUN npm install --production
 
 RUN npm run build
 
