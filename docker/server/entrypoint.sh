@@ -46,6 +46,6 @@ if [ "${APP_ENV^^}" = "PRODUCTION" ]; then
 
     # Run Gunicorn / Django
     printf "\n" && echo " Running Gunicorn / Django"
-    echo "Running: gunicorn api.wsgi -b 0.0.0.0:8000 --workers=3 --keep-alive 20 --log-level info --access-logfile=/var/log/gunicorn/access.log --error-logfile=/var/log/gunicorn/error.log --capture-output --timeout 50"
-    gunicorn api.wsgi -b 0.0.0.0:8000 --workers=3 --keep-alive 20 --log-level info --access-logfile=/var/log/gunicorn/access.log --error-logfile=/var/log/gunicorn/error.log --capture-output --timeout 50
+    echo "Running: gunicorn api.wsgi -b 0.0.0.0:8081 --workers=3 --keep-alive 20 --log-level info --access-logfile=/var/log/gunicorn/access.log --error-logfile=/var/log/gunicorn/error.log --capture-output --timeout 50"
+    gunicorn api.wsgi -b 0.0.0.0:8081 --workers=3 --keep-alive 20 --log-level info --access-logfile=/var/log/gunicorn/access.log --error-logfile=/var/log/gunicorn/error.log --capture-output --timeout 50
 fi

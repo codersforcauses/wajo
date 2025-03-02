@@ -16,5 +16,3 @@ COPY ./server ./
 RUN poetry install --without dev
 
 RUN chmod +x /entrypoint.sh
-
-EXPOSE 8000
