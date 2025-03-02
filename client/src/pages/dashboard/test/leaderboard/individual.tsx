@@ -53,7 +53,7 @@ export default function IndividualLeaderboardIndex() {
     setSearchParams(updatedParams);
     push(
       {
-        pathname: "/test/leaderboard/individual",
+        pathname: "/dashboard/test/leaderboard/individual",
         query: Object.fromEntries(
           Object.entries(updatedParams).filter(([_, v]) => Boolean(v))
         ),

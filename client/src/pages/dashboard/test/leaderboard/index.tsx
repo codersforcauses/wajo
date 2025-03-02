@@ -53,7 +53,7 @@ export default function TeamLeaderboardIndex() {
     setSearchParams(updatedParams);
     push(
       {
-        pathname: "/test/leaderboard/team",
+        pathname: "/dashboard/test/leaderboard",
         query: Object.fromEntries(
           Object.entries(updatedParams).filter(([_, v]) => Boolean(v))
         ),

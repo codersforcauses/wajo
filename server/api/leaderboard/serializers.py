@@ -42,7 +42,7 @@ class IndividualLeaderboardSerializer(serializers.ModelSerializer):
 
 class StudentSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
-    
+
     def get_name(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}".strip()
 

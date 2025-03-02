@@ -112,17 +112,17 @@ export function TeamDataGrid({
         key={index}
         className="divide-gray-200 border-gray-50 text-sm text-black"
       >
-        <TableCell className="w-1/4 ">{item.school}</TableCell>
-        <TableCell className="w-1/4">{item.id}</TableCell>
-        <TableCell className="w-1/4">{item.total_marks}</TableCell>
-        <TableCell className="w-1/4">
+        <TableCell>{item.school}</TableCell>
+        <TableCell>{item.id}</TableCell>
+        <TableCell>{item.total_marks}</TableCell>
+        <TableCell>
           {item.is_country === true
             ? "Yes"
             : item.is_country === false
             ? "No"
             : ""}
         </TableCell>
-        <TableCell className="w-1/4">{item.max_year}</TableCell>
+        <TableCell>{item.max_year}</TableCell>
         {studentCells}
       </TableRow>
     );

@@ -74,7 +74,7 @@ export function IndividualDataGrid({
                 </span>
               </div></TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>School Type</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Is Country?</TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>Country School</TableHead>
             <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
               <div className="flex items-center text-white">
                 <span>Total Marks</span>
@@ -95,18 +95,18 @@ export function IndividualDataGrid({
                 key={index}
                 className={"divide-gray-200 border-gray-50 text-sm text-black"}
               >
-                <TableCell className="w-1/4 whitespace-nowrap">{item.name}</TableCell>
-                <TableCell className="w-1/4">{item.year_level}</TableCell>
-                <TableCell className="w-1/4">{item.school}</TableCell>
-                <TableCell className="w-1/4">{item.school_type}</TableCell>
-                <TableCell className="w-1/4">
+                <TableCell className="whitespace-nowrap">{item.name}</TableCell>
+                <TableCell>{item.year_level}</TableCell>
+                <TableCell>{item.school}</TableCell>
+                <TableCell>{item.school_type}</TableCell>
+                <TableCell>
                   {item.is_country === true
                     ? "Yes"
                     : item.is_country === false
                     ? "No"
                     : ""}
                 </TableCell>
-                <TableCell className="text-center">{item.total_marks}</TableCell>
+                <TableCell>{item.total_marks}</TableCell>
               </TableRow>
             ))
           ) : (
