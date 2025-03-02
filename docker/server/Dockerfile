@@ -11,8 +11,11 @@ WORKDIR /app
 
 COPY ./docker/server/entrypoint.sh /entrypoint.sh
 
-COPY ./server ./
+COPY ./server/pyproject.toml ./server/poetry.lock ./
 
 RUN poetry install --without dev
 
+COPY ./server ./
+
 RUN chmod +x /entrypoint.sh
+CMD ["/entrypoint.sh"]
