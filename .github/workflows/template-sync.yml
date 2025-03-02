@@ -18,11 +18,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           # submodules: true
-          token: ${{ secrets.TEMPLATE_SYNC_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: actions-template-sync
         uses: AndreasAugustin/actions-template-sync@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_gh_token: ${{ secrets.GITHUB_TOKEN }}
           source_repo_path: codersforcauses/django-nextjs-template
           upstream_branch: main
