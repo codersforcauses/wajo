@@ -15,6 +15,7 @@ COPY ./client/package.json ./client/package-lock.json ./
 RUN npm install
 # Copy Application code into a directory called `app`
 COPY ./client ./
+
 ARG NEXT_PUBLIC_BACKEND_URL_BASE
 ENV NEXT_PUBLIC_BACKEND_URL_BASE=$NEXT_PUBLIC_BACKEND_URL_BASE
 ARG NEXT_PUBLIC_BACKEND_URL
