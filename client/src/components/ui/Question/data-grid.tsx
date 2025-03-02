@@ -1,8 +1,12 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
+import DateTimeDisplay from "@/components/ui/date-format";
 import DeleteModal from "@/components/ui/delete-modal";
+import { SortIcon } from "@/components/ui/icon";
+import { WaitingLoader } from "@/components/ui/loading";
 import {
   Table,
   TableBody,
@@ -15,9 +19,6 @@ import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
 import { Question } from "@/types/question";
 
-import DateTimeDisplay from "../date-format";
-import { SortIcon } from "../icon";
-
 /**
  * The Datagrid component is a flexible, paginated data table with sorting and navigation features.
  *
@@ -25,6 +26,9 @@ import { SortIcon } from "../icon";
  */
 export function Datagrid({
   datacontext,
+  isLoading,
+  startIdx,
+  onDeleteSuccess,
   onOrderingChange = () => {},
 }: DatagridProps<Question>) {
   const router = useRouter();
@@ -36,7 +40,7 @@ export function Datagrid({
         <Table className="w-full border-collapse text-left shadow-md">
           <TableHeader className="bg-black text-lg font-semibold">
             <TableRow className="hover:bg-muted/0">
-              <TableHead className={commonTableHeadClasses}>Id</TableHead>
+              <TableHead className={commonTableHeadClasses}>No.</TableHead>
               <TableHead className={commonTableHeadClasses}>Name</TableHead>
               <TableHead
                 className={commonTableHeadClasses}
@@ -67,7 +71,7 @@ export function Datagrid({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {datacontext.length > 0 ? (
+            {!isLoading && datacontext.length > 0 ? (
               datacontext.map((item, index) => (
                 <TableRow
                   key={item.id}
@@ -75,7 +79,9 @@ export function Datagrid({
                     "divide-gray-200 border-gray-50 text-sm text-black"
                   }
                 >
-                  <TableCell className="w-0">{item.id}</TableCell>
+                  <TableCell className="w-0">
+                    {startIdx ? startIdx + index : item.id}
+                  </TableCell>
                   <TableCell className="w-1/2 max-w-80 truncate">
                     {item.name}
                   </TableCell>
@@ -89,16 +95,14 @@ export function Datagrid({
                   </TableCell>
                   <TableCell className="sticky right-0 flex bg-white">
                     <div className="flex w-full justify-between">
-                      <Button
-                        className="me-2"
-                        onClick={() => router.push(`/question/${item.id}`)}
-                      >
-                        View
+                      <Button asChild className="me-2">
+                        <Link href={`${router.pathname}/${item.id}`}>View</Link>
                       </Button>
                       <DeleteModal
                         baseUrl="/questions/question-bank"
                         entity="question"
                         id={item.id}
+                        onSuccess={onDeleteSuccess}
                       >
                         <Button variant={"destructive"}>Delete</Button>
                       </DeleteModal>
@@ -112,7 +116,11 @@ export function Datagrid({
                   colSpan={7}
                   className="py-4 text-center text-gray-500"
                 >
-                  No Results Found
+                  {isLoading ? (
+                    <WaitingLoader className="p-0" />
+                  ) : (
+                    "No Results Found"
+                  )}
                 </TableCell>
               </TableRow>
             )}

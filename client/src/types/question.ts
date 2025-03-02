@@ -7,6 +7,13 @@ export interface Category {
   info: string;
 }
 
+export interface CategoryPaged {
+  count: number;
+  next: string;
+  previous: string;
+  results: Category[];
+}
+
 /**
  * Represents a Question object with its properties.
  *
@@ -41,6 +48,13 @@ export interface Question {
   time_created: Date;
   time_modified: Date;
   images: QuestionImage[];
+}
+
+export interface QuestionPaged {
+  count: number;
+  next: string;
+  previous: string;
+  results: Question[];
 }
 
 export interface QuestionImage {
@@ -165,6 +179,7 @@ export interface DeleteModalProps {
   id: number;
   entity: string;
   children: ReactNode;
+  onSuccess?: () => void;
 }
 
 export const createCategorySchema = z.object({

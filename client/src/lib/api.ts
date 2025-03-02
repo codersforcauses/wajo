@@ -55,8 +55,9 @@ api.interceptors.response.use(
 
     const refreshTokenValid =
       tokenState.refresh != undefined && tokenState.refresh.expiry > Date.now();
-    const isAuthError =
-      error.response?.status === 401 || error.response?.status === 403;
+    // const isAuthError =
+    //   error.response?.status === 401 || error.response?.status === 403;
+    const isAuthError = error.response?.status === 401;
 
     if (
       refreshTokenValid == true &&
