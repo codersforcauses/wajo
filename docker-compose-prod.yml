@@ -23,7 +23,7 @@ services:
       - ./opt/accesslogs/:/var/log/accesslogs/
       - ./opt/static_files:/opt/static_files
     environment:
-      - DJANGO_SETTINGS_MODULE=wajo.settings
+      - DJANGO_SETTINGS_MODULE=api.settings
     depends_on:
       - db
 
