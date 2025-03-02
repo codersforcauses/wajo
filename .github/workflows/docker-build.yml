@@ -60,8 +60,8 @@ jobs:
           file: ./docker/client/Dockerfile
           push: true
           build-args: |
-            NEXT_PUBLIC_BACKEND_URL_BASE=${{ vars.NEXT_PUBLIC_BACKEND_URL_BASE }}
-            NEXT_PUBLIC_BACKEND_URL=${{ vars.NEXT_PUBLIC_BACKEND_URL }}
+            NEXT_PUBLIC_BACKEND_URL_BASE=${{ secrets.NEXT_PUBLIC_BACKEND_URL_BASE }}
+            NEXT_PUBLIC_BACKEND_URL=${{ secrets.NEXT_PUBLIC_BACKEND_URL }}
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/wajo-prod-client:latest
             ${{ vars.DOCKERHUB_USERNAME }}/wajo-prod-client:${{ env.date }}
