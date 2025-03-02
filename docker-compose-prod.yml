@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./data/db:/var/lib/postgresql/data
-    env_file: server/.env.prod
+    env_file: ./.env.prod
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 3s
@@ -15,7 +15,7 @@ services:
     image: ${DOCKERHUB_USERNAME}/wajo-prod-server:latest
     container_name: wajo_server
     restart: unless-stopped
-    env_file: server/.env.prod
+    env_file: ./.env.prod
     ports:
       - 8081:8081
     entrypoint: /entrypoint.sh
@@ -31,7 +31,7 @@ services:
     image: ${DOCKERHUB_USERNAME}/wajo-prod-client:latest
     container_name: wajo_client
     restart: unless-stopped
-    env_file: client/.env.prod
+    env_file: ./.env.prod
     ports:
       - 8000:8000
     entrypoint: /entrypoint.sh
