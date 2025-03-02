@@ -59,9 +59,6 @@ fi
 
 if [[ "${APP_ENV^^}" = "PRODUCTION" ]]; then
     echo "  "
-    echo "======= Building nextjs webserver ==================================================================="
-    npm run build
-    echo "  "
     echo "======= Starting nextjs webserver ==================================================================="
     npm run start
 fi
