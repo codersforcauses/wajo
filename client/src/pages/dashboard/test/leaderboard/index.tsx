@@ -30,11 +30,12 @@ export default function TeamLeaderboardIndex() {
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<TeamLeaderboard>({
-    queryKey: ["leaderboard.team"],
-    endpoint: "/leaderboard/team/",
-    searchParams: searchParams,
-  });
+  const { data, isLoading, error, totalPages } =
+    useFetchDataTable<TeamLeaderboard>({
+      queryKey: ["leaderboard.team"],
+      endpoint: "/leaderboard/team/",
+      searchParams: searchParams,
+    });
 
   useEffect(() => {
     if (isReady && !isLoading) {
@@ -46,7 +47,14 @@ export default function TeamLeaderboardIndex() {
       }));
       setOrderings(stringToOrdering(query.ordering as string));
     }
-  }, [query.ordering, query.search, query.nrows, query.page, isReady, isLoading]);
+  }, [
+    query.ordering,
+    query.search,
+    query.nrows,
+    query.page,
+    isReady,
+    isLoading,
+  ]);
 
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
@@ -55,11 +63,11 @@ export default function TeamLeaderboardIndex() {
       {
         pathname: "/dashboard/test/leaderboard",
         query: Object.fromEntries(
-          Object.entries(updatedParams).filter(([_, v]) => Boolean(v))
+          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),
       },
       undefined,
-      { shallow: true }
+      { shallow: true },
     );
   };
 
@@ -77,17 +85,17 @@ export default function TeamLeaderboardIndex() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-        <div className="m-4 space-y-4">
-          <div className="flex justify-between">
-            <SearchInput
-              label=""
-              value={searchParams.search ?? ""}
-              placeholder="Search Schools and Teams"
-              onSearch={(newSearch: string) => {
-                setAndPush({ search: newSearch, page: 1 });
-              }}
-            />
-          </div>
+    <div className="m-4 space-y-4">
+      <div className="flex justify-between">
+        <SearchInput
+          label=""
+          value={searchParams.search ?? ""}
+          placeholder="Search Schools and Teams"
+          onSearch={(newSearch: string) => {
+            setAndPush({ search: newSearch, page: 1 });
+          }}
+        />
+      </div>
 
       <Suspense fallback={<WaitingLoader />}>
         <div>
@@ -102,7 +110,9 @@ export default function TeamLeaderboardIndex() {
               <SelectRow
                 className="h-7 w-20"
                 selectedRow={searchParams.nrows}
-                onChange={(newNrows) => setAndPush({ nrows: Number(newNrows), page: 1 })}
+                onChange={(newNrows) =>
+                  setAndPush({ nrows: Number(newNrows), page: 1 })
+                }
               />
             </div>
             <Pagination

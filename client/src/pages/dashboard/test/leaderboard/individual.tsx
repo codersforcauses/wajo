@@ -8,7 +8,7 @@ import {
   SelectRow,
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
-import { IndividualDataGrid } from "@/components/ui/Test/individual-data-grid"; 
+import { IndividualDataGrid } from "@/components/ui/Test/individual-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import {
   OrderingItem,
@@ -30,11 +30,12 @@ export default function IndividualLeaderboardIndex() {
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<IndividualLeaderboard>({
-    queryKey: ["leaderboard.individual"],
-    endpoint: "/leaderboard/individual/",
-    searchParams: searchParams,
-  });
+  const { data, isLoading, error, totalPages } =
+    useFetchDataTable<IndividualLeaderboard>({
+      queryKey: ["leaderboard.individual"],
+      endpoint: "/leaderboard/individual/",
+      searchParams: searchParams,
+    });
 
   useEffect(() => {
     if (isReady && !isLoading) {
@@ -46,7 +47,14 @@ export default function IndividualLeaderboardIndex() {
       }));
       setOrderings(stringToOrdering(query.ordering as string));
     }
-  }, [query.ordering, query.search, query.nrows, query.page, isReady, isLoading]);
+  }, [
+    query.ordering,
+    query.search,
+    query.nrows,
+    query.page,
+    isReady,
+    isLoading,
+  ]);
 
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
@@ -55,11 +63,11 @@ export default function IndividualLeaderboardIndex() {
       {
         pathname: "/dashboard/test/leaderboard/individual",
         query: Object.fromEntries(
-          Object.entries(updatedParams).filter(([_, v]) => Boolean(v))
+          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),
       },
       undefined,
-      { shallow: true }
+      { shallow: true },
     );
   };
 
@@ -103,7 +111,9 @@ export default function IndividualLeaderboardIndex() {
               <SelectRow
                 className="h-7 w-20"
                 selectedRow={searchParams.nrows}
-                onChange={(newNrows) => setAndPush({ nrows: Number(newNrows), page: 1 })}
+                onChange={(newNrows) =>
+                  setAndPush({ nrows: Number(newNrows), page: 1 })
+                }
               />
             </div>
             <Pagination

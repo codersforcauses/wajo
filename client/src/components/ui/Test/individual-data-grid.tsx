@@ -32,7 +32,6 @@ export function IndividualDataGrid({
   datacontext,
   onOrderingChange = () => {},
 }: DatagridProps<IndividualLeaderboard>) {
-
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
 
   return (
@@ -41,7 +40,7 @@ export function IndividualDataGrid({
         <TableHeader className="bg-black text-lg font-semibold">
           <TableRow className="hover:bg-muted/0">
             <TableHead className={cn(commonTableHeadClasses, "rounded-tl-lg")}>
-            <div className="flex items-center text-white">
+              <div className="flex items-center text-white">
                 <span>Student Name</span>
                 <span
                   className="ml-2 cursor-pointer"
@@ -50,7 +49,6 @@ export function IndividualDataGrid({
                   <SortIcon />
                 </span>
               </div>
-              
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
               <div className="flex items-center text-white">
@@ -64,7 +62,7 @@ export function IndividualDataGrid({
               </div>
             </TableHead>
             <TableHead className={cn(commonTableHeadClasses)}>
-            <div className="flex items-center text-white">
+              <div className="flex items-center text-white">
                 <span>School Name</span>
                 <span
                   className="ml-2 cursor-pointer"
@@ -72,9 +70,14 @@ export function IndividualDataGrid({
                 >
                   <SortIcon />
                 </span>
-              </div></TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>School Type</TableHead>
-            <TableHead className={cn(commonTableHeadClasses)}>Country School</TableHead>
+              </div>
+            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              School Type
+            </TableHead>
+            <TableHead className={cn(commonTableHeadClasses)}>
+              Country School
+            </TableHead>
             <TableHead className={cn(commonTableHeadClasses, "rounded-tr-lg")}>
               <div className="flex items-center text-white">
                 <span>Total Marks</span>
@@ -103,8 +106,8 @@ export function IndividualDataGrid({
                   {item.is_country === true
                     ? "Yes"
                     : item.is_country === false
-                    ? "No"
-                    : ""}
+                      ? "No"
+                      : ""}
                 </TableCell>
                 <TableCell>{item.total_marks}</TableCell>
               </TableRow>
