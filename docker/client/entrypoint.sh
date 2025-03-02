@@ -58,7 +58,9 @@ if [ "${APP_ENV^^}" = "DEVELOPMENT" ]; then
 fi
 
 if [[ "${APP_ENV^^}" = "PRODUCTION" ]]; then
-    # npm install --production
+    echo "  "
+    echo "======= Building nextjs webserver ==================================================================="
+    npm run build
     echo "  "
     echo "======= Starting nextjs webserver ==================================================================="
     npm run start
