@@ -110,11 +110,11 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    FRONTEND_URL,
-]
+CORS_ALLOWED_ORIGINS = (
+    os.environ.get("API_CORS_ALLOWED_ORIGINS").split(" ")
+    if os.environ.get("API_CORS_ALLOWED_ORIGINS")
+    else []
+) + [FRONTEND_URL]
 
 ROOT_URLCONF = "api.urls"
 
