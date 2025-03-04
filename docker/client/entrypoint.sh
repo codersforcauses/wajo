@@ -56,3 +56,9 @@ if [ "${APP_ENV^^}" = "DEVELOPMENT" ]; then
     npm run dev
     exit
 fi
+
+if [[ "${APP_ENV^^}" = "PRODUCTION" ]]; then
+    echo "  "
+    echo "======= Starting nextjs webserver ==================================================================="
+    npm run start
+fi

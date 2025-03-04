@@ -13,7 +13,7 @@ COPY ./docker/server/entrypoint.sh /entrypoint.sh
 
 COPY ./server/pyproject.toml ./server/poetry.lock ./
 
-RUN poetry install
+RUN poetry install --without dev
 
 COPY ./server ./
 

@@ -1,4 +1,4 @@
-FROM node:20-slim as development-stage
+FROM node:20-slim
 
 # SET WORKING DIRECTORY
 WORKDIR /app
@@ -6,20 +6,21 @@ WORKDIR /app
 # Copy runtime script & make it executable
 COPY /docker/client/entrypoint.sh /entrypoint.sh
 
+# Make the script executable
+RUN chmod +x /entrypoint.sh
+
+# Copy package.json and package-lock.json
 COPY ./client/package.json ./client/package-lock.json ./
 
-# Install ALL Dependencies
 RUN npm install
-
 # Copy Application code into a directory called `app`
-COPY ./client /app
+COPY ./client ./
 
-# ========================================
-# ---- Executed at Container Runtime ----
-# ========================================
+ARG NEXT_PUBLIC_BACKEND_URL_BASE
+ENV NEXT_PUBLIC_BACKEND_URL_BASE=$NEXT_PUBLIC_BACKEND_URL_BASE
+ARG NEXT_PUBLIC_BACKEND_URL
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
-# CMD commands get executed at container runtime!
-RUN chmod +x /entrypoint.sh
-CMD ["/entrypoint.sh"]
+RUN npm run build
 
-# TODO: Production 
+EXPOSE 3000
