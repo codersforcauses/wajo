@@ -1,7 +1,7 @@
 import MultipleSelector, { Option } from "@/components/ui/multiple-select";
-import { useFetchData } from "@/hooks/use-fetch-data";
+import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import { cn } from "@/lib/utils";
-import { CategoryResponse } from "@/types/question";
+import { Category } from "@/types/question";
 
 type Props = {
   value?: Option[];
@@ -12,19 +12,23 @@ type Props = {
 export function MultipleSelectCategory({ value, onChange, className }: Props) {
   const {
     data: categories,
-    isPending,
+    isLoading,
     isError,
-  } = useFetchData<CategoryResponse>({
-    queryKey: ["questions.categories"],
+  } = useFetchDataTable<Category>({
+    queryKey: ["questions.categories.all"],
     endpoint: "/questions/categories/",
+    searchParams: {
+      nrows: 999999, // to get all with some large number
+      page: 1,
+    },
   });
 
-  if (isPending || isError) return;
+  if (isLoading || isError) return;
 
   const categoryOptions =
-    isPending || isError
+    isLoading || isError
       ? []
-      : categories.results?.map((cat) => ({
+      : categories?.map((cat) => ({
           label: cat.genre,
           value: cat.id.toString(),
         }));
@@ -37,7 +41,7 @@ export function MultipleSelectCategory({ value, onChange, className }: Props) {
       defaultOptions={categoryOptions}
       placeholder="Select categories..."
       emptyIndicator="No categories found."
-      disabled={isPending || isError}
+      disabled={isLoading || isError}
     />
   );
 }

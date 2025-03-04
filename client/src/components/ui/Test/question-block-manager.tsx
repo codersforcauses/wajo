@@ -31,8 +31,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useFetchData } from "@/hooks/use-fetch-data";
-import { Question, QuestionResponse } from "@/types/question";
+import { useFetchDataTable } from "@/hooks/use-fetch-data";
+import { Question } from "@/types/question";
 
 type Props = {
   formControl: Control<any>;
@@ -183,11 +183,15 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
 
   const {
     data: questionList,
-    isPending,
+    isLoading: isPending,
     isError,
-  } = useFetchData<QuestionResponse>({
-    queryKey: ["questions.question-bank"],
+  } = useFetchDataTable<Question>({
+    queryKey: ["questions.question-bank.all"],
     endpoint: "/questions/question-bank/",
+    searchParams: {
+      nrows: 999999, // to get all with some large number
+      page: 1,
+    },
   });
 
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -198,9 +202,9 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
   const handleSearch = (value: string) => {
     setSearchTerm(value);
     const filtered =
-      isPending || isError || !questionList
+      isPending || isError || !questionList || !value
         ? []
-        : questionList.results.filter((question) =>
+        : questionList.filter((question) =>
             question.name.toLowerCase().includes(value.toLowerCase()),
           );
     setSearchResults(filtered);

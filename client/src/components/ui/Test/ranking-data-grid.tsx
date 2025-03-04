@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
+import { WaitingLoader } from "@/components/ui/loading";
 import {
   Table,
   TableBody,
@@ -35,6 +36,7 @@ import { Ranking } from "@/types/leaderboard";
  */
 export function RankingDataGrid({
   datacontext,
+  isLoading,
   onOrderingChange = () => {},
 }: DatagridProps<Ranking>) {
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
@@ -64,7 +66,7 @@ export function RankingDataGrid({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {datacontext.length > 0 ? (
+            {!isLoading && datacontext.length > 0 ? (
               datacontext.map((item, index) => (
                 <TableRow
                   key={index}
@@ -87,7 +89,11 @@ export function RankingDataGrid({
                   colSpan={4}
                   className="py-4 text-center text-gray-500"
                 >
-                  No Results Found
+                  {isLoading ? (
+                    <WaitingLoader className="p-0" />
+                  ) : (
+                    "No Results Found"
+                  )}
                 </TableCell>
               </TableRow>
             )}

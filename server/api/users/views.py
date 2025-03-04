@@ -74,22 +74,18 @@ class StudentViewSet(viewsets.ModelViewSet):
         if hasattr(request.user, "teacher"):
             # teacher can only create students for their school
             for student in data:
-                student["school_id"] = request.user.teacher.school.id
-
+                student["school_id"] = self.request.user.teacher.school.id
             serializer = self.get_serializer(data=data, many=True)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
-            for i, student in enumerate(serializer.data):
-                student["password"] = request.data[i]["password"]
+            self.set_passwords(serializer.data, data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif self.request.user.is_staff:
             # allow bulk creation of students by admin
             serializer = self.get_serializer(data=data, many=True)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
-            for i, student in enumerate(serializer.data):
-                student["password"] = request.data[i]["password"]
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            self.set_passwords(serializer.data, data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(
@@ -114,6 +110,13 @@ class StudentViewSet(viewsets.ModelViewSet):
                     error), "message": "A student with this username already exists."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    def set_passwords(self, serialized_data, original_data) -> None:
+        """
+        Sets the plan text passwords for the students when they are created.
+        """
+        for item, student_data in zip(serialized_data, original_data):
+            item["password"] = student_data["password"]
 
 
 @permission_classes([IsAuthenticated])
@@ -147,7 +150,10 @@ class TeacherViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         if request.user.is_staff:
-            return super().create(request, *args, **kwargs)
+            serializer = self.get_serializer(data=request.data, many=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(
                 {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)

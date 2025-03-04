@@ -41,8 +41,7 @@ export function ProtectedPage({ children, requiredRoles }: ProtectedPageProps) {
   }, [isLoggedIn, userRole, requiredRoles]);
 
   if (isInitializing) return <WaitingLoader />;
-  // console.log(userRole);
-  // console.log(authState);
+
   switch (authState) {
     case "unauthorized":
       return (
@@ -62,7 +61,6 @@ export function ProtectedPage({ children, requiredRoles }: ProtectedPageProps) {
         </Sidebar>
       );
     case "authorized":
-      // console.log("inside authorized");
       return (
         <Sidebar
           role={userRole.toLowerCase() as Role}

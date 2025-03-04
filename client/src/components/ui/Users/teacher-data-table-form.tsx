@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -53,7 +54,8 @@ type Teacher = z.infer<typeof createTeacherSchema>;
  */
 export function TeacherDataTableForm() {
   const router = useRouter();
-  const { mutateAsync: postTeachers, isPending } = usePostMutation<Teacher[]>({
+  const queryClient = useQueryClient();
+  const { mutate: postTeachers, isPending } = usePostMutation<Teacher[]>({
     mutationKey: ["teachers", "users"],
     endpoint: "/users/teachers/",
   });
@@ -79,26 +81,19 @@ export function TeacherDataTableForm() {
     name: "teachers",
   });
 
-  const onSubmit = async (data: { teachers: Teacher[] }) => {
-    console.log("Inside onSubmit");
-    console.log("Submitting data:", data);
-    await data.teachers.forEach((teacher) => {
-      if (teacher.email == "") {
-        teacher.email = "example@gmail.com";
-      }
-      if (teacher.phone == "") {
-        teacher.phone = "0";
-      }
-      postTeachers(teacher, {
-        onSuccess: (response) => {
-          toast.success("Teacher created successfully");
-          console.log("Response:", response);
-        },
-        onError: (error) => {
-          toast.error("Failed to create teacher");
-          console.error("Error creating teacher", error);
-        },
-      });
+  const onSubmit = (data: { teachers: Teacher[] }) => {
+    console.log("inside onSubmit", data);
+    postTeachers(data.teachers, {
+      onSuccess: (response) => {
+        queryClient.invalidateQueries();
+        toast.success("Teachers created successfully");
+        console.log("Response:", response);
+        router.push("/dashboard/users/teachers");
+      },
+      onError: (error) => {
+        toast.error("Failed to create teachers");
+        console.error("Error creating teachers", error);
+      },
     });
   };
 
@@ -107,8 +102,10 @@ export function TeacherDataTableForm() {
     <div className="space-y-4 p-4">
       <Form {...createTeacherForm}>
         <form
-          id="create_user_form"
-          onSubmit={createTeacherForm.handleSubmit(onSubmit)}
+          id="create_teacher_form"
+          onSubmit={createTeacherForm.handleSubmit(onSubmit, (errors) => {
+            console.log("Errors:", errors);
+          })}
           className="space-y-4"
         >
           <Table className="w-full border-collapse text-left shadow-md">
@@ -278,7 +275,9 @@ export function TeacherDataTableForm() {
             >
               Add Row
             </Button>
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isPending}>
+              Submit
+            </Button>
           </div>
         </form>
       </Form>

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import DateTimeDisplay from "@/components/ui/date-format";
 import DeleteModal from "@/components/ui/delete-modal";
+import { WaitingLoader } from "@/components/ui/loading";
 import {
   Table,
   TableBody,
@@ -52,6 +53,9 @@ import { Role, Student, Teacher, User } from "@/types/user";
  */
 export function DataGrid({
   datacontext,
+  isLoading,
+  startIdx,
+  onDeleteSuccess,
   onOrderingChange,
 }: DatagridProps<User | Student | Teacher>) {
   const { userId } = useAuth();
@@ -80,7 +84,7 @@ export function DataGrid({
         <Table className="w-full border-collapse text-left shadow-md">
           <TableHeader className="w-full bg-black text-lg font-semibold">
             <TableRow className="hover:bg-muted/0">
-              <TableHead className={commonTableHeadClasses}>User Id</TableHead>
+              <TableHead className={commonTableHeadClasses}>No.</TableHead>
               <TableHead className={commonTableHeadClasses}>
                 User Name
               </TableHead>
@@ -90,7 +94,7 @@ export function DataGrid({
               <TableHead className={commonTableHeadClasses}>
                 Last Name
               </TableHead>
-              {role === Role.ADMIN && (
+              {role !== Role.ADMIN && (
                 <TableHead className={commonTableHeadClasses}>School</TableHead>
               )}
               <TableHead
@@ -101,7 +105,7 @@ export function DataGrid({
             </TableRow>
           </TableHeader>
           <TableBody className="w-full">
-            {datacontext.length > 0 ? (
+            {!isLoading && datacontext.length > 0 ? (
               datacontext.map((item, index) => (
                 <TableRow
                   key={index}
@@ -109,15 +113,19 @@ export function DataGrid({
                     "divide-gray-200 border-gray-50 text-sm text-black"
                   }
                 >
-                  <TableCell className="w-1/4">{item.id}</TableCell>
+                  <TableCell className="w-1/4">
+                    {startIdx ? startIdx + index : item.id}
+                  </TableCell>
                   <TableCell className="w-1/4">
                     {!item.id
                       ? ""
-                      : item.username
-                        ? item.username
-                        : item.student_id
-                          ? item.student_id
-                          : "-"}
+                      : item.student_id
+                        ? item.student_id
+                        : item.username
+                          ? item.username
+                          : item.last_name && item.first_name
+                            ? `${item.last_name}${item.first_name}`
+                            : "-"}
                   </TableCell>
                   <TableCell className="w-1/4">
                     {!item.id ? "" : item.first_name ? item.first_name : "-"}
@@ -125,25 +133,28 @@ export function DataGrid({
                   <TableCell className="w-1/4">
                     {!item.id ? "" : item.last_name ? item.last_name : "-"}
                   </TableCell>
-                  {role === Role.ADMIN && item.id && (
+                  {role !== Role.ADMIN && item.id && (
                     <TableCell className="w-1/4">
                       {item.school?.name ? item.school.name : "-"}
                     </TableCell>
                   )}
                   <TableCell className="flex py-4">
                     <div className={cn("flex", { invisible: !item.id })}>
-                      <Button asChild className="me-2">
-                        <Link
-                          href={`${router.pathname}/${item.id}?entity=${entityName}`}
-                        >
-                          View
-                        </Link>
-                      </Button>
-                      {item.id.toString() === userId && (
+                      {(entityName !== "staffs" ||
+                        (entityName === "staffs" &&
+                          item.id.toString() === userId?.toString())) && (
+                        <Button asChild className="me-2">
+                          <Link href={`${router.pathname}/${item.id}`}>
+                            View
+                          </Link>
+                        </Button>
+                      )}
+                      {entityName !== "staffs" && (
                         <DeleteModal
                           baseUrl={`/users/${entityName}`}
                           entity={entityName.replace(/s$/, "")}
                           id={item.id}
+                          onSuccess={onDeleteSuccess}
                         >
                           <Button
                             variant={"destructive"}
@@ -165,7 +176,11 @@ export function DataGrid({
                   colSpan={6}
                   className="py-4 text-center text-gray-500"
                 >
-                  No Results Found
+                  {isLoading ? (
+                    <WaitingLoader className="p-0" />
+                  ) : (
+                    "No Results Found"
+                  )}
                 </TableCell>
               </TableRow>
             )}

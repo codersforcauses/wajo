@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import {
   Select,
   SelectContent,
@@ -51,6 +53,13 @@ export function SelectSchool({ selectedId, onChange, className }: Props) {
     },
   });
 
+  // Auto Select when only 1 data
+  useEffect(() => {
+    if (data?.length === 1 && !selectedId) {
+      onChange(data[0].id);
+    }
+  }, [data, selectedId, onChange]);
+
   const onValueChange = (value: string) => {
     const parsed = parseInt(value);
     if (parsed) {
@@ -58,12 +67,7 @@ export function SelectSchool({ selectedId, onChange, className }: Props) {
     }
   };
 
-  // Auto Select when only 1 data
-  const value = selectedId
-    ? selectedId.toString()
-    : data?.length === 1
-      ? data[0].id.toString()
-      : "";
+  const value = selectedId ? selectedId.toString() : "";
   return (
     <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger className={cn(className)}>

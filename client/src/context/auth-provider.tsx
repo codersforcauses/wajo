@@ -7,7 +7,7 @@ import { useTokenStore } from "@/store/token-store";
 import { Role } from "@/types/user";
 
 type AuthContextType = {
-  userId: string | null;
+  userId: string | number | null;
   userRole: Role;
   primaryId: string | null;
   isLoggedIn: boolean;
