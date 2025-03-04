@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
+import { ProtectedPage } from "@/components/layout";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
@@ -16,8 +17,18 @@ import {
   stringToOrdering,
 } from "@/types/data-grid";
 import { IndividualLeaderboard } from "@/types/leaderboard";
+import { Role } from "@/types/user";
 
-export default function IndividualLeaderboardIndex() {
+export default function PageConfig() {
+  const roles = [Role.ADMIN];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <IndividualLeaderboardIndex />
+    </ProtectedPage>
+  );
+}
+
+function IndividualLeaderboardIndex() {
   const router = useRouter();
   const { query, isReady, push } = router;
 

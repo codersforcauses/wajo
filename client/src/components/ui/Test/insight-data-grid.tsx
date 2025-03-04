@@ -58,7 +58,7 @@ export function InsightDataGrid({
               <TableHead
                 className={cn(commonTableHeadClasses, "rounded-tl-lg")}
               >
-                Qeustion Name
+                Question Name
               </TableHead>
               <TableHead className={cn(commonTableHeadClasses)}>
                 Genre

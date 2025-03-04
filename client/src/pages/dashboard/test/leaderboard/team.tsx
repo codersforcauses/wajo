@@ -2,70 +2,120 @@ import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
 import { ProtectedPage } from "@/components/layout";
+import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
-  toQueryString,
 } from "@/components/ui/pagination";
-import { InsightDataGrid } from "@/components/ui/Test/insight-data-grid";
+import { SearchInput } from "@/components/ui/search";
+import { TeamDataGrid } from "@/components/ui/Test/team-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
-import { Insight } from "@/types/leaderboard";
+import {
+  OrderingItem,
+  orderingToString,
+  stringToOrdering,
+} from "@/types/data-grid";
+import { TeamLeaderboard } from "@/types/leaderboard";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
   const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <InsightPage />
+      <TeamLeaderboardIndex />
     </ProtectedPage>
   );
 }
 
-function InsightPage() {
+function TeamLeaderboardIndex() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
+  const [orderings, setOrderings] = useState<OrderingItem>({});
+
   const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
+    ordering: orderingToString(orderings),
     search: "",
     nrows: 5,
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages } = useFetchDataTable<Insight>({
-    queryKey: ["leaderboard.team"],
-    endpoint: "/leaderboard/team/",
-    searchParams: searchParams,
-  });
+  const { data, isLoading, error, totalPages } =
+    useFetchDataTable<TeamLeaderboard>({
+      queryKey: ["leaderboard.team"],
+      endpoint: "/leaderboard/team/",
+      searchParams: searchParams,
+    });
 
   useEffect(() => {
-    if (!isLoading) {
+    if (isReady && !isLoading) {
       setSearchParams((prev) => ({
+        ordering: (query.ordering as string) || prev.ordering,
         search: (query.search as string) || prev.search,
         nrows: Number(query.nrows) || prev.nrows,
         page: Number(query.page) || prev.page,
       }));
+      setOrderings(stringToOrdering(query.ordering as string));
     }
-  }, [query.search, query.nrows, query.page, !isLoading]);
+  }, [
+    query.ordering,
+    query.search,
+    query.nrows,
+    query.page,
+    isReady,
+    isLoading,
+  ]);
 
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
+    push(
+      {
+        pathname: "/dashboard/test/leaderboard",
+        query: Object.fromEntries(
+          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
+        ),
+      },
+      undefined,
+      { shallow: true },
+    );
+  };
+
+  const onOrderingChange = (field: keyof OrderingItem) => {
+    setOrderings((prevOrderings) => {
+      const newOrder = prevOrderings[field] === "asc" ? "desc" : "asc";
+      const newOrderings = {
+        [field]: newOrder,
+      } as OrderingItem;
+      setAndPush({ ordering: orderingToString(newOrderings) });
+      return newOrderings;
+    });
   };
 
   if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div className="m-4 space-y-4">
-      <Suspense>
+      <div className="flex justify-between">
+        <SearchInput
+          label=""
+          value={searchParams.search ?? ""}
+          placeholder="Search Schools and Teams"
+          onSearch={(newSearch: string) => {
+            setAndPush({ search: newSearch, page: 1 });
+          }}
+        />
+      </div>
+
+      <Suspense fallback={<WaitingLoader />}>
         <div>
-          <InsightDataGrid
+          <TeamDataGrid
             datacontext={data ?? []}
             isLoading={!isReady || isLoading}
+            onOrderingChange={onOrderingChange}
           />
           <div className="flex items-center justify-between p-4">
-            {/* Rows Per Page Selector */}
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-600">Rows per page:</span>
               <SelectRow
@@ -76,7 +126,6 @@ function InsightPage() {
                 }
               />
             </div>
-            {/* Pagination Controls */}
             <Pagination
               totalPages={totalPages}
               currentPage={searchParams.page}
