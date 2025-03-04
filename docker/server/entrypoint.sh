@@ -40,8 +40,18 @@ fi
 # ===================
 if [ "${APP_ENV^^}" = "PRODUCTION" ]; then
 
+    # if the number of workers is not set, default to 1
+    if [ -z "${GUNICORN_WORKERS}" ]; then
+        GUNICORN_WORKERS=3
+    fi
+
+    # if the port is not set, default to 8081
+    if [ -z "${GUNICORN_PORT}" ]; then
+        GUNICORN_PORT=8081
+    fi
+
     # Run Gunicorn / Django
     printf "\n" && echo " Running Gunicorn / Django"
-    echo "Running: gunicorn api.wsgi -b 0.0.0.0:8081 --workers=1 --keep-alive 20 --log-file=- --log-level debug --access-logfile=/var/log/accesslogs/gunicorn --capture-output --timeout 50"
-    gunicorn api.wsgi -b 0.0.0.0:8081 --workers=1 --keep-alive 20 --log-file=- --log-level debug --access-logfile=/var/log/accesslogs/gunicorn --capture-output --timeout 50
+    echo "Running: gunicorn api.wsgi -b 0.0.0.0:$GUNICORN_PORT --workers=$GUNICORN_WORKERS --keep-alive 20 --log-file=- --log-level debug --access-logfile=/var/log/accesslogs/gunicorn --capture-output --timeout 50"
+    gunicorn api.wsgi -b 0.0.0.0:"$GUNICORN_PORT" --workers="$GUNICORN_WORKERS" --keep-alive 20 --log-file=- --log-level debug --access-logfile=/var/log/accesslogs/gunicorn --capture-output --timeout 50
 fi
