@@ -40,7 +40,7 @@ fi
 # ===================
 if [ "${APP_ENV^^}" = "PRODUCTION" ]; then
 
-    # if the number of workers is not set, default to 1
+    # if the number of workers is not set, default to 3
     if [ -z "${GUNICORN_WORKERS}" ]; then
         GUNICORN_WORKERS=3
     fi
