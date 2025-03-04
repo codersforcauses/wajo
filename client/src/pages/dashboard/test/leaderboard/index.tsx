@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
+import { ProtectedPage } from "@/components/layout";
 import {
   Pagination,
   PaginationSearchParams,
@@ -11,8 +12,18 @@ import { SearchInput } from "@/components/ui/search";
 import { LeaderboardDataGrid } from "@/components/ui/Test/leaderboard-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import { Leaderboard } from "@/types/leaderboard";
+import { Role } from "@/types/user";
 
-export default function Index() {
+export default function PageConfig() {
+  const roles = [Role.ADMIN, Role.TEACHER, Role.STUDENT];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <Index />
+    </ProtectedPage>
+  );
+}
+
+function Index() {
   const router = useRouter();
   const { query, isReady, push } = router;
 

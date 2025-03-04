@@ -51,10 +51,10 @@ export const navData: NavigationData = {
       title: "Test Management",
       icon: BookType,
       items: [
-        { title: "Practice Test", url: "/test" },
-        { title: "Competitions", url: "/test/competition" },
-        { title: "Results & Rankings", url: "/test/leaderboard" },
-        { title: "Insights", url: "/test/insights" },
+        { title: "Practice Test", url: "/dashboard/test" },
+        { title: "Competitions", url: "/dashboard/test/competition" },
+        { title: "Results & Rankings", url: "/dashboard/test/leaderboard" },
+        { title: "Insights", url: "/dashboard/test/insights" },
       ],
     },
     {
