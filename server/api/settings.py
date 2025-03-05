@@ -38,7 +38,11 @@ ALLOWED_HOSTS = (
     if os.environ.get("API_ALLOWED_HOSTS")
     else []
 )
-
+CSRF_TRUSTED_ORIGINS = (
+    os.environ.get("API_CSRF_TRUSTED_ORIGINS").split()
+    if os.environ.get("API_CSRF_TRUSTED_ORIGINS")
+    else []
+)
 
 # Application definition
 
