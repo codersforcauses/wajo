@@ -1,36 +1,34 @@
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
 import { ProtectedPage } from "@/components/layout";
-import { Button } from "@/components/ui/button";
+import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
-  toQueryString,
 } from "@/components/ui/pagination";
-import { CategoryDataGrid } from "@/components/ui/Question/category-data-grid";
 import { SearchInput } from "@/components/ui/search";
+import { TeamDataGrid } from "@/components/ui/Test/team-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import {
   OrderingItem,
   orderingToString,
   stringToOrdering,
 } from "@/types/data-grid";
-import { Category } from "@/types/question";
+import { TeamLeaderboard } from "@/types/leaderboard";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
   const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <Index />
+      <TeamLeaderboardIndex />
     </ProtectedPage>
   );
 }
 
-function Index() {
+function TeamLeaderboardIndex() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -43,15 +41,15 @@ function Index() {
     page: 1,
   });
 
-  const { data, isLoading, error, totalPages, refetch } =
-    useFetchDataTable<Category>({
-      queryKey: ["questions.categories"],
-      endpoint: "/questions/categories/",
+  const { data, isLoading, error, totalPages } =
+    useFetchDataTable<TeamLeaderboard>({
+      queryKey: ["leaderboard.team"],
+      endpoint: "/leaderboard/team/",
       searchParams: searchParams,
     });
 
   useEffect(() => {
-    if (!isLoading) {
+    if (isReady && !isLoading) {
       setSearchParams((prev) => ({
         ordering: (query.ordering as string) || prev.ordering,
         search: (query.search as string) || prev.search,
@@ -60,12 +58,28 @@ function Index() {
       }));
       setOrderings(stringToOrdering(query.ordering as string));
     }
-  }, [query.ordering, query.search, query.nrows, query.page, !isLoading]);
+  }, [
+    query.ordering,
+    query.search,
+    query.nrows,
+    query.page,
+    isReady,
+    isLoading,
+  ]);
 
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
+    push(
+      {
+        pathname: "/dashboard/test/leaderboard",
+        query: Object.fromEntries(
+          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
+        ),
+      },
+      undefined,
+      { shallow: true },
+    );
   };
 
   const onOrderingChange = (field: keyof OrderingItem) => {
@@ -87,27 +101,21 @@ function Index() {
         <SearchInput
           label=""
           value={searchParams.search ?? ""}
-          placeholder="Search Genre"
+          placeholder="Search Schools and Teams"
           onSearch={(newSearch: string) => {
             setAndPush({ search: newSearch, page: 1 });
           }}
         />
-        <Button asChild className="mr-6 h-auto">
-          <Link href={`${router.pathname}/create`}>Create a Category</Link>
-        </Button>
       </div>
 
-      <Suspense>
+      <Suspense fallback={<WaitingLoader />}>
         <div>
-          <CategoryDataGrid
+          <TeamDataGrid
             datacontext={data ?? []}
             isLoading={!isReady || isLoading}
-            startIdx={(searchParams.page - 1) * searchParams.nrows + 1}
             onOrderingChange={onOrderingChange}
-            onDeleteSuccess={refetch}
           />
           <div className="flex items-center justify-between p-4">
-            {/* Rows Per Page Selector */}
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-600">Rows per page:</span>
               <SelectRow
@@ -118,7 +126,6 @@ function Index() {
                 }
               />
             </div>
-            {/* Pagination Controls */}
             <Pagination
               totalPages={totalPages}
               currentPage={searchParams.page}

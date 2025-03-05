@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 
+import { ProtectedPage } from "@/components/layout";
 import {
   Pagination,
   PaginationSearchParams,
@@ -10,8 +11,18 @@ import {
 import { InsightDataGrid } from "@/components/ui/Test/insight-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import { Insight } from "@/types/leaderboard";
+import { Role } from "@/types/user";
 
-export default function Index() {
+export default function PageConfig() {
+  const roles = [Role.ADMIN];
+  return (
+    <ProtectedPage requiredRoles={roles}>
+      <InsightPage />
+    </ProtectedPage>
+  );
+}
+
+function InsightPage() {
   const router = useRouter();
   const { query, isReady, push } = router;
 

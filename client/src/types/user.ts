@@ -70,6 +70,7 @@ export interface User {
 }
 
 export interface Student extends User {
+  name: string;
   year_level: number;
   quiz_attempts: number[];
   attendent_year: number;
