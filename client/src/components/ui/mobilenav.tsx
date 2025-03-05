@@ -25,12 +25,14 @@ export default function MobileNav() {
           <div className="flex h-full w-full grow flex-col border border-red-500 bg-zinc-50 p-5">
             {/* <div className="mx-auto"> */}
             <Drawer.Title className="mx-5 flex justify-between border border-green-500 text-base text-zinc-900">
-              <Image
-                src="wajo_white.svg"
-                alt="WAJO logo with white background"
-                width={105}
-                height={105}
-              />
+              <Link href="/">
+                <Image
+                  src="wajo_white.svg"
+                  alt="WAJO logo with white background"
+                  width={105}
+                  height={105}
+                />
+              </Link>
               <Drawer.Close>
                 <X />
               </Drawer.Close>
@@ -38,7 +40,7 @@ export default function MobileNav() {
             <Drawer.Description className="mb-2 flex flex-col items-center justify-center gap-4 text-zinc-600">
               <Link href="/news">News</Link>
               <Link href="/awards">Awards</Link>
-              <Link href="/resources">Resources</Link>
+              <Link href="/quiz">Quizzes</Link>
               <Link href="/contact">Contact us</Link>
               <LoginModal>
                 <Button

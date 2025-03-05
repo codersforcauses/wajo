@@ -1,6 +1,7 @@
 // import Layout from "@/components/layout";
 import { useEffect } from "react";
 
+import { PublicPage } from "@/components/layout";
 import DateTimeDisplay from "@/components/ui/date-format";
 import HorizontalCard from "@/components/ui/horizontal-card";
 import { WaitingLoader } from "@/components/ui/loading";
@@ -20,6 +21,15 @@ import {
  * The list of quizzes are fetched from the database as an array of JSONs.
  * Each quiz is one of three categories: upcoming competition, past questions and solutions, and practice tests.
  */
+
+export default function PageConfig() {
+  return (
+    <PublicPage>
+      <QuizPage />
+    </PublicPage>
+  );
+}
+
 const QuizPage = () => {
   const {
     data: quizData,
@@ -137,9 +147,3 @@ function QuizCard({
     </section>
   );
 }
-
-// QuizPage.getLayout = (page: ReactElement) => {
-//   return <Layout isPublic={true}>{page}</Layout>;
-// };
-
-export default QuizPage;

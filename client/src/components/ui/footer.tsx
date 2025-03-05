@@ -16,8 +16,8 @@ export default function Footer() {
         <Link href="/awards" className="hover:animate-bounce">
           Awards
         </Link>
-        <Link href="/resources" className="hover:animate-bounce">
-          Resources
+        <Link href="/quiz" className="hover:animate-bounce">
+          Quizzes
         </Link>
         <Link href="/contact" className="hover:animate-bounce">
           Contact us

@@ -24,7 +24,8 @@ function HomePage() {
             "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 59%, rgba(224,224,224,1) 100%)",
         }}
       >
-        <h1>WAJO Olympiads will be back next year!</h1>
+        {/* <h1>WAJO Olympiads will be back in the coming!</h1> */}
+        <h1>Western Australian Juniour mathematics</h1>
         <Button variant="inactive" onClick={() => router.push("/quiz")}>
           {" "}
           {/* the url needs to be changed */}
