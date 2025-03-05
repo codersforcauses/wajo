@@ -24,7 +24,8 @@ function HomePage() {
             "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 59%, rgba(224,224,224,1) 100%)",
         }}
       >
-        <h1>WAJO Olympiads will be back next year!</h1>
+        {/* <h1>WAJO Olympiads will be back in the coming!</h1> */}
+        <h1>Western Australian Juniour mathematics</h1>
         <Button variant="inactive" onClick={() => router.push("/quiz")}>
           <p className="body-1 px-10">Start Quiz</p>
         </Button>
@@ -34,8 +35,8 @@ function HomePage() {
         <div className="body-2">
           The Western Australian Junior Mathematics Olympiad is an annual
           competition celebrating top young mathematicians. Open to students in
-          Years 7-9 (exceptional younger students may apply), it consists of two
-          parts: an online individual paper and an in-person team paper.
+          Years 7-9, it consists of two parts: an online individual paper and an
+          in-person team paper.
         </div>
       </div>
 

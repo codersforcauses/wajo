@@ -17,23 +17,25 @@ export default function Navbar() {
     <nav className="flex h-28 bg-[--nav-background]">
       <div className="container mx-auto flex items-center">
         <div className="flex-auto">
-          <Image
-            src="/wajo_white.svg"
-            alt="WAJO logo with white background"
-            width={105}
-            height={105}
-          />
+          <Link href="/">
+            <Image
+              src="/wajo_white.svg"
+              alt="WAJO logo with white background"
+              width={105}
+              height={105}
+            />
+          </Link>
         </div>
         <div className="flex flex-shrink items-center justify-between gap-20 text-xl font-medium max-md:hidden">
           <Link href="/news">News</Link>
           <Link href="/awards">Awards</Link>
-          <Link href="/resources">Resources</Link>
+          <Link href="/quiz">Quizzes</Link>
           <Link href="/contact">Contact us</Link>
           {isLoggedIn ? (
             <Button
               variant={"outline"}
               size={"lg"}
-              className="font-roboto border-2 border-black text-lg"
+              className="border-2 border-black font-roboto text-lg"
               onClick={() => router.push("/dashboard")}
             >
               Dashboard
@@ -43,7 +45,7 @@ export default function Navbar() {
               <Button
                 variant={"outline"}
                 size={"lg"}
-                className="font-roboto border-2 border-black text-lg"
+                className="border-2 border-black font-roboto text-lg"
               >
                 Login
               </Button>

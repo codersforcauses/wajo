@@ -10,7 +10,11 @@ type Props = {
 };
 
 export function MultipleSelectCategory({ value, onChange, className }: Props) {
-  const { data, isLoading, isError } = useFetchDataTable<Category>({
+  const {
+    data: categories,
+    isLoading,
+    isError,
+  } = useFetchDataTable<Category>({
     queryKey: ["questions.categories.all"],
     endpoint: "/questions/categories/",
     searchParams: {
@@ -24,7 +28,7 @@ export function MultipleSelectCategory({ value, onChange, className }: Props) {
   const categoryOptions =
     isLoading || isError
       ? []
-      : data?.map((cat) => ({
+      : categories?.map((cat) => ({
           label: cat.genre,
           value: cat.id.toString(),
         }));

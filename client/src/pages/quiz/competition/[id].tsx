@@ -1,155 +1,242 @@
+import { AxiosError } from "axios";
 import { useRouter } from "next/router";
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-// import ButtonList from "@/components/ui/Quiz/buttonList";
-// import CountdownDisplay from "@/components/ui/Quiz/countdown-display";
-// import GenericQuiz from "@/components/ui/Quiz/generic-quiz";
-// import QuizStartPage from "@/components/ui/Quiz/quiz-start-page";
-// import SubmissionPopup from "@/components/ui/submission-popup";
+import { WaitingLoader } from "@/components/ui/loading";
+import ButtonList from "@/components/ui/Quiz/button-list";
+import CountdownDisplay from "@/components/ui/Quiz/countdown-display";
+import GenericQuiz from "@/components/ui/Quiz/generic-quiz";
+import QuizStartPage from "@/components/ui/Quiz/quiz-start-page";
+import SubmissionPopup from "@/components/ui/submission-popup";
+import { useAuth } from "@/context/auth-provider";
 import { useFetchData } from "@/hooks/use-fetch-data";
-import { Question } from "@/types/question";
-import { Competition, Quiz } from "@/types/quiz";
+import { usePostMutation } from "@/hooks/use-post-data";
+import {
+  Competition,
+  CompetitionSlot,
+  QuizAttempt,
+  QuizAttemptResponse,
+} from "@/types/quiz";
 
 export default function CompetitionQuizPage() {
-  return <></>;
-  // // Fetches the quiz data using the custom hook.
-  // const router = useRouter();
-  // let { id }: { id?: string | string[] | undefined | Number } = router.query;
-  // const {
-  //   data: quizData,
-  //   isLoading: isQuizDataLoading,
-  //   isError: isQuizDataError,
-  //   error: QuizDataError,
-  // } = useFetchData<Competition>({
-  //   queryKey: [`quiz.competition.${id}`],
-  //   endpoint: `/quiz/competition/${id}/`,
-  // });
+  const router = useRouter();
+  const compId = parseInt(router.query.id as string);
+  const { primaryId } = useAuth();
+  const [quizState, setQuizState] = useState({
+    isDisplayQuiz: false,
+    isQuizAttempt: false,
+    isSubmitted: false,
+    currentPage: 1,
+    timeLeft: null as number | null,
+    isRunning: false,
+  });
 
-  // const {
-  //   data: quizQuestionData,
-  //   isLoading: isQuizQuestionDataLoading,
-  //   isError: isQuizQuestionDataError,
-  //   error: QuizQuestionDataError,
-  // } = useFetchData<Question[]>({
-  //   queryKey: [`quiz.competition.${id}/slots`],
-  //   endpoint: `/quiz/competition/${id}/slots/`,
-  // });
+  // Fetch quiz data
+  const {
+    data: quizData,
+    isLoading: isQuizDataLoading,
+    isError: isQuizDataError,
+    error: quizDataError,
+  } = useFetchData<Competition>({
+    queryKey: [`quiz.competition.${compId}`],
+    endpoint: `/quiz/competition/${compId}/`,
+    enabled: !isNaN(compId),
+  });
 
-  // // console.log("Quiz Data: ", quizData);
-  // // console.log("2024 Quiz Data: ", quizData ? quizData[0] : "No data available");
+  // Fetch quiz slots (questions) only when quiz starts
+  const {
+    data: quizSlot,
+    isLoading: isQuizSlotLoading,
+    isError: isQuizSlotError,
+    error: quizSlotError,
+  } = useFetchData<CompetitionSlot>({
+    queryKey: [`quiz.competition.${compId}/slots`],
+    endpoint: `/quiz/competition/${compId}/slots/`,
+    enabled: !!quizData && quizState.isDisplayQuiz,
+    retry: 1,
+  });
 
-  // /**
-  //  * Handles page change logic.
-  //  * @param {number} page - The new page number.
-  //  */
+  // Fetch quiz (attempts) only when quiz starts
+  const {
+    data: quizAttemptData,
+    isLoading: isQuizAttemptDataLoading,
+    isError: isQuizAttemptDataError,
+    error: quizAttemptError,
+  } = useFetchData<QuizAttemptResponse>({
+    queryKey: [`quiz.quiz-attempts.${compId}.${primaryId}`],
+    endpoint: `/quiz/quiz-attempts/?state=2`,
+    enabled: !!quizSlot && quizState.isDisplayQuiz,
+  });
 
-  // const [displayQuiz, setDisplayQuiz] = useState(false);
-  // const [isSubmitted, setIsSubmitted] = useState(false);
-  // const [currentPage, setCurrentPage] = useState(1);
+  // Submit quiz
+  const { data, isLoading, isError, error, isSuccess } = useFetchData<{
+    message: string;
+  }>({
+    queryKey: [`quiz.quiz-attempts.${primaryId}.submit.${compId}`],
+    endpoint: `/quiz/quiz-attempts/${primaryId}/submit/`,
+    enabled: quizState.isSubmitted,
+  });
 
-  // let quizTitle = "Math Competition";
-  // let quizStartTime = "2021-09-01T00:00:00.000Z";
-  // let quizDuration = 100;
-  // let numberOfQuestions = 16;
+  const calculateTimeLeft = () => {
+    if (!quizSlot) return 0;
+    const now = new Date();
+    const endTime = new Date(quizSlot.end_time);
+    return Math.max(0, Math.floor((endTime.getTime() - now.getTime()) / 1000));
+  };
 
-  // const quizIndex = Number(id);
+  useEffect(() => {
+    console.log("Quiz Attempt Data: ", quizAttemptData);
+    if (quizAttemptData && quizAttemptData.results.length > 0) {
+      setQuizState((prev) => ({ ...prev, isQuizAttempt: true }));
+    }
+  }, [quizAttemptData]);
 
-  // if (quizData && !isNaN(quizIndex)) {
-  //   quizTitle = quizData.name;
-  //   quizStartTime = quizData.open_time_date.toString();
-  //   quizDuration = quizData.time_limit;
-  //   // numberOfQuestions = quizData.questions.length;
-  // }
+  useEffect(() => {
+    setQuizState((prev) => ({ ...prev, timeLeft: calculateTimeLeft() }));
+  }, [quizState.isDisplayQuiz, quizSlot]);
 
-  // const handleStartQuiz = () => {
-  //   console.log("Start Quiz");
-  //   setDisplayQuiz(true);
-  //   // setTimeLeft(quizDuration * 60 * 1000)
-  //   setTimeLeft(6000); // Set the countdown to 60 seconds (you can change this)
-  //   setIsRunning(true);
-  // };
+  useEffect(() => {
+    if (!quizState.isRunning || quizState.timeLeft === null) return;
 
-  // const [timeLeft, setTimeLeft] = useState<number | null>(null); // State for countdown time
-  // const [isRunning, setIsRunning] = useState(false); // Track if timer is running
+    if (quizSlot && quizState.timeLeft <= 0) {
+      handleSubmit();
+      return;
+    }
 
-  // useEffect(() => {
-  //   if (!isRunning || timeLeft === null) return;
+    const timer = setTimeout(() => {
+      setQuizState((prev) => ({
+        ...prev,
+        timeLeft: prev.timeLeft !== null ? prev.timeLeft - 1 : 0,
+      }));
+    }, 1000);
 
-  //   if (timeLeft <= 0) {
-  //     setIsRunning(false); // Stop the countdown when time reaches 0
-  //     return;
-  //   }
+    return () => clearTimeout(timer);
+  }, [quizState.timeLeft, quizState.isRunning]);
 
-  //   const timer = setTimeout(() => {
-  //     setTimeLeft((prevTime) => (prevTime !== null ? prevTime - 1 : 0));
-  //   }, 1000);
+  const handleStartQuiz = () => {
+    // Clear any existing localStorage data
+    // localStorage.removeItem("quizAnswers");
+    setQuizState((prev) => ({
+      ...prev,
+      isDisplayQuiz: true,
+      isRunning: true,
+    }));
+  };
 
-  //   return () => clearTimeout(timer); // Cleanup timer on unmount or state change
-  // }, [timeLeft, isRunning]);
+  const handleSubmit = async () => {
+    const savedAnswers = localStorage.getItem("quizAnswers");
+    if (!savedAnswers) {
+      toast.error("No answers found to submit");
+      return;
+    }
 
-  // const handleSubmit = () => {
-  //   setIsSubmitted(true); // Show the popup
-  // };
+    setQuizState((prev) => ({
+      ...prev,
+      isSubmitted: true,
+      isRunning: false,
+    }));
+  };
 
-  // const closePopup = () => {
-  //   setIsSubmitted(false); // Hide the popup
-  // };
+  const getErrorResponse = (
+    err: AxiosError<{ error: string; message: string }>,
+  ) => {
+    return (
+      err?.response?.data?.error ||
+      err?.message ||
+      "Failed to get error message."
+    );
+  };
 
-  // return (
-  //   <>
-  //     {isQuizDataLoading ? (
-  //       <div>QuizData Loading...</div>
-  //     ) : isQuizDataError ? (
-  //       <div>Error: {QuizDataError?.message}</div>
-  //     ) : !displayQuiz ? (
-  //       <div className="flex flex-col items-center">
-  //         <h1 className="my-4 text-center">{quizTitle}</h1>
-  //         <QuizStartPage
-  //           numberOfQuestions={numberOfQuestions}
-  //           quizDuration={quizDuration}
-  //           startTime={quizStartTime}
-  //           quizName={quizTitle}
-  //           onStart={handleStartQuiz}
-  //         />
-  //       </div>
-  //     ) : (
-  //       <div className="">
-  //         <h1 className="my-4 text-center">{quizTitle}</h1>
-  //         {/* <RetrieveQuestion /> */}
+  // load quiz data
+  if (isQuizDataLoading) return <WaitingLoader />;
+  if (isQuizDataError)
+    return <div>Error loading quiz: {getErrorResponse(quizDataError)}</div>;
+  if (!quizData) return <div>Quiz not found</div>;
+  // load quiz slot (questions)
+  if (quizState.isDisplayQuiz && isQuizSlotLoading) return <WaitingLoader />;
+  if (quizState.isDisplayQuiz && isQuizSlotError)
+    return (
+      <div>Error loading questions: {getErrorResponse(quizSlotError)}</div>
+    );
+  if (quizSlot && quizSlot.data.length < 1)
+    return <div>Questions not found</div>;
+  // load student quiz (attempt)
+  if (quizState.isQuizAttempt && isQuizAttemptDataLoading)
+    return <WaitingLoader />;
+  if (quizState.isQuizAttempt && isQuizAttemptDataError)
+    return (
+      <div>
+        Error loading quiz attempt: {getErrorResponse(quizAttemptError)}
+      </div>
+    );
 
-  //         <div className="my-4 flex justify-center">
-  //           <div>
-  //             <CountdownDisplay timeLeft={timeLeft} />
-  //           </div>
-  //         </div>
-  //         <div className="flex items-center justify-center space-x-2">
-  //           <p>Question Navigation:</p>
-  //           <ButtonList
-  //             currentPage={currentPage}
-  //             setCurrentPage={setCurrentPage}
-  //             totalQuestions={numberOfQuestions}
-  //           />
-  //           <Button variant="secondary" onClick={() => setIsSubmitted(true)}>
-  //             Submit
-  //           </Button>
-  //         </div>
-  //         <GenericQuiz
-  //           currentPage={currentPage}
-  //           setCurrentPage={setCurrentPage}
-  //           totalQuestions={numberOfQuestions}
-  //           questions={quizQuestionData ? quizQuestionData : []}
-  //         />
-  //         {isSubmitted && (
-  //           <SubmissionPopup
-  //             popUpStyle="showSubmit"
-  //             isOpen={isSubmitted}
-  //             onClose={() => setIsSubmitted(false)}
-  //             onTry={() => setDisplayQuiz(false)}
-  //           />
-  //         )}
-  //       </div>
-  //     )}
-  //   </>
-  // );
+  const {
+    name: quizTitle,
+    open_time_date: quizStartTime,
+    time_limit: quizDuration,
+  } = quizData;
+  const numberOfQuestions = quizSlot?.data.length ?? 0;
+
+  return (
+    <div className="container mx-auto px-4">
+      <h1 className="my-4 text-center text-2xl font-bold">{quizTitle}</h1>
+      {!quizState.isDisplayQuiz ? (
+        <QuizStartPage
+          numberOfQuestions={numberOfQuestions}
+          quizDuration={quizDuration}
+          startTime={quizStartTime}
+          quizName={quizTitle}
+          onStart={handleStartQuiz}
+        />
+      ) : (
+        <div className="space-y-4">
+          <div className="flex justify-center">
+            <CountdownDisplay timeLeft={quizState.timeLeft} />
+          </div>
+
+          <div className="flex items-center justify-center space-x-2">
+            <p>Question Navigation:</p>
+            <ButtonList
+              currentPage={quizState.currentPage}
+              setCurrentPage={(page) =>
+                setQuizState((prev) => ({ ...prev, currentPage: page }))
+              }
+              totalQuestions={numberOfQuestions}
+            />
+            <Button
+              variant="secondary"
+              onClick={handleSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? "Submitting..." : "Submit"}
+            </Button>
+          </div>
+
+          {quizSlot && quizAttemptData && (
+            <GenericQuiz
+              currentPage={quizState.currentPage}
+              setCurrentPage={(page) =>
+                setQuizState((prev) => ({ ...prev, currentPage: page }))
+              }
+              totalQuestions={numberOfQuestions}
+              slots={quizSlot.data}
+              quizAttempt={quizAttemptData}
+            />
+          )}
+
+          {quizState.isSubmitted && (
+            <SubmissionPopup
+              popUpStyle="showSubmit"
+              isOpen={quizState.isSubmitted}
+              onClose={() => {
+                router.push("/quiz");
+              }}
+            />
+          )}
+        </div>
+      )}
+    </div>
+  );
 }

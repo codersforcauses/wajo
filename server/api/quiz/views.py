@@ -28,9 +28,10 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     queryset = Quiz.objects.all().order_by('-created_at')
     serializer_class = AdminQuizSerializer
     status = serializers.IntegerField(default=0, required=False)
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
     filterset_fields = ['is_comp', 'status']
+    ordering_fields = ['time_created']
 
     @action(detail=True, methods=['get', 'post'])
     def slots(self, request, pk=None):
@@ -144,7 +145,6 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
-@permission_classes([IsAuthenticated])
 class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
     """
     A viewset for retrieving competition quizzes that are visible and have a status of 1.
@@ -155,6 +155,12 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Quiz.objects.filter(status=1, visible=True).order_by('-created_at')
     serializer_class = UserQuizSerializer
+
+    def get_permissions(self):
+        """Allow public access for GET requests, require authentication for others."""
+        if self.action in ['list', 'retrieve']:  # Allow unauthenticated GET requests
+            return [AllowAny()]
+        return [IsAuthenticated()]  # Require authentication for other actions
 
     @action(detail=True, methods=['get'])
     def submit(self, request, pk=None):
@@ -172,34 +178,39 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
     def slots(self, request, pk=None):
         """
         Only allow the user to access the slots(competition questions) if the quiz is available.
-        api:
-        /api/quiz/competition/1/slots/
+        api: /api/quiz/competition/1/slots/
         data shape: {"data":[ ], "end_time": "2025-01-29T00:49:17.015606Z"}
-
-    {"data": [
-        {
-            "id": 1,
-            "question": {
-                "id": 12,
-                "name": "question_1",
-                "question_text": "question_text_1",
-                "layout": "left",
-                "image": null,
-                "mark": 2
-            },
-            "slot_index": 1,
-            "block": 1,
-            "quiz": 2
-        }
-    ],
-    "end_time": "2025-01-29T00:49:17.015606Z"}
-
+        ```
+            {
+              "data":[
+                {
+                "id":1,
+                "question":{
+                    "id":12,
+                    "name":"question_1",
+                    "question_text":"question_text_1",
+                    "layout":"left",
+                    "image":null,
+                    "mark":2
+                },
+                "slot_index":1,
+                "block":1,
+                "quiz":2
+                }
+              ],
+              "end_time":"2025-01-29T00:49:17.015606Z"
+            }
+        ```
         """
         try:
             quiz_instance = Quiz.objects.get(pk=pk)
         except Quiz.DoesNotExist:
             return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
+
         user = request.user
+        if not hasattr(request.user, "student"):
+            return Response({'error': 'Only student can access this endpoint.'}, status=status.HTTP_404_NOT_FOUND)
+
         student_id = user.student.id
         existing_attempt = QuizAttempt.objects.filter(
             quiz_id=pk, student_id=student_id).first()
@@ -207,7 +218,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         is_available = self._is_available(quiz_instance, existing_attempt)
 
         user = request.user.student
-        if existing_attempt is not None and user.quiz_attempts.get(pk=pk).state == QuizAttempt.State.SUBMITTED:
+        if existing_attempt is not None and user.quiz_attempts.get(quiz_id=pk).state == QuizAttempt.State.SUBMITTED:
             return Response({'error': 'Quiz has submitted '}, status=status.HTTP_400_BAD_REQUEST)
 
         if quiz_instance.status == 3 and existing_attempt is None:
@@ -255,7 +266,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         else:
             return Response({'error': 'Quiz not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-    def _get_slots_response(self, quiz_id, existing_attempt, user):
+    def _get_slots_response(self, quiz_id, existing_attempt, student):
         """
         Get the response containing the slosts data.
         The slots are corresponding sorted questions of the quiz.
@@ -272,7 +283,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         if existing_attempt is None:
             quiz_attempt_serializer = QuizAttemptSerializer(data={
                 'quiz': quiz_id,
-                'student': user.student.id,
+                'student': student.id,
                 'state': QuizAttempt.State.IN_PROGRESS,
             })
             quiz_attempt_serializer.is_valid(raise_exception=True)
@@ -287,7 +298,10 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         instances = QuizSlot.objects.filter(quiz_id=quiz_id)
         serializer = CompQuizSlotSerializer(instances, many=True)
 
-        return Response({'data': serializer.data, 'end_time': end_time}, status=status.HTTP_200_OK)
+        return Response({'data': serializer.data,
+                         'end_time': end_time,
+                         'quiz_attempt_id': existing_attempt.id
+                         }, status=status.HTTP_200_OK)
 
 
 class QuizSlotViewSet(viewsets.ModelViewSet):
@@ -305,6 +319,8 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
     """
     queryset = QuizAttempt.objects.all()
     serializer_class = QuizAttemptSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['state']
 
     def get_queryset(self):
         if hasattr(self.request.user, "student"):
@@ -386,7 +402,7 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
         attempt.state = QuizAttempt.State.SUBMITTED
         attempt.time_finish = now()
         attempt.save()
-        return Response({'status': 'Quiz attempt submitted successfully.'})
+        return Response({'message': 'Quiz attempt submitted successfully.'})
 
 
 @permission_classes([IsAuthenticated])

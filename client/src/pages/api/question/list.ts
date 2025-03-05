@@ -21,6 +21,9 @@ const mockQuestions: Partial<Question>[] = [
     name: "Question01_2024",
     categories: [{ genre: "Geometry Questions" }] as Category[],
     diff_level: 1,
+    question_text: "What is the area of a circle with radius 5?",
+    answers: [{ value: 78.54 }],
+    solution_text: "A = πr² = π(5)² = 78.54",
   },
   {
     id: 2,
@@ -33,6 +36,9 @@ const mockQuestions: Partial<Question>[] = [
     name: "Question03_2024",
     categories: [{ genre: "Arithmetic Questions" }] as Category[],
     diff_level: 1,
+    question_text: "What is the area of a circle with radius 5?",
+    answers: [{ value: 78.54 }],
+    solution_text: "A = πr² = π(5)² = 78.54",
   },
   {
     id: 4,
@@ -57,6 +63,9 @@ const mockQuestions: Partial<Question>[] = [
     name: "Question07_2024",
     categories: [{ genre: "Calculus Questions" }] as Category[],
     diff_level: 1,
+    question_text: "What is the area of a circle with radius 5?",
+    answers: [{ value: 78.54 }],
+    solution_text: "A = πr² = π(5)² = 78.54",
   },
 ];
 

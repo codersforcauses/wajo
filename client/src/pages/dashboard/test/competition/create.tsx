@@ -41,6 +41,7 @@ function Create() {
       intro: "",
       time_limit: 0,
       time_window: 0,
+      open_time_date: new Date(),
     },
   });
 

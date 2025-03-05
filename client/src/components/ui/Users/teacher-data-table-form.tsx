@@ -122,9 +122,6 @@ export function TeacherDataTableForm() {
                 <TableHead className={commonTableHeadClasses}>
                   Lastname*
                 </TableHead>
-                {/* <TableHead className={commonTableHeadClasses}>
-                  Username*
-                </TableHead> */}
                 <TableHead
                   className={cn(commonTableHeadClasses, "text-pretty", "w-1/5")}
                 >

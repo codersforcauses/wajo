@@ -1,12 +1,13 @@
 from rest_framework import serializers
 from api.question.models import Question, Category
-from api.question.serializers import AnswerSerializer
+from api.question.serializers import AnswerSerializer, ImageSerializer
 from api.quiz.models import Quiz, QuizSlot, QuizAttempt, QuestionAttempt
 
 
 class QuestionSerializer(serializers.ModelSerializer):
     # answers is a foreign key field, so we need to use a nested serializer
     answers = AnswerSerializer(many=True)
+    images = ImageSerializer(read_only=True, many=True)
 
     class Meta:
         model = Question
@@ -17,9 +18,11 @@ class CompQuestionSerializer(serializers.ModelSerializer):
     """
     Serializer for the Question model with no answer field.
     """
+    images = ImageSerializer(read_only=True, many=True)
+
     class Meta:
         model = Question
-        fields = ['id', 'name', 'question_text', 'layout', 'image', 'mark']
+        fields = ['id', 'name', 'question_text', 'layout', 'images', 'mark']
 
 
 class CategorySerializer(serializers.ModelSerializer):

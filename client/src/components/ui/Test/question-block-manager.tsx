@@ -201,12 +201,13 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
-    const filtered = value
-      ? questionList?.filter((question) =>
-          question.name.toLowerCase().includes(value.toLowerCase()),
-        )
-      : [];
-    setSearchResults(filtered as Question[]);
+    const filtered =
+      isPending || isError || !questionList || !value
+        ? []
+        : questionList.filter((question) =>
+            question.name.toLowerCase().includes(value.toLowerCase()),
+          );
+    setSearchResults(filtered);
   };
 
   useEffect(() => {

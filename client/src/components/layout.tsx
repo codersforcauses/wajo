@@ -27,10 +27,13 @@ export function ProtectedPage({ children, requiredRoles }: ProtectedPageProps) {
       setIsInitializing(false);
       if (!isLoggedIn || !userRole) {
         setAuthState("unauthorized");
+        // console.log("authState", authState);
       } else if (!requiredRoles.includes(userRole)) {
         setAuthState("wrong-role");
+        // console.log("authState", authState);
       } else {
         setAuthState("authorized");
+        // console.log("authState", authState);
       }
     }, 0);
 

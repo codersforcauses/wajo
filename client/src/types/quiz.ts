@@ -6,7 +6,7 @@ export interface AdminQuiz {
   id: number;
   name: string;
   intro: string;
-  total_marks: string;
+  total_marks: number;
   is_comp: boolean;
   visible: boolean;
   open_time_date: Date;
@@ -43,6 +43,13 @@ export interface Quiz {
   status: number;
 }
 
+export interface QuizResponse {
+  count: number;
+  next: string;
+  previous: string;
+  results: Quiz[];
+}
+
 export interface QuizSlot {
   id: number;
   name: string;
@@ -74,22 +81,36 @@ export interface Competition {
   status: QuizStatus; // ask: to be discuss
 }
 
-export interface CompetitionSlot {
-  id: number;
-  name: string;
-  intro: string;
-  total_marks: string;
-  open_time_date: Date;
-  time_limit: number;
-  time_window: number;
+export interface CompetitionResponse {
+  count: number;
+  next: string;
+  previous: string;
+  results: Competition[];
 }
 
-export interface QuestionAttempt {
+export interface CompetitionSlotData {
   id: number;
-  answer_student: number;
+  question: Question;
+  slot_index: number;
+  block: number;
+  quiz: number;
+}
+
+export interface CompetitionSlot {
+  data: CompetitionSlotData[];
+  end_time: Date;
+  quiz_attempt_id: number;
+}
+
+export interface QuestionAnswer {
+  question: number;
+  answer_student: string;
+}
+
+export interface QuestionAttempt extends QuestionAnswer {
+  id: number;
   is_correct: boolean;
   student: number;
-  question: number;
   quiz_attempt: number;
 }
 
@@ -111,6 +132,13 @@ export interface QuizAttempt {
   quiz: number;
   student: number;
   team: number;
+}
+
+export interface QuizAttemptResponse {
+  count: number;
+  next: string;
+  previous: string;
+  results: QuizAttempt[];
 }
 
 export interface QuizSlot {
