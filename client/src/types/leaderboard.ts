@@ -17,15 +17,15 @@ import { Student } from "@/types/user";
  *   status: "Active",
  * };
  */
-export interface Leaderboard {
-  // ask: to be discuss
-  id: number;
-  name: string;
-  participant_students: number;
-  participant_teams: number;
-}
+// export interface Leaderboard {
+//   // ask: to be discuss
+//   id: number;
+//   name: string;
+//   participant_students: number;
+//   participant_teams: number;
+// }
 
-export interface LeaderboardIndividual {
+export interface IndividualLeaderboard {
   name: string;
   year_level: number;
   school: string;
@@ -34,12 +34,13 @@ export interface LeaderboardIndividual {
   total_marks: number;
 }
 
-export interface LeaderboardTeam {
+export interface TeamLeaderboard {
   school: string;
   id: number;
   total_marks: number;
-  is_country: true;
+  is_country: boolean;
   students: Student[];
+  max_year: number;
 }
 
 export interface Ranking {
@@ -55,4 +56,17 @@ export interface Insight {
   genre: string;
   difficulty: string;
   correct_rate: number;
+}
+
+export interface Insight {
+  category: string;
+  total: number;
+  public_count: number;
+  catholic_count: number;
+  independent_count: number;
+  allies_count: number;
+  country: number;
+  year_7: number;
+  year_8: number;
+  year_9: number;
 }

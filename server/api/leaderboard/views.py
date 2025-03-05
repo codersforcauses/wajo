@@ -1,10 +1,14 @@
-from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import BigIntegerField
+from rest_framework import viewsets, filters, status
 from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
-from django.db.models import Sum
+from django.db.models import Sum, Max
+from django.db.models.functions import Cast
 from ..quiz.models import Quiz, QuizAttempt
 from .serializers import IndividualLeaderboardSerializer, TeamLeaderboardSerializer
 from ..users.models import School, Student
 from ..team.models import Team
+from rest_framework.response import Response
 
 
 class IndividualLeaderboardFilter(FilterSet):
@@ -47,9 +51,19 @@ class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
         - get(request): Handles GET requests. Returns sample data for the leaderboard.
     """
 
-    queryset = QuizAttempt.objects.all()
+    queryset = QuizAttempt.objects.select_related("quiz", "student__school")
     serializer_class = IndividualLeaderboardSerializer
     filterset_class = IndividualLeaderboardFilter
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ["student__user__first_name", "student__user__last_name"]
+    ordering_fields = [
+        "student__year_level",
+        "total_marks",
+        "student__school__type",
+        "student__school__name",
+        "student__user__first_name",
+    ]
+    ordering = ["-student__year_level"]
 
 
 class TeamLeaderboardFilter(FilterSet):
@@ -81,6 +95,59 @@ class TeamLeaderboardFilter(FilterSet):
 
 
 class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Team.objects.annotate(total_marks=Sum('quiz_attempts__total_marks')).order_by('id')
+    queryset = Team.objects.annotate(
+        total_marks=Sum('quiz_attempts__total_marks'),
+        max_year=Max(Cast('students__year_level', output_field=BigIntegerField()))
+    )
     serializer_class = TeamLeaderboardSerializer
     filterset_class = TeamLeaderboardFilter
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ["school__name", "id"]
+    ordering_fields = [
+        "total_marks",
+        "max_year",
+        "id",
+        "school__name"
+    ]
+    ordering = ["-total_marks"]
+
+
+class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
+    # need to define get_queryset, but we don't use
+    def get_queryset(self):
+        return Student.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        all_students = Student.objects.all()
+        scored_students = all_students.filter(quiz_attempts__total_marks__gt=0)
+        all_teams = Team.objects.all()
+        scored_team = all_teams.filter(students__quiz_attempts__total_marks__gt=0).distinct()
+
+        def get_counts(queryset, category, type):
+
+            if type == "student":
+                year_filter = "year_level"
+            elif type == "team":
+                year_filter = "students__year_level"
+
+            return {
+                "category": category,
+                "total": queryset.count(),
+                "public_count": queryset.filter(school__type="Public").count(),
+                "catholic_count": queryset.filter(school__type="Catholic").count(),
+                "independent_count": queryset.filter(school__type="Independent").count(),
+                "allies_count": queryset.filter(school__type="Allies").count(),
+                "country": queryset.filter(school__is_country=True).count(),
+                "year_7": queryset.filter(**{year_filter: "7"}).count(),
+                "year_8": queryset.filter(**{year_filter: "8"}).count(),
+                "year_9": queryset.filter(**{year_filter: "9"}).count(),
+            }
+
+        data = [
+            get_counts(all_students, "All Students", "student"),
+            get_counts(scored_students, "Students with scores", "student"),
+            get_counts(all_teams, "All Teams", "team"),
+            get_counts(scored_team, "Teams with scores", "team")
+        ]
+
+        return Response(data, status=status.HTTP_200_OK)

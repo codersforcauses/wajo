@@ -46,7 +46,7 @@ class Student(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="student",)
     school = models.ForeignKey(
-        School, on_delete=models.CASCADE, related_name="students", blank=True, null=True)
+        School, on_delete=models.CASCADE, related_name="students", null=False)
     attendent_year = models.IntegerField(default=2025)
     year_level = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -71,7 +71,7 @@ class Teacher(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="teacher")
     school = models.ForeignKey(
-        School, on_delete=models.CASCADE, related_name="teachers"
+        School, on_delete=models.CASCADE, related_name="teachers", null=False
     )
     phone = models.CharField(max_length=15, blank=True)
     email = models.EmailField(blank=True)

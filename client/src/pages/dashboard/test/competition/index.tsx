@@ -88,7 +88,6 @@ function Index() {
     setOrderings((prevOrderings) => {
       const newOrder = prevOrderings[field] === "asc" ? "desc" : "asc";
       const newOrderings = {
-        ...prevOrderings,
         [field]: newOrder,
       } as OrderingItem;
       setAndPush({ ordering: orderingToString(newOrderings) });

@@ -54,6 +54,7 @@ export const navData: NavigationData = {
         { title: "Practice Test", url: "/dashboard/test" },
         { title: "Competitions", url: "/dashboard/test/competition" },
         { title: "Results & Rankings", url: "/dashboard/test/leaderboard" },
+        { title: "Insights", url: "/dashboard/test/insights" },
       ],
     },
     {
