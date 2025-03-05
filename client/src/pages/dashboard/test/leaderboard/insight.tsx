@@ -14,15 +14,15 @@ import { Insight } from "@/types/leaderboard";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
-  const roles = [Role.ADMIN, Role.TEACHER, Role.STUDENT];
+  const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <Index />
+      <InsightPage />
     </ProtectedPage>
   );
 }
 
-function Index() {
+function InsightPage() {
   const router = useRouter();
   const { query, isReady, push } = router;
 

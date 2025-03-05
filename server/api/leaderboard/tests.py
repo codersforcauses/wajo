@@ -99,12 +99,12 @@ class LeaderboardAPITest(APITestCase):
         self.assertDictEqual(
             data[0],
             {
-                "name": "Test User1",
-                "year_level": 10,
-                "school": "City High",
-                "school_type": "Public",
-                "is_country": False,
-                "total_marks": 100,
+                "name": "Sample User",
+                "year_level": 11,
+                "school": "Outback School",
+                "school_type": "Independent",
+                "is_country": True,
+                "total_marks": 85,
             },
         )
 
@@ -141,10 +141,10 @@ class LeaderboardAPITest(APITestCase):
         self.assertEqual(data[0]["is_country"], False)
         self.assertEqual(len(data[0]["students"]), 2)
         self.assertEqual(data[0]["students"][0]["id"], self.student1.id)
-        self.assertEqual(data[0]["students"][0]["name"], "testuser1")
+        self.assertEqual(data[0]["students"][0]["name"], "Test User1")
         self.assertEqual(data[0]["students"][0]["year_level"], "10")
         self.assertEqual(data[0]["students"][1]["id"], self.student3.id)
-        self.assertEqual(data[0]["students"][1]["name"], "inactiveuser")
+        self.assertEqual(data[0]["students"][1]["name"], "Inactive User")
         self.assertEqual(data[0]["students"][1]["year_level"], "10")
 
     def test_team_leaderboard_should_filter_by_type(self):

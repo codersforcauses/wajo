@@ -1,107 +1,38 @@
-import { useRouter } from "next/router";
-import React, { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
 
 import { ProtectedPage } from "@/components/layout";
-import {
-  Pagination,
-  PaginationSearchParams,
-  SelectRow,
-  toQueryString,
-} from "@/components/ui/pagination";
-import { SearchInput } from "@/components/ui/search";
-import { LeaderboardDataGrid } from "@/components/ui/Test/leaderboard-data-grid";
-import { useFetchDataTable } from "@/hooks/use-fetch-data";
-import { Leaderboard } from "@/types/leaderboard";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
-  const roles = [Role.ADMIN, Role.TEACHER, Role.STUDENT];
+  const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <Index />
+      <Create />
     </ProtectedPage>
   );
 }
 
-function Index() {
-  const router = useRouter();
-  const { query, isReady, push } = router;
-
-  const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
-    search: "",
-    nrows: 5,
-    page: 1,
-  });
-
-  const { data, isLoading, error, totalPages } = useFetchDataTable<Leaderboard>(
-    {
-      queryKey: ["leaderboard.team"],
-      endpoint: "/leaderboard/team/",
-      searchParams: searchParams,
-    },
-  );
-
-  useEffect(() => {
-    if (!isLoading) {
-      setSearchParams((prev) => ({
-        search: (query.search as string) || prev.search,
-        nrows: Number(query.nrows) || prev.nrows,
-        page: Number(query.page) || prev.page,
-      }));
-    }
-  }, [query.search, query.nrows, query.page, !isLoading]);
-
-  const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
-    const updatedParams = { ...searchParams, ...newParams };
-    setSearchParams(updatedParams);
-    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
-  };
-
-  if (error) return <div>Error: {error.message}</div>;
-
+function Create() {
+  const links = [
+    { href: "leaderboard/individual", label: "individuals" },
+    { href: "leaderboard/team", label: "teams" },
+    { href: "leaderboard/insight", label: "insights" },
+  ];
   return (
-    <div className="m-4 space-y-4">
-      <div className="flex justify-between">
-        <SearchInput
-          label=""
-          value={searchParams.search ?? ""}
-          placeholder="Search Leaderboard"
-          onSearch={(newSearch: string) => {
-            setAndPush({ search: newSearch, page: 1 });
-          }}
-        />
-      </div>
-
-      <Suspense>
-        <div>
-          <LeaderboardDataGrid
-            datacontext={data ?? []}
-            isLoading={!isReady || isLoading}
-          />
-          <div className="flex items-center justify-between p-4">
-            {/* Rows Per Page Selector */}
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">Rows per page:</span>
-              <SelectRow
-                className="h-7 w-20"
-                selectedRow={searchParams.nrows}
-                onChange={(newNrows) =>
-                  setAndPush({ nrows: Number(newNrows), page: 1 })
-                }
-              />
-            </div>
-            {/* Pagination Controls */}
-            <Pagination
-              totalPages={totalPages}
-              currentPage={searchParams.page}
-              onPageChange={(newPage: number) =>
-                setAndPush({ page: Math.min(newPage, totalPages) })
-              }
-              className="mr-4 flex"
-            />
-          </div>
+    <div className="flex h-[80vh] items-center justify-center gap-10">
+      {links.map(({ href, label }) => (
+        <div
+          key={href}
+          className="flex h-40 w-40 items-center justify-center rounded-md border-2 border-yellow hover:bg-yellow"
+        >
+          <Link
+            className="flex h-full w-full items-center justify-center text-center"
+            href={href}
+          >
+            {label}
+          </Link>
         </div>
-      </Suspense>
+      ))}
     </div>
   );
 }
