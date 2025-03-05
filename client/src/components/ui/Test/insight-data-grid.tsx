@@ -52,28 +52,36 @@ export function InsightDataGrid({
   return (
     <div className="grid">
       <div className="overflow-hidden rounded-lg border">
-        <Table className="w-full border-collapse text-left shadow-md">
+        <Table className="w-full table-fixed border-collapse shadow-md">
           <TableHeader className="bg-black text-lg font-semibold">
             <TableRow className="hover:bg-muted/0">
-              <TableHead
-                className={cn(commonTableHeadClasses, "rounded-tl-lg")}
-              >
-                Question Name
+              <TableHead className={cn(commonTableHeadClasses)}></TableHead>
+              <TableHead className={cn(commonTableHeadClasses)}>
+                Total
               </TableHead>
               <TableHead className={cn(commonTableHeadClasses)}>
-                Genre
+                Public
               </TableHead>
               <TableHead className={cn(commonTableHeadClasses)}>
-                Difficulty
+                Catholic
               </TableHead>
-              <TableHead
-                className={cn(
-                  commonTableHeadClasses,
-                  "text-center",
-                  "rounded-tr-lg",
-                )}
-              >
-                Correct Rate
+              <TableHead className={cn(commonTableHeadClasses)}>
+                Independent
+              </TableHead>
+              <TableHead className={cn(commonTableHeadClasses)}>
+                Allies
+              </TableHead>
+              <TableHead className={cn(commonTableHeadClasses)}>
+                Country
+              </TableHead>
+              <TableHead className={cn(commonTableHeadClasses)}>
+                Year 7
+              </TableHead>
+              <TableHead className={cn(commonTableHeadClasses)}>
+                Year 8
+              </TableHead>
+              <TableHead className={cn(commonTableHeadClasses)}>
+                Year 9
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -82,22 +90,26 @@ export function InsightDataGrid({
               datacontext.map((item, index) => (
                 <TableRow
                   key={index}
-                  className={
-                    "divide-gray-200 border-gray-50 text-sm text-black"
-                  }
+                  className="border-gray-50 text-center text-lg text-black"
                 >
-                  <TableCell className="w-1/2">{item.question_name}</TableCell>
-                  <TableCell className="w-1/4">{item.genre}</TableCell>
-                  <TableCell className="">{item.difficulty}</TableCell>
-                  <TableCell className="w-1/4 text-center">
-                    {item.correct_rate}
+                  <TableCell className="text-left font-semibold">
+                    {item.category}
                   </TableCell>
+                  <TableCell>{item.total}</TableCell>
+                  <TableCell>{item.public_count}</TableCell>
+                  <TableCell>{item.catholic_count}</TableCell>
+                  <TableCell>{item.independent_count}</TableCell>
+                  <TableCell>{item.allies_count}</TableCell>
+                  <TableCell>{item.country}</TableCell>
+                  <TableCell>{item.year_7}</TableCell>
+                  <TableCell>{item.year_8}</TableCell>
+                  <TableCell>{item.year_9}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={2}
                   className="py-4 text-center text-gray-500"
                 >
                   {isLoading ? (
