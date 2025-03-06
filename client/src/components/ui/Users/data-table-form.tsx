@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { AlertTriangle } from "lucide-react";
-import { ReactNode , useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -118,8 +118,8 @@ export function DataTableForm() {
           yearLevel: std.year_level,
           schoolId: std.school!.id,
           schoolName: std.school.name,
-          attendentYear: std.attendance_year,
-          extensionTime: std.extenstion_time || 0,
+          attendentYear: std.attendent_year,
+          extensionTime: std.extension_time || 0,
         }));
 
         // Merge with any existing data in localStorage
@@ -192,7 +192,7 @@ export function DataTableForm() {
       record.yearLevel,
       record.schoolId,
       record.schoolName,
-      record.attendanceYear,
+      record.attendentYear,
       record.extensionTime,
     ]);
 

@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircleIcon } from "lucide-react";
 import { useRouter } from "next/router";
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -183,7 +183,7 @@ function EditUserForm({ user }: { user: Student }) {
           {/* Attendant Year */}
           <FormField
             control={updateForm.control}
-            name="attendant_year"
+            name="attendent_year"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Year of attendance{requiredStar}</FormLabel>
@@ -204,7 +204,7 @@ function EditUserForm({ user }: { user: Student }) {
           {/* role check for teacher or admin, teachers shouldnt be able to give extension time */}
 
           {/* Extension Time */}
-          {role?.toLowerCase() === "admin" && (
+          {/* {role?.toLowerCase() === "admin" && (
             <FormField
               control={updateForm.control}
               name="extension_time"
@@ -225,7 +225,7 @@ function EditUserForm({ user }: { user: Student }) {
                 </FormItem>
               )}
             />
-          )}
+          )} */}
 
           <div className="flex justify-center">
             <Button type="submit">
