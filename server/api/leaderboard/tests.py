@@ -8,7 +8,7 @@ from ..team.models import Team, TeamMember
 from datetime import datetime
 from dateutil import tz
 
-awst = tz.gettz('Australia/Perth')
+awst = tz.gettz("Australia/Perth")
 
 
 class LeaderboardAPITest(APITestCase):
@@ -58,8 +58,12 @@ class LeaderboardAPITest(APITestCase):
             year_level="10",
         )
 
-        quiz1 = Quiz.objects.create(name="Test Quiz 1", total_marks=100, open_time_date=datetime.now(tz=awst))
-        quiz2 = Quiz.objects.create(name="Test Quiz 2", total_marks=100, open_time_date=datetime.now(tz=awst))
+        quiz1 = Quiz.objects.create(
+            name="Test Quiz 1", total_marks=100, open_time_date=datetime.now(tz=awst)
+        )
+        quiz2 = Quiz.objects.create(
+            name="Test Quiz 2", total_marks=100, open_time_date=datetime.now(tz=awst)
+        )
 
         QuizAttempt.objects.create(
             quiz=quiz1,

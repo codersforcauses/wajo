@@ -9,7 +9,8 @@ class Invoice(models.Model):
     date_created = models.DateField()
     address = models.CharField()
     school_name = models.ForeignKey(
-        School, on_delete=models.CASCADE, name="school_name")
+        School, on_delete=models.CASCADE, name="school_name"
+    )
     amount_of_students = models.IntegerField()
     cost = models.IntegerField()
     subject = models.CharField(max_length=100, default="Registration")

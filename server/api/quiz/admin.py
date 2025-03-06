@@ -16,4 +16,7 @@ class QuizSlotsAdmin(admin.ModelAdmin):
 
 @admin.register(QuizAttempt)
 class QuizAttemptAdmin(admin.ModelAdmin):
-    list_display = ("id", "quiz_id",)
+    list_display = (
+        "id",
+        "quiz_id",
+    )

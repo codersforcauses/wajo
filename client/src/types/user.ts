@@ -76,7 +76,7 @@ export interface Student extends User {
   attendent_year: number;
   school: School;
   created_at: Date;
-  extenstion_time: number;
+  extension_time: number;
 }
 
 /**
@@ -144,7 +144,7 @@ export const createUserSchema = z.object({
   //School ID now is not compuslory, need to modify later
   school_id: z.number().int().positive("Required"),
   attendent_year: z.number().int().min(2024).max(2050),
-  extenstion_time: z.number().int().min(0).optional(),
+  extension_time: z.number().int().min(0).optional(),
 });
 
 export const createStaffSchema = z.object({
@@ -197,6 +197,9 @@ export const updateStudentSchema = updateStaffSchema.extend({
       message: "Year must be a 4-digit number",
     })
     .default(new Date().getFullYear()),
+});
+
+export const updateAdminStudentSchema = updateStudentSchema.extend({
   extension_time: z.number({ invalid_type_error: "Required" }).default(0),
 });
 

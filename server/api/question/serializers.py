@@ -10,6 +10,7 @@ class CategorySerializer(serializers.ModelSerializer):
         genre (CharField): The genre of the category.
         info (CharField): Additional information about the category.
     """
+
     genre = serializers.CharField(max_length=50, required=True)
     info = serializers.CharField(required=False)
 
@@ -22,14 +23,14 @@ class ImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Image
-        fields = ['url', 'question']
+        fields = ["url", "question"]
 
 
 class AnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = ['value']
+        fields = ["value"]
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -44,13 +45,18 @@ class QuestionSerializer(serializers.ModelSerializer):
         categories (CategorySerializer): The categories associated with the question.
         is_comp (BooleanField): Indicates if the question is for competition.
     """
+
     name = serializers.CharField(max_length=255, required=True)
-    created_by = serializers.CharField(
-        source='created_by.username', read_only=True)
-    modified_by = serializers.CharField(
-        source='modified_by.username', read_only=True)
+    created_by = serializers.CharField(source="created_by.username", read_only=True)
+    modified_by = serializers.CharField(source="modified_by.username", read_only=True)
     category_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(), write_only=True, required=False, allow_null=True, many=True, source='categories')
+        queryset=Category.objects.all(),
+        write_only=True,
+        required=False,
+        allow_null=True,
+        many=True,
+        source="categories",
+    )
     categories = CategorySerializer(read_only=True, many=True)
     is_comp = serializers.BooleanField(required=False, default=False)
     answers = AnswerSerializer(required=False, many=True)
@@ -61,11 +67,11 @@ class QuestionSerializer(serializers.ModelSerializer):
         Override the default create method to set the created_by and modified_by fields
         and handle nested answer data.
         """
-        request = self.context.get('request')
-        validated_data['created_by'] = request.user
-        validated_data['modified_by'] = request.user
+        request = self.context.get("request")
+        validated_data["created_by"] = request.user
+        validated_data["modified_by"] = request.user
 
-        answers_data = validated_data.pop('answers', [])
+        answers_data = validated_data.pop("answers", [])
 
         # image_data = validated_data.pop('image')
 
@@ -81,10 +87,10 @@ class QuestionSerializer(serializers.ModelSerializer):
         Override the default update method to set the modified_by field
         and handle nested answer data.
         """
-        request = self.context.get('request')
-        validated_data['modified_by'] = request.user
+        request = self.context.get("request")
+        validated_data["modified_by"] = request.user
 
-        answers_data = validated_data.pop('answers', [])
+        answers_data = validated_data.pop("answers", [])
 
         instance = super().update(instance, validated_data)
 
@@ -95,6 +101,10 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = '__all__'
-        read_only_fields = ['created_by', 'modified_by',
-                            'time_created', 'time_modified']
+        fields = "__all__"
+        read_only_fields = [
+            "created_by",
+            "modified_by",
+            "time_created",
+            "time_modified",
+        ]

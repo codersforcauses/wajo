@@ -16,17 +16,19 @@ class IndividualLeaderboardFilter(FilterSet):
         field_name="quiz__name",
         queryset=Quiz.objects.all(),
         label="Quiz Name",
-        to_field_name="name"
+        to_field_name="name",
     )
     quiz_id = ModelChoiceFilter(
-        queryset=Quiz.objects.all().values_list('id', flat=True),
+        queryset=Quiz.objects.all().values_list("id", flat=True),
         label="Quiz ID",
     )
     year_level = ModelChoiceFilter(
-        field_name='student__year_level',
-        queryset=Student.objects.distinct("year_level").values_list('year_level', flat=True),
+        field_name="student__year_level",
+        queryset=Student.objects.distinct("year_level").values_list(
+            "year_level", flat=True
+        ),
         label="Year Level",
-        to_field_name="year_level"
+        to_field_name="year_level",
     )
     school_type = ChoiceFilter(
         field_name="student__school__type", choices=School.SchoolType.choices
@@ -54,7 +56,11 @@ class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = QuizAttempt.objects.select_related("quiz", "student__school")
     serializer_class = IndividualLeaderboardSerializer
     filterset_class = IndividualLeaderboardFilter
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter,
+    ]
     search_fields = ["student__user__first_name", "student__user__last_name"]
     ordering_fields = [
         "student__year_level",
@@ -71,17 +77,19 @@ class TeamLeaderboardFilter(FilterSet):
         field_name="quiz_attempt__quiz__name",
         queryset=Quiz.objects.all(),
         label="Quiz Name",
-        to_field_name="name"
+        to_field_name="name",
     )
     quiz_id = ModelChoiceFilter(
-        queryset=Quiz.objects.all().values_list('id', flat=True),
+        queryset=Quiz.objects.all().values_list("id", flat=True),
         label="Quiz ID",
     )
     year_level = ModelChoiceFilter(
         field_name="students__year_level",
-        queryset=Student.objects.distinct("year_level").values_list('year_level', flat=True),
+        queryset=Student.objects.distinct("year_level").values_list(
+            "year_level", flat=True
+        ),
         label="Year Level",
-        to_field_name="year_level"
+        to_field_name="year_level",
     )
     school_type = ChoiceFilter(
         field_name="students__school__type",
@@ -96,19 +104,18 @@ class TeamLeaderboardFilter(FilterSet):
 
 class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Team.objects.annotate(
-        total_marks=Sum('quiz_attempts__total_marks'),
-        max_year=Max(Cast('students__year_level', output_field=BigIntegerField()))
+        total_marks=Sum("quiz_attempts__total_marks"),
+        max_year=Max(Cast("students__year_level", output_field=BigIntegerField())),
     )
     serializer_class = TeamLeaderboardSerializer
     filterset_class = TeamLeaderboardFilter
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
-    search_fields = ["school__name", "id"]
-    ordering_fields = [
-        "total_marks",
-        "max_year",
-        "id",
-        "school__name"
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter,
     ]
+    search_fields = ["school__name", "id"]
+    ordering_fields = ["total_marks", "max_year", "id", "school__name"]
     ordering = ["-total_marks"]
 
 
@@ -121,7 +128,9 @@ class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
         all_students = Student.objects.all()
         scored_students = all_students.filter(quiz_attempts__total_marks__gt=0)
         all_teams = Team.objects.all()
-        scored_team = all_teams.filter(students__quiz_attempts__total_marks__gt=0).distinct()
+        scored_team = all_teams.filter(
+            students__quiz_attempts__total_marks__gt=0
+        ).distinct()
 
         def get_counts(queryset, category, type):
 
@@ -135,7 +144,9 @@ class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
                 "total": queryset.count(),
                 "public_count": queryset.filter(school__type="Public").count(),
                 "catholic_count": queryset.filter(school__type="Catholic").count(),
-                "independent_count": queryset.filter(school__type="Independent").count(),
+                "independent_count": queryset.filter(
+                    school__type="Independent"
+                ).count(),
                 "allies_count": queryset.filter(school__type="Allies").count(),
                 "country": queryset.filter(school__is_country=True).count(),
                 "year_7": queryset.filter(**{year_filter: "7"}).count(),
@@ -147,7 +158,7 @@ class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
             get_counts(all_students, "All Students", "student"),
             get_counts(scored_students, "Students with scores", "student"),
             get_counts(all_teams, "All Teams", "team"),
-            get_counts(scored_team, "Teams with scores", "team")
+            get_counts(scored_team, "Teams with scores", "team"),
         ]
 
         return Response(data, status=status.HTTP_200_OK)
