@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircleIcon } from "lucide-react";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect,useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -21,7 +21,13 @@ import { WaitingLoader } from "@/components/ui/loading";
 import { SelectSchool } from "@/components/ui/Users/select-school";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePatchMutation } from "@/hooks/use-put-data";
-import { Role, Student, updateStudentSchema } from "@/types/user";
+import { useTokenStore } from "@/store/token-store";
+import {
+  Role,
+  Student,
+  updateAdminStudentSchema,
+  updateStudentSchema,
+} from "@/types/user";
 
 export default function PageConfig() {
   const roles = [Role.ADMIN, Role.TEACHER];
@@ -71,9 +77,19 @@ function EditUserForm({ user }: { user: Student }) {
       year_level: user.year_level,
       school_id: user.school?.id,
       attendent_year: user.attendent_year,
-      extension_time: user.extenstion_time,
     },
   });
+
+  const { access } = useTokenStore(); // access the JWT token
+
+  const [role, setRole] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (access?.decoded) {
+      const userRole = access.decoded["role"];
+      setRole(userRole);
+    }
+  }, [access]);
 
   const onSubmit = (data: UpdateStudent) => {
     updateStudent({
@@ -82,7 +98,6 @@ function EditUserForm({ user }: { user: Student }) {
       year_level: data.year_level,
       school_id: data.school_id,
       attendent_year: data.attendent_year,
-      extenstion_time: data.extension_time,
     });
   };
 
@@ -165,18 +180,18 @@ function EditUserForm({ user }: { user: Student }) {
               </FormItem>
             )}
           />
-          {/* Attendent Year */}
+          {/* Attendant Year */}
           <FormField
             control={updateForm.control}
-            name="attendent_year"
+            name="attendant_year"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Attendent Year {requiredStar}</FormLabel>
+                <FormLabel>Year of attendance{requiredStar}</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     type="number"
-                    placeholder="Please input attendent year"
+                    placeholder="Please input year of attendance"
                     onChange={(e) =>
                       field.onChange(Number(e.target.value) || 0)
                     } // Convert to number
@@ -186,27 +201,31 @@ function EditUserForm({ user }: { user: Student }) {
               </FormItem>
             )}
           />
+          {/* role check for teacher or admin, teachers shouldnt be able to give extension time */}
+
           {/* Extension Time */}
-          <FormField
-            control={updateForm.control}
-            name="extension_time"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Extension Time {requiredStar}</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="number"
-                    placeholder="Please input extention time"
-                    onChange={(e) =>
-                      field.onChange(Number(e.target.value) || 0)
-                    } // Convert to number
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {role?.toLowerCase() === "admin" && (
+            <FormField
+              control={updateForm.control}
+              name="extension_time"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Extension Time {requiredStar}</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="number"
+                      placeholder="Please input extension time"
+                      onChange={(e) =>
+                        field.onChange(Number(e.target.value) || 0)
+                      } // Convert to number
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <div className="flex justify-center">
             <Button type="submit">

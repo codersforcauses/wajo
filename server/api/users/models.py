@@ -44,9 +44,13 @@ class Student(models.Model):
     """
 
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="student",)
+        User,
+        on_delete=models.CASCADE,
+        related_name="student",
+    )
     school = models.ForeignKey(
-        School, on_delete=models.CASCADE, related_name="students", null=False)
+        School, on_delete=models.CASCADE, related_name="students", null=False
+    )
     attendent_year = models.IntegerField(default=2025)
     year_level = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -68,8 +72,7 @@ class Teacher(models.Model):
         created_at (DateTimeField): The timestamp when the teacher record was created.
     """
 
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="teacher")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="teacher")
     school = models.ForeignKey(
         School, on_delete=models.CASCADE, related_name="teachers", null=False
     )

@@ -69,7 +69,7 @@ export function StudentDataTableForm() {
     last_name: "",
     password: "",
     year_level: 7,
-    attendent_year: new Date().getFullYear(),
+    attend_year: new Date().getFullYear(),
     school_id: 0,
     extension_time: 0,
   };

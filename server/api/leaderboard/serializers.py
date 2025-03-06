@@ -67,14 +67,7 @@ class TeamLeaderboardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = [
-            "school",
-            "id",
-            "total_marks",
-            "is_country",
-            "students",
-            "max_year"
-        ]
+        fields = ["school", "id", "total_marks", "is_country", "students", "max_year"]
 
     def to_representation(self, instance):
         """Sort students by ID before returning the response."""

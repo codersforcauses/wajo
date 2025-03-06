@@ -65,7 +65,7 @@ INSTALLED_APPS = [
     "api.quiz",
     "api.team",
     "api.invoice",
-    'drf_spectacular',
+    "drf_spectacular",
 ]
 
 REST_FRAMEWORK = {
@@ -74,9 +74,9 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 5,
 }
 
@@ -210,14 +210,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # DRF Spectacular settings
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Your Project API',
-    'DESCRIPTION': 'Your project description',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+    "TITLE": "Your Project API",
+    "DESCRIPTION": "Your project description",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 # Actual directory user files go to
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'mediafiles')
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "mediafiles")
 
 # URL used to access the media
-MEDIA_URL = '/media/'
+MEDIA_URL = "/media/"

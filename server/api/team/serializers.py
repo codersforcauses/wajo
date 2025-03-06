@@ -6,10 +6,10 @@ from api.users.models import School, Student
 
 class TeamMemberSerializer(serializers.ModelSerializer):
     student = StudentSerializer(read_only=True)
-    studentName = serializers.CharField(
-        source="student.user.username", read_only=True)
+    studentName = serializers.CharField(source="student.user.username", read_only=True)
     student_id = serializers.PrimaryKeyRelatedField(
-        queryset=Student.objects.all(), write_only=True, source='student')
+        queryset=Student.objects.all(), write_only=True, source="student"
+    )
 
     class Meta:
         model = TeamMember
@@ -18,10 +18,11 @@ class TeamMemberSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    members = TeamMemberSerializer(source='has', many=True, read_only=True)
+    members = TeamMemberSerializer(source="has", many=True, read_only=True)
     school = SchoolSerializer(read_only=True)
     school_id = serializers.PrimaryKeyRelatedField(
-        queryset=School.objects.all(), write_only=True, source='school')
+        queryset=School.objects.all(), write_only=True, source="school"
+    )
 
     class Meta:
         model = Team

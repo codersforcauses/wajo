@@ -1,4 +1,5 @@
 from django.db import models
+
 # from api.quiz.models import Quiz
 from api.users.models import School, Student
 
@@ -21,10 +22,8 @@ class Team(models.Model):
 
 
 class TeamMember(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE,
-                                related_name="isA")
-    team = models.ForeignKey("Team", on_delete=models.CASCADE,
-                             related_name="has")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="isA")
+    team = models.ForeignKey("Team", on_delete=models.CASCADE, related_name="has")
     time_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

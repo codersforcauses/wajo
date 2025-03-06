@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { AlertTriangle } from "lucide-react";
-import { ReactNode } from "react";
+import { ReactNode , useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -34,6 +34,7 @@ import {
 import { SelectSchool } from "@/components/ui/Users/select-school";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { cn } from "@/lib/utils";
+import { useTokenStore } from "@/store/token-store";
 import { createRandomPwd, createUserSchema, Student } from "@/types/user";
 
 // For localStorage and CSV export
@@ -117,7 +118,7 @@ export function DataTableForm() {
           yearLevel: std.year_level,
           schoolId: std.school!.id,
           schoolName: std.school.name,
-          attendentYear: std.attendent_year,
+          attendentYear: std.attendance_year,
           extensionTime: std.extenstion_time || 0,
         }));
 
@@ -137,6 +138,17 @@ export function DataTableForm() {
       }
     },
   });
+
+  const [role, setRole] = useState<string | undefined>(undefined);
+
+  const { access } = useTokenStore(); // Access the JWT token
+
+  useEffect(() => {
+    if (access?.decoded) {
+      const userRole = access.decoded["role"];
+      setRole(userRole);
+    }
+  }, [access]);
 
   const onSubmit = (data: { users: User[] }) => {
     createUser([...data.users]);
@@ -167,7 +179,7 @@ export function DataTableForm() {
       "Year Level",
       "School ID",
       "School Name",
-      "Attendent Year",
+      "Attendance Year",
       "Extension Time",
     ];
 
@@ -180,7 +192,7 @@ export function DataTableForm() {
       record.yearLevel,
       record.schoolId,
       record.schoolName,
-      record.attendentYear,
+      record.attendanceYear,
       record.extensionTime,
     ]);
 
@@ -238,11 +250,13 @@ export function DataTableForm() {
                       School*
                     </TableHead>
                     <TableHead className={commonTableHeadClasses}>
-                      Attendent Year*
+                      Attendance Year*
                     </TableHead>
-                    <TableHead className={commonTableHeadClasses}>
-                      Extenstion Time
-                    </TableHead>
+                    {role?.toLowerCase() === "admin" && (
+                      <TableHead className={commonTableHeadClasses}>
+                        Extension Time
+                      </TableHead>
+                    )}
                     <TableHead
                       className={cn(
                         commonTableHeadClasses,
@@ -382,7 +396,7 @@ export function DataTableForm() {
                         />
                       </TableCell>
 
-                      {/* Attendent Year Field (2024-2050) */}
+                      {/* Attend Year Field (2024-2050) */}
                       <TableCell className="align-top">
                         <FormField
                           control={createUserForm.control}
@@ -415,28 +429,30 @@ export function DataTableForm() {
                         />
                       </TableCell>
 
-                      {/* Extenstion Time (optional) */}
-                      <TableCell className="align-top">
-                        <FormField
-                          control={createUserForm.control}
-                          name={`users.${index}.extenstion_time`}
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  {...field}
-                                  placeholder="0"
-                                  onChange={(e) =>
-                                    field.onChange(Number(e.target.value))
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </TableCell>
+                      {/* Extension Time Field - Only for Admin */}
+                      {role?.toLowerCase() === "admin" && ( // Check if the user is an admin
+                        <TableCell className="align-top">
+                          <FormField
+                            control={createUserForm.control}
+                            name={`users.${index}.extension_time`}
+                            render={({ field }) => (
+                              <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    {...field}
+                                    placeholder="0"
+                                    onChange={(e) =>
+                                      field.onChange(Number(e.target.value))
+                                    }
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </TableCell>
+                      )}
 
                       {/* Delete Button */}
                       <TableCell className="sticky right-0 flex w-24 bg-white text-right align-top">
