@@ -11,7 +11,7 @@ from dateutil import tz
 awst = tz.gettz("Australia/Perth")
 
 
-class LeaderboardAPITest(APITestCase):
+class ResultsAPITest(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
@@ -93,7 +93,7 @@ class LeaderboardAPITest(APITestCase):
 
     def test_individual_leaderboard_should_list_results(self):
         # Act
-        url = reverse("leaderboard:individual-list")
+        url = reverse("results:individual-list")
         response = self.client.get(url)
 
         # Assert
@@ -114,7 +114,7 @@ class LeaderboardAPITest(APITestCase):
 
     def test_individual_leaderboard_should_filter_by_school_type(self):
         # Act
-        url = reverse("leaderboard:individual-list")
+        url = reverse("results:individual-list")
         response = self.client.get(url, {"school_type": "Public"})
         # Assert
         self.assertEqual(response.status_code, 200)
@@ -123,7 +123,7 @@ class LeaderboardAPITest(APITestCase):
 
     def test_individual_leaderboard_should_filter_by_year_level(self):
         # Act
-        url = reverse("leaderboard:individual-list")
+        url = reverse("results:individual-list")
         response = self.client.get(url, {"year_level": 10})
 
         # Assert
@@ -133,7 +133,7 @@ class LeaderboardAPITest(APITestCase):
 
     def test_team_leaderboard_should_list_results(self):
         # Act
-        url = reverse("leaderboard:team-list")
+        url = reverse("results:team-list")
         response = self.client.get(url)
 
         # Assert
@@ -153,7 +153,7 @@ class LeaderboardAPITest(APITestCase):
 
     def test_team_leaderboard_should_filter_by_type(self):
         # Act
-        url = reverse("leaderboard:team-list")
+        url = reverse("results:team-list")
         response = self.client.get(url, {"school_type": "Independent"})
 
         # Assert

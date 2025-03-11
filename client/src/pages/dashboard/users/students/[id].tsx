@@ -170,18 +170,18 @@ function EditUserForm({ user }: { user: Student }) {
               </FormItem>
             )}
           />
-          {/* Attendant Year */}
+          {/* Participation Year */}
           <FormField
             control={updateForm.control}
             name="attendent_year"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Year of attendance{requiredStar}</FormLabel>
+                <FormLabel>Year of participation{requiredStar}</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     type="number"
-                    placeholder="Please input year of attendance"
+                    placeholder="Please input year of participation"
                     onChange={(e) =>
                       field.onChange(Number(e.target.value) || 0)
                     } // Convert to number

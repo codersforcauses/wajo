@@ -46,7 +46,7 @@ type StoredRecord = {
   yearLevel: number | string;
   schoolId: number;
   schoolName: string;
-  attendentYear: number;
+  participationYear: number;
   extensionTime: number;
 };
 type User = z.infer<typeof createUserSchema>;
@@ -90,7 +90,7 @@ export function DataTableForm(schoolID: DataTableFormProps) {
     year_level: "7", // default year_level is "7"
     school_id: schoolID?.schoolID ?? 0, // default school_id is 0
     attendent_year: defaultAttendentYear,
-    // extenstion_time is optional, so it can be omitted
+    // extension_time is optional, so it can be omitted
   };
 
   const createUserForm = useForm<{
@@ -122,7 +122,7 @@ export function DataTableForm(schoolID: DataTableFormProps) {
           yearLevel: std.year_level,
           schoolId: std.school!.id,
           schoolName: std.school.name,
-          attendentYear: std.attendent_year,
+          participationYear: std.attendent_year,
           extensionTime: std.extension_time || 0,
         }));
 
@@ -162,7 +162,7 @@ export function DataTableForm(schoolID: DataTableFormProps) {
    * Download a CSV file from the localStorage data.
    * We'll read from "studentRecords" and produce the requested columns:
    *   Student ID, First Name, Last Name, Year Level, School ID, School Name,
-   *   Attendent Year, Created At, Extension Time
+   *   Participation Year, Created At, Extension Time
    */
   const downloadCSV = () => {
     const storedData: StoredRecord[] = JSON.parse(
@@ -183,7 +183,7 @@ export function DataTableForm(schoolID: DataTableFormProps) {
       "Year Level",
       "School ID",
       "School Name",
-      "Attendance Year",
+      "Participation Year",
       "Extension Time",
     ];
 
@@ -196,7 +196,7 @@ export function DataTableForm(schoolID: DataTableFormProps) {
       record.yearLevel,
       record.schoolId,
       record.schoolName,
-      record.attendentYear,
+      record.participationYear,
       record.extensionTime,
     ]);
 
@@ -257,7 +257,7 @@ export function DataTableForm(schoolID: DataTableFormProps) {
                     )}
 
                     <TableHead className={commonTableHeadClasses}>
-                      Attendance Year*
+                      Participation Year*
                     </TableHead>
                     {role?.toLowerCase() === "admin" && (
                       <TableHead className={commonTableHeadClasses}>
@@ -405,7 +405,7 @@ export function DataTableForm(schoolID: DataTableFormProps) {
                         </TableCell>
                       )}
 
-                      {/* Attend Year Field (2024-2050) */}
+                      {/* Participation Year Field (2024-2050) */}
                       <TableCell className="align-top">
                         <FormField
                           control={createUserForm.control}

@@ -52,7 +52,7 @@ export function Datagrid({
                 className={commonTableHeadClasses}
                 onClick={() => onOrderingChange("diff_level")}
               >
-                <SortIcon title="Difficulty" />
+                <SortIcon title="Marks" />
               </TableHead>
               <TableHead className={commonTableHeadClasses}>
                 Modified By

@@ -58,7 +58,6 @@ function Create() {
       total_marks: data.total_marks,
       open_time_date: data.open_time_date,
       time_limit: data.time_limit,
-      time_window: data.time_window,
       status: 0,
     });
   };
@@ -70,47 +69,26 @@ function Create() {
         <h1 className="my-4 text-center text-xl font-bold">Create Practice</h1>
         <div className="mx-auto max-w-3xl space-y-5 rounded-lg bg-gray-50 p-4 shadow-lg">
           <h3 className="-mb-2 text-lg">Basic</h3>
-          <div className="flex gap-4">
-            <div className="flex-auto">
-              {/* Test Name */}
-              <FormField
-                name="name"
-                control={form.control}
-                defaultValue=""
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Test Name {requiredStar}</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Please input test name"
-                        className="w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="flex-none">
-              {/* Open Time */}
-              <FormField
-                name="open_time_date"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="mt-2 flex flex-col gap-1.5">
-                    <FormLabel>Open Time {requiredStar}</FormLabel>
-                    <FormControl>
-                      <DateTimePicker
-                        className="h-80 overflow-scroll"
-                        field={field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+          <div className="flex-auto">
+            {/* Test Name */}
+            <FormField
+              name="name"
+              control={form.control}
+              defaultValue=""
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Test Name {requiredStar}</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Please input test name"
+                      className="w-full"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
           {/* Intro */}
           <FormField
@@ -129,53 +107,28 @@ function Create() {
               </FormItem>
             )}
           />
-          <div className="flex gap-4">
-            <div className="flex-auto">
-              {/* Time Limit */}
-              <FormField
-                name="time_limit"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Time Limit</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        placeholder="Please input time limit"
-                        onChange={(e) =>
-                          field.onChange(Number(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="flex-auto">
-              {/* Time Window */}
-              <FormField
-                name="time_window"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="mt-2 flex flex-col gap-1.5">
-                    <FormLabel>Time Window</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        placeholder="Please input time window"
-                        onChange={(e) =>
-                          field.onChange(Number(e.target.value) || 0)
-                        } // Convert to number
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+          <div className="flex-auto">
+            {/* Time Limit */}
+            <FormField
+              name="time_limit"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time Limit</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="number"
+                      placeholder="Please input time limit"
+                      onChange={(e) =>
+                        field.onChange(Number(e.target.value) || 0)
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           <div className="flex justify-end gap-4">

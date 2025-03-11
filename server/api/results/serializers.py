@@ -11,11 +11,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["email"]
 
 
-class IndividualLeaderboardSerializer(serializers.ModelSerializer):
+class IndividualResultsSerializer(serializers.ModelSerializer):
     """
-    Serializer for the leaderboard data.
+    Serializer for the results data.
 
-    This serializer is designed for handling student entries in the competition leaderboard. Each entry represents
+    This serializer is designed for handling student entries in the competition results. Each entry represents
     an individual student, including their personal information, scores, and participation status.
     """
 
@@ -51,11 +51,11 @@ class StudentSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "year_level"]
 
 
-class TeamLeaderboardSerializer(serializers.ModelSerializer):
+class TeamResultsSerializer(serializers.ModelSerializer):
     """
-    Serializer for the leaderboard data.
+    Serializer for the results data.
 
-    This serializer is designed for handling team entries in the competition leaderboard. Each entry represents
+    This serializer is designed for handling team entries in the competition results. Each entry represents
     a team, including their members, scores, and participation status.
     """
 

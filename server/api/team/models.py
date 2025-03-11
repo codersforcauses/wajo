@@ -14,7 +14,7 @@ class Team(models.Model):
     )
     description = models.CharField(max_length=100)
     time_created = models.DateTimeField(auto_now_add=True)
-    # `students` field is used in `/leaderboard/serializers.py`
+    # `students` field is used in `/results/serializers.py`
     students = models.ManyToManyField(Student, through="TeamMember")
 
     def __str__(self):
