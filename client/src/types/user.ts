@@ -220,3 +220,10 @@ export const createRandomPwd = () => {
   // it has 1 digit, 1 upper-case and 1 lower-case character
   return passhelp.character(8, passhelp.alphabets.alphanumeric, true); // "A2nJEH4o"
 };
+
+export interface Profile {
+  user_id: string;
+  username: string;
+  teacher_id: string;
+  school_id: string;
+}

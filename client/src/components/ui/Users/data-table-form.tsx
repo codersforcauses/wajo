@@ -74,7 +74,11 @@ type User = z.infer<typeof createUserSchema>;
  * - {@link https://react-hook-form.com/docs/usefieldarray React Hook Form: useFieldArray}
  */
 
-export function DataTableForm() {
+interface DataTableFormProps {
+  schoolID?: number;
+}
+
+export function DataTableForm(schoolID: DataTableFormProps) {
   // calculate the default year for the attendent_year field
   const currentYear = new Date().getFullYear();
   const defaultAttendentYear = Math.max(2024, Math.min(currentYear, 2050));
@@ -84,7 +88,7 @@ export function DataTableForm() {
     last_name: "",
     password: "",
     year_level: "7", // default year_level is "7"
-    school_id: 0,
+    school_id: schoolID?.schoolID ?? 0, // default school_id is 0
     attendent_year: defaultAttendentYear,
     // extenstion_time is optional, so it can be omitted
   };
@@ -246,9 +250,12 @@ export function DataTableForm() {
                     <TableHead className={commonTableHeadClasses}>
                       Year Level*
                     </TableHead>
-                    <TableHead className={commonTableHeadClasses}>
-                      School*
-                    </TableHead>
+                    {role?.toLowerCase() !== "teacher" && (
+                      <TableHead className={commonTableHeadClasses}>
+                        School*
+                      </TableHead>
+                    )}
+
                     <TableHead className={commonTableHeadClasses}>
                       Attendance Year*
                     </TableHead>
@@ -378,23 +385,25 @@ export function DataTableForm() {
                       </TableCell>
 
                       {/* School Field */}
-                      <TableCell className="align-top">
-                        <FormField
-                          control={createUserForm.control}
-                          name={`users.${index}.school_id`}
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                              <FormControl>
-                                <SelectSchool
-                                  selectedId={field.value}
-                                  onChange={field.onChange}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </TableCell>
+                      {role?.toLowerCase() !== "teacher" && (
+                        <TableCell className="align-top">
+                          <FormField
+                            control={createUserForm.control}
+                            name={`users.${index}.school_id`}
+                            render={({ field }) => (
+                              <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                                <FormControl>
+                                  <SelectSchool
+                                    selectedId={field.value}
+                                    onChange={field.onChange}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </TableCell>
+                      )}
 
                       {/* Attend Year Field (2024-2050) */}
                       <TableCell className="align-top">

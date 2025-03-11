@@ -13,6 +13,7 @@ from .serializers import (
     UserSerializer,
 )
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.views import APIView
 
 
 @permission_classes([IsAdminUser])
@@ -252,15 +253,16 @@ class SchoolViewSet(viewsets.ModelViewSet):
             )
 
 
-# def get_role(self):
-#     """
-#     Returns the role of the user.
+@permission_classes([IsAuthenticated])
+class UserProfileView(APIView):
 
-#     Returns:
-#         str: The role of the user.
-#     """
-#     if hasattr(self, "student"):
-#         return "student"
-#     elif hasattr(self, "teacher"):
-#         return "teacher"
-#     return "user"
+    def get(self, request):
+        user = request.user
+        profile = {
+            'user_id': user.id,
+            'username': user.username,
+            'teacher_id': user.teacher.id if hasattr(user, 'teacher') else None,
+            'school_id': user.teacher.school.id if hasattr(user, 'teacher') else None,
+            # other profile details
+        }
+        return Response(profile)
