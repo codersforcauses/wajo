@@ -1,27 +1,30 @@
+from unfold.admin import ModelAdmin, StackedInline
 from .models import School, Student, Teacher
 from django.contrib import admin
 from django.contrib.auth.models import User
 
 
-class StudentInline(admin.StackedInline):
+class StudentInline(StackedInline):
+    ordering = ('created_at',)
     model = Student
     extra = 0
 
 
-class TeacherInline(admin.StackedInline):
+class TeacherInline(StackedInline):
+    ordering = ('created_at',)
     model = Teacher
     extra = 0
 
 
 @admin.register(School)
-class SchoolAdmin(admin.ModelAdmin):
+class SchoolAdmin(ModelAdmin):
     list_display = ("id", "name", "code", "type", "abbreviation", "is_country")
     search_fields = ("name", "code", "type", "abbreviation", "is_country")
     ordering = ("id",)
 
 
 @admin.register(Student)
-class StudentAdmin(admin.ModelAdmin):
+class StudentAdmin(ModelAdmin):
     list_display = ('user', 'school',
                     'year_level', 'created_at')
     list_filter = ('school', 'year_level')
@@ -31,15 +34,18 @@ class StudentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Teacher)
-class TeacherAdmin(admin.ModelAdmin):
+class TeacherAdmin(ModelAdmin):
     list_display = ("user", "school", "phone")
     list_filter = ("school",)
     search_fields = ("user__username", "school__name", "phone")
     ordering = ("user",)
 
 
-class CustomUserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(ModelAdmin):
     inlines = [StudentInline, TeacherInline]
+    ordering = ('date_joined',)
+    list_display = ('username', 'email', 'is_staff',
+                    'is_active', 'date_joined')
 
     def save_model(self, request, obj, form, change):
         if form.cleaned_data["password"]:
