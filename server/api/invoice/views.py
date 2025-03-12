@@ -14,5 +14,6 @@ class AdminInvoice(viewsets.ModelViewSet):
     - retrieve the invoice for a specific school
 
     """
+
     queryset = Invoice.objects.all()
     serializer_class = invoiceSerializer

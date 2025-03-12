@@ -43,8 +43,8 @@ function TeamLeaderboardIndex() {
 
   const { data, isLoading, error, totalPages } =
     useFetchDataTable<TeamLeaderboard>({
-      queryKey: ["leaderboard.team"],
-      endpoint: "/leaderboard/team/",
+      queryKey: ["results.team"],
+      endpoint: "/results/team/",
       searchParams: searchParams,
     });
 
@@ -72,7 +72,7 @@ function TeamLeaderboardIndex() {
     setSearchParams(updatedParams);
     push(
       {
-        pathname: "/dashboard/test/leaderboard",
+        pathname: "/dashboard/test/results",
         query: Object.fromEntries(
           Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),

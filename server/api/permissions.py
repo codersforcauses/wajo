@@ -2,7 +2,7 @@ from rest_framework.permissions import BasePermission
 from .users.models import Student, Teacher
 
 
-'''
+"""
 Example of using this file in the views.py file:
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -17,7 +17,7 @@ class SchoolViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated | IsStudent | IsTeacher | IsAdmin]
 
 
-'''
+"""
 
 
 def get_user_role(user):
@@ -31,48 +31,51 @@ def get_user_role(user):
         str: 'student', 'teacher', or 'unknown' based on the user's role.
     """
     if not user.is_authenticated:
-        return 'unknown'
+        return "unknown"
 
     try:
         # Check if the user is a Student
         if user.student:
-            return 'student'
+            return "student"
     except Student.DoesNotExist:
         pass
 
     try:
         # Check if the user is a Teacher
         if user.teacher:
-            return 'teacher'
+            return "teacher"
     except Teacher.DoesNotExist:
         pass
 
     # Check if the user is an Admin
     if user.is_staff:
-        return 'admin'
+        return "admin"
 
-    return 'unknown'
+    return "unknown"
 
 
 class IsStudent(BasePermission):
     """
     Permission class to allow access only to students.
     """
+
     def has_permission(self, request, view):
-        return get_user_role(request.user) == 'student'
+        return get_user_role(request.user) == "student"
 
 
 class IsTeacher(BasePermission):
     """
     Permission class to allow access only to teachers.
     """
+
     def has_permission(self, request, view):
-        return get_user_role(request.user) == 'teacher'
+        return get_user_role(request.user) == "teacher"
 
 
 class IsAdmin(BasePermission):
     """
     Permission class to allow access only to superusers or staff.
     """
+
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.is_staff

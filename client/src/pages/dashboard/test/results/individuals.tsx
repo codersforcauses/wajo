@@ -43,8 +43,8 @@ function IndividualLeaderboardIndex() {
 
   const { data, isLoading, error, totalPages } =
     useFetchDataTable<IndividualLeaderboard>({
-      queryKey: ["leaderboard.individual"],
-      endpoint: "/leaderboard/individual/",
+      queryKey: ["results.individual"],
+      endpoint: "/results/individual/",
       searchParams: searchParams,
     });
 
@@ -72,7 +72,7 @@ function IndividualLeaderboardIndex() {
     setSearchParams(updatedParams);
     push(
       {
-        pathname: "/dashboard/test/leaderboard/individual",
+        pathname: "/dashboard/test/results/individuals",
         query: Object.fromEntries(
           Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
         ),

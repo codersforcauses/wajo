@@ -4,6 +4,7 @@ from api.users.models import Student
 from api.question.models import Question
 from django.utils.timezone import now
 from datetime import timedelta
+from django.core.exceptions import ValidationError
 
 
 class Quiz(models.Model):
@@ -26,9 +27,9 @@ class Quiz(models.Model):
     total_marks = models.DecimalField(max_digits=5, decimal_places=2)
     is_comp = models.BooleanField(default=False)
     visible = models.BooleanField(default=False)
-    open_time_date = models.DateTimeField(default=None)
+    open_time_date = models.DateTimeField(null=True, blank=True)
     time_limit = models.IntegerField(default=120)
-    time_window = models.IntegerField(default=10)
+    time_window = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
@@ -37,6 +38,18 @@ class Quiz(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+    def clean(self):
+        if self.is_comp:
+            if self.open_time_date is None:
+                raise ValidationError({'open_time_date': 'This field is required for competition quizzes.'})
+            if self.time_window is None:
+                raise ValidationError({'time_window': 'This field is required for competition quizzes.'})
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Ensure the clean method is called before saving
+        super().save(*args, **kwargs)
 
 
 class QuizSlot(models.Model):
@@ -51,10 +64,10 @@ class QuizSlot(models.Model):
     """
 
     id = models.AutoField(primary_key=True)
-    quiz = models.ForeignKey(
-        Quiz, on_delete=models.CASCADE, related_name="quiz_slots")
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="quiz_slots")
     question = models.ForeignKey(
-        Question, on_delete=models.CASCADE, default=None, related_name="slots")
+        Question, on_delete=models.CASCADE, default=None, related_name="slots"
+    )
     # an index of the question in the quiz
     slot_index = models.IntegerField(db_index=True)
     block = models.IntegerField()
@@ -85,20 +98,27 @@ class QuizAttempt(models.Model):
         COMPLETED = 4
 
     id = models.AutoField(primary_key=True)
-    quiz = models.ForeignKey(
-        Quiz, on_delete=models.CASCADE, related_name="attempts")
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="attempts")
     student = models.ForeignKey(
-        Student, on_delete=models.CASCADE, related_name="quiz_attempts", default=None, null=True
+        Student,
+        on_delete=models.CASCADE,
+        related_name="quiz_attempts",
+        default=None,
+        null=True,
     )
     current_page = models.IntegerField()
-    state = models.IntegerField(
-        choices=State.choices, default=State.UNATTEMPTED)
+    state = models.IntegerField(choices=State.choices, default=State.UNATTEMPTED)
     time_start = models.DateTimeField(auto_now_add=True)
     time_finish = models.DateTimeField(null=True, blank=True)
     time_modified = models.DateTimeField(auto_now=True)
     total_marks = models.IntegerField()
     team = models.ForeignKey(
-        Team, on_delete=models.CASCADE, related_name="quiz_attempts", default=None, null=True, blank=True
+        Team,
+        on_delete=models.CASCADE,
+        related_name="quiz_attempts",
+        default=None,
+        null=True,
+        blank=True,
     )
     dead_line = models.DateTimeField(default=None, null=True, blank=True)
 
@@ -113,14 +133,16 @@ class QuizAttempt(models.Model):
     @property
     def is_available(self):
         current_time = now()
-        end_time = self.quiz.open_time_date + \
-            timedelta(minutes=self.quiz.time_limit) + \
-            timedelta(minutes=self.quiz.time_window)
-        end_time = min(end_time, self.time_start +
-                       timedelta(minutes=self.quiz.time_limit))
+        end_time = (
+            self.quiz.open_time_date
+            + timedelta(minutes=self.quiz.time_limit)
+            + timedelta(minutes=self.quiz.time_window)
+        )
+        end_time = min(
+            end_time, self.time_start + timedelta(minutes=self.quiz.time_limit)
+        )
         if int(self.student.extenstion_time) > 0:
-            end_time = now() + \
-                timedelta(minutes=self.student.extenstion_time)
+            end_time = now() + timedelta(minutes=self.student.extenstion_time)
             self.student.extenstion_time = 0
             self.student.save()
         if self.dead_line is None:
@@ -144,11 +166,14 @@ class QuizAttempt(models.Model):
 class QuestionAttempt(models.Model):
     id = models.AutoField(primary_key=True)
     student = models.ForeignKey(
-        Student, on_delete=models.CASCADE, related_name="question_attempts")
+        Student, on_delete=models.CASCADE, related_name="question_attempts"
+    )
     question = models.ForeignKey(
-        Question, on_delete=models.CASCADE, related_name="attempts")
+        Question, on_delete=models.CASCADE, related_name="attempts"
+    )
     quiz_attempt = models.ForeignKey(
-        QuizAttempt, on_delete=models.CASCADE, related_name="question_attempts")
+        QuizAttempt, on_delete=models.CASCADE, related_name="question_attempts"
+    )
     answer_student = models.IntegerField(default=None)
     is_correct = models.BooleanField(default=None)
 

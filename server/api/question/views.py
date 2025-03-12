@@ -1,5 +1,10 @@
 from rest_framework import viewsets, filters, status
-from .serializers import QuestionSerializer, CategorySerializer, AnswerSerializer, ImageSerializer
+from .serializers import (
+    QuestionSerializer,
+    CategorySerializer,
+    AnswerSerializer,
+    ImageSerializer,
+)
 from .models import Question, Category, Answer, Image
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import permission_classes
@@ -21,19 +26,27 @@ class QuestionViewSet(viewsets.ModelViewSet):
         search_fields (list): The fields to search in the viewset.
         filterset_fields (list): The fields to filter in the viewset.
     """
+
     queryset = Question.objects.all().order_by("-time_created")
     serializer_class = QuestionSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name']
-    filterset_fields = ['mark', 'answers__value']
-    ordering_fields = ['time_created', 'time_modified', 'diff_level', 'mark']
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+    search_fields = ["name"]
+    filterset_fields = ["mark", "answers__value"]
+    ordering_fields = ["time_created", "time_modified", "diff_level", "mark"]
 
     # override the create method
     def create(self, request, *args, **kwargs):
         # validate integrity of name
-        name = request.data.get('name')
+        name = request.data.get("name")
         if Question.objects.filter(name=name).exists():
-            return Response({'error': 'Question with this name already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Question with this name already exists"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         response = self.handle_answers(request, True)
         return response
 
@@ -44,7 +57,10 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
     # override the partial_update method to disable PATCH requests
     def partial_update(self, request, *args, **kwargs):
-        return Response({'error': 'PATCH method is not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(
+            {"error": "PATCH method is not allowed"},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 
     def perform_update(self, serializer):
         instance = serializer.save(modified_by=self.request.user)
@@ -52,19 +68,22 @@ class QuestionViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def handle_answers(self, request, is_create, *args, **kwargs):
-        answers = request.data.get('answers')
+        answers = request.data.get("answers")
         if is_create:
             if not answers or len(answers) == 0:
-                return Response({'error': 'Answers field is required'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Answers field is required"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         if isinstance(answers[0], dict):
             if is_create:
                 return super().create(request, *args, **kwargs)
             else:
                 return super().update(request, *args, **kwargs)
         else:
-            answers_list = [{'value': int(answer)} for answer in answers]
+            answers_list = [{"value": int(answer)} for answer in answers]
             data = request.data.copy()
-            data['answers'] = answers_list
+            data["answers"] = answers_list
             if is_create:
                 serializer = self.get_serializer(data=data)
             else:
@@ -100,10 +119,11 @@ class CategoryViewSet(viewsets.ModelViewSet):
         filter_backends (list): The filter backends for the viewset.
         search_fields (list): The fields to search in the viewset.
     """
+
     queryset = Category.objects.all().order_by("id")
     serializer_class = CategorySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    search_fields = ['genre']
+    search_fields = ["genre"]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, many=True)

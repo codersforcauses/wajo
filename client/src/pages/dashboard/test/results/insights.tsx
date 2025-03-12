@@ -9,7 +9,7 @@ import {
   toQueryString,
 } from "@/components/ui/pagination";
 import { InsightDataGrid } from "@/components/ui/Test/insight-data-grid";
-import { useFetchDataTable } from "@/hooks/use-fetch-data";
+import { useFetchData, useFetchDataTable } from "@/hooks/use-fetch-data";
 import { Insight } from "@/types/leaderboard";
 import { Role } from "@/types/user";
 
@@ -33,9 +33,19 @@ function InsightPage() {
   });
 
   const { data, isLoading, error, totalPages } = useFetchDataTable<Insight>({
-    queryKey: ["leaderboard.team"],
-    endpoint: "/leaderboard/team/",
+    queryKey: ["results.team"],
+    endpoint: "/results/team/",
     searchParams: searchParams,
+  });
+
+  const {
+    data: insights,
+    isLoading: isInsightLoading,
+    isError: isInsightError,
+    error: insightError,
+  } = useFetchData<Insight[]>({
+    queryKey: ["students.insight"],
+    endpoint: "/results/insight/",
   });
 
   useEffect(() => {
@@ -61,8 +71,8 @@ function InsightPage() {
       <Suspense>
         <div>
           <InsightDataGrid
-            datacontext={data ?? []}
-            isLoading={!isReady || isLoading}
+            datacontext={insights ?? []}
+            isLoading={!isReady || isInsightLoading}
           />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}

@@ -29,7 +29,10 @@ class TeamViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         user = self.request.user
         if hasattr(user, "teacher") and not user.teacher.school_id == request.school_id:
-            return Response({'error': 'Teacher cannot create team for different school.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Teacher cannot create team for different school."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         serializer = self.get_serializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
@@ -48,7 +51,7 @@ class TeamViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    @action(detail=True, methods=['get', 'post'])
+    @action(detail=True, methods=["get", "post"])
     def members(self, request, pk=None):
         """
         Handle team member operations.
@@ -63,24 +66,41 @@ class TeamViewSet(viewsets.ModelViewSet):
         def validate_school_access():
             """Validate teacher's access to the school"""
             if teacher_school_id and teacher_school_id != team.school_id:
-                return Response({"error": "Teacher can only access teams from their school."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Teacher can only access teams from their school."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         def validate_team_member_record(student_id, team_id):
             """Validate student belongs to the same school as the team"""
             if not all([student_id, team_id]):
-                return Response({"error": "Missing required fields: student_id or team."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Missing required fields: student_id or team."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             student = Student.objects.filter(id=student_id).first()
             team_member = TeamMember.objects.filter(student_id=student_id).first()
             if teacher_school_id and student.school.id != teacher_school_id:
-                return Response({"error": "Teacher can only manage students from their school."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Teacher can only manage students from their school."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             if student.school.id != team.school.id:
-                return Response({"error": "Student must belong to the same school as the team."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Student must belong to the same school as the team."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             if team_member and team_member.team.id != int(pk):
                 team_name = Team.objects.filter(id=team_member.team.id).first().name
-                return Response({"error": f"Student:{student.user.get_username()} exists in team:{team_name}."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {
+                        "error": f"Student:{student.user.get_username()} exists in team:{team_name}."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             return None
 
-        if request.method == 'GET':
+        if request.method == "GET":
             """Filter based on user role."""
             validate_result = validate_school_access()
             if validate_result:
@@ -88,10 +108,12 @@ class TeamViewSet(viewsets.ModelViewSet):
             self.serializer_class = TeamMemberSerializer
             serializer = TeamMemberSerializer(instance, many=True)
             return Response(serializer.data)
-        if request.method == 'POST':
+        if request.method == "POST":
             """Check if student school and team school matched"""
             for entry in request.data:
-                validate_result = validate_team_member_record(entry.get('student_id'), entry.get('team'))
+                validate_result = validate_team_member_record(
+                    entry.get("student_id"), entry.get("team")
+                )
                 if validate_result:
                     return validate_result
 

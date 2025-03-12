@@ -22,10 +22,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             sub_id = user.teacher.id
 
         token = super().get_token(user)
-        token['is_superuser'] = user.is_superuser
-        token['role'] = role
-        token['primary_id'] = primary_id
-        token['school_id'] = school_id
-        token['sub_id'] = sub_id
+        token["is_superuser"] = user.is_superuser
+        token["role"] = role
+        token["primary_id"] = primary_id
+        token["school_id"] = school_id
+        token["sub_id"] = sub_id
 
         return token

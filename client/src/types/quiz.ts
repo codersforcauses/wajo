@@ -168,6 +168,23 @@ export const genericCreateTestSchema = z.object({
   time_window: z.number().int().nonnegative().default(10),
 });
 
+/**
+ * Zod schema for validating generic test creation input.
+ *
+ * Validates name, general instructions.
+ *
+ * @constant
+ */
+export const createPracticeTestSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Required")
+    .max(255, "Name cannot exceed 255 characters"),
+  intro: z.string().min(1, "Required"),
+  total_marks: z.number().int().nonnegative().default(0),
+  time_limit: z.number().int().nonnegative().default(120),
+});
+
 // export const createCompetitionSchema = genericCreateTestSchema
 //   .extend({
 //     start_time: z.date(),
@@ -193,6 +210,7 @@ const createQuestionSchema = z.object({
   id: z.number().int().nonnegative(),
   name: z.string(),
   diff_level: z.number().int().nonnegative(),
+  mark: z.number().int().nonnegative(),
 });
 
 const createQuestionBlockSchema = z.object({
@@ -214,6 +232,7 @@ type SlotsProps = {
     id: number;
     name: string;
     diff_level: number;
+    mark: number;
   }[];
 };
 
@@ -231,6 +250,7 @@ export function mapSlotsToBlocks(slots: AdminQuizSlot[]): SlotsProps[] {
         id: slot.question.id,
         name: slot.question.name,
         diff_level: slot.question.diff_level,
+        mark: slot.question.mark,
       });
       return acc;
     },

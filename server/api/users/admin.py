@@ -33,6 +33,7 @@ class StudentAdmin(ModelAdmin):
     readonly_fields = ('created_at',)
 
 
+
 @admin.register(Teacher)
 class TeacherAdmin(ModelAdmin):
     list_display = ("user", "school", "phone")

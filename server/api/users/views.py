@@ -2,13 +2,18 @@ from django.db import IntegrityError
 from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework import status, viewsets, filters
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAdminUser)
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from api.permissions import IsTeacher, IsAdmin
 from django.contrib.auth.models import User
 from .models import Student, Teacher, School
-from .serializers import StudentSerializer, SchoolSerializer, TeacherSerializer, UserSerializer
+from .serializers import (
+    StudentSerializer,
+    SchoolSerializer,
+    TeacherSerializer,
+    UserSerializer,
+)
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.views import APIView
 
 
 @permission_classes([IsAdminUser])
@@ -21,9 +26,11 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             return super().create(request, *args, **kwargs)
         except IntegrityError as error:
             return Response(
-                {"error": str(
-                    error), "message": "A user with this username already exists."},
-                status=status.HTTP_400_BAD_REQUEST
+                {
+                    "error": str(error),
+                    "message": "A user with this username already exists.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
     def update(self, request, *args, **kwargs):
@@ -31,9 +38,11 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             return super().update(request, *args, **kwargs)
         except IntegrityError as error:
             return Response(
-                {"error": str(
-                    error), "message": "A user with this username already exists."},
-                status=status.HTTP_400_BAD_REQUEST
+                {
+                    "error": str(error),
+                    "message": "A user with this username already exists.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
 
@@ -57,8 +66,8 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['school', 'year_level']
-    search_fields = ['user__username']
+    filterset_fields = ["school", "year_level"]
+    search_fields = ["user__username"]
 
     def get_queryset(self):
         if hasattr(self.request.user, "teacher"):
@@ -90,25 +99,27 @@ class StudentViewSet(viewsets.ModelViewSet):
         else:
             return Response(
                 {"error": "You do not have permission to access this resource."},
-                status=status.HTTP_403_FORBIDDEN)
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
     def update(self, request, *args, **kwargs):
         data = request.data.copy()  # Create a mutable copy of request.data
         if hasattr(self.request.user, "teacher"):
             data["school"] = self.request.user.teacher.school.id
         try:
-            partial = kwargs.pop('partial', False)
+            partial = kwargs.pop("partial", False)
             instance = self.get_object()
-            serializer = self.get_serializer(
-                instance, data=data, partial=partial)
+            serializer = self.get_serializer(instance, data=data, partial=partial)
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
             return Response(serializer.data)
         except IntegrityError as error:
             return Response(
-                {"error": str(
-                    error), "message": "A student with this username already exists."},
-                status=status.HTTP_400_BAD_REQUEST
+                {
+                    "error": str(error),
+                    "message": "A student with this username already exists.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
     def set_passwords(self, serialized_data, original_data) -> None:
@@ -124,8 +135,8 @@ class TeacherViewSet(viewsets.ModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['school']
-    search_fields = ['user__username']
+    filterset_fields = ["school"]
+    search_fields = ["user__username"]
 
     def list(self, request, *args, **kwargs):
         if request.user.is_staff:
@@ -133,7 +144,8 @@ class TeacherViewSet(viewsets.ModelViewSet):
         else:
             return Response(
                 {"error": "You do not have permission to access this resource."},
-                status=status.HTTP_403_FORBIDDEN)
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
     def retrieve(self, request, *args, **kwargs):
         if request.user.is_staff:
@@ -143,10 +155,14 @@ class TeacherViewSet(viewsets.ModelViewSet):
                 return super().retrieve(request, *args, **kwargs)
             else:
                 return Response(
-                    {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+                    {"error": "You do not have permission to access this resource."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
         else:
             return Response(
-                {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+                {"error": "You do not have permission to access this resource."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
     def create(self, request, *args, **kwargs):
         if request.user.is_staff:
@@ -156,7 +172,9 @@ class TeacherViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(
-                {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+                {"error": "You do not have permission to access this resource."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
     def update(self, request, *args, **kwargs):
         if request.user.is_staff:
@@ -166,17 +184,23 @@ class TeacherViewSet(viewsets.ModelViewSet):
                 return super().update(request, *args, **kwargs)
             else:
                 return Response(
-                    {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+                    {"error": "You do not have permission to access this resource."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
         else:
             return Response(
-                {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+                {"error": "You do not have permission to access this resource."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
     def destroy(self, request, *args, **kwargs):
         if request.user.is_staff:
             return super().destroy(request, *args, **kwargs)
         else:
             return Response(
-                {"error": "You do not have permission to access this resource."}, status=status.HTTP_403_FORBIDDEN)
+                {"error": "You do not have permission to access this resource."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
 
 @permission_classes([IsTeacher | IsAdmin | IsAdminUser])
@@ -190,9 +214,10 @@ class SchoolViewSet(viewsets.ModelViewSet):
         filter_backends: Filters applied to the viewset.
         search_fields: Fields that can be searched.
     """
+
     serializer_class = SchoolSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name', 'abbreviation', 'type', 'is_country']
+    search_fields = ["name", "abbreviation", "type", "is_country"]
 
     def get_queryset(self):
         """Filter based on user role."""
@@ -205,7 +230,10 @@ class SchoolViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         user = self.request.user
         if hasattr(user, "teacher"):
-            return Response({'error': 'Teacher cannot create school.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Teacher cannot create school."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         serializer = self.get_serializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
@@ -219,21 +247,22 @@ class SchoolViewSet(viewsets.ModelViewSet):
             return Response(
                 {
                     "error": "A school with this name already exists.",
-                    "message": str(error)
+                    "message": str(error),
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
 
-# def get_role(self):
-#     """
-#     Returns the role of the user.
+@permission_classes([IsAuthenticated])
+class UserProfileView(APIView):
 
-#     Returns:
-#         str: The role of the user.
-#     """
-#     if hasattr(self, "student"):
-#         return "student"
-#     elif hasattr(self, "teacher"):
-#         return "teacher"
-#     return "user"
+    def get(self, request):
+        user = request.user
+        profile = {
+            'user_id': user.id,
+            'username': user.username,
+            'teacher_id': user.teacher.id if hasattr(user, 'teacher') else None,
+            'school_id': user.teacher.school.id if hasattr(user, 'teacher') else None,
+            # other profile details
+        }
+        return Response(profile)

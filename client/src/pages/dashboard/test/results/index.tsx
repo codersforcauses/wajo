@@ -14,9 +14,9 @@ export default function PageConfig() {
 
 function Create() {
   const links = [
-    { href: "leaderboard/individual", label: "individuals" },
-    { href: "leaderboard/team", label: "teams" },
-    { href: "leaderboard/insight", label: "insights" },
+    { href: "results/individual", label: "individuals" },
+    { href: "results/team", label: "teams" },
+    { href: "results/insight", label: "insights" },
   ];
   return (
     <div className="flex h-[80vh] items-center justify-center gap-10">

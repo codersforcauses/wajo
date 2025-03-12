@@ -25,7 +25,9 @@ function HomePage() {
         }}
       >
         {/* <h1>WAJO Olympiads will be back in the coming!</h1> */}
-        <h1>Western Australian Juniour mathematics</h1>
+        <h1 className="w-2/3">
+          Western Australian Juniour mathematics Olympiad
+        </h1>
         <Button variant="inactive" onClick={() => router.push("/quiz")}>
           <p className="body-1 px-10">Start Quiz</p>
         </Button>

@@ -53,8 +53,18 @@ export const navData: NavigationData = {
       items: [
         { title: "Practice Test", url: "/dashboard/test" },
         { title: "Competitions", url: "/dashboard/test/competition" },
-        { title: "Results & Rankings", url: "/dashboard/test/leaderboard" },
-        { title: "Insights", url: "/dashboard/test/insights" },
+        {
+          title: "Results & Rankings",
+          url: "/dashboard/test/results",
+          items: [
+            {
+              title: "Individuals",
+              url: "/dashboard/test/results/individuals",
+            },
+            { title: "Teams", url: "/dashboard/test/results/teams" },
+            { title: "Insights", url: "/dashboard/test/results/insights" },
+          ],
+        },
       ],
     },
     {

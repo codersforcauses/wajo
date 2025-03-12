@@ -5,4 +5,4 @@ from rest_framework import serializers
 class invoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invoice
-        fields = '__all__'
+        fields = "__all__"

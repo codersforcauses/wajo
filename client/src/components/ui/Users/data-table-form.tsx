@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { AlertTriangle } from "lucide-react";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -34,6 +34,7 @@ import {
 import { SelectSchool } from "@/components/ui/Users/select-school";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { cn } from "@/lib/utils";
+import { useTokenStore } from "@/store/token-store";
 import { createRandomPwd, createUserSchema, Student } from "@/types/user";
 
 // For localStorage and CSV export
@@ -45,7 +46,7 @@ type StoredRecord = {
   yearLevel: number | string;
   schoolId: number;
   schoolName: string;
-  attendentYear: number;
+  participationYear: number;
   extensionTime: number;
 };
 type User = z.infer<typeof createUserSchema>;
@@ -73,7 +74,11 @@ type User = z.infer<typeof createUserSchema>;
  * - {@link https://react-hook-form.com/docs/usefieldarray React Hook Form: useFieldArray}
  */
 
-export function DataTableForm() {
+interface DataTableFormProps {
+  schoolID?: number;
+}
+
+export function DataTableForm(schoolID: DataTableFormProps) {
   // calculate the default year for the attendent_year field
   const currentYear = new Date().getFullYear();
   const defaultAttendentYear = Math.max(2024, Math.min(currentYear, 2050));
@@ -83,9 +88,9 @@ export function DataTableForm() {
     last_name: "",
     password: "",
     year_level: "7", // default year_level is "7"
-    school_id: 0,
+    school_id: schoolID?.schoolID ?? 0, // default school_id is 0
     attendent_year: defaultAttendentYear,
-    // extenstion_time is optional, so it can be omitted
+    // extension_time is optional, so it can be omitted
   };
 
   const createUserForm = useForm<{
@@ -117,8 +122,8 @@ export function DataTableForm() {
           yearLevel: std.year_level,
           schoolId: std.school!.id,
           schoolName: std.school.name,
-          attendentYear: std.attendent_year,
-          extensionTime: std.extenstion_time || 0,
+          participationYear: std.attendent_year,
+          extensionTime: std.extension_time || 0,
         }));
 
         // Merge with any existing data in localStorage
@@ -138,6 +143,17 @@ export function DataTableForm() {
     },
   });
 
+  const [role, setRole] = useState<string | undefined>(undefined);
+
+  const { access } = useTokenStore(); // Access the JWT token
+
+  useEffect(() => {
+    if (access?.decoded) {
+      const userRole = access.decoded["role"];
+      setRole(userRole);
+    }
+  }, [access]);
+
   const onSubmit = (data: { users: User[] }) => {
     createUser([...data.users]);
   };
@@ -146,7 +162,7 @@ export function DataTableForm() {
    * Download a CSV file from the localStorage data.
    * We'll read from "studentRecords" and produce the requested columns:
    *   Student ID, First Name, Last Name, Year Level, School ID, School Name,
-   *   Attendent Year, Created At, Extension Time
+   *   Participation Year, Created At, Extension Time
    */
   const downloadCSV = () => {
     const storedData: StoredRecord[] = JSON.parse(
@@ -167,7 +183,7 @@ export function DataTableForm() {
       "Year Level",
       "School ID",
       "School Name",
-      "Attendent Year",
+      "Participation Year",
       "Extension Time",
     ];
 
@@ -180,7 +196,7 @@ export function DataTableForm() {
       record.yearLevel,
       record.schoolId,
       record.schoolName,
-      record.attendentYear,
+      record.participationYear,
       record.extensionTime,
     ]);
 
@@ -234,15 +250,20 @@ export function DataTableForm() {
                     <TableHead className={commonTableHeadClasses}>
                       Year Level*
                     </TableHead>
+                    {role?.toLowerCase() !== "teacher" && (
+                      <TableHead className={commonTableHeadClasses}>
+                        School*
+                      </TableHead>
+                    )}
+
                     <TableHead className={commonTableHeadClasses}>
-                      School*
+                      Participation Year*
                     </TableHead>
-                    <TableHead className={commonTableHeadClasses}>
-                      Attendent Year*
-                    </TableHead>
-                    <TableHead className={commonTableHeadClasses}>
-                      Extenstion Time
-                    </TableHead>
+                    {role?.toLowerCase() === "admin" && (
+                      <TableHead className={commonTableHeadClasses}>
+                        Extension Time
+                      </TableHead>
+                    )}
                     <TableHead
                       className={cn(
                         commonTableHeadClasses,
@@ -364,25 +385,27 @@ export function DataTableForm() {
                       </TableCell>
 
                       {/* School Field */}
-                      <TableCell className="align-top">
-                        <FormField
-                          control={createUserForm.control}
-                          name={`users.${index}.school_id`}
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                              <FormControl>
-                                <SelectSchool
-                                  selectedId={field.value}
-                                  onChange={field.onChange}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </TableCell>
+                      {role?.toLowerCase() !== "teacher" && (
+                        <TableCell className="align-top">
+                          <FormField
+                            control={createUserForm.control}
+                            name={`users.${index}.school_id`}
+                            render={({ field }) => (
+                              <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                                <FormControl>
+                                  <SelectSchool
+                                    selectedId={field.value}
+                                    onChange={field.onChange}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </TableCell>
+                      )}
 
-                      {/* Attendent Year Field (2024-2050) */}
+                      {/* Participation Year Field (2024-2050) */}
                       <TableCell className="align-top">
                         <FormField
                           control={createUserForm.control}
@@ -415,28 +438,30 @@ export function DataTableForm() {
                         />
                       </TableCell>
 
-                      {/* Extenstion Time (optional) */}
-                      <TableCell className="align-top">
-                        <FormField
-                          control={createUserForm.control}
-                          name={`users.${index}.extenstion_time`}
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  {...field}
-                                  placeholder="0"
-                                  onChange={(e) =>
-                                    field.onChange(Number(e.target.value))
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </TableCell>
+                      {/* Extension Time Field - Only for Admin */}
+                      {role?.toLowerCase() === "admin" && ( // Check if the user is an admin
+                        <TableCell className="align-top">
+                          <FormField
+                            control={createUserForm.control}
+                            name={`users.${index}.extension_time`}
+                            render={({ field }) => (
+                              <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    {...field}
+                                    placeholder="0"
+                                    onChange={(e) =>
+                                      field.onChange(Number(e.target.value))
+                                    }
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </TableCell>
+                      )}
 
                       {/* Delete Button */}
                       <TableCell className="sticky right-0 flex w-24 bg-white text-right align-top">
