@@ -59,10 +59,10 @@ class ResultsAPITest(APITestCase):
         )
 
         quiz1 = Quiz.objects.create(
-            name="Test Quiz 1", total_marks=100, open_time_date=datetime.now(tz=awst)
+            name="Test Quiz 1", intro="This is test1 quiz.", total_marks=100, open_time_date=datetime.now(tz=awst)
         )
         quiz2 = Quiz.objects.create(
-            name="Test Quiz 2", total_marks=100, open_time_date=datetime.now(tz=awst)
+            name="Test Quiz 2", intro="This is test2 quiz.", total_marks=100, open_time_date=datetime.now(tz=awst)
         )
 
         QuizAttempt.objects.create(
