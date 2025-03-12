@@ -47,6 +47,14 @@ CSRF_TRUSTED_ORIGINS = (
 # Application definition
 
 INSTALLED_APPS = [
+    "unfold",  # before django.contrib.admin
+    "unfold.contrib.filters",  # optional, if special filters are needed
+    "unfold.contrib.forms",  # optional, if special form elements are needed
+    "unfold.contrib.inlines",  # optional, if special inlines are needed
+    "unfold.contrib.import_export",  # optional, if django-import-export package is used
+    "unfold.contrib.guardian",  # optional, if django-guardian package is used
+    # optional, if django-simple-history package is used
+    "unfold.contrib.simple_history",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -67,6 +75,23 @@ INSTALLED_APPS = [
     "api.invoice",
     "drf_spectacular",
 ]
+UNFOLD = {
+    "COLORS": {
+        "primary": {
+            "50": "254 252 232",
+            "100": "254 249 195",
+            "200": "254 240 138",
+            "300": "253 224 71",
+            "400": "250 204 21",
+            "500": "234 179 8",
+            "600": "202 138 4",
+            "700": "161 98 7",
+            "800": "133 77 14",
+            "900": "113 63 18",
+            "950": "66 32 6",
+        }
+    }
+}
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
