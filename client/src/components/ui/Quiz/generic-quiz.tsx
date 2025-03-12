@@ -1,9 +1,9 @@
 import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
-import Latex from "react-latex-next";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { LatexInput } from "@/components/ui/math-input";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { backendURL } from "@/lib/api";
 import { Layout } from "@/types/question";
@@ -57,12 +57,20 @@ export default function GenericQuiz({
 
   const [answers, setAnswers] = useState<QuestionAnswer[]>(() => {
     try {
+      // Refresh any existing localStorage data
       const savedAnswers = localStorage.getItem(STORAGE_KEY);
-      // console.log("initial savedAnswers: ", savedAnswers);
-      // console.log("slots: ", slots);
-      return savedAnswers
+      const parsedAnswers: QuestionAnswer[] = savedAnswers
         ? JSON.parse(savedAnswers)
-        : slots.map((s) => ({ question: s.question.id, answer_student: "" }));
+        : [];
+      const completeAnswers = slots.map((s) => {
+        const existingAnswer = parsedAnswers.find(
+          (a) => a.question === s.question.id,
+        );
+        return (
+          existingAnswer || { question: s.question.id, answer_student: "" }
+        );
+      });
+      return completeAnswers;
     } catch (error) {
       console.error("Error loading saved answers:", error);
       return slots.map((s) => ({
@@ -153,7 +161,7 @@ export default function GenericQuiz({
       return (
         <div className="my-4">
           <Image
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL_BASE}/${currentQuestion.images[0].url}`}
+            src={`${backendURL}/${currentQuestion.images[0].url}`}
             alt="Question Image"
             width={400}
             height={200}
@@ -189,9 +197,7 @@ export default function GenericQuiz({
             className={`flex ${isHorizontalLayout ? "flex-row items-center space-x-4" : "flex-col items-center space-y-4"}`}
           >
             {currentQuestion.layout === Layout.LEFT ? renderImage() : null}
-            <div className="flex h-auto w-auto items-center justify-center text-pretty p-4">
-              <Latex>{currentQuestion.question_text}</Latex>
-            </div>
+            <LatexInput>{currentQuestion.question_text}</LatexInput>
             {currentQuestion.layout === Layout.RIGHT ? renderImage() : null}
           </div>
           {currentQuestion.layout === Layout.BOTTOM ? renderImage() : null}

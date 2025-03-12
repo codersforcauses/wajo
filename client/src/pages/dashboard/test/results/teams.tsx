@@ -7,6 +7,7 @@ import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
+  toQueryString,
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
 import { TeamDataGrid } from "@/components/ui/Test/team-data-grid";
@@ -70,16 +71,7 @@ function TeamLeaderboardIndex() {
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push(
-      {
-        pathname: "/dashboard/test/results",
-        query: Object.fromEntries(
-          Object.entries(updatedParams).filter(([_, v]) => Boolean(v)),
-        ),
-      },
-      undefined,
-      { shallow: true },
-    );
+    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
   };
 
   const onOrderingChange = (field: keyof OrderingItem) => {

@@ -1,8 +1,8 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import Latex from "react-latex-next";
 
 import { Button } from "@/components/ui/button";
+import { LatexInput } from "@/components/ui/math-input";
 import { Layout } from "@/types/question";
 import { AdminQuizSlot } from "@/types/quiz";
 
@@ -142,9 +142,7 @@ export default function GenericPractice({
             {currentQuestion.question.layout === Layout.LEFT
               ? renderImage()
               : null}
-            <div className="flex h-auto w-auto items-center justify-center text-pretty p-4">
-              <Latex>{currentQuestion.question.question_text}</Latex>
-            </div>
+            <LatexInput>{currentQuestion.question.question_text}</LatexInput>
             {currentQuestion.question.layout === Layout.RIGHT
               ? renderImage()
               : null}
