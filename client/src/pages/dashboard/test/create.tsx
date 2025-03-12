@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DateTimePicker } from "@/components/ui/time-picker/date-time-picker";
 import { usePostMutation } from "@/hooks/use-post-data";
-import { AdminQuiz, genericCreateTestSchema } from "@/types/quiz";
+import { AdminQuiz, createPracticeTestSchema } from "@/types/quiz";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
@@ -31,11 +31,11 @@ export default function PageConfig() {
   );
 }
 
-type CreatePractice = z.infer<typeof genericCreateTestSchema>;
+type CreatePractice = z.infer<typeof createPracticeTestSchema>;
 
 function Create() {
   const form = useForm<CreatePractice>({
-    resolver: zodResolver(genericCreateTestSchema),
+    resolver: zodResolver(createPracticeTestSchema),
     defaultValues: {} as CreatePractice,
   });
 
@@ -56,7 +56,6 @@ function Create() {
       name: data.name,
       intro: data.intro,
       total_marks: data.total_marks,
-      open_time_date: data.open_time_date,
       time_limit: data.time_limit,
       status: 0,
     });
