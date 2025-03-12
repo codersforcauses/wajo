@@ -338,7 +338,7 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
                       Name
                     </TableHead>
                     <TableHead className={commonTableHeadClasses}>
-                      Difficulty
+                      Marks
                     </TableHead>
                     <TableHead className={commonTableHeadClasses}>
                       Actions
@@ -416,7 +416,7 @@ const SortableQuestionRow = ({
       </TableCell>
       <TableCell className="w-0 py-2">{ques.id}</TableCell>
       <TableCell className="w-full py-2">{ques.name}</TableCell>
-      <TableCell className="w-0 py-2">{ques.diff_level}</TableCell>
+      <TableCell className="w-0 py-2">{ques.mark}</TableCell>
       <TableCell className="w-0 py-2 text-right">
         <Button
           type="button"

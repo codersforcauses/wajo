@@ -197,10 +197,7 @@ export const updateStudentSchema = updateStaffSchema.extend({
       message: "Year must be a 4-digit number",
     })
     .default(new Date().getFullYear()),
-});
-
-export const updateAdminStudentSchema = updateStudentSchema.extend({
-  extension_time: z.number({ invalid_type_error: "Required" }).default(0),
+  extension_time: z.number().default(0),
 });
 
 /**
@@ -223,3 +220,10 @@ export const createRandomPwd = () => {
   // it has 1 digit, 1 upper-case and 1 lower-case character
   return passhelp.character(8, passhelp.alphabets.alphanumeric, true); // "A2nJEH4o"
 };
+
+export interface Profile {
+  user_id: string;
+  username: string;
+  teacher_id: string;
+  school_id: string;
+}

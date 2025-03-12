@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "django_filters",
     "api.healthcheck",
-    "api.leaderboard",
+    "api.results",
     "api.question",
     "api.users",
     "api.quiz",

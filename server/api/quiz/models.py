@@ -4,6 +4,7 @@ from api.users.models import Student
 from api.question.models import Question
 from django.utils.timezone import now
 from datetime import timedelta
+from django.core.exceptions import ValidationError
 
 
 class Quiz(models.Model):
@@ -26,9 +27,9 @@ class Quiz(models.Model):
     total_marks = models.DecimalField(max_digits=5, decimal_places=2)
     is_comp = models.BooleanField(default=False)
     visible = models.BooleanField(default=False)
-    open_time_date = models.DateTimeField(default=None)
+    open_time_date = models.DateTimeField(null=True, blank=True)
     time_limit = models.IntegerField(default=120)
-    time_window = models.IntegerField(default=10)
+    time_window = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
@@ -37,6 +38,18 @@ class Quiz(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+    def clean(self):
+        if self.is_comp:
+            if self.open_time_date is None:
+                raise ValidationError({'open_time_date': 'This field is required for competition quizzes.'})
+            if self.time_window is None:
+                raise ValidationError({'time_window': 'This field is required for competition quizzes.'})
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Ensure the clean method is called before saving
+        super().save(*args, **kwargs)
 
 
 class QuizSlot(models.Model):

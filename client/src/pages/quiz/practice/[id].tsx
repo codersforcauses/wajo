@@ -8,7 +8,7 @@ import ButtonList from "@/components/ui/Quiz/button-list";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { AdminQuizSlot } from "@/types/quiz";
 
-export default function CompetitionQuizPage() {
+export default function PracticeQuizPage() {
   // Fetches the quiz data using the custom hook.
   const router = useRouter();
   let { id }: { id?: string | string[] | undefined | Number } = router.query;
@@ -72,14 +72,6 @@ export default function CompetitionQuizPage() {
 
   const handleSubmit = () => {
     setIsSubmitted(true); // Show the popup
-  };
-
-  const closePopup = () => {
-    setIsSubmitted(false); // Hide the popup
-  };
-
-  const tryAgain = () => {
-    console.log("Try again");
   };
 
   return (

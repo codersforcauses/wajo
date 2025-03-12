@@ -5,13 +5,13 @@ from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
 from django.db.models import Sum, Max
 from django.db.models.functions import Cast
 from ..quiz.models import Quiz, QuizAttempt
-from .serializers import IndividualLeaderboardSerializer, TeamLeaderboardSerializer
+from .serializers import IndividualResultsSerializer, TeamResultsSerializer
 from ..users.models import School, Student
 from ..team.models import Team
 from rest_framework.response import Response
 
 
-class IndividualLeaderboardFilter(FilterSet):
+class IndividualResultsFilter(FilterSet):
     quiz_name = ModelChoiceFilter(
         field_name="quiz__name",
         queryset=Quiz.objects.all(),
@@ -39,23 +39,23 @@ class IndividualLeaderboardFilter(FilterSet):
         fields = ["quiz_name", "quiz_id", "year_level", "school_type"]
 
 
-class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
+class IndividualResultsViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    LeaderboardView API view to manage leaderboard data.
+    ResultsView API view to manage Results data.
 
-    This view handles retrieving leaderboard data. It returns sample leaderboard data in response to GET requests.
+    This view handles retrieving Results data. It returns sample Results data in response to GET requests.
 
     Attributes:
         permission_classes (list): Defines the permission class, allowing any user access to the view.
-        serializer_class (LeaderboardSerializer): Specifies the serializer used for serializing the leaderboard data.
+        serializer_class (ResultsSerializer): Specifies the serializer used for serializing the Results data.
 
     Methods:
-        - get(request): Handles GET requests. Returns sample data for the leaderboard.
+        - get(request): Handles GET requests. Returns sample data for the Results.
     """
 
     queryset = QuizAttempt.objects.select_related("quiz", "student__school")
-    serializer_class = IndividualLeaderboardSerializer
-    filterset_class = IndividualLeaderboardFilter
+    serializer_class = IndividualResultsSerializer
+    filterset_class = IndividualResultsFilter
     filter_backends = [
         DjangoFilterBackend,
         filters.OrderingFilter,
@@ -72,7 +72,7 @@ class IndividualLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ["-student__year_level"]
 
 
-class TeamLeaderboardFilter(FilterSet):
+class TeamResultsFilter(FilterSet):
     quiz_name = ModelChoiceFilter(
         field_name="quiz_attempt__quiz__name",
         queryset=Quiz.objects.all(),
@@ -102,13 +102,13 @@ class TeamLeaderboardFilter(FilterSet):
         fields = ["quiz_name", "quiz_id", "year_level", "school_type"]
 
 
-class TeamLeaderboardViewSet(viewsets.ReadOnlyModelViewSet):
+class TeamResultsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Team.objects.annotate(
         total_marks=Sum("quiz_attempts__total_marks"),
         max_year=Max(Cast("students__year_level", output_field=BigIntegerField())),
     )
-    serializer_class = TeamLeaderboardSerializer
-    filterset_class = TeamLeaderboardFilter
+    serializer_class = TeamResultsSerializer
+    filterset_class = TeamResultsFilter
     filter_backends = [
         DjangoFilterBackend,
         filters.OrderingFilter,

@@ -23,12 +23,12 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from rest_framework.routers import DefaultRouter
-from api.leaderboard import urls as leaderboard_urls
+from api.results import urls as results_urls
 from django.conf import settings
 from django.conf.urls.static import static
 
 router = DefaultRouter()
-router.registry.extend(leaderboard_urls.router.registry)
+router.registry.extend(results_urls.router.registry)
 
 api_urls = [
     path("healthcheck/", include("api.healthcheck.urls")),
@@ -58,6 +58,6 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-    path("api/", include(leaderboard_urls)),
+    path("api/", include(results_urls)),
     path(r"api/", include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

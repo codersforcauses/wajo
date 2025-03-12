@@ -22,12 +22,7 @@ import { SelectSchool } from "@/components/ui/Users/select-school";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePatchMutation } from "@/hooks/use-put-data";
 import { useTokenStore } from "@/store/token-store";
-import {
-  Role,
-  Student,
-  updateAdminStudentSchema,
-  updateStudentSchema,
-} from "@/types/user";
+import { Role, Student, updateStudentSchema } from "@/types/user";
 
 export default function PageConfig() {
   const roles = [Role.ADMIN, Role.TEACHER];
@@ -77,6 +72,7 @@ function EditUserForm({ user }: { user: Student }) {
       year_level: user.year_level,
       school_id: user.school?.id,
       attendent_year: user.attendent_year,
+      extension_time: user.extension_time ? user.extension_time : 0,
     },
   });
 
@@ -92,13 +88,7 @@ function EditUserForm({ user }: { user: Student }) {
   }, [access]);
 
   const onSubmit = (data: UpdateStudent) => {
-    updateStudent({
-      first_name: data.first_name,
-      last_name: data.last_name,
-      year_level: data.year_level,
-      school_id: data.school_id,
-      attendent_year: data.attendent_year,
-    });
+    updateStudent(data);
   };
 
   const requiredStar = <span className="text-red-500">*</span>;
@@ -180,18 +170,18 @@ function EditUserForm({ user }: { user: Student }) {
               </FormItem>
             )}
           />
-          {/* Attendant Year */}
+          {/* Participation Year */}
           <FormField
             control={updateForm.control}
             name="attendent_year"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Year of attendance{requiredStar}</FormLabel>
+                <FormLabel>Year of participation{requiredStar}</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     type="number"
-                    placeholder="Please input year of attendance"
+                    placeholder="Please input year of participation"
                     onChange={(e) =>
                       field.onChange(Number(e.target.value) || 0)
                     } // Convert to number
@@ -204,7 +194,7 @@ function EditUserForm({ user }: { user: Student }) {
           {/* role check for teacher or admin, teachers shouldnt be able to give extension time */}
 
           {/* Extension Time */}
-          {/* {role?.toLowerCase() === "admin" && (
+          {role?.toLowerCase() === "admin" && (
             <FormField
               control={updateForm.control}
               name="extension_time"
@@ -225,7 +215,7 @@ function EditUserForm({ user }: { user: Student }) {
                 </FormItem>
               )}
             />
-          )} */}
+          )}
 
           <div className="flex justify-center">
             <Button type="submit">
