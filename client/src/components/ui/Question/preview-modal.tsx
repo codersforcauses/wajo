@@ -1,5 +1,3 @@
-import "katex/dist/katex.min.css";
-
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import {
   SquareChevronDown,
@@ -8,7 +6,6 @@ import {
   SquareChevronUp,
 } from "lucide-react";
 import Image from "next/image";
-import Latex from "react-latex-next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { LatexInput } from "@/components/ui/math-input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Layout, PreviewModalProps } from "@/types/question";
 
@@ -102,9 +100,7 @@ export default function PreviewModal({
                 className={`flex ${isHorizontalLayout ? "flex-row items-center space-x-4" : "flex-col items-center space-y-4"}`}
               >
                 {renderImage(Layout.LEFT)}
-                <div className="flex h-auto w-auto items-center justify-center text-pretty p-4">
-                  <Latex>{question}</Latex>
-                </div>
+                <LatexInput>{question}</LatexInput>
                 {renderImage(Layout.RIGHT)}
               </div>
 
@@ -116,7 +112,7 @@ export default function PreviewModal({
               <p>
                 Answer: <span className="font-bold">{answer}</span>
               </p>
-              <Latex>{solution}</Latex>
+              <LatexInput>{solution}</LatexInput>
             </div>
 
             <div className="mt-auto flex justify-center pb-4">

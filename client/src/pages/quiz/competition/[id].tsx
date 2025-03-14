@@ -74,9 +74,11 @@ export default function CompetitionQuizPage() {
   const { data, isLoading, isError, error, isSuccess } = useFetchData<{
     message: string;
   }>({
-    queryKey: [`quiz.quiz-attempts.${primaryId}.submit.${compId}`],
-    endpoint: `/quiz/quiz-attempts/${primaryId}/submit/`,
-    enabled: quizState.isSubmitted,
+    queryKey: [
+      `quiz.quiz-attempts.${quizSlot?.quiz_attempt_id}.submit.${compId}.${primaryId}`,
+    ],
+    endpoint: `/quiz/quiz-attempts/${quizSlot?.quiz_attempt_id}/submit/`,
+    enabled: !!quizSlot && quizState.isSubmitted,
   });
 
   const calculateTimeLeft = () => {

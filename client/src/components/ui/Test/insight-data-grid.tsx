@@ -52,10 +52,12 @@ export function InsightDataGrid({
   return (
     <div className="grid">
       <div className="overflow-hidden rounded-lg border">
-        <Table className="w-full table-fixed border-collapse shadow-md">
+        <Table className="w-full border-collapse text-left shadow-md">
           <TableHeader className="bg-black text-lg font-semibold">
             <TableRow className="hover:bg-muted/0">
-              <TableHead className={cn(commonTableHeadClasses)}></TableHead>
+              <TableHead
+                className={cn(commonTableHeadClasses, "w-1/5")}
+              ></TableHead>
               <TableHead className={cn(commonTableHeadClasses)}>
                 Total
               </TableHead>

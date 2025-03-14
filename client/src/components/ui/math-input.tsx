@@ -3,8 +3,10 @@ import "katex/dist/katex.min.css";
 import axios from "axios";
 import { useState } from "react";
 import Latex from "react-latex-next";
+import { LatexProps } from "react-latex-next/dist/Latex";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface MathInputProps {
   input: string;
@@ -167,7 +169,7 @@ function MathInput({ input, onChange }: MathInputProps) {
               "Loading..."
             ) : (
               /* Render text and math with TikZ */
-              <Latex>{renderedOutput}</Latex>
+              <LatexInput>{renderedOutput}</LatexInput>
             )
           ) : (
             "Please write something to preview."
@@ -224,4 +226,21 @@ function MathInput({ input, onChange }: MathInputProps) {
   );
 }
 
-export { MathInput };
+interface LatexInputProps extends LatexProps {
+  className?: string;
+}
+
+function LatexInput({ className, ...props }: LatexInputProps) {
+  return (
+    <div
+      className={cn(
+        "flex h-auto w-auto items-center justify-center text-pretty",
+        className,
+      )}
+    >
+      <Latex {...props} />
+    </div>
+  );
+}
+
+export { LatexInput, MathInput };

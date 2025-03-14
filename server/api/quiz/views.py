@@ -464,12 +464,12 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
         Submit the quiz attempt, changing its state to 2 (submitted).
         """
         user = request.user
-        if self.student != user.student:
+        attempt = self.get_object()
+        if not hasattr(self.request.user, "student") or attempt.student != user.student:
             return Response(
                 {"error": "You are not authorized to perform this action."},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        attempt = self.get_object()
         attempt.state = QuizAttempt.State.SUBMITTED
         attempt.time_finish = now()
         attempt.save()
