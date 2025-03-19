@@ -43,10 +43,13 @@ export interface Quiz {
   status: number;
 }
 
-export interface QuizResponse {
+interface GenericResponse {
   count: number;
   next: string;
   previous: string;
+}
+
+export interface QuizResponse extends GenericResponse {
   results: Quiz[];
 }
 
@@ -81,10 +84,7 @@ export interface Competition {
   status: QuizStatus; // ask: to be discuss
 }
 
-export interface CompetitionResponse {
-  count: number;
-  next: string;
-  previous: string;
+export interface CompetitionResponse extends GenericResponse {
   results: Competition[];
 }
 
@@ -114,6 +114,10 @@ export interface QuestionAttempt extends QuestionAnswer {
   quiz_attempt: number;
 }
 
+export interface QuestionAttemptResponse extends GenericResponse {
+  results: QuestionAttempt[];
+}
+
 export enum QuizState {
   UNATTEMPTED = 1,
   IN_PROGRESS = 2,
@@ -134,10 +138,7 @@ export interface QuizAttempt {
   team: number;
 }
 
-export interface QuizAttemptResponse {
-  count: number;
-  next: string;
-  previous: string;
+export interface QuizAttemptResponse extends GenericResponse {
   results: QuizAttempt[];
 }
 
