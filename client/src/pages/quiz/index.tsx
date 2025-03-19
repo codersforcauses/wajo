@@ -79,6 +79,29 @@ const QuizPage = () => {
 
 function CompetitionCard({ data }: { data: Competition[] }) {
   const compData = data && data.length > 0 ? data : null;
+  const curDate = new Date();
+  const curTime = curDate.toISOString();
+
+  let endTimes = [];
+
+  if (compData) {
+    for (let i = 0; i < compData.length; i++) {
+      let openTime = new Date(compData[i].open_time_date);
+      let endTime = new Date(
+        openTime.setMinutes(
+          openTime.getMinutes() +
+            compData[i].time_limit +
+            compData[i].time_window,
+        ),
+      ).toISOString();
+      endTimes.push(endTime);
+    }
+  }
+
+  let validCompCounter = 0;
+
+  console.log("Current Time: ", curTime);
+  console.log("End Times: ", endTimes);
   return (
     <section className="my-4 flex min-h-32 w-full flex-col items-center justify-center bg-background2 p-4">
       <div className="text-6xl font-semibold">
@@ -86,23 +109,40 @@ function CompetitionCard({ data }: { data: Competition[] }) {
       </div>
       {compData ? (
         <>
-          {compData.map((comp) => (
-            <div key={comp.id} className="w-full border border-red-500">
-              <div className="my-4 flex justify-center gap-2 text-center text-lg">
-                Competition will start at{" "}
-                <DateTimeDisplay
-                  className="flex-row gap-1 font-bold"
-                  date={comp.open_time_date}
-                />
+          {compData.map(
+            (comp, index) =>
+              endTimes[index] > curTime &&
+              (() => {
+                validCompCounter++;
+                return (
+                  <div key={comp.id} className="w-full border border-red-500">
+                    <div className="my-4 flex justify-center gap-2 text-center text-lg">
+                      Competition will start at{" "}
+                      <DateTimeDisplay
+                        className="flex-row gap-1 font-bold"
+                        date={comp.open_time_date}
+                      />
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-center gap-4">
+                      <HorizontalCard
+                        title={comp.name}
+                        href={`quiz/competition/${comp.id}`}
+                      />
+                    </div>
+                  </div>
+                );
+              })(),
+          )}
+          {validCompCounter === 0 && (
+            <>
+              <div className="my-4 flex gap-2 text-lg">
+                Competition will start at <div className="font-bold">[TBD]</div>
               </div>
               <div className="flex w-full flex-col items-center justify-center gap-4">
-                <HorizontalCard
-                  title={comp.name}
-                  href={`quiz/competition/${comp.id}`}
-                />
+                <HorizontalCard title={"Coming Soon!"} href="#" />
               </div>
-            </div>
-          ))}
+            </>
+          )}
         </>
       ) : (
         <>

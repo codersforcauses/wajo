@@ -8,7 +8,7 @@ import type { Profile } from "@/types/user";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
-  const roles = [Role.ADMIN, Role.TEACHER];
+  const roles = [Role.ADMIN, Role.TEACHER, Role.STUDENT];
   return (
     <ProtectedPage requiredRoles={roles}>
       <UserProfile />
