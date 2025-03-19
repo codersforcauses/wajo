@@ -163,27 +163,22 @@ export const genericCreateTestSchema = z.object({
     .min(1, "Required")
     .max(255, "Name cannot exceed 255 characters"),
   intro: z.string().min(1, "Required"),
-  open_time_date: z.date(),
+  // open_time_date: z.date(),
   total_marks: z.number().int().nonnegative().default(0),
   time_limit: z.number().int().nonnegative().default(120),
-  time_window: z.number().int().nonnegative().default(10),
+  // time_window: z.number().int().nonnegative().default(10),
 });
 
 /**
- * Zod schema for validating generic test creation input.
+ * Zod schema for validating competition test creation input.
  *
  * Validates name, general instructions.
  *
  * @constant
  */
-export const createPracticeTestSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Required")
-    .max(255, "Name cannot exceed 255 characters"),
-  intro: z.string().min(1, "Required"),
-  total_marks: z.number().int().nonnegative().default(0),
-  time_limit: z.number().int().nonnegative().default(120),
+export const createCompetitionTestSchema = genericCreateTestSchema.extend({
+  open_time_date: z.date(),
+  time_window: z.number().int().nonnegative().default(10),
 });
 
 // export const createCompetitionSchema = genericCreateTestSchema
