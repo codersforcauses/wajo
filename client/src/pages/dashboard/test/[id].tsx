@@ -89,7 +89,7 @@ function UpdatePracticeForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
     defaultValues: {
       name: adminQuiz.name,
       intro: adminQuiz.intro,
-      open_time_date: DateTimePickerFormat(adminQuiz.open_time_date),
+      open_time_date: new Date(),
       time_limit: adminQuiz.time_limit,
       time_window: adminQuiz.time_window,
     },

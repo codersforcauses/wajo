@@ -18,19 +18,19 @@ import {
   orderingToString,
   stringToOrdering,
 } from "@/types/data-grid";
-import { Category } from "@/types/question";
+import { Category as CategoryType } from "@/types/question";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
   const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <Index />
+      <Category />
     </ProtectedPage>
   );
 }
 
-function Index() {
+function Category() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -44,7 +44,7 @@ function Index() {
   });
 
   const { data, isLoading, error, totalPages, refetch } =
-    useFetchDataTable<Category>({
+    useFetchDataTable<CategoryType>({
       queryKey: ["questions.categories"],
       endpoint: "/questions/categories/",
       searchParams: searchParams,

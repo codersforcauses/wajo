@@ -67,14 +67,14 @@ export default function GenericQuiz({
           (a) => a.question === s.question.id,
         );
         return (
-          existingAnswer || { question: s.question.id, answer_student: "" }
+          existingAnswer || { question: s.question.id ?? 0, answer_student: "" }
         );
       });
       return completeAnswers;
     } catch (error) {
       console.error("Error loading saved answers:", error);
       return slots.map((s) => ({
-        question: s.question.id,
+        question: s.question.id ?? 0,
         answer_student: "",
       }));
     }
@@ -197,7 +197,7 @@ export default function GenericQuiz({
             className={`flex ${isHorizontalLayout ? "flex-row items-center space-x-4" : "flex-col items-center space-y-4"}`}
           >
             {currentQuestion.layout === Layout.LEFT ? renderImage() : null}
-            <LatexInput>{currentQuestion.question_text}</LatexInput>
+            <LatexInput>{String(currentQuestion.question_text)}</LatexInput>
             {currentQuestion.layout === Layout.RIGHT ? renderImage() : null}
           </div>
           {currentQuestion.layout === Layout.BOTTOM ? renderImage() : null}
