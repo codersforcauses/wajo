@@ -58,6 +58,7 @@ export default function GenericQuiz({
       endpoint: "/quiz/question-attempts/",
       onSuccess: () => {
         setIsSaved(true);
+        toast.success("Answer saved successfully");
       },
       onError: (err) => {
         toast.error("Failed to save answer");
@@ -74,14 +75,29 @@ export default function GenericQuiz({
   // }, [quizAttempt]);
 
   // filter through all question attempts to get the questions attempts for the current quiz attempt
-  const questionAttempts = Array.isArray(questionData?.results)
-    ? questionData.results.filter(
-        (qa) => qa.quiz_attempt === quizAttempt.results[0].id,
-      )
-    : [];
+  const [questionAttempts, setQuestionAttempts] = useState<QuestionAttempt[]>(
+    [],
+  );
 
   useEffect(() => {
-    console.log("questionAttempts", questionAttempts);
+    if (questionData && questionData.results) {
+      const attempts = questionData.results.filter(
+        (qa) => qa.quiz_attempt === quizAttempt.results[0].id,
+      );
+      setQuestionAttempts(attempts);
+      console.log("filtered attempts: ", attempts);
+      console.log("questionData", questionData);
+      // console.log("questionAttempts", questionAttempts);
+    }
+  }, [questionData, quizAttempt]);
+
+  const isQuestionAttemptsInitialized = useRef(false);
+
+  useEffect(() => {
+    if (!isQuestionAttemptsInitialized.current) {
+      console.log("questionAttempts", questionAttempts);
+      isQuestionAttemptsInitialized.current = true;
+    }
   }, [questionAttempts]);
 
   const [answers, setAnswers] = useState<QuestionAnswer[]>([]);
@@ -264,6 +280,22 @@ export default function GenericQuiz({
   const isHorizontalLayout =
     currentQuestion.layout === Layout.LEFT ||
     currentQuestion.layout === Layout.RIGHT;
+
+  if (questionDataIsLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (questionDataError) {
+    return <p>Error: {questionDataError.message}</p>;
+  }
+
+  if (!quizAttempt.results[0]) {
+    return <p>No quiz attempt found</p>;
+  }
+
+  if (!questionData?.results) {
+    return <p>No questions found</p>;
+  }
 
   return (
     <div className="flex w-full items-center justify-center">

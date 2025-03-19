@@ -144,7 +144,7 @@ function UpdateCompetitionForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
             <Button
               type="button"
               onClick={handleFetch}
-              variant={"link"}
+              variant={"ghost"}
               disabled={markCompetition.isPending}
               className="rounded-lg border-green-700 p-2 text-2xl font-black text-green-700 outline-double"
             >
