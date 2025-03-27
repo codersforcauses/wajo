@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DateTimePicker } from "@/components/ui/time-picker/date-time-picker";
 import { usePostMutation } from "@/hooks/use-post-data";
-import { AdminQuiz, genericCreateTestSchema } from "@/types/quiz";
+import { AdminQuiz, createCompetitionTestSchema } from "@/types/quiz";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
@@ -31,11 +31,11 @@ export default function PageConfig() {
   );
 }
 
-type CreateCompetition = z.infer<typeof genericCreateTestSchema>;
+type CreateCompetition = z.infer<typeof createCompetitionTestSchema>;
 
 function Create() {
   const form = useForm<CreateCompetition>({
-    resolver: zodResolver(genericCreateTestSchema),
+    resolver: zodResolver(createCompetitionTestSchema),
     defaultValues: {
       name: "",
       intro: "",

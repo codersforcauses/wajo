@@ -163,49 +163,21 @@ export const genericCreateTestSchema = z.object({
     .min(1, "Required")
     .max(255, "Name cannot exceed 255 characters"),
   intro: z.string().min(1, "Required"),
-  open_time_date: z.date(),
   total_marks: z.number().int().nonnegative().default(0),
   time_limit: z.number().int().nonnegative().default(120),
-  time_window: z.number().int().nonnegative().default(10),
 });
 
 /**
- * Zod schema for validating generic test creation input.
+ * Zod schema for validating competition test creation input.
  *
  * Validates name, general instructions.
  *
  * @constant
  */
-export const createPracticeTestSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Required")
-    .max(255, "Name cannot exceed 255 characters"),
-  intro: z.string().min(1, "Required"),
-  total_marks: z.number().int().nonnegative().default(0),
-  time_limit: z.number().int().nonnegative().default(120),
+export const createCompetitionTestSchema = genericCreateTestSchema.extend({
+  open_time_date: z.date(),
+  time_window: z.number().int().nonnegative().default(10),
 });
-
-// export const createCompetitionSchema = genericCreateTestSchema
-//   .extend({
-//     start_time: z.date(),
-//     end_time: z.date(),
-//   })
-//   .refine((data) => data.start_time < data.end_time, {
-//     message: "Start time must be earlier than end time.",
-//     path: ["start_time"], // optional: Specify which field the error applies to
-//   });
-
-// export const createPracticeSchema = genericCreateTestSchema.extend({
-//   hours: z
-//     .number()
-//     .min(0, "Number must be at least 0")
-//     .max(24, "Number must be at most 24"),
-//   minutes: z
-//     .number()
-//     .min(0, "Number must be at least 0")
-//     .max(60, "Number must be at most 60"),
-// });
 
 const createQuestionSchema = z.object({
   id: z.number().int().nonnegative(),
