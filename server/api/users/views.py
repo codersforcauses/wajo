@@ -129,6 +129,15 @@ class StudentViewSet(viewsets.ModelViewSet):
         for item, student_data in zip(serialized_data, original_data):
             item["password"] = student_data["password"]
 
+    def perform_create(self, serializer):
+        # Save the student instance
+        students = serializer.save()
+
+        # Update the plaintext_password field for each student
+        for student, data in zip(students, self.request.data):
+            student.plaintext_password = data.get("password")
+            student.save()
+
 
 @permission_classes([IsAuthenticated])
 class TeacherViewSet(viewsets.ModelViewSet):
