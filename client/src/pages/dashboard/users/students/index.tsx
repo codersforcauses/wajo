@@ -142,22 +142,23 @@ function UserList() {
             setAndPush({ search: newSearch, page: 1 });
           }}
         />
-        <Button asChild className="mr-6 h-auto">
-          <Link href={`${router.pathname}/create`}>Create a Student</Link>
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Suspense fallback={<div className="h-6 w-6 animate-pulse" />}>
+            <Button
+              variant="outline"
+              className="h-auto"
+              onClick={downloadStudentsCSV}
+            >
+              Download CSV
+            </Button>
+          </Suspense>
+          <Button asChild className="mr-6 h-auto">
+            <Link href={`${router.pathname}/create`}>Create a Student</Link>
+          </Button>
+        </div>
       </div>
 
       <Suspense>
-        <div className="flex justify-end">
-          <Button
-            variant="outline"
-            className="h-auto"
-            onClick={downloadStudentsCSV}
-            disabled={isLoading}
-          >
-            Download this page as CSV
-          </Button>
-        </div>
         <div>
           <DataGrid
             datacontext={data ?? []}
