@@ -37,18 +37,6 @@ import { cn } from "@/lib/utils";
 import { useTokenStore } from "@/store/token-store";
 import { createRandomPwd, createUserSchema, Student } from "@/types/user";
 
-// For localStorage and CSV export
-type StoredRecord = {
-  studentId: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-  yearLevel: number | string;
-  schoolId: number;
-  schoolName: string;
-  participationYear: number;
-  extensionTime: number;
-};
 type User = z.infer<typeof createUserSchema>;
 
 /**
@@ -112,34 +100,6 @@ export function DataTableForm(schoolID: DataTableFormProps) {
       console.log(res.data);
 
       toast.success("Students created successfully!");
-      try {
-        // Build newRecords in the shape you want to store in localStorage
-        const newRecords: StoredRecord[] = res.data.map((std) => ({
-          studentId: std.student_id!,
-          firstName: std.first_name,
-          lastName: std.last_name,
-          password: std.password,
-          yearLevel: std.year_level,
-          schoolId: std.school!.id,
-          schoolName: std.school.name,
-          participationYear: std.attendent_year,
-          extensionTime: std.extension_time || 0,
-        }));
-
-        // Merge with any existing data in localStorage
-        const previousData = JSON.parse(
-          localStorage.getItem("studentRecords") || "[]",
-        );
-        const updatedData = [...previousData, ...newRecords];
-
-        localStorage.setItem("studentRecords", JSON.stringify(updatedData));
-        toast.success(
-          "You can click Export CSV button to download the historical user creation data.",
-        );
-        createUserForm.reset({ users: [defaultUser] });
-      } catch (error) {
-        toast.error(`Error when update data for Export CSV. ${error}`);
-      }
     },
   });
 
@@ -156,65 +116,6 @@ export function DataTableForm(schoolID: DataTableFormProps) {
 
   const onSubmit = (data: { users: User[] }) => {
     createUser([...data.users]);
-  };
-
-  /**
-   * Download a CSV file from the localStorage data.
-   * We'll read from "studentRecords" and produce the requested columns:
-   *   Student ID, First Name, Last Name, Year Level, School ID, School Name,
-   *   Participation Year, Created At, Extension Time
-   */
-  const downloadCSV = () => {
-    const storedData: StoredRecord[] = JSON.parse(
-      localStorage.getItem("studentRecords") || "[]",
-    );
-
-    if (storedData.length === 0) {
-      toast.warning("No data available to export.");
-      return;
-    }
-
-    // CSV headers in the order you want them
-    const csvHeaders = [
-      "Student ID",
-      "First Name",
-      "Last Name",
-      "Password",
-      "Year Level",
-      "School ID",
-      "School Name",
-      "Participation Year",
-      "Extension Time",
-    ];
-
-    // Build each row from storedData
-    const csvRows = storedData.map((record) => [
-      record.studentId,
-      record.firstName,
-      record.lastName,
-      record.password,
-      record.yearLevel,
-      record.schoolId,
-      record.schoolName,
-      record.participationYear,
-      record.extensionTime,
-    ]);
-
-    // Convert to CSV string
-    const csvContent = [csvHeaders, ...csvRows]
-      .map((row) => row.map((value) => `"${value}"`).join(","))
-      .join("\n");
-
-    // Trigger a download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.setAttribute("download", "Student_Create_Data.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
@@ -489,21 +390,6 @@ export function DataTableForm(schoolID: DataTableFormProps) {
               Add Row
             </Button>
             <div className="flex gap-2">
-              <ClearHistoryModal>
-                <Button type="button" variant={"destructive"}>
-                  Clear History
-                </Button>
-              </ClearHistoryModal>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={downloadCSV}
-                title="Click to export the user create history from this browser as a CSV file"
-              >
-                Export CSV
-              </Button>
-
               <Button type="submit" disabled={isPending}>
                 Submit
               </Button>
@@ -512,53 +398,5 @@ export function DataTableForm(schoolID: DataTableFormProps) {
         </form>
       </Form>
     </div>
-  );
-}
-
-function ClearHistoryModal({ children }: { children: ReactNode }) {
-  const onClearHistory = () => {
-    localStorage.removeItem("studentRecords");
-    toast.success("Creation history cleared from this browser.");
-  };
-
-  return (
-    <Dialog>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="flex h-auto w-[95%] max-w-[400px] flex-col items-center rounded-lg bg-[--nav-background] p-6 shadow-xl">
-        <VisuallyHidden.Root>
-          <DialogTitle>Delete Confirmation</DialogTitle>
-          <DialogDescription></DialogDescription>
-        </VisuallyHidden.Root>
-
-        <AlertTriangle className="mb-4 h-12 w-12 text-red-500" />
-
-        <div className="text-center text-gray-900">
-          <p className="text-2xl font-semibold">
-            Are you sure you want to clear all creation history in this browser?
-          </p>
-          <p className="text-md mt-1 text-gray-500">
-            This cannot be undone. We recommend exporting the data first.
-          </p>
-        </div>
-
-        <div className="mt-6 flex gap-10">
-          <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              className="w-36 border border-black bg-white"
-            >
-              No
-            </Button>
-          </DialogTrigger>
-          <Button
-            onClick={onClearHistory}
-            variant={"secondary"}
-            className="w-36"
-          >
-            Yes
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }
