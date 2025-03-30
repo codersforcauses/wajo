@@ -49,7 +49,7 @@ export function pickKeys<T, K extends keyof T>(
  * throttledFunction('Hello'); // Does not log 'Hello'
  * throttledFunction('World'); // Logs 'World' after 1 second
  */
-export const throttle = (
+export const useThrottle = (
   fn: Function,
   delay: number,
   timeoutIdRef: MutableRefObject<NodeJS.Timeout | null>,

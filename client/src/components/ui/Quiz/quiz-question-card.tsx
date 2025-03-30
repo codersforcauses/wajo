@@ -1,4 +1,4 @@
-import { AlertCircle, Save } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 import {
   Card,
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LatexInput } from "@/components/ui/math-input";
 import { Question } from "@/types/question";
 import {
   Competition,
@@ -21,7 +22,7 @@ import {
 } from "@/types/quiz";
 
 interface QuizQuestionCardProps {
-  questions: CompetitionSlot;
+  questions: CompetitionSlot | undefined;
   currentQuestion: number;
   userAnswers: string[];
   validationErrors: string[];
@@ -41,12 +42,9 @@ export default function QuizQuestionCard({
     <CardContent>
       <div className="space-y-6">
         <h3 className="flex content-between justify-between text-xl font-medium">
-          {questions.data[currentQuestion].question.question_text}
-          {isSaved ? (
-            <span className="flex items-center gap-1 text-sm text-green-600">
-              <Save /> Saved{" "}
-            </span>
-          ) : null}
+          <LatexInput>
+            {String(questions?.data[currentQuestion].question.question_text)}
+          </LatexInput>
         </h3>
 
         <div className="space-y-2">
@@ -56,7 +54,7 @@ export default function QuizQuestionCard({
           <div className="relative">
             <Input
               id="answer"
-              value={userAnswers[currentQuestion]}
+              value={userAnswers[currentQuestion] || ""} // Ensure a fallback value
               onChange={(e) => handleAnswerChange(e.target.value)}
               placeholder="Enter a number between 0 and 999"
               className={`w-full ${validationErrors[currentQuestion] ? "border-red-600 pr-10" : ""}`}

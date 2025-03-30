@@ -1,7 +1,6 @@
 "use client";
-
 import { set } from "date-fns";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Save } from "lucide-react";
 import { useRouter } from "next/router";
 import { use, useEffect, useRef, useState } from "react";
 
@@ -21,7 +20,7 @@ import QuizQuestionCard from "@/components/ui/Quiz/quiz-question-card";
 import WajoLogo from "@/components/wajo-logo";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePostMutation } from "@/hooks/use-post-data";
-import { throttle } from "@/lib/utils";
+import { useThrottle } from "@/lib/utils";
 import { Layout } from "@/types/question";
 import {
   Competition,
@@ -33,38 +32,6 @@ import {
   QuizAttemptResponse,
 } from "@/types/quiz";
 
-const qs111: CompetitionSlot = {
-  data: [
-    {
-      id: 1,
-      question: {
-        id: 12,
-        name: "question1",
-        question_text: "wasdf ?",
-        images: [{ url: "sss", question: 12 }],
-        layout: Layout.LEFT,
-      },
-      slot_index: 1,
-      block: 3,
-      quiz: 1,
-    },
-    {
-      id: 1,
-      question: {
-        id: 12,
-        name: "question2",
-        question_text: "wasdf2 ?",
-        images: [{ url: "sss", question: 12 }],
-        layout: Layout.LEFT,
-      },
-      slot_index: 1,
-      block: 3,
-      quiz: 1,
-    },
-  ],
-  end_time: new Date(),
-};
-
 export function CompStart({
   compId,
   compName,
@@ -72,23 +39,24 @@ export function CompStart({
   compId: string;
   compName?: string;
 }) {
-  // Fetch competitoin data (questions)
-  // const {
-  //     data: quizSlot,
-  //     isLoading: isQuizSlotLoading,
-  //     isError: isQuizSlotError,
-  //     error: quizSlotError,
-  // } = useFetchData<CompetitionSlot>({
-  //     queryKey: [`quiz.competition.${compId}/slots`],
-  //     endpoint: `/quiz/competition/${compId}/slots/`,
-  //     retry: 1,
-  // });
-  // console.log("isLoading", isQuizSlotLoading)
-  // console.log("isError", isQuizSlotError)
-  // console.log("error", quizSlotError)
-  // console.log("data", quizSlot)
+  const {
+    data: question_slots,
+    isLoading,
+    error,
+  } = useFetchData<CompetitionSlot>({
+    queryKey: ["competition-slots", compId],
+    endpoint: "/quiz/competition/" + compId + "/slots/",
+  });
 
-  const questions = qs111?.data || [];
+  const questions = question_slots?.data || [];
+  const endTime = question_slots?.end_time || null; // Ensure endTime is null if not available
+
+  const { data: questionAttempts } = useFetchData<
+    GetPagedList<QuestionAttempt>
+  >({
+    queryKey: ["quiz.question-attempts"],
+    endpoint: `/quiz/question-attempts/`,
+  });
 
   const [currentQuestion, setCurrentQuestion] = useState(0); // Index of the current question
   const [userAnswers, setUserAnswers] = useState<string[]>(
@@ -100,12 +68,26 @@ export function CompStart({
   const [isSaved, setIsSaved] = useState(false);
   const router = useRouter();
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Initialize userAnswers with pre-filled answers from questionAttempts
+  useEffect(() => {
+    if (questions.length > 0 && questionAttempts?.results) {
+      const prefilledAnswers = questions.map((question) => {
+        const attempt = questionAttempts.results.find(
+          (attempt) => attempt.question === question.question.id,
+        );
+        return attempt ? attempt.answer_student.toString() : ""; // Default to empty if no answer
+      });
+      setUserAnswers(prefilledAnswers);
+    }
+  }, [questions, questionAttempts]);
+
   const { mutate: saveAnswer, isPending: isSaving } =
     usePostMutation<QuestionAttempt>({
       mutationKey: ["quiz.answer"],
       endpoint: "/quiz/question-attempts/",
       onSuccess: () => {
-        setIsSaved(true);
+        setIsSaved(true); // Set isSaved to true after successful save
       },
       onError: (err) => {
         console.log("Error saving answer:", err);
@@ -115,24 +97,6 @@ export function CompStart({
   const handleComplete = () => {
     // router.push("/quiz")
   };
-  useEffect(() => {
-    // console.log("Current answers:", userAnswers)
-    // In the future, this could be replaced with:
-    // async function saveAnswers() {
-    //   try {
-    //     const response = await fetch('/api/save-answers', {
-    //       method: 'POST',
-    //       headers: { 'Content-Type': 'application/json' },
-    //       body: JSON.stringify({ answers: userAnswers })
-    //     });
-    //     const data = await response.json();
-    //     console.log('Answers saved:', data);
-    //   } catch (error) {
-    //     console.error('Error saving answers:', error);
-    //   }
-    // }w
-    // saveAnswers();
-  }, [userAnswers]);
 
   const validateAnswer = (answer: string): string => {
     if (answer.trim() === "") {
@@ -152,7 +116,7 @@ export function CompStart({
 
     return ""; // No error
   };
-
+  const throttledSaveAnswer = useThrottle(saveAnswer, 1000, timeoutIdRef);
   const handleAnswerChange = (answer: string) => {
     // 1.Update the answer
     const newAnswers = [...userAnswers];
@@ -172,7 +136,11 @@ export function CompStart({
     if (error) return;
     // Log the answer for the current question
     setIsSaved(false);
-    const throttledSaveAnswer = throttle(saveAnswer, 1000, timeoutIdRef);
+    throttledSaveAnswer({
+      question: questions[currentQuestion].question.id,
+      answer_student: answer,
+      quiz_attempt: question_slots?.quiz_attempt_id,
+    });
 
     // throttledLog(`Question ${currentQuestion + 1} answer:`, answer)
   };
@@ -209,19 +177,25 @@ export function CompStart({
   const isCurrentAnswerValid = () => {
     return (
       !validationErrors[currentQuestion] &&
-      userAnswers[currentQuestion].trim() !== ""
+      userAnswers[currentQuestion]?.trim() !== ""
     );
   };
+
+  // if (isLoading) return <div>Loading...</div>;
+  // if (error) return <div>Error: {error.message}</div>;
+
   return (
     <div className="flex flex-col items-center justify-center p-4">
       <div className="flex w-full items-center gap-4">
         <CardTitle className="flex w-full items-center justify-between">
           <WajoLogo className="mx-4 mt-2 w-20 md:mx-11 md:w-28" />
-          <CountdownDisplay
-            className="text-sm md:mr-10"
-            targetDate={qs111.end_time}
-            onComplete={handleComplete}
-          ></CountdownDisplay>
+          {endTime && ( // Render CountdownDisplay only if endTime is valid
+            <CountdownDisplay
+              className="text-sm md:mr-10"
+              targetDate={endTime}
+              onComplete={handleComplete}
+            />
+          )}
         </CardTitle>
       </div>
 
@@ -232,7 +206,12 @@ export function CompStart({
       <Card className="mt-3 w-full max-w-6xl">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>{questions[currentQuestion].question.name}</CardTitle>
+            <CardTitle>{questions[currentQuestion]?.question.name}</CardTitle>
+            {isSaved ? (
+              <span className="flex items-center gap-1 text-sm text-green-600">
+                <Save /> Saved{" "}
+              </span>
+            ) : null}
             <div className="text-sm text-muted-foreground">
               Answered:{" "}
               {
@@ -246,7 +225,7 @@ export function CompStart({
         </CardHeader>
         <QuizQuestionCard
           {...{
-            questions: qs111,
+            questions: question_slots,
             handleAnswerChange,
             currentQuestion,
             userAnswers,
@@ -260,9 +239,12 @@ export function CompStart({
           <div className="flex flex-wrap justify-center gap-2">
             {questions.map((_, index) => {
               const isAnswered =
-                userAnswers[index].trim() !== "" && !validationErrors[index];
+                userAnswers[index]?.trim() !== "" &&
+                !validationErrors[index] &&
+                userAnswers[index] !== undefined;
+              console.log("isAnswered", isAnswered);
               const hasError =
-                userAnswers[index].trim() !== "" && validationErrors[index];
+                userAnswers[index]?.trim() !== "" && validationErrors[index];
 
               return (
                 <Button

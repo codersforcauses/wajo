@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 interface CountdownTimerProps {
-  targetDate: Date; // A future date/time when the countdown should end
+  targetDate: Date | undefined; // A future date/time when the countdown should end
   onComplete?: () => void;
   className?: string;
 }
@@ -16,36 +16,40 @@ export default function CountdownTimer({
   const [timeLeft, setTimeLeft] = useState<string | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [isWarning, setIsWarning] = useState(false);
+  const calculateTimeLeft = () => {
+    if (!targetDate) {
+      return null; // Return null if targetDate is undefined
+    }
+    const endDate = new Date(targetDate);
+    const difference = endDate.getTime() - new Date().getTime();
+    console.log("Difference in milliseconds:", difference);
 
+    if (difference <= 0) {
+      setTimeLeft("00:00:00");
+      setIsComplete(true);
+      if (onComplete) {
+        onComplete();
+      }
+      return null; // Return null to indicate we should clear the interval
+    }
+
+    // Convert to seconds
+    const secondsLeft = Math.floor(difference / 1000);
+    const hours = Math.floor(secondsLeft / 3600);
+    const minutes = Math.floor((secondsLeft - hours * 3600) / 60);
+    const seconds = secondsLeft % 60;
+
+    // Check if less than or equal to 5 minutes
+    if (secondsLeft <= 300) {
+      setIsWarning(true);
+    } else {
+      setIsWarning(false);
+    }
+
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  };
   useEffect(() => {
     setIsComplete(false);
-    const calculateTimeLeft = () => {
-      const difference = targetDate.getTime() - new Date().getTime();
-
-      if (difference <= 0) {
-        setTimeLeft("00:00:00");
-        setIsComplete(true);
-        if (onComplete) {
-          onComplete();
-        }
-        return null; // Return null to indicate we should clear the interval
-      }
-
-      // Convert to seconds
-      const secondsLeft = Math.floor(difference / 1000);
-      const hours = Math.floor(secondsLeft / 3600);
-      const minutes = Math.floor((secondsLeft - hours * 3600) / 60);
-      const seconds = secondsLeft % 60;
-
-      // Check if less than or equal to 5 minutes
-      if (secondsLeft <= 300) {
-        setIsWarning(true);
-      } else {
-        setIsWarning(false);
-      }
-
-      return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-    };
 
     // Calculate initial time left
     const initialTimeLeft = calculateTimeLeft();
