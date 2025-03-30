@@ -18,7 +18,12 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "wajo.duck.ceo",
-        port: "443",
+        port: "",
+      },
+      {
+        protocol: "http",
+        hostname: "wajo.duck.ceo",
+        port: "",
       },
     ],
   },
