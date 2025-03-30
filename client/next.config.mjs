@@ -11,9 +11,14 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "http",
+        protocol: "https",
         hostname: "localhost",
         port: "8000", // Allow images from Django backend
+      },
+      {
+        protocol: "https",
+        hostname: "wajo.duck.ceo",
+        port: "443",
       },
     ],
   },
