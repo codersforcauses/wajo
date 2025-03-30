@@ -1,4 +1,5 @@
 import { AlertCircle } from "lucide-react";
+import Image from "next/image";
 
 import {
   Card,
@@ -11,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LatexInput } from "@/components/ui/math-input";
+import { backendURL } from "@/lib/api";
 import { Question } from "@/types/question";
 import {
   Competition,
@@ -38,14 +40,28 @@ export default function QuizQuestionCard({
   validationErrors,
   isSaved,
 }: QuizQuestionCardProps) {
+  const imageURL =
+    questions?.data[currentQuestion]?.question?.images?.[0]?.url ?? "";
   return (
     <CardContent>
       <div className="space-y-6">
-        <h3 className="flex content-between justify-between text-xl font-medium">
-          <LatexInput>
+        <div className="flex w-full flex-col content-between items-baseline justify-between text-sm md:text-base">
+          <LatexInput className=" ">
             {String(questions?.data[currentQuestion].question.question_text)}
           </LatexInput>
-        </h3>
+          {imageURL && (
+            <div className="my-4">
+              <Image
+                src={`${backendURL}/${imageURL}`}
+                alt="Question Image"
+                width={400}
+                height={300}
+                className="h-auto max-h-[30vh] w-auto max-w-[30vw]"
+                priority
+              />
+            </div>
+          )}
+        </div>
 
         <div className="space-y-2">
           <Label htmlFor="answer">
