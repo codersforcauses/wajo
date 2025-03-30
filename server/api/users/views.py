@@ -75,8 +75,12 @@ class StudentViewSet(viewsets.ModelViewSet):
             return self.queryset.filter(school=teacher_school)
         elif self.request.user.is_staff:
             return self.queryset.all()
-        else:
-            return self.queryset.all()
+        # If the user is a student, return only their own data
+        elif hasattr(self.request.user, "student"):
+            return self.queryset.filter(id=self.request.user.student.id)
+
+        # For all other cases (there shouldn't be any, but just in case), return an empty queryset
+        return self.queryset.none()
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()  # Create a mutable copy of request.data
@@ -270,8 +274,32 @@ class UserProfileView(APIView):
         profile = {
             'user_id': user.id,
             'username': user.username,
-            'teacher_id': user.teacher.id if hasattr(user, 'teacher') else None,
-            'school_id': user.teacher.school.id if hasattr(user, 'teacher') else None,
-            # other profile details
+            'role': 'teacher' if hasattr(user, 'teacher') else 'student' if hasattr(user, 'student') else 'admin',
+            'email': user.email if hasattr(user, 'email') else None,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'is_staff': None if hasattr(user, "teacher") or hasattr(user, "student") else user.is_staff,
+            'is_superuser': None if hasattr(user, "teacher") or hasattr(user, "student") else user.is_superuser,
         }
+
+        if hasattr(user, 'student'):
+            student_profile_fields = {
+                'student_id': user.student.id,
+                'school': user.student.school.name,
+                'school_name': user.student.school.name,
+                'year_level': user.student.year_level if hasattr(user, 'student') else None,
+            }
+            profile.update(student_profile_fields)
+        elif hasattr(user, 'teacher'):
+            teacher_profile_fields = {
+                'school': user.teacher.school.name,
+                'school_name': user.teacher.school.name,
+                'school_id': user.teacher.school.id,
+                'is_country': user.teacher.school.is_country,
+                'school_type': user.teacher.school.type,
+                'phone': user.teacher.phone,
+                'teacher_email': user.teacher.email,
+            }
+            profile.update(teacher_profile_fields)
+
         return Response(profile)

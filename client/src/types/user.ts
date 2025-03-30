@@ -225,6 +225,16 @@ export const createRandomPwd = () => {
 export interface Profile {
   user_id: string;
   username: string;
-  teacher_id: string;
-  school_id: string;
+  first_name: string;
+  last_name: string;
+  role: Role;
+  school_name?: School["name"];
+  school_type?: SchoolType;
+  student_id?: string;
+  year_level?: string;
+  teacher_email?: string;
+  is_staff?: boolean;
+  is_superuser?: boolean;
+  phone?: string;
+  email?: string;
 }
