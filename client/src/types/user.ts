@@ -228,6 +228,7 @@ export interface Profile {
   first_name: string;
   last_name: string;
   role: Role;
+  school_id: School["id"];
   school_name?: School["name"];
   school_type?: SchoolType;
   student_id?: string;
