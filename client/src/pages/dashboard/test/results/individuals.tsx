@@ -1,7 +1,9 @@
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { ProtectedPage } from "@/components/layout";
+import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
@@ -88,6 +90,74 @@ function IndividualLeaderboardIndex() {
   if (error) return <div>Error: {error.message}</div>;
   if (!isReady || isLoading) return <WaitingLoader />;
 
+  // For CSV export
+  type ResultsRecord = {
+    studentName: string;
+    yearLevel: Number | string;
+    schoolName: string;
+    schoolType: string;
+    isCountrySchool: boolean;
+    totalMarks: number;
+  };
+
+  /**
+   * Download a CSV file from the db data.
+   * The CSV will contain the following columns:
+   *   Student Name, year Level, School Type, is Country, Total Marks,
+   */
+  const downloadStudentsCSV = () => {
+    // instead of getting from localStorage, use the data fetched from the API
+    const csvData: ResultsRecord[] = (data ?? []).map((record) => ({
+      studentName: record.name,
+      yearLevel: record.year_level,
+      schoolName: record.school,
+      schoolType: record.school_type,
+      isCountrySchool: record.is_country,
+      totalMarks: record.total_marks,
+    }));
+
+    if (csvData.length === 0) {
+      toast.warning("No data available to export.");
+      return;
+    }
+
+    // CSV headers in the order you want them
+    const csvHeaders = [
+      "Student Name",
+      "Year Level",
+      "School Name",
+      "School Type",
+      "Is Country School?",
+      "Total Marks",
+    ];
+
+    // Build each row from csvData
+    const csvRows = csvData.map((record) => [
+      record.studentName,
+      record.yearLevel,
+      record.schoolName,
+      record.schoolType,
+      record.isCountrySchool ? "Yes" : "No",
+      record.totalMarks,
+    ]);
+
+    // Convert to CSV string
+    const csvContent = [csvHeaders, ...csvRows]
+      .map((row) => row.map((value) => `"${value}"`).join(","))
+      .join("\n");
+
+    // Trigger a download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.setAttribute("download", "Student_Results_WAJO.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="m-4 space-y-4">
       <div className="flex justify-between">
@@ -99,6 +169,15 @@ function IndividualLeaderboardIndex() {
             setAndPush({ search: newSearch, page: 1 });
           }}
         />
+        <Suspense fallback={<div className="h-6 w-6 animate-pulse" />}>
+          <Button
+            variant="outline"
+            className="h-auto"
+            onClick={downloadStudentsCSV}
+          >
+            Download CSV
+          </Button>
+        </Suspense>
       </div>
 
       <Suspense fallback={<WaitingLoader />}>

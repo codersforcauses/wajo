@@ -1,7 +1,9 @@
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { ProtectedPage } from "@/components/layout";
+import { Button } from "@/components/ui/button";
 import {
   Pagination,
   PaginationSearchParams,
@@ -66,9 +68,177 @@ function InsightPage() {
 
   if (error) return <div>Error: {error.message}</div>;
 
+  // For CSV export
+  type ResultsRecord = [
+    {
+      category: "All Students";
+      total: Number;
+      public_count: Number;
+      catholic_count: Number;
+      independent_count: Number;
+      allies_count: Number;
+      country: Number;
+      year_7: Number;
+      year_8: Number;
+      year_9: Number;
+    },
+    {
+      category: "Students with scores";
+      total: Number;
+      public_count: Number;
+      catholic_count: Number;
+      independent_count: Number;
+      allies_count: Number;
+      country: Number;
+      year_7: Number;
+      year_8: Number;
+      year_9: Number;
+    },
+    {
+      category: "All Teams";
+      total: Number;
+      public_count: Number;
+      catholic_count: Number;
+      independent_count: Number;
+      allies_count: Number;
+      country: Number;
+      year_7: Number;
+      year_8: Number;
+      year_9: Number;
+    },
+    {
+      category: "Teams with scores";
+      total: Number;
+      public_count: Number;
+      catholic_count: Number;
+      independent_count: Number;
+      allies_count: Number;
+      country: Number;
+      year_7: Number;
+      year_8: Number;
+      year_9: Number;
+    },
+  ];
+
+  /**
+   * Download a CSV file from the db data.
+   * The CSV will contain the following columns:
+   *   Category (All Students, Students with scores, All Teams, Teams with scores),
+   *   Total, Public, Catholic, Independent, Allies, Country, Year 7, Year 8, Year 9
+   */
+  const downloadInsightsCSV = () => {
+    // instead of getting from localStorage, use the data fetched from the API
+    const csvData: ResultsRecord = [
+      {
+        category: "All Students",
+        total: data?.[0]?.total ?? 0,
+        public_count: data?.[0]?.public_count ?? 0,
+        catholic_count: data?.[0]?.catholic_count ?? 0,
+        independent_count: data?.[0]?.independent_count ?? 0,
+        allies_count: data?.[0]?.allies_count ?? 0,
+        country: data?.[0]?.country ?? 0,
+        year_7: data?.[0]?.year_7 ?? 0,
+        year_8: data?.[0]?.year_8 ?? 0,
+        year_9: data?.[0]?.year_9 ?? 0,
+      },
+      {
+        category: "Students with scores",
+        total: data?.[1]?.total ?? 0,
+        public_count: data?.[1]?.public_count ?? 0,
+        catholic_count: data?.[1]?.catholic_count ?? 0,
+        independent_count: data?.[1]?.independent_count ?? 0,
+        allies_count: data?.[1]?.allies_count ?? 0,
+        country: data?.[1]?.country ?? 0,
+        year_7: data?.[1]?.year_7 ?? 0,
+        year_8: data?.[1]?.year_8 ?? 0,
+        year_9: data?.[1]?.year_9 ?? 0,
+      },
+      {
+        category: "All Teams",
+        total: data?.[2]?.total ?? 0,
+        public_count: data?.[2]?.public_count ?? 0,
+        catholic_count: data?.[2]?.catholic_count ?? 0,
+        independent_count: data?.[2]?.independent_count ?? 0,
+        allies_count: data?.[2]?.allies_count ?? 0,
+        country: data?.[2]?.country ?? 0,
+        year_7: data?.[2]?.year_7 ?? 0,
+        year_8: data?.[2]?.year_8 ?? 0,
+        year_9: data?.[2]?.year_9 ?? 0,
+      },
+      {
+        category: "Teams with scores",
+        total: data?.[3]?.total ?? 0,
+        public_count: data?.[3]?.public_count ?? 0,
+        catholic_count: data?.[3]?.catholic_count ?? 0,
+        independent_count: data?.[3]?.independent_count ?? 0,
+        allies_count: data?.[3]?.allies_count ?? 0,
+        country: data?.[3]?.country ?? 0,
+        year_7: data?.[3]?.year_7 ?? 0,
+        year_8: data?.[3]?.year_8 ?? 0,
+        year_9: data?.[3]?.year_9 ?? 0,
+      },
+    ];
+
+    if (!data || data.length === 0) {
+      toast.warning("No data available to export.");
+      return;
+    }
+
+    // CSV headers in the order you want them
+    const csvHeaders = [
+      "Category",
+      "Total",
+      "Public",
+      "Catholic",
+      "Independent",
+      "Allies",
+      "Country",
+      "Year 7",
+      "Year 8",
+      "Year 9",
+    ];
+
+    // Build each row from csvData
+    const allStudentsCsvRows = Object.values(csvData[0]);
+    const studentsWithScoresCsvRows = Object.values(csvData[1]);
+    const allTeamsCsvRows = Object.values(csvData[2]);
+    const teamsWithScoresCsvRows = Object.values(csvData[3]);
+    const csvRows = [
+      allStudentsCsvRows,
+      studentsWithScoresCsvRows,
+      allTeamsCsvRows,
+      teamsWithScoresCsvRows,
+    ];
+
+    // Convert to CSV string
+    const csvContent = [csvHeaders, ...csvRows]
+      .map((row) => row.map((value) => `"${value}"`).join(","))
+      .join("\n");
+
+    // Trigger a download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.setAttribute("download", "Insights_WAJO.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="m-4 space-y-4">
       <Suspense>
+        <Suspense fallback={<div className="h-6 w-6 animate-pulse" />}>
+          <Button
+            variant="outline"
+            className="h-auto"
+            onClick={downloadInsightsCSV}
+          >
+            Download CSV
+          </Button>
+        </Suspense>
         <div>
           <InsightDataGrid
             datacontext={insights ?? []}

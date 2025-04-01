@@ -1,7 +1,9 @@
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { ProtectedPage } from "@/components/layout";
+import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
   Pagination,
@@ -87,6 +89,100 @@ function TeamLeaderboardIndex() {
 
   if (error) return <div>Error: {error.message}</div>;
 
+  // For CSV export
+  type ResultsRecord = {
+    schoolName: string;
+    teamId: Number | string;
+    totalMarks: number;
+    isCountrySchool: boolean;
+    student1: string;
+    student2: string;
+    student3: string;
+    student4: string;
+    maxYearLevel: number;
+  };
+
+  /**
+   * Download a CSV file from the db data.
+   * The CSV will contain the following columns:
+   *   School Name, Team Id, Total Marks, Is Country, Max Year Level, Student 1, Student 2, Student 3
+   *   Student 4
+   */
+  const downloadTeamsCSV = () => {
+    // instead of getting from localStorage, use the data fetched from the API
+    const csvData: ResultsRecord[] = (data ?? []).map((record) => ({
+      schoolName: record.school,
+      teamId: record.id,
+      totalMarks: record.total_marks,
+      isCountrySchool: record.is_country,
+      student1:
+        (record.students[0]?.name as string) +
+        " (" +
+        record.students[0]?.year_level +
+        ")",
+      student2:
+        (record.students[1]?.name as string) +
+        " (" +
+        record.students[1]?.year_level +
+        ")",
+      student3:
+        (record.students[2]?.name as string) +
+        " (" +
+        record.students[2]?.year_level +
+        ")",
+      student4:
+        (record.students[3]?.name as string) +
+        " (" +
+        record.students[3]?.year_level +
+        ")",
+      maxYearLevel: record.max_year,
+    }));
+
+    if (csvData.length === 0) {
+      toast.warning("No data available to export.");
+      return;
+    }
+
+    // CSV headers in the order you want them
+    const csvHeaders = [
+      "Student Name",
+      "Year Level",
+      "School Name",
+      "School Type",
+      "Is Country School?",
+      "Total Marks",
+    ];
+
+    // Build each row from csvData
+    const csvRows = csvData.map((record) => [
+      record.schoolName,
+      record.teamId,
+      record.totalMarks,
+      record.isCountrySchool ? "Yes" : "No",
+      record.student1,
+      record.student2,
+      record.student3,
+      record.student4,
+      record.maxYearLevel,
+    ]);
+
+    // Convert to CSV string
+    const csvContent = [csvHeaders, ...csvRows]
+      .map((row) => row.map((value) => `"${value}"`).join(","))
+      .join("\n");
+
+    // Trigger a download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.setAttribute("download", "Team_Results_WAJO.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="m-4 space-y-4">
       <div className="flex justify-between">
@@ -98,6 +194,15 @@ function TeamLeaderboardIndex() {
             setAndPush({ search: newSearch, page: 1 });
           }}
         />
+        <Suspense fallback={<div className="h-6 w-6 animate-pulse" />}>
+          <Button
+            variant="outline"
+            className="h-auto"
+            onClick={downloadTeamsCSV}
+          >
+            Download CSV
+          </Button>
+        </Suspense>
       </div>
 
       <Suspense fallback={<WaitingLoader />}>

@@ -7,12 +7,12 @@ export default function PageConfig() {
   const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <Create />
+      <Index />
     </ProtectedPage>
   );
 }
 
-function Create() {
+function Index() {
   const links = [
     { href: "results/individual", label: "individuals" },
     { href: "results/team", label: "teams" },
