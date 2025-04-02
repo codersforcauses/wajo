@@ -17,6 +17,7 @@ function Index() {
     { href: "results/individual", label: "individuals" },
     { href: "results/team", label: "teams" },
     { href: "results/insight", label: "insights" },
+    { href: "results/question-attempts", label: "question-attempts" },
   ];
   return (
     <div className="flex h-[80vh] items-center justify-center gap-10">

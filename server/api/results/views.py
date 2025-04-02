@@ -174,8 +174,3 @@ class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return QuestionAttempt.objects.all()
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
