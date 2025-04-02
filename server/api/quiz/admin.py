@@ -1,21 +1,21 @@
 from django.contrib import admin
-
+from unfold.admin import ModelAdmin
 # Register your models here.
 from .models import QuizAttempt, Quiz, QuizSlot, QuestionAttempt
 
 
 @admin.register(Quiz)
-class QuizAdmin(admin.ModelAdmin):
+class QuizAdmin(ModelAdmin):
     list_display = ("name", "intro")
 
 
 @admin.register(QuizSlot)
-class QuizSlotsAdmin(admin.ModelAdmin):
+class QuizSlotsAdmin(ModelAdmin):
     list_display = ("id", "quiz_id")
 
 
 @admin.register(QuizAttempt)
-class QuizAttemptAdmin(admin.ModelAdmin):
+class QuizAttemptAdmin(ModelAdmin):
     list_display = (
         "id",
         "quiz_id",
@@ -23,7 +23,7 @@ class QuizAttemptAdmin(admin.ModelAdmin):
 
 
 @admin.register(QuestionAttempt)
-class QuestionAttemptAdmin(admin.ModelAdmin):
+class QuestionAttemptAdmin(ModelAdmin):
     list_display = (
         "id",
         "quiz_attempt_id",
