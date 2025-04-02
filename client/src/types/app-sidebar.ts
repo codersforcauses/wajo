@@ -63,6 +63,10 @@ export const navData: NavigationData = {
             },
             { title: "Teams", url: "/dashboard/test/results/teams" },
             { title: "Insights", url: "/dashboard/test/results/insights" },
+            {
+              title: "Question Attempts",
+              url: "/dashboard/test/results/question-attempts",
+            },
           ],
         },
       ],

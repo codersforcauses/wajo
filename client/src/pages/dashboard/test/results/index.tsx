@@ -7,16 +7,17 @@ export default function PageConfig() {
   const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <Create />
+      <Index />
     </ProtectedPage>
   );
 }
 
-function Create() {
+function Index() {
   const links = [
     { href: "results/individual", label: "individuals" },
     { href: "results/team", label: "teams" },
     { href: "results/insight", label: "insights" },
+    { href: "results/question-attempts", label: "question-attempts" },
   ];
   return (
     <div className="flex h-[80vh] items-center justify-center gap-10">
