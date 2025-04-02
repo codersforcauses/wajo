@@ -4,8 +4,8 @@ from rest_framework import viewsets, filters, status
 from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
 from django.db.models import Sum, Max
 from django.db.models.functions import Cast
-from ..quiz.models import Quiz, QuizAttempt
-from .serializers import IndividualResultsSerializer, TeamResultsSerializer
+from ..quiz.models import Quiz, QuizAttempt, QuestionAttempt
+from .serializers import IndividualResultsSerializer, TeamResultsSerializer, QuestionAttemptsSerializer
 from ..users.models import School, Student
 from ..team.models import Team
 from rest_framework.response import Response
@@ -162,3 +162,20 @@ class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
         ]
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    View to retrieve all question attempts for all quiz attempts.
+    """
+
+    queryset = QuestionAttempt.objects.all()
+    serializer_class = QuestionAttemptsSerializer
+
+    def get_queryset(self):
+        return QuestionAttempt.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

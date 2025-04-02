@@ -70,3 +70,13 @@ export interface Insight {
   year_8: number;
   year_9: number;
 }
+
+export interface QuestionAttempts {
+  quiz_name: string;
+  student_name: string;
+  student_year_level: number;
+  question_id: number;
+  question_text: string;
+  is_correct: boolean;
+  marks_awarded: number;
+}
