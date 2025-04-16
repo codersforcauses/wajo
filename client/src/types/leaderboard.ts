@@ -77,6 +77,7 @@ export interface QuestionAttempts {
   student_year_level: number;
   question_id: number;
   question_text: string;
+  answer_student: string;
   is_correct: boolean;
   marks_awarded: number;
 }

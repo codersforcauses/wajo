@@ -91,6 +91,17 @@ export function QuestionAttemptsDataGrid({
               </TableHead>
               <TableHead className={cn(commonTableHeadClasses)}>
                 <div className="flex items-center text-white">
+                  <span>Student Answer</span>
+                  <span
+                    className="ml-2 cursor-pointer"
+                    onClick={() => onOrderingChange("answer_student")}
+                  >
+                    <SortIcon />
+                  </span>
+                </div>
+              </TableHead>
+              <TableHead className={cn(commonTableHeadClasses)}>
+                <div className="flex items-center text-white">
                   <span>Is correct</span>
                   <span
                     className="ml-2 cursor-pointer"
@@ -129,6 +140,7 @@ export function QuestionAttemptsDataGrid({
                   <TableCell>{item.student_year_level}</TableCell>
                   <TableCell>{item.question_id}</TableCell>
                   <TableCell>{item.question_text}</TableCell>
+                  <TableCell>{item.answer_student}</TableCell>
                   <TableCell>
                     {item.is_correct === true
                       ? "Yes"

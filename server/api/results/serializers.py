@@ -106,6 +106,7 @@ class QuestionAttemptsSerializer(serializers.ModelSerializer):
             "student_year_level",
             "question_id",
             "question_text",
+            "answer_student",
             "is_correct",
             "marks_awarded",
         ]
