@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { ProtectedPage } from "@/components/layout";
+import { ProtectedPage, ResultsLayout, useQuizId } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import {
   Pagination,
@@ -19,7 +19,9 @@ export default function PageConfig() {
   const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <InsightPage />
+      <ResultsLayout>
+        <InsightPage />
+      </ResultsLayout>
     </ProtectedPage>
   );
 }
@@ -27,6 +29,7 @@ export default function PageConfig() {
 function InsightPage() {
   const router = useRouter();
   const { query, isReady, push } = router;
+  const quizId = useQuizId();
 
   const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
     search: "",
@@ -35,8 +38,8 @@ function InsightPage() {
   });
 
   const { data, isLoading, error, totalPages } = useFetchDataTable<Insight>({
-    queryKey: ["results.team"],
-    endpoint: "/results/team/",
+    queryKey: [`results.team.${quizId}`],
+    endpoint: `/results/team/?quizId=${quizId}`,
     searchParams: searchParams,
   });
 
@@ -46,8 +49,8 @@ function InsightPage() {
     isError: isInsightError,
     error: insightError,
   } = useFetchData<Insight[]>({
-    queryKey: ["students.insight"],
-    endpoint: "/results/insight/",
+    queryKey: [`students.insight.${quizId}`],
+    endpoint: `/results/insight/?quiz_id=${quizId}`,
   });
 
   useEffect(() => {
@@ -63,7 +66,11 @@ function InsightPage() {
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
+    push(
+      { query: toQueryString(updatedParams) },
+      `/dashboard/results/${quizId}/insights`,
+      { shallow: true },
+    );
   };
 
   if (error) return <div>Error: {error.message}</div>;

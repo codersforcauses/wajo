@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { ProtectedPage } from "@/components/layout";
+import { ProtectedPage, ResultsLayout, useQuizId } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -26,7 +26,9 @@ export default function PageConfig() {
   const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <IndividualLeaderboardIndex />
+      <ResultsLayout>
+        <IndividualLeaderboardIndex />
+      </ResultsLayout>
     </ProtectedPage>
   );
 }
@@ -34,6 +36,7 @@ export default function PageConfig() {
 function IndividualLeaderboardIndex() {
   const router = useRouter();
   const { query, isReady, push } = router;
+  const quizId = useQuizId();
 
   const [orderings, setOrderings] = useState<OrderingItem>({});
 
@@ -46,8 +49,8 @@ function IndividualLeaderboardIndex() {
 
   const { data, isLoading, error, totalPages } =
     useFetchDataTable<IndividualLeaderboard>({
-      queryKey: ["results.individual"],
-      endpoint: "/results/individual/",
+      queryKey: [`results.individual.${quizId}`],
+      endpoint: `/results/individual/?quiz_id=${quizId}`,
       searchParams: searchParams,
     });
 
@@ -73,7 +76,13 @@ function IndividualLeaderboardIndex() {
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
+    push(
+      { query: toQueryString(updatedParams) },
+      `/dashboard/results/${quizId}/individuals`,
+      {
+        shallow: true,
+      },
+    );
   };
 
   const onOrderingChange = (field: keyof OrderingItem) => {

@@ -71,6 +71,13 @@ class IndividualResultsViewSet(viewsets.ReadOnlyModelViewSet):
     ]
     ordering = ["-student__year_level"]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        quiz_id = self.request.query_params.get("quiz_id")
+        if quiz_id:
+            queryset = queryset.filter(quiz_id=quiz_id)
+        return queryset
+
 
 class TeamResultsFilter(FilterSet):
     quiz_name = ModelChoiceFilter(
@@ -125,9 +132,10 @@ class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
         return Student.objects.none()
 
     def list(self, request, *args, **kwargs):
-        all_students = Student.objects.all()
+        quiz_id = self.request.query_params.get("quiz_id")
+        all_students = Student.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct() if quiz_id else Student.objects.all()
         scored_students = all_students.filter(quiz_attempts__total_marks__gt=0)
-        all_teams = Team.objects.all()
+        all_teams = Team.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct() if quiz_id else Team.objects.all()
         scored_team = all_teams.filter(
             students__quiz_attempts__total_marks__gt=0
         ).distinct()
@@ -173,4 +181,8 @@ class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = QuestionAttemptsSerializer
 
     def get_queryset(self):
-        return QuestionAttempt.objects.all()
+        queryset = super().get_queryset()
+        quiz_id = self.request.query_params.get("quiz_id")
+        if quiz_id:
+            queryset = queryset.filter(quiz_attempt__quiz_id=quiz_id)
+        return queryset

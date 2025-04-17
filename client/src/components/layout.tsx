@@ -1,6 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
@@ -119,5 +119,33 @@ function NotAuthorizedPage() {
         {userRole ? "Back to Dashboard" : "Logout"}
       </Button>
     </div>
+  );
+}
+
+// Create a context to store the quizId
+const QuizIdContext = createContext<number | undefined>(undefined);
+
+export const useQuizId = () => {
+  const context = useContext(QuizIdContext);
+  if (!context) {
+    throw new Error("useQuizId must be used within a QuizIdProvider");
+  }
+  return context;
+};
+
+export function ResultsLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const { id } = router.query;
+
+  const quizId = typeof id === "string" ? parseInt(id, 10) : undefined;
+
+  if (!quizId || isNaN(quizId)) {
+    return <div>Error: Quiz ID is missing or invalid</div>;
+  }
+
+  return (
+    <QuizIdContext.Provider value={quizId}>
+      <div>{children}</div>
+    </QuizIdContext.Provider>
   );
 }

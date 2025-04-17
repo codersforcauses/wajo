@@ -59,16 +59,17 @@ export const navData: NavigationData = {
       title: "Results & Rankings",
       icon: ChartNoAxesColumnIncreasing,
       items: [
-        {
-          title: "Individuals",
-          url: "/dashboard/results/individuals",
-        },
-        { title: "Teams", url: "/dashboard/results/teams" },
-        { title: "Insights", url: "/dashboard/results/insights" },
-        {
-          title: "Question Attempts",
-          url: "/dashboard/results/question-attempts",
-        },
+        { title: "Quizzes", url: "/dashboard/results/" },
+        // {
+        //   title: "Individuals",
+        //   url: "/dashboard/results/individuals",
+        // },
+        // { title: "Teams", url: "/dashboard/results/teams" },
+        // { title: "Insights", url: "/dashboard/results/insights" },
+        // {
+        //   title: "Question Attempts",
+        //   url: "/dashboard/results/question-attempts",
+        // },
       ],
     },
     {

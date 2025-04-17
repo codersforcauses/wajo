@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { ProtectedPage } from "@/components/layout";
+import { ProtectedPage, ResultsLayout, useQuizId } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -12,28 +12,31 @@ import {
   toQueryString,
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
-import { QuestionAttemptsDataGrid } from "@/components/ui/Test/question-attempts-data-grid";
+import { TeamDataGrid } from "@/components/ui/Test/team-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import {
   OrderingItem,
   orderingToString,
   stringToOrdering,
 } from "@/types/data-grid";
-import { QuestionAttempts } from "@/types/leaderboard";
+import { TeamLeaderboard } from "@/types/leaderboard";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
   const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <QuestionAttemptsIndex />
+      <ResultsLayout>
+        <TeamLeaderboardIndex />
+      </ResultsLayout>
     </ProtectedPage>
   );
 }
 
-function QuestionAttemptsIndex() {
+function TeamLeaderboardIndex() {
   const router = useRouter();
   const { query, isReady, push } = router;
+  const quizId = useQuizId();
 
   const [orderings, setOrderings] = useState<OrderingItem>({});
 
@@ -45,17 +48,11 @@ function QuestionAttemptsIndex() {
   });
 
   const { data, isLoading, error, totalPages } =
-    useFetchDataTable<QuestionAttempts>({
-      queryKey: ["results.question-attempts"],
-      endpoint: "/results/question-attempts/",
+    useFetchDataTable<TeamLeaderboard>({
+      queryKey: [`results.team.${quizId}`],
+      endpoint: `/results/team/?quizId=${quizId}`,
       searchParams: searchParams,
     });
-
-  useEffect(() => {
-    console.log("Search Params:", searchParams);
-    console.log("Data fetched:", data);
-    console.log("Error:", error);
-  }, [data, error, searchParams]);
 
   useEffect(() => {
     if (isReady && !isLoading) {
@@ -79,7 +76,11 @@ function QuestionAttemptsIndex() {
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
+    push(
+      { query: toQueryString(updatedParams) },
+      `/dashboard/results/${quizId}/teams`,
+      { shallow: true },
+    );
   };
 
   const onOrderingChange = (field: keyof OrderingItem) => {
@@ -93,40 +94,55 @@ function QuestionAttemptsIndex() {
     });
   };
 
-  useEffect(() => {
-    console.log("Data fetched:", data);
-  }),
-    [data];
-
   if (error) return <div>Error: {error.message}</div>;
-  if (!isReady || isLoading) return <WaitingLoader />;
 
   // For CSV export
   type ResultsRecord = {
-    quizName: string;
-    studentName: string;
-    studentYearLevel: number;
-    questionId: string | number;
-    questionText: string;
-    isCorrect: boolean;
-    marks: number;
+    schoolName: string;
+    teamId: Number | string;
+    totalMarks: number;
+    isCountrySchool: boolean;
+    student1: string;
+    student2: string;
+    student3: string;
+    student4: string;
+    maxYearLevel: number;
   };
 
   /**
    * Download a CSV file from the db data.
    * The CSV will contain the following columns:
-   *   Student Name, year Level, School Type, is Country, Total Marks,
+   *   School Name, Team Id, Total Marks, Is Country, Max Year Level, Student 1, Student 2, Student 3
+   *   Student 4
    */
-  const downloadQuestionAttemptsCSV = () => {
+  const downloadTeamsCSV = () => {
     // instead of getting from localStorage, use the data fetched from the API
     const csvData: ResultsRecord[] = (data ?? []).map((record) => ({
-      quizName: record.quiz_name,
-      studentName: record.student_name,
-      studentYearLevel: record.student_year_level,
-      questionId: record.question_id,
-      questionText: record.question_text,
-      isCorrect: record.is_correct,
-      marks: record.marks_awarded,
+      schoolName: record.school,
+      teamId: record.id,
+      totalMarks: record.total_marks,
+      isCountrySchool: record.is_country,
+      student1:
+        (record.students[0]?.name as string) +
+        " (" +
+        record.students[0]?.year_level +
+        ")",
+      student2:
+        (record.students[1]?.name as string) +
+        " (" +
+        record.students[1]?.year_level +
+        ")",
+      student3:
+        (record.students[2]?.name as string) +
+        " (" +
+        record.students[2]?.year_level +
+        ")",
+      student4:
+        (record.students[3]?.name as string) +
+        " (" +
+        record.students[3]?.year_level +
+        ")",
+      maxYearLevel: record.max_year,
     }));
 
     if (csvData.length === 0) {
@@ -136,23 +152,28 @@ function QuestionAttemptsIndex() {
 
     // CSV headers in the order you want them
     const csvHeaders = [
-      "quizName",
-      "studentName",
-      "studentYearLevel",
-      "questionId",
-      "questionText",
-      "isCorrect",
-      "marks",
+      "School Name",
+      "Team ID",
+      "Total Marks",
+      "Is Country School?",
+      "Student 1",
+      "Student 2",
+      "Student 3",
+      "Student 4",
+      "Max Year Level",
     ];
 
     // Build each row from csvData
     const csvRows = csvData.map((record) => [
-      record.studentName,
-      record.studentYearLevel,
-      record.questionId,
-      record.questionText,
-      record.isCorrect,
-      record.marks,
+      record.schoolName,
+      record.teamId,
+      record.totalMarks,
+      record.isCountrySchool ? "Yes" : "No",
+      record.student1,
+      record.student2,
+      record.student3,
+      record.student4,
+      record.maxYearLevel,
     ]);
 
     // Convert to CSV string
@@ -166,7 +187,7 @@ function QuestionAttemptsIndex() {
     const link = document.createElement("a");
 
     link.href = url;
-    link.setAttribute("download", "Student_Results_WAJO.csv");
+    link.setAttribute("download", "Team_Results_WAJO.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -178,7 +199,7 @@ function QuestionAttemptsIndex() {
         <SearchInput
           label=""
           value={searchParams.search ?? ""}
-          placeholder="Search Students"
+          placeholder="Search Schools and Teams"
           onSearch={(newSearch: string) => {
             setAndPush({ search: newSearch, page: 1 });
           }}
@@ -187,7 +208,7 @@ function QuestionAttemptsIndex() {
           <Button
             variant="outline"
             className="h-auto"
-            onClick={downloadQuestionAttemptsCSV}
+            onClick={downloadTeamsCSV}
           >
             Download CSV
           </Button>
@@ -196,7 +217,7 @@ function QuestionAttemptsIndex() {
 
       <Suspense fallback={<WaitingLoader />}>
         <div>
-          <QuestionAttemptsDataGrid
+          <TeamDataGrid
             datacontext={data ?? []}
             isLoading={!isReady || isLoading}
             onOrderingChange={onOrderingChange}

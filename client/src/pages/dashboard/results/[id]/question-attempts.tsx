@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { ProtectedPage } from "@/components/layout";
+import { ProtectedPage, ResultsLayout, useQuizId } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -12,29 +12,35 @@ import {
   toQueryString,
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
-import { TeamDataGrid } from "@/components/ui/Test/team-data-grid";
+import { QuestionAttemptsDataGrid } from "@/components/ui/Test/question-attempts-data-grid";
 import { useFetchDataTable } from "@/hooks/use-fetch-data";
 import {
   OrderingItem,
   orderingToString,
   stringToOrdering,
 } from "@/types/data-grid";
-import { TeamLeaderboard } from "@/types/leaderboard";
+import { QuestionAttempts } from "@/types/leaderboard";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
   const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <TeamLeaderboardIndex />
+      <ResultsLayout>
+        <QuestionAttemptsIndex />
+      </ResultsLayout>
     </ProtectedPage>
   );
 }
 
-function TeamLeaderboardIndex() {
+function QuestionAttemptsIndex() {
   const router = useRouter();
   const { query, isReady, push } = router;
+  const quizId = useQuizId();
 
+  if (!quizId) {
+    return <div>Error: Quiz ID is missing</div>;
+  }
   const [orderings, setOrderings] = useState<OrderingItem>({});
 
   const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
@@ -45,11 +51,17 @@ function TeamLeaderboardIndex() {
   });
 
   const { data, isLoading, error, totalPages } =
-    useFetchDataTable<TeamLeaderboard>({
-      queryKey: ["results.team"],
-      endpoint: "/results/team/",
+    useFetchDataTable<QuestionAttempts>({
+      queryKey: [`results.question-attempts.${quizId}`],
+      endpoint: `/results/question-attempts/?quizId=${quizId}`,
       searchParams: searchParams,
     });
+
+  useEffect(() => {
+    console.log("Search Params:", searchParams);
+    console.log("Data fetched:", data);
+    console.log("Error:", error);
+  }, [data, error, searchParams]);
 
   useEffect(() => {
     if (isReady && !isLoading) {
@@ -73,7 +85,11 @@ function TeamLeaderboardIndex() {
   const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
+    push(
+      { query: toQueryString(updatedParams) },
+      `/dashboard/results/${quizId}/question-attempts`,
+      { shallow: true },
+    );
   };
 
   const onOrderingChange = (field: keyof OrderingItem) => {
@@ -87,55 +103,40 @@ function TeamLeaderboardIndex() {
     });
   };
 
+  useEffect(() => {
+    console.log("Data fetched:", data);
+  }),
+    [data];
+
   if (error) return <div>Error: {error.message}</div>;
+  if (!isReady || isLoading) return <WaitingLoader />;
 
   // For CSV export
   type ResultsRecord = {
-    schoolName: string;
-    teamId: Number | string;
-    totalMarks: number;
-    isCountrySchool: boolean;
-    student1: string;
-    student2: string;
-    student3: string;
-    student4: string;
-    maxYearLevel: number;
+    quizName: string;
+    studentName: string;
+    studentYearLevel: number;
+    questionId: string | number;
+    questionText: string;
+    isCorrect: boolean;
+    marks: number;
   };
 
   /**
    * Download a CSV file from the db data.
    * The CSV will contain the following columns:
-   *   School Name, Team Id, Total Marks, Is Country, Max Year Level, Student 1, Student 2, Student 3
-   *   Student 4
+   *   Student Name, year Level, School Type, is Country, Total Marks,
    */
-  const downloadTeamsCSV = () => {
+  const downloadQuestionAttemptsCSV = () => {
     // instead of getting from localStorage, use the data fetched from the API
     const csvData: ResultsRecord[] = (data ?? []).map((record) => ({
-      schoolName: record.school,
-      teamId: record.id,
-      totalMarks: record.total_marks,
-      isCountrySchool: record.is_country,
-      student1:
-        (record.students[0]?.name as string) +
-        " (" +
-        record.students[0]?.year_level +
-        ")",
-      student2:
-        (record.students[1]?.name as string) +
-        " (" +
-        record.students[1]?.year_level +
-        ")",
-      student3:
-        (record.students[2]?.name as string) +
-        " (" +
-        record.students[2]?.year_level +
-        ")",
-      student4:
-        (record.students[3]?.name as string) +
-        " (" +
-        record.students[3]?.year_level +
-        ")",
-      maxYearLevel: record.max_year,
+      quizName: record.quiz_name,
+      studentName: record.student_name,
+      studentYearLevel: record.student_year_level,
+      questionId: record.question_id,
+      questionText: record.question_text,
+      isCorrect: record.is_correct,
+      marks: record.marks_awarded,
     }));
 
     if (csvData.length === 0) {
@@ -145,28 +146,23 @@ function TeamLeaderboardIndex() {
 
     // CSV headers in the order you want them
     const csvHeaders = [
-      "School Name",
-      "Team ID",
-      "Total Marks",
-      "Is Country School?",
-      "Student 1",
-      "Student 2",
-      "Student 3",
-      "Student 4",
-      "Max Year Level",
+      "quizName",
+      "studentName",
+      "studentYearLevel",
+      "questionId",
+      "questionText",
+      "isCorrect",
+      "marks",
     ];
 
     // Build each row from csvData
     const csvRows = csvData.map((record) => [
-      record.schoolName,
-      record.teamId,
-      record.totalMarks,
-      record.isCountrySchool ? "Yes" : "No",
-      record.student1,
-      record.student2,
-      record.student3,
-      record.student4,
-      record.maxYearLevel,
+      record.studentName,
+      record.studentYearLevel,
+      record.questionId,
+      record.questionText,
+      record.isCorrect,
+      record.marks,
     ]);
 
     // Convert to CSV string
@@ -180,7 +176,7 @@ function TeamLeaderboardIndex() {
     const link = document.createElement("a");
 
     link.href = url;
-    link.setAttribute("download", "Team_Results_WAJO.csv");
+    link.setAttribute("download", "Student_Results_WAJO.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -192,7 +188,7 @@ function TeamLeaderboardIndex() {
         <SearchInput
           label=""
           value={searchParams.search ?? ""}
-          placeholder="Search Schools and Teams"
+          placeholder="Search Students"
           onSearch={(newSearch: string) => {
             setAndPush({ search: newSearch, page: 1 });
           }}
@@ -201,7 +197,7 @@ function TeamLeaderboardIndex() {
           <Button
             variant="outline"
             className="h-auto"
-            onClick={downloadTeamsCSV}
+            onClick={downloadQuestionAttemptsCSV}
           >
             Download CSV
           </Button>
@@ -210,7 +206,7 @@ function TeamLeaderboardIndex() {
 
       <Suspense fallback={<WaitingLoader />}>
         <div>
-          <TeamDataGrid
+          <QuestionAttemptsDataGrid
             datacontext={data ?? []}
             isLoading={!isReady || isLoading}
             onOrderingChange={onOrderingChange}

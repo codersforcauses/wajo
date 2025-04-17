@@ -115,6 +115,14 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
 
         return Response({"message": "Quiz attempt marked successfully."})
 
+    @action(detail=False, methods=["get"])
+    def quiz_names_and_ids(self, request):
+        """
+        Retrieve only the names and IDs of all admin quizzes.
+        """
+        quizzes = self.filter_queryset(self.queryset).values("id", "name")
+        return Response(quizzes)
+
 
 @permission_classes([AllowAny])
 class QuizViewSet(viewsets.ReadOnlyModelViewSet):
