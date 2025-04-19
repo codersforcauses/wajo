@@ -9,6 +9,7 @@ from .serializers import IndividualResultsSerializer, TeamResultsSerializer, Que
 from ..users.models import School, Student
 from ..team.models import Team
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 
 class IndividualResultsFilter(FilterSet):
@@ -174,7 +175,7 @@ class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
 
 class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    View to retrieve all question attempts for all quiz attempts.
+    View to retrieve all question attempts for a specific quiz.
     """
 
     queryset = QuestionAttempt.objects.all()
@@ -183,6 +184,11 @@ class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         quiz_id = self.request.query_params.get("quiz_id")
-        if quiz_id:
-            queryset = queryset.filter(quiz_attempt__quiz_id=quiz_id)
+        if not quiz_id:
+            raise ValidationError({"quiz_id": "This query parameter is required."})
+        try:
+            quiz_id = int(quiz_id)
+            queryset = queryset.filter(quiz_attempt__quiz=quiz_id)
+        except ValueError:
+            raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
         return queryset

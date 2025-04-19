@@ -2,7 +2,11 @@ import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { ProtectedPage, ResultsLayout, useQuizId } from "@/components/layout";
+import {
+  ProtectedPage,
+  ResultsLayout,
+  useQuizResultsContext,
+} from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import {
   Pagination,
@@ -29,7 +33,7 @@ export default function PageConfig() {
 function InsightPage() {
   const router = useRouter();
   const { query, isReady, push } = router;
-  const quizId = useQuizId();
+  const { quizId, quizName } = useQuizResultsContext();
 
   const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
     search: "",
@@ -236,6 +240,9 @@ function InsightPage() {
 
   return (
     <div className="m-4 space-y-4">
+      <h2 className="flex w-full items-center justify-center text-3xl font-bold">
+        {quizName}
+      </h2>
       <Suspense>
         <Suspense fallback={<div className="h-6 w-6 animate-pulse" />}>
           <Button

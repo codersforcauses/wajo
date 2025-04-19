@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import Footer from "@/components/ui/footer";
 import { WaitingLoader } from "@/components/ui/loading";
 import { useAuth } from "@/context/auth-provider";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { AdminQuizName } from "@/types/quiz";
 import { Role } from "@/types/user";
 
 interface ProtectedPageProps {
@@ -122,13 +124,22 @@ function NotAuthorizedPage() {
   );
 }
 
-// Create a context to store the quizId
-const QuizIdContext = createContext<number | undefined>(undefined);
+// Create a context to store the quiz ID and name for the results pages
+interface QuizResultsContextType {
+  quizId: number;
+  quizName: string | undefined;
+}
+// Create a context to store the quiz ID and name for the results pages
+const QuizResultsContext = createContext<QuizResultsContextType | undefined>(
+  undefined,
+);
 
-export const useQuizId = () => {
-  const context = useContext(QuizIdContext);
+export const useQuizResultsContext = () => {
+  const context = useContext(QuizResultsContext);
   if (!context) {
-    throw new Error("useQuizId must be used within a QuizIdProvider");
+    throw new Error(
+      "useQuizResultsContext must be used within a QuizResultsContext.Provider",
+    );
   }
   return context;
 };
@@ -143,9 +154,15 @@ export function ResultsLayout({ children }: { children: React.ReactNode }) {
     return <div>Error: Quiz ID is missing or invalid</div>;
   }
 
+  // fetch quiz name
+  const { data, isLoading } = useFetchData<AdminQuizName>({
+    queryKey: [`quiz.admin-quizzes.get_quiz_name.${quizId}`],
+    endpoint: `/quiz/admin-quizzes/get_quiz_name/?quiz_id=${quizId}`,
+  });
+  const quizName = data?.name;
   return (
-    <QuizIdContext.Provider value={quizId}>
+    <QuizResultsContext.Provider value={{ quizId, quizName }}>
       <div>{children}</div>
-    </QuizIdContext.Provider>
+    </QuizResultsContext.Provider>
   );
 }

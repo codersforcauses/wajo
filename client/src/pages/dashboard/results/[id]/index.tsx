@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-import { ProtectedPage, ResultsLayout, useQuizId } from "@/components/layout";
+import {
+  ProtectedPage,
+  ResultsLayout,
+  useQuizResultsContext,
+} from "@/components/layout";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
@@ -15,28 +19,35 @@ export default function PageConfig() {
 }
 
 function Index() {
-  const quizId = useQuizId();
+  const { quizId, quizName } = useQuizResultsContext();
   const links = [
-    { href: `${quizId}/individuals`, label: "individuals" },
-    { href: `${quizId}/teams`, label: "teams" },
-    { href: `${quizId}/insights`, label: "insights" },
-    { href: `${quizId}/question-attempts`, label: "question-attempts" },
+    { href: `${quizId}/individuals`, label: "Individuals" },
+    { href: `${quizId}/teams`, label: "Teams" },
+    { href: `${quizId}/insights`, label: "Insights" },
+    { href: `${quizId}/question-attempts`, label: "Question attempts" },
   ];
+  console.log(quizId);
+  console.log(quizName);
   return (
-    <div className="flex h-[80vh] items-center justify-center gap-10">
-      {links.map(({ href, label }) => (
-        <div
-          key={href}
-          className="flex h-40 w-40 items-center justify-center rounded-md border-2 border-yellow hover:bg-yellow"
-        >
-          <Link
-            className="flex h-full w-full items-center justify-center text-center"
-            href={href}
+    <div className="flex h-[80vh] flex-col items-center justify-center gap-20">
+      <h2 className="flex w-full items-center justify-center text-3xl font-bold">
+        {quizName}
+      </h2>
+      <div className="flex items-center justify-center gap-10">
+        {links.map(({ href, label }) => (
+          <div
+            key={href}
+            className="flex h-52 w-52 items-center justify-center rounded-md border-2 border-yellow font-semibold hover:bg-yellow"
           >
-            {label}
-          </Link>
-        </div>
-      ))}
+            <Link
+              className="flex h-full w-full items-center justify-center text-center text-xl"
+              href={href}
+            >
+              {label}
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

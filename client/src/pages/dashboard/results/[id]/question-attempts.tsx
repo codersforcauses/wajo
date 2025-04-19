@@ -2,7 +2,11 @@ import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { ProtectedPage, ResultsLayout, useQuizId } from "@/components/layout";
+import {
+  ProtectedPage,
+  ResultsLayout,
+  useQuizResultsContext,
+} from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -36,7 +40,7 @@ export default function PageConfig() {
 function QuestionAttemptsIndex() {
   const router = useRouter();
   const { query, isReady, push } = router;
-  const quizId = useQuizId();
+  const { quizId, quizName } = useQuizResultsContext();
 
   if (!quizId) {
     return <div>Error: Quiz ID is missing</div>;
@@ -53,7 +57,7 @@ function QuestionAttemptsIndex() {
   const { data, isLoading, error, totalPages } =
     useFetchDataTable<QuestionAttempts>({
       queryKey: [`results.question-attempts.${quizId}`],
-      endpoint: `/results/question-attempts/?quizId=${quizId}`,
+      endpoint: `/results/question-attempts/?quiz_id=${quizId}`,
       searchParams: searchParams,
     });
 
@@ -184,6 +188,9 @@ function QuestionAttemptsIndex() {
 
   return (
     <div className="m-4 space-y-4">
+      <h2 className="flex w-full items-center justify-center text-3xl font-bold">
+        {quizName}
+      </h2>
       <div className="flex justify-between">
         <SearchInput
           label=""

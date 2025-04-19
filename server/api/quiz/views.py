@@ -118,10 +118,29 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def quiz_names_and_ids(self, request):
         """
-        Retrieve only the names and IDs of all admin quizzes.
+        Retrieve only the names and IDs of all competition quizzes.
         """
+        self.queryset = Quiz.objects.filter(status__in=[1, 2]).order_by("-created_at")
         quizzes = self.filter_queryset(self.queryset).values("id", "name")
         return Response(quizzes)
+
+    @action(detail=False, methods=["get"])
+    def get_quiz_name(self, request):
+        """
+        Retrieve the name of a specific quiz by its ID.
+        """
+        quiz_id = request.query_params.get("quiz_id")
+        if not quiz_id:
+            return Response(
+                {"error": "quiz_id is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            quiz = Quiz.objects.get(id=quiz_id)
+            return Response({"name": quiz.name})
+        except Quiz.DoesNotExist:
+            return Response(
+                {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 @permission_classes([AllowAny])

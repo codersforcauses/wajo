@@ -22,8 +22,12 @@ export interface AdminQuizResponse {
   results: AdminQuiz[];
 }
 
-export interface AdminQuizNameResponse {
+export interface AdminQuizNameIdResponse {
   id: number;
+  name: string;
+}
+
+export interface AdminQuizName {
   name: string;
 }
 

@@ -40,7 +40,7 @@ export function QuestionAttemptsDataGrid({
         <Table className="w-full border-collapse text-left shadow-md">
           <TableHeader className="bg-black text-lg font-semibold">
             <TableRow className="hover:bg-muted/0">
-              <TableHead
+              {/* <TableHead
                 className={cn(commonTableHeadClasses, "rounded-tl-lg")}
               >
                 <div className="flex items-center text-white">
@@ -52,7 +52,7 @@ export function QuestionAttemptsDataGrid({
                     <SortIcon />
                   </span>
                 </div>
-              </TableHead>
+              </TableHead> */}
               <TableHead className={cn(commonTableHeadClasses)}>
                 <div className="flex items-center text-white">
                   <span>Student Name</span>
@@ -133,9 +133,9 @@ export function QuestionAttemptsDataGrid({
                     "divide-gray-200 border-gray-50 text-sm text-black"
                   }
                 >
-                  <TableCell className="whitespace-nowrap">
+                  {/* <TableCell className="whitespace-nowrap">
                     {item.quiz_name}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell>{item.student_name}</TableCell>
                   <TableCell>{item.student_year_level}</TableCell>
                   <TableCell>{item.question_id}</TableCell>
