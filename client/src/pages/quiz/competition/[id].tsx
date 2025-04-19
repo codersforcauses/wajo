@@ -118,8 +118,6 @@ export default function CompetitionQuizPage() {
   }, [quizState.timeLeft, quizState.isRunning]);
 
   const handleStartQuiz = () => {
-    // Clear any existing localStorage data
-    // localStorage.removeItem("quizAnswers");
     setQuizState((prev) => ({
       ...prev,
       isDisplayQuiz: true,
@@ -128,12 +126,6 @@ export default function CompetitionQuizPage() {
   };
 
   const handleSubmit = async () => {
-    const savedAnswers = localStorage.getItem("quizAnswers");
-    if (!savedAnswers) {
-      toast.error("No answers found to submit");
-      return;
-    }
-
     setQuizState((prev) => ({
       ...prev,
       isSubmitted: true,

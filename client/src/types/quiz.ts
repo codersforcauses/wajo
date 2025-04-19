@@ -15,6 +15,22 @@ export interface AdminQuiz {
   status: number;
 }
 
+export interface AdminQuizResponse {
+  count: number;
+  next: string;
+  previous: string;
+  results: AdminQuiz[];
+}
+
+export interface AdminQuizNameIdResponse {
+  id: number;
+  name: string;
+}
+
+export interface AdminQuizName {
+  name: string;
+}
+
 export interface AdminQuizSlotRequest {
   question_id: number;
   slot_index: number;

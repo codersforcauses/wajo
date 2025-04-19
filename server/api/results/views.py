@@ -4,11 +4,12 @@ from rest_framework import viewsets, filters, status
 from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
 from django.db.models import Sum, Max
 from django.db.models.functions import Cast
-from ..quiz.models import Quiz, QuizAttempt
-from .serializers import IndividualResultsSerializer, TeamResultsSerializer
+from ..quiz.models import Quiz, QuizAttempt, QuestionAttempt
+from .serializers import IndividualResultsSerializer, TeamResultsSerializer, QuestionAttemptsSerializer
 from ..users.models import School, Student
 from ..team.models import Team
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 
 class IndividualResultsFilter(FilterSet):
@@ -71,6 +72,13 @@ class IndividualResultsViewSet(viewsets.ReadOnlyModelViewSet):
     ]
     ordering = ["-student__year_level"]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        quiz_id = self.request.query_params.get("quiz_id")
+        if quiz_id:
+            queryset = queryset.filter(quiz_id=quiz_id)
+        return queryset
+
 
 class TeamResultsFilter(FilterSet):
     quiz_name = ModelChoiceFilter(
@@ -125,9 +133,10 @@ class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
         return Student.objects.none()
 
     def list(self, request, *args, **kwargs):
-        all_students = Student.objects.all()
+        quiz_id = self.request.query_params.get("quiz_id")
+        all_students = Student.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct() if quiz_id else Student.objects.all()
         scored_students = all_students.filter(quiz_attempts__total_marks__gt=0)
-        all_teams = Team.objects.all()
+        all_teams = Team.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct() if quiz_id else Team.objects.all()
         scored_team = all_teams.filter(
             students__quiz_attempts__total_marks__gt=0
         ).distinct()
@@ -162,3 +171,24 @@ class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
         ]
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    View to retrieve all question attempts for a specific quiz.
+    """
+
+    queryset = QuestionAttempt.objects.all()
+    serializer_class = QuestionAttemptsSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            raise ValidationError({"quiz_id": "This query parameter is required."})
+        try:
+            quiz_id = int(quiz_id)
+            queryset = queryset.filter(quiz_attempt__quiz=quiz_id)
+        except ValueError:
+            raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
+        return queryset
