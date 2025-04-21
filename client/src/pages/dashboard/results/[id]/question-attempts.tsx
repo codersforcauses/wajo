@@ -143,6 +143,8 @@ function QuestionAttemptsIndex() {
       marks: record.marks_awarded,
     }));
 
+    console.log("CSV Data:", csvData);
+
     if (csvData.length === 0) {
       toast.warning("No data available to export.");
       return;
@@ -161,6 +163,7 @@ function QuestionAttemptsIndex() {
 
     // Build each row from csvData
     const csvRows = csvData.map((record) => [
+      record.quizName,
       record.studentName,
       record.studentYearLevel,
       record.questionId,
