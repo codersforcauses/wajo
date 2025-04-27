@@ -72,7 +72,7 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
             serializer = QuizSlotSerializer(instance, many=True)
             return Response(serializer.data)
         if request.method == "POST":
-            # check if the quiz solts already exist, if so, detele them in database
+            # check if the quiz slots already exist, if so, detele them in database
             if QuizSlot.objects.filter(quiz_id=pk).exists():
                 QuizSlot.objects.filter(quiz_id=pk).delete()
 

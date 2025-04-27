@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
 import { QuestionAttemptsDataGrid } from "@/components/ui/Test/question-attempts-data-grid";
-import { useFetchDataTable } from "@/hooks/use-fetch-data";
+import { useFetchData, useFetchDataTable } from "@/hooks/use-fetch-data";
 import {
   OrderingItem,
   orderingToString,
@@ -60,6 +60,19 @@ function QuestionAttemptsIndex() {
       endpoint: `/results/question-attempts/?quiz_id=${quizId}`,
       searchParams: searchParams,
     });
+
+  const {
+    data: nonPaginatedData,
+    isLoading: nonPaginatedIsLoading,
+    error: nonPaginatedError,
+  } = useFetchData<QuestionAttempts>({
+    queryKey: [`results.question-attempts.${quizId}.non-paginated`],
+    endpoint: `/results/question-attempts/non_paginated/?quiz_id=${quizId}`,
+  });
+
+  useEffect(() => {
+    console.log("Non-Paginated Data:", nonPaginatedData);
+  }, [nonPaginatedData]);
 
   useEffect(() => {
     console.log("Search Params:", searchParams);
@@ -132,8 +145,10 @@ function QuestionAttemptsIndex() {
    *   Student Name, year Level, School Type, is Country, Total Marks,
    */
   const downloadQuestionAttemptsCSV = () => {
-    // instead of getting from localStorage, use the data fetched from the API
-    const csvData: ResultsRecord[] = (data ?? []).map((record) => ({
+    console.log("nonPaginatedData:", nonPaginatedData);
+    const csvData: ResultsRecord[] = (
+      Array.isArray(nonPaginatedData) ? nonPaginatedData : []
+    ).map((record) => ({
       quizName: record.quiz_name,
       studentName: record.student_name,
       studentYearLevel: record.student_year_level,

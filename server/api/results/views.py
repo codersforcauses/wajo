@@ -10,6 +10,8 @@ from ..users.models import School, Student
 from ..team.models import Team
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import action, permission_classes
+from rest_framework.permissions import IsAdminUser
 
 
 class IndividualResultsFilter(FilterSet):
@@ -40,6 +42,7 @@ class IndividualResultsFilter(FilterSet):
         fields = ["quiz_name", "quiz_id", "year_level", "school_type"]
 
 
+@permission_classes([IsAdminUser])
 class IndividualResultsViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ResultsView API view to manage Results data.
@@ -110,6 +113,7 @@ class TeamResultsFilter(FilterSet):
         fields = ["quiz_name", "quiz_id", "year_level", "school_type"]
 
 
+@permission_classes([IsAdminUser])
 class TeamResultsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Team.objects.annotate(
         total_marks=Sum("quiz_attempts__total_marks"),
@@ -127,6 +131,7 @@ class TeamResultsViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ["-total_marks"]
 
 
+@permission_classes([IsAdminUser])
 class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
     # need to define get_queryset, but we don't use
     def get_queryset(self):
@@ -184,11 +189,44 @@ class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         quiz_id = self.request.query_params.get("quiz_id")
-        if not quiz_id:
-            raise ValidationError({"quiz_id": "This query parameter is required."})
-        try:
-            quiz_id = int(quiz_id)
-            queryset = queryset.filter(quiz_attempt__quiz=quiz_id)
-        except ValueError:
-            raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
+        if quiz_id:
+            try:
+                quiz_id = int(quiz_id)
+                queryset = queryset.filter(quiz_attempt__quiz=quiz_id)
+            except ValueError:
+                raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if quiz_id:
+            try:
+                quiz_id = int(quiz_id)
+            except ValueError:
+                return Response(
+                    {"detail": "Invalid Quiz ID. Must be an integer."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            quiz = Quiz.objects.filter(id=quiz_id).first()
+            if not quiz:
+                return Response(
+                    {"detail": "Quiz not found."}, status=status.HTTP_404_NOT_FOUND
+                )
+        else:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().list(request, *args, **kwargs)
+
+    # action for getting non-paginated results
+    @action(detail=False, methods=["get"], pagination_class=None)
+    def non_paginated(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        question_attempts = self.get_queryset()
+        serializer = self.get_serializer(question_attempts, many=True)
+        return Response(serializer.data)
