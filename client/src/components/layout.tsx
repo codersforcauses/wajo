@@ -150,16 +150,25 @@ export function ResultsLayout({ children }: { children: React.ReactNode }) {
 
   const quizId = typeof id === "string" ? parseInt(id, 10) : undefined;
 
+  // fetch quiz name
+  const { data, isLoading, error } = useFetchData<AdminQuizName>({
+    queryKey: [`quiz.admin-quizzes.get_quiz_name.${quizId}`],
+    endpoint: `/quiz/admin-quizzes/get_quiz_name/?quiz_id=${quizId}`,
+  });
+
+  const quizName = data?.name;
+
   if (!quizId || isNaN(quizId)) {
     return <div>Error: Quiz ID is missing or invalid</div>;
   }
 
-  // fetch quiz name
-  const { data, isLoading } = useFetchData<AdminQuizName>({
-    queryKey: [`quiz.admin-quizzes.get_quiz_name.${quizId}`],
-    endpoint: `/quiz/admin-quizzes/get_quiz_name/?quiz_id=${quizId}`,
-  });
-  const quizName = data?.name;
+  if (isLoading) {
+    return <WaitingLoader />;
+  }
+
+  if (error) {
+    return <div>Error: Failed to fetch quiz data</div>;
+  }
   return (
     <QuizResultsContext.Provider value={{ quizId, quizName }}>
       <div>{children}</div>

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
 import { TeamDataGrid } from "@/components/ui/Test/team-data-grid";
-import { useFetchDataTable } from "@/hooks/use-fetch-data";
+import { useFetchData, useFetchDataTable } from "@/hooks/use-fetch-data";
 import {
   OrderingItem,
   orderingToString,
@@ -59,6 +59,12 @@ function TeamLeaderboardIndex() {
     });
 
   useEffect(() => {
+    if (data) {
+      console.log("data: ", data);
+    }
+  }, [data]);
+
+  useEffect(() => {
     if (isReady && !isLoading) {
       setSearchParams((prev) => ({
         ordering: (query.ordering as string) || prev.ordering,
@@ -98,6 +104,30 @@ function TeamLeaderboardIndex() {
     });
   };
 
+  const [exportIsClicked, setExportIsClicked] = useState(false);
+
+  const {
+    data: nonPaginatedData,
+    isLoading: nonPaginatedIsLoading,
+    error: nonPaginatedError,
+  } = useFetchData<TeamLeaderboard>({
+    queryKey: [`results.team.${quizId}.non-paginated`],
+    endpoint: `/results/team/non_paginated/?quiz_id=${quizId}`,
+    enabled: exportIsClicked,
+  });
+
+  useEffect(() => {
+    if (exportIsClicked && !nonPaginatedIsLoading && nonPaginatedData) {
+      console.log(
+        "Request URL:",
+        `/results/team/non_paginated/?quiz_id=${quizId}`,
+      );
+      console.log("nonPaginatedData: ", nonPaginatedData);
+      downloadTeamsCSV(nonPaginatedData);
+      setExportIsClicked(false); // Reset the state
+    }
+  }, [exportIsClicked, nonPaginatedData, nonPaginatedIsLoading]);
+
   if (error) return <div>Error: {error.message}</div>;
 
   // For CSV export
@@ -119,82 +149,88 @@ function TeamLeaderboardIndex() {
    *   School Name, Team Id, Total Marks, Is Country, Max Year Level, Student 1, Student 2, Student 3
    *   Student 4
    */
-  const downloadTeamsCSV = () => {
-    // instead of getting from localStorage, use the data fetched from the API
-    const csvData: ResultsRecord[] = (data ?? []).map((record) => ({
-      schoolName: record.school,
-      teamId: record.id,
-      totalMarks: record.total_marks,
-      isCountrySchool: record.is_country,
-      student1:
-        (record.students[0]?.name as string) +
-        " (" +
-        record.students[0]?.year_level +
-        ")",
-      student2:
-        (record.students[1]?.name as string) +
-        " (" +
-        record.students[1]?.year_level +
-        ")",
-      student3:
-        (record.students[2]?.name as string) +
-        " (" +
-        record.students[2]?.year_level +
-        ")",
-      student4:
-        (record.students[3]?.name as string) +
-        " (" +
-        record.students[3]?.year_level +
-        ")",
-      maxYearLevel: record.max_year,
-    }));
+  const downloadTeamsCSV = (data: TeamLeaderboard) => {
+    if (exportIsClicked && nonPaginatedData && !nonPaginatedIsLoading) {
+      // instead of getting from localStorage, use the data fetched from the API
+      const csvData: ResultsRecord[] = (Array.isArray(data) ? data : []).map(
+        (record) => ({
+          schoolName: record.school,
+          teamId: record.id,
+          totalMarks: record.total_marks,
+          isCountrySchool: record.is_country,
+          student1:
+            (record.students[0]?.name as string) +
+            " (" +
+            record.students[0]?.year_level +
+            ")",
+          student2:
+            (record.students[1]?.name as string) +
+            " (" +
+            record.students[1]?.year_level +
+            ")",
+          student3:
+            (record.students[2]?.name as string) +
+            " (" +
+            record.students[2]?.year_level +
+            ")",
+          student4:
+            (record.students[3]?.name as string) +
+            " (" +
+            record.students[3]?.year_level +
+            ")",
+          maxYearLevel: record.max_year,
+        }),
+      );
 
-    if (csvData.length === 0) {
-      toast.warning("No data available to export.");
-      return;
+      console.log("csv data: ", csvData);
+
+      if (csvData.length === 0) {
+        toast.warning("No data available to export.");
+        return;
+      }
+
+      // CSV headers in the order you want them
+      const csvHeaders = [
+        "School Name",
+        "Team ID",
+        "Total Marks",
+        "Is Country School?",
+        "Student 1",
+        "Student 2",
+        "Student 3",
+        "Student 4",
+        "Max Year Level",
+      ];
+
+      // Build each row from csvData
+      const csvRows = csvData.map((record) => [
+        record.schoolName,
+        record.teamId,
+        record.totalMarks,
+        record.isCountrySchool ? "Yes" : "No",
+        record.student1,
+        record.student2,
+        record.student3,
+        record.student4,
+        record.maxYearLevel,
+      ]);
+
+      // Convert to CSV string
+      const csvContent = [csvHeaders, ...csvRows]
+        .map((row) => row.map((value) => `"${value}"`).join(","))
+        .join("\n");
+
+      // Trigger a download
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.setAttribute("download", "Team_Results_WAJO.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
-
-    // CSV headers in the order you want them
-    const csvHeaders = [
-      "School Name",
-      "Team ID",
-      "Total Marks",
-      "Is Country School?",
-      "Student 1",
-      "Student 2",
-      "Student 3",
-      "Student 4",
-      "Max Year Level",
-    ];
-
-    // Build each row from csvData
-    const csvRows = csvData.map((record) => [
-      record.schoolName,
-      record.teamId,
-      record.totalMarks,
-      record.isCountrySchool ? "Yes" : "No",
-      record.student1,
-      record.student2,
-      record.student3,
-      record.student4,
-      record.maxYearLevel,
-    ]);
-
-    // Convert to CSV string
-    const csvContent = [csvHeaders, ...csvRows]
-      .map((row) => row.map((value) => `"${value}"`).join(","))
-      .join("\n");
-
-    // Trigger a download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.setAttribute("download", "Team_Results_WAJO.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   return (
@@ -215,7 +251,9 @@ function TeamLeaderboardIndex() {
           <Button
             variant="outline"
             className="h-auto"
-            onClick={downloadTeamsCSV}
+            onClick={() => {
+              setExportIsClicked(true);
+            }}
           >
             Download CSV
           </Button>

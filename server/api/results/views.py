@@ -57,7 +57,6 @@ class IndividualResultsViewSet(viewsets.ReadOnlyModelViewSet):
         - get(request): Handles GET requests. Returns sample data for the Results.
     """
 
-    queryset = QuizAttempt.objects.select_related("quiz", "student__school")
     serializer_class = IndividualResultsSerializer
     filterset_class = IndividualResultsFilter
     filter_backends = [
@@ -76,11 +75,24 @@ class IndividualResultsViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ["-student__year_level"]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = QuizAttempt.objects.select_related("quiz", "student__school")
         quiz_id = self.request.query_params.get("quiz_id")
         if quiz_id:
             queryset = queryset.filter(quiz_id=quiz_id)
         return queryset
+
+    # action for getting non-paginated results
+    @action(detail=False, methods=["get"], pagination_class=None)
+    def non_paginated(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        individual_results = self.get_queryset()
+        serializer = self.get_serializer(individual_results, many=True)
+        return Response(serializer.data)
 
 
 class TeamResultsFilter(FilterSet):
@@ -115,10 +127,20 @@ class TeamResultsFilter(FilterSet):
 
 @permission_classes([IsAdminUser])
 class TeamResultsViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Team.objects.annotate(
-        total_marks=Sum("quiz_attempts__total_marks"),
-        max_year=Max(Cast("students__year_level", output_field=BigIntegerField())),
-    )
+    def get_queryset(self):
+        quiz_id = self.request.query_params.get("quiz_id")
+        queryset = Team.objects.annotate(
+                    total_marks=Sum("quiz_attempts__total_marks"),
+                    max_year=Max(Cast("students__year_level", output_field=BigIntegerField())),
+                )
+        if quiz_id:
+            try:
+                quiz_id = int(quiz_id)
+                queryset = queryset.filter(quiz_attempts__quiz=quiz_id)                
+            except ValueError:
+                raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
+        return queryset
+
     serializer_class = TeamResultsSerializer
     filterset_class = TeamResultsFilter
     filter_backends = [
@@ -129,6 +151,19 @@ class TeamResultsViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ["school__name", "id"]
     ordering_fields = ["total_marks", "max_year", "id", "school__name"]
     ordering = ["-total_marks"]
+
+    # action for getting non-paginated results
+    @action(detail=False, methods=["get"], pagination_class=None)
+    def non_paginated(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        team_results = self.get_queryset()
+        serializer = self.get_serializer(team_results, many=True)
+        return Response(serializer.data)
 
 
 @permission_classes([IsAdminUser])
@@ -187,8 +222,8 @@ class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = QuestionAttemptsSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset()
         quiz_id = self.request.query_params.get("quiz_id")
+        queryset = self.queryset
         if quiz_id:
             try:
                 quiz_id = int(quiz_id)

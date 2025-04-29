@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
 import { IndividualDataGrid } from "@/components/ui/Test/individual-data-grid";
-import { useFetchDataTable } from "@/hooks/use-fetch-data";
+import { useFetchData, useFetchDataTable } from "@/hooks/use-fetch-data";
 import {
   OrderingItem,
   orderingToString,
@@ -100,6 +100,25 @@ function IndividualLeaderboardIndex() {
     });
   };
 
+  const [exportIsClicked, setExportIsClicked] = useState(false);
+
+  const {
+    data: nonPaginatedData,
+    isLoading: nonPaginatedIsLoading,
+    error: nonPaginatedError,
+  } = useFetchData<IndividualLeaderboard>({
+    queryKey: [`results.individual.${quizId}.non-paginated`],
+    endpoint: `/results/individual/non_paginated/?quiz_id=${quizId}`,
+    enabled: exportIsClicked,
+  });
+
+  useEffect(() => {
+    if (exportIsClicked && !nonPaginatedIsLoading && nonPaginatedData) {
+      downloadStudentsCSV(nonPaginatedData);
+      setExportIsClicked(false); // Reset the state
+    }
+  }, [exportIsClicked, nonPaginatedData, nonPaginatedIsLoading]);
+
   if (error) return <div>Error: {error.message}</div>;
   if (!isReady || isLoading) return <WaitingLoader />;
 
@@ -118,16 +137,18 @@ function IndividualLeaderboardIndex() {
    * The CSV will contain the following columns:
    *   Student Name, year Level, School Type, is Country, Total Marks,
    */
-  const downloadStudentsCSV = () => {
+  const downloadStudentsCSV = (data: IndividualLeaderboard) => {
     // instead of getting from localStorage, use the data fetched from the API
-    const csvData: ResultsRecord[] = (data ?? []).map((record) => ({
-      studentName: record.name,
-      yearLevel: record.year_level,
-      schoolName: record.school,
-      schoolType: record.school_type,
-      isCountrySchool: record.is_country,
-      totalMarks: record.total_marks,
-    }));
+    const csvData: ResultsRecord[] = (Array.isArray(data) ? data : []).map(
+      (record) => ({
+        studentName: record.name,
+        yearLevel: record.year_level,
+        schoolName: record.school,
+        schoolType: record.school_type,
+        isCountrySchool: record.is_country,
+        totalMarks: record.total_marks,
+      }),
+    );
 
     if (csvData.length === 0) {
       toast.warning("No data available to export.");
@@ -189,7 +210,9 @@ function IndividualLeaderboardIndex() {
           <Button
             variant="outline"
             className="h-auto"
-            onClick={downloadStudentsCSV}
+            onClick={() => {
+              setExportIsClicked(true);
+            }}
           >
             Download CSV
           </Button>

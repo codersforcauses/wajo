@@ -61,6 +61,8 @@ function QuestionAttemptsIndex() {
       searchParams: searchParams,
     });
 
+  const [exportIsClicked, setExportIsClicked] = useState(false);
+
   const {
     data: nonPaginatedData,
     isLoading: nonPaginatedIsLoading,
@@ -68,6 +70,7 @@ function QuestionAttemptsIndex() {
   } = useFetchData<QuestionAttempts>({
     queryKey: [`results.question-attempts.${quizId}.non-paginated`],
     endpoint: `/results/question-attempts/non_paginated/?quiz_id=${quizId}`,
+    enabled: exportIsClicked,
   });
 
   useEffect(() => {
@@ -122,8 +125,14 @@ function QuestionAttemptsIndex() {
 
   useEffect(() => {
     console.log("Data fetched:", data);
-  }),
-    [data];
+  }, [data]);
+
+  useEffect(() => {
+    if (exportIsClicked && !nonPaginatedIsLoading && nonPaginatedData) {
+      downloadQuestionAttemptsCSV(nonPaginatedData);
+      setExportIsClicked(false); // Reset the state
+    }
+  }, [exportIsClicked, nonPaginatedData, nonPaginatedIsLoading]);
 
   if (error) return <div>Error: {error.message}</div>;
   if (!isReady || isLoading) return <WaitingLoader />;
@@ -144,64 +153,66 @@ function QuestionAttemptsIndex() {
    * The CSV will contain the following columns:
    *   Student Name, year Level, School Type, is Country, Total Marks,
    */
-  const downloadQuestionAttemptsCSV = () => {
-    console.log("nonPaginatedData:", nonPaginatedData);
-    const csvData: ResultsRecord[] = (
-      Array.isArray(nonPaginatedData) ? nonPaginatedData : []
-    ).map((record) => ({
-      quizName: record.quiz_name,
-      studentName: record.student_name,
-      studentYearLevel: record.student_year_level,
-      questionId: record.question_id,
-      questionText: record.question_text,
-      isCorrect: record.is_correct,
-      marks: record.marks_awarded,
-    }));
+  const downloadQuestionAttemptsCSV = (data: QuestionAttempts) => {
+    if (exportIsClicked && nonPaginatedData && !nonPaginatedIsLoading) {
+      console.log("nonPaginatedData:", data);
+      const csvData: ResultsRecord[] = (Array.isArray(data) ? data : []).map(
+        (record) => ({
+          quizName: record.quiz_name,
+          studentName: record.student_name,
+          studentYearLevel: record.student_year_level,
+          questionId: record.question_id,
+          questionText: record.question_text,
+          isCorrect: record.is_correct,
+          marks: record.marks_awarded,
+        }),
+      );
 
-    console.log("CSV Data:", csvData);
+      console.log("CSV Data:", csvData);
 
-    if (csvData.length === 0) {
-      toast.warning("No data available to export.");
-      return;
+      if (csvData.length === 0) {
+        toast.warning("No data available to export. Please try again.");
+        return;
+      }
+
+      // CSV headers in the order you want them
+      const csvHeaders = [
+        "quizName",
+        "studentName",
+        "studentYearLevel",
+        "questionId",
+        "questionText",
+        "isCorrect",
+        "marks",
+      ];
+
+      // Build each row from csvData
+      const csvRows = csvData.map((record) => [
+        record.quizName,
+        record.studentName,
+        record.studentYearLevel,
+        record.questionId,
+        record.questionText,
+        record.isCorrect,
+        record.marks,
+      ]);
+
+      // Convert to CSV string
+      const csvContent = [csvHeaders, ...csvRows]
+        .map((row) => row.map((value) => `"${value}"`).join(","))
+        .join("\n");
+
+      // Trigger a download
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.setAttribute("download", "Student_Results_WAJO.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
-
-    // CSV headers in the order you want them
-    const csvHeaders = [
-      "quizName",
-      "studentName",
-      "studentYearLevel",
-      "questionId",
-      "questionText",
-      "isCorrect",
-      "marks",
-    ];
-
-    // Build each row from csvData
-    const csvRows = csvData.map((record) => [
-      record.quizName,
-      record.studentName,
-      record.studentYearLevel,
-      record.questionId,
-      record.questionText,
-      record.isCorrect,
-      record.marks,
-    ]);
-
-    // Convert to CSV string
-    const csvContent = [csvHeaders, ...csvRows]
-      .map((row) => row.map((value) => `"${value}"`).join(","))
-      .join("\n");
-
-    // Trigger a download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.setAttribute("download", "Student_Results_WAJO.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   return (
@@ -222,7 +233,9 @@ function QuestionAttemptsIndex() {
           <Button
             variant="outline"
             className="h-auto"
-            onClick={downloadQuestionAttemptsCSV}
+            onClick={() => {
+              setExportIsClicked(true);
+            }}
           >
             Download CSV
           </Button>

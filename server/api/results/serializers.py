@@ -60,6 +60,7 @@ class TeamResultsSerializer(serializers.ModelSerializer):
     a team, including their members, scores, and participation status.
     """
 
+    name = serializers.StringRelatedField()
     school = serializers.StringRelatedField()
     is_country = serializers.BooleanField(source="school.is_country")
     students = StudentSerializer(many=True)
@@ -68,7 +69,7 @@ class TeamResultsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ["school", "id", "total_marks", "is_country", "students", "max_year"]
+        fields = ["name", "school", "id", "total_marks", "is_country", "students", "max_year"]
 
     def to_representation(self, instance):
         """Sort students by ID before returning the response."""
