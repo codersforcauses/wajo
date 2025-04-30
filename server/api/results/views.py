@@ -97,12 +97,14 @@ class IndividualResultsViewSet(viewsets.ReadOnlyModelViewSet):
 
 class TeamResultsFilter(FilterSet):
     quiz_name = ModelChoiceFilter(
-        field_name="quiz_attempt__quiz__name",
+        field_name="quiz_attempts__quiz__name",  # Correctly reference the quiz name
+        # field_name="quiz_attempt__quiz__name",
         queryset=Quiz.objects.all(),
         label="Quiz Name",
         to_field_name="name",
     )
     quiz_id = ModelChoiceFilter(
+        field_name="quiz_attempts__quiz__id",  # Correctly reference the quiz ID
         queryset=Quiz.objects.all().values_list("id", flat=True),
         label="Quiz ID",
     )
@@ -129,16 +131,22 @@ class TeamResultsFilter(FilterSet):
 class TeamResultsViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         quiz_id = self.request.query_params.get("quiz_id")
-        queryset = Team.objects.annotate(
-                    total_marks=Sum("quiz_attempts__total_marks"),
-                    max_year=Max(Cast("students__year_level", output_field=BigIntegerField())),
-                )
-        if quiz_id:
-            try:
-                quiz_id = int(quiz_id)
-                queryset = queryset.filter(quiz_attempts__quiz=quiz_id)                
-            except ValueError:
-                raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
+        if not quiz_id:
+            raise ValidationError({"quiz_id": "This query parameter is required."})
+
+        try:
+            quiz_id = int(quiz_id)
+        except ValueError:
+            raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
+
+        # Filter teams that are referenced in the `team` field of a QuizAttempt for the given quiz
+        queryset = Team.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct()
+
+        # Annotate additional fields for the queryset
+        queryset = queryset.annotate(
+            total_marks=Sum("quiz_attempts__total_marks"),
+            max_year=Max(Cast("students__year_level", output_field=BigIntegerField())),
+        )
         return queryset
 
     serializer_class = TeamResultsSerializer

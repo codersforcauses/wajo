@@ -17,6 +17,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, serializers, filters
 from datetime import timedelta
 from django.utils.timezone import now
+from api.team.models import TeamMember
 
 
 @permission_classes([IsAdminUser])
@@ -276,7 +277,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(
                 {"error": "Quiz has finished"}, status=status.HTTP_404_NOT_FOUND
             )
-        # check the attemt is available or not
+        # check the attempt is available or not
         elif is_available is True:
             return self._get_slots_response(pk, existing_attempt, user)
         else:
@@ -358,8 +359,10 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
             # run attempt.is_available to update the dead_line
             attempt.is_available
             end_time = attempt.dead_line
+            quiz_attempt_id = attempt.id
         else:
             end_time = existing_attempt.dead_line
+            quiz_attempt_id = existing_attempt.id
         # wrap the end_time into the response
         instances = QuizSlot.objects.filter(quiz_id=quiz_id)
         serializer = CompQuizSlotSerializer(instances, many=True)
@@ -368,7 +371,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
             {
                 "data": serializer.data,
                 "end_time": end_time,
-                "quiz_attempt_id": existing_attempt.id,
+                "quiz_attempt_id": quiz_attempt_id,
             },
             status=status.HTTP_200_OK,
         )
@@ -397,6 +400,13 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if hasattr(self.request.user, "student"):
             student_id = self.request.user.student.id
+            print("\n\n-----------------------------------------")
+            print("QUIZ ATTEMPT qet_queryset")
+            print("-----------------------------------------")
+            print("student_id: ", student_id)
+            print("queryset: ", QuizAttempt.objects.filter(student_id=student_id))
+            print("-----------------------------------------")
+            print("-----------------------------------------\n\n")
             return QuizAttempt.objects.filter(student_id=student_id)
         elif hasattr(self.request.user, "teacher"):
             return QuizAttempt.objects.filter(
@@ -417,19 +427,47 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
         """
         Create a new quiz attempt. Ensure that a user can only have one active attempt per quiz.
         """
+        print("\n\n-----------------------------------------")
+        print("QUIZ ATTEMPT create method")
+        print("-----------------------------------------")
+        print("request.data: ", request.data)
+        print("request.user: ", request.user)
+        print("request.user.student: ", request.user.student)
+        print("request.user.student.id: ", request.user.student.id)
+        print("request.user.student.quiz_attempts: ", request.user.student.quiz_attempts)
+        print("request.user.student.quiz_attempts.all(): ", request.user.student.quiz_attempts.all())
+        print("-----------------------------------------")
+        print("-----------------------------------------\n\n")
         quiz_id = request.data.get("quiz")
         student_id = request.data.get("student")
+
+        # find the team the student belongs to
+        team_member = TeamMember.objects.filter(student=student_id).first()
+        team = team_member.team if team_member else None
+
+        print("\n\n-----------------------------------------")
+        print("QUIZ ATTEMPT create")
+        print("-----------------------------------------")
+        print("quiz_id: ", quiz_id)
+        print("student_id: ", student_id)
+        print("team_member: ", team_member)
+        print("team: ", team)
+        print("-----------------------------------------")
+        print("-----------------------------------------\n\n")
+
         existing_attempt = QuizAttempt.objects.filter(
             quiz_id=quiz_id, student_id=student_id
         ).first()
 
         if existing_attempt:
-            serializer = self.get_serializer(existing_attempt)
-            data = serializer.data
-            if not data.is_available:
+            
+            if not existing_attempt.is_available:
                 return Response(
                     {"error": "Quiz has finished"}, status=status.HTTP_403_FORBIDDEN
                 )
+            
+            serializer = self.get_serializer(existing_attempt)
+            data = serializer.data
 
             # switch cases by state
             match existing_attempt.state:
@@ -455,7 +493,14 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
                         status=status.HTTP_403_FORBIDDEN,
                     )
         else:
-            return super().create(request, *args, **kwargs)
+            # return super().create(request, *args, **kwargs)
+            # Create a new QuizAttempt and assign the team
+            data = request.data.copy()
+            data["team"] = team.id if team else None  # Assign the team ID or None if no team is found
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -465,6 +510,10 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
                 if int(data.get("state")) == QuizAttempt.State.SUBMITTED:
                     # set the time_finish to the current time
                     data["time_finish"] = now()
+
+                # Preserve the team if not in request data
+                if "team" not in data and instance.team:
+                    data["team"] = instance.team.id
 
                 serializer = self.get_serializer(instance, data=data)
                 serializer.is_valid(raise_exception=True)
@@ -499,7 +548,17 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
             )
         attempt.state = QuizAttempt.State.SUBMITTED
         attempt.time_finish = now()
-        attempt.save()
+        attempt.save(update_fields=['state', 'time_finish'])
+        # team = attempt.get("team", None)
+        print("\n\n-----------------------------------------")
+        print("QUIZ ATTEMPT submit method")
+        print("-----------------------------------------")
+        print("attempt: ", attempt)
+        print("attempt.state: ", attempt.state)
+        print("attempt.time_finish: ", attempt.time_finish)
+        print("attempt.team: ", attempt.team)
+        print("-----------------------------------------")
+        print("-----------------------------------------\n\n")
         return Response({"message": "Quiz attempt submitted successfully."})
 
 

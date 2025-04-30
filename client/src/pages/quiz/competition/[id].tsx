@@ -70,6 +70,26 @@ export default function CompetitionQuizPage() {
     enabled: !!quizSlot && quizState.isDisplayQuiz,
   });
 
+  // if no quiz attempt data, create a new quiz attempt
+  const { mutate: createQuizAttempt } = usePostMutation<QuizAttempt>({
+    mutationKey: [`quiz.quiz-attempts.${compId}.${primaryId}`],
+    endpoint: `/quiz/quiz-attempts/`,
+    onSuccess: (data) => {
+      setQuizState((prev) => ({
+        ...prev,
+        isQuizAttempt: true,
+      }));
+      toast.success("Quiz attempt created successfully");
+    },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.error ||
+          err?.message ||
+          "Failed to create quiz attempt.",
+      );
+    },
+  });
+
   // Submit quiz
   const { data, isLoading, isError, error, isSuccess } = useFetchData<{
     message: string;
@@ -94,6 +114,22 @@ export default function CompetitionQuizPage() {
       setQuizState((prev) => ({ ...prev, isQuizAttempt: true }));
     }
   }, [quizAttemptData]);
+
+  useEffect(() => {
+    // Check if quizAttemptData is empty and create a new quiz attempt if necessary
+    if (
+      quizState.isDisplayQuiz &&
+      !quizAttemptData &&
+      !isQuizAttemptDataLoading
+    ) {
+      console.log("No quiz attempt found. Creating a new quiz attempt...");
+      createQuizAttempt({
+        quiz: compId, // The current quiz ID
+        student: primaryId, // The current student's ID
+      });
+      setQuizState((prev) => ({ ...prev, isQuizAttempt: true }));
+    }
+  }, [quizAttemptData, quizState.isDisplayQuiz, isQuizAttemptDataLoading]);
 
   useEffect(() => {
     setQuizState((prev) => ({ ...prev, timeLeft: calculateTimeLeft() }));

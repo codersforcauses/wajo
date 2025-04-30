@@ -80,14 +80,13 @@ export default function GenericQuiz({
   );
 
   useEffect(() => {
-    if (questionData && questionData.results) {
+    if (questionData && questionData.results && quizAttempt) {
       const attempts = questionData.results.filter(
         (qa) => qa.quiz_attempt === quizAttempt.results[0].id,
       );
       setQuestionAttempts(attempts);
       console.log("filtered attempts: ", attempts);
       console.log("questionData", questionData);
-      // console.log("questionAttempts", questionAttempts);
     }
   }, [questionData, quizAttempt]);
 
@@ -182,6 +181,15 @@ export default function GenericQuiz({
         // console.log("currentAnswer", currentAnswer);
         if (currentAnswer) {
           console.log("Saving currentAnswer to the backend: ", currentAnswer);
+          console.log("quizAttempt: ", quizAttempt);
+
+          const quizAttemptResult = quizAttempt?.results?.[0];
+          if (!quizAttemptResult) {
+            console.error("No quiz attempt found for saving answers.");
+            toast.error("Failed to save answers: No quiz attempt found.");
+            return;
+          }
+
           saveAnswer({
             student: quizAttempt.results[0].student,
             question: currentAnswer.question,

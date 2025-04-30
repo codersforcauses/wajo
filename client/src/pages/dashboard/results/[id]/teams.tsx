@@ -54,7 +54,7 @@ function TeamLeaderboardIndex() {
   const { data, isLoading, error, totalPages } =
     useFetchDataTable<TeamLeaderboard>({
       queryKey: [`results.team.${quizId}`],
-      endpoint: `/results/team/?quizId=${quizId}`,
+      endpoint: `/results/team/?quiz_id=${quizId}`,
       searchParams: searchParams,
     });
 
