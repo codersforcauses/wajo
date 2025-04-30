@@ -8,7 +8,7 @@ import type { Profile } from "@/types/user";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
-  const roles = [Role.ADMIN, Role.TEACHER];
+  const roles = [Role.ADMIN, Role.TEACHER, Role.STUDENT];
   return (
     <ProtectedPage requiredRoles={roles}>
       <UserProfile />
@@ -27,10 +27,34 @@ const UserProfile = () => {
 
   return (
     <div>
-      <h1>{data.username}</h1>
-      <p>Teacher ID: {data.teacher_id}</p>
-      <p>School ID: {data.school_id}</p>
-      {/* Render other profile details as needed */}
+      <h1>
+        {data.first_name} {data.last_name}'s Profile
+      </h1>
+      <p>Username: {data.username}</p>
+      <p>Role: {data.role}</p>
+      {data.role === "student" && (
+        // Render student-specific details
+        <div>
+          <p>Year Level: {data.year_level}</p>
+          <p>School: {data.school_name}</p>
+        </div>
+      )}
+      {data.role === "teacher" && (
+        // Render teacher-specific details
+        <div>
+          <p>School: {data.school_name}</p>
+          <p>School type: {data.school_type}</p>
+          <p>Email: {data.teacher_email}</p>
+          <p>Phone: {data.phone}</p>
+        </div>
+      )}
+      {data.role === "admin" && (
+        // Render admin-specific details
+        <div>
+          <p>Is staff? {data.is_staff}</p>
+          <p>Is superuser? {data.is_superuser}</p>
+        </div>
+      )}
     </div>
   );
 };

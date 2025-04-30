@@ -15,6 +15,16 @@ const nextConfig = {
         hostname: "localhost",
         port: "8000", // Allow images from Django backend
       },
+      {
+        protocol: "https",
+        hostname: "wajo.duck.ceo",
+        port: "",
+      },
+      {
+        protocol: "http",
+        hostname: "wajo.duck.ceo",
+        port: "",
+      },
     ],
   },
   // dumb fix for windows docker

@@ -31,8 +31,8 @@ import {
   AdminQuiz,
   AdminQuizSlot,
   AdminQuizSlotRequest,
+  createCompetitionTestSchema,
   createSlotsSchema,
-  genericCreateTestSchema,
   mapBlocksToSlots,
   mapSlotsToBlocks,
 } from "@/types/quiz";
@@ -47,7 +47,7 @@ export default function PageConfig() {
   );
 }
 
-type UpdateCompetition = z.infer<typeof genericCreateTestSchema>;
+type UpdateCompetition = z.infer<typeof createCompetitionTestSchema>;
 type UpdateCompetitionSlots = z.infer<typeof createSlotsSchema>;
 
 function Create() {
@@ -87,7 +87,7 @@ function Create() {
 
 function UpdateCompetitionForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
   const form = useForm<UpdateCompetition>({
-    resolver: zodResolver(genericCreateTestSchema),
+    resolver: zodResolver(createCompetitionTestSchema),
     defaultValues: {
       name: adminQuiz.name,
       intro: adminQuiz.intro,
@@ -144,7 +144,7 @@ function UpdateCompetitionForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
             <Button
               type="button"
               onClick={handleFetch}
-              variant={"link"}
+              variant={"ghost"}
               disabled={markCompetition.isPending}
               className="rounded-lg border-green-700 p-2 text-2xl font-black text-green-700 outline-double"
             >

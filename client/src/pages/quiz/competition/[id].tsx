@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { WaitingLoader } from "@/components/ui/loading";
 import ButtonList from "@/components/ui/Quiz/button-list";
 import { CompStart } from "@/components/ui/Quiz/comp-start";
-import GenericQuiz from "@/components/ui/Quiz/generic-quiz";
 import QuizIntro from "@/components/ui/Quiz/quiz-intro";
 import SubmissionPopup from "@/components/ui/submission-popup";
 import { useAuth } from "@/context/auth-provider";

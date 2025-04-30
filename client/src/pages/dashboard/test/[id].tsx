@@ -19,10 +19,6 @@ import { Input } from "@/components/ui/input";
 import { WaitingLoader } from "@/components/ui/loading";
 import { QuestionBlockManager } from "@/components/ui/Test/question-block-manager";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  DateTimePicker,
-  DateTimePickerFormat,
-} from "@/components/ui/time-picker/date-time-picker";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { usePutMutation } from "@/hooks/use-put-data";
@@ -89,9 +85,7 @@ function UpdatePracticeForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
     defaultValues: {
       name: adminQuiz.name,
       intro: adminQuiz.intro,
-      open_time_date: new Date(),
       time_limit: adminQuiz.time_limit,
-      time_window: adminQuiz.time_window,
     },
   });
 
@@ -113,9 +107,7 @@ function UpdatePracticeForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
       name: data.name,
       intro: data.intro,
       total_marks: data.total_marks,
-      open_time_date: data.open_time_date,
       time_limit: data.time_limit,
-      time_window: data.time_window,
     });
   };
 
@@ -144,22 +136,6 @@ function UpdatePracticeForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
                         placeholder="Please input test name"
                         className="w-full"
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="flex-none">
-              {/* Open Time */}
-              <FormField
-                name="open_time_date"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="mt-2 flex flex-col gap-1.5">
-                    <FormLabel>Open Time {requiredStar}</FormLabel>
-                    <FormControl>
-                      <DateTimePicker field={field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -201,29 +177,6 @@ function UpdatePracticeForm({ adminQuiz }: { adminQuiz: AdminQuiz }) {
                         onChange={(e) =>
                           field.onChange(Number(e.target.value) || 0)
                         }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="flex-auto">
-              {/* Time Window */}
-              <FormField
-                name="time_window"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="mt-2 flex flex-col gap-1.5">
-                    <FormLabel>Time Window</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        placeholder="Please input time window"
-                        onChange={(e) =>
-                          field.onChange(Number(e.target.value) || 0)
-                        } // Convert to number
                       />
                     </FormControl>
                     <FormMessage />
