@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 interface CountdownTimerProps {
@@ -16,13 +17,14 @@ export default function CountdownTimer({
   const [timeLeft, setTimeLeft] = useState<string | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [isWarning, setIsWarning] = useState(false);
+  const router = useRouter();
   const calculateTimeLeft = () => {
     if (!targetDate) {
       return null; // Return null if targetDate is undefined
     }
     const endDate = new Date(targetDate);
     const difference = endDate.getTime() - new Date().getTime();
-    console.log("Difference in milliseconds:", difference);
+    // console.log("Difference in milliseconds:", difference);
 
     if (difference <= 0) {
       setTimeLeft("00:00:00");
@@ -49,7 +51,10 @@ export default function CountdownTimer({
     return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
   useEffect(() => {
-    setIsComplete(false);
+    if (isComplete) {
+      router.push("/");
+      // Don't set up interval if already complete
+    }
 
     // Calculate initial time left
     const initialTimeLeft = calculateTimeLeft();
@@ -70,7 +75,7 @@ export default function CountdownTimer({
         clearInterval(timerId);
       }
     }, 1000);
-  }, []);
+  }, [isComplete]);
 
   return (
     <div className={className}>

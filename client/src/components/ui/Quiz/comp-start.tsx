@@ -20,12 +20,14 @@ import QuizQuestionCard from "@/components/ui/Quiz/quiz-question-card";
 import WajoLogo from "@/components/wajo-logo";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePostMutation } from "@/hooks/use-post-data";
+import api from "@/lib/api";
 import { useThrottle } from "@/lib/utils";
 import { Layout } from "@/types/question";
 import {
   Competition,
   CompetitionResponse,
   CompetitionSlot,
+  CompetitionSubmitResponse,
   GetPagedList,
   QuestionAttempt,
   QuizAttempt,
@@ -164,6 +166,25 @@ export function CompStart({
 
       // TODO: Submit the answers
       // Log final answers before showing results
+      // popup to make sure student want to submit
+      if (
+        window.confirm(
+          "Are you sure you want to submit? You won't be able to change your answers after this.",
+        )
+      ) {
+        api
+          .get(`/quiz/competition/${compId}/submit/`)
+          .then((response) => {
+            console.log("Submission successful:", response.data);
+          })
+          .catch((error) => {
+            console.error("Error during submission:", error);
+          });
+        window.alert("Your answers have been submitted successfully.");
+        // refresh the page to get the latest data
+        window.location.reload();
+        router.push("/");
+      }
       console.log("Final answers:", userAnswers);
     }
   };
@@ -242,7 +263,7 @@ export function CompStart({
                 userAnswers[index]?.trim() !== "" &&
                 !validationErrors[index] &&
                 userAnswers[index] !== undefined;
-              console.log("isAnswered", isAnswered);
+              // console.log("isAnswered", isAnswered);
               const hasError =
                 userAnswers[index]?.trim() !== "" && validationErrors[index];
 

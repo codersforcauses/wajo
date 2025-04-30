@@ -181,6 +181,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
     def submit(self, request, pk=None):
         """
         Submit the quiz attempt, changing its state to 2 (submitted).
+        api: /api/quiz/competition/1/submit/
         """
         user = request.user.student
         attempt = user.quiz_attempts.get(quiz_id=pk)

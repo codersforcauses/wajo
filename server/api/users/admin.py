@@ -2,6 +2,7 @@ from unfold.admin import ModelAdmin, StackedInline
 from .models import School, Student, Teacher
 from django.contrib import admin
 from django.contrib.auth.models import User
+from import_export.admin import ImportExportModelAdmin
 
 
 class StudentInline(StackedInline):
@@ -17,14 +18,14 @@ class TeacherInline(StackedInline):
 
 
 @admin.register(School)
-class SchoolAdmin(ModelAdmin):
+class SchoolAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ("id", "name", "code", "type", "abbreviation", "is_country")
     search_fields = ("name", "code", "type", "abbreviation", "is_country")
     ordering = ("id",)
 
 
 @admin.register(Student)
-class StudentAdmin(ModelAdmin):
+class StudentAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ('user', 'school',
                     'year_level', 'created_at')
     list_filter = ('school', 'year_level')
@@ -34,14 +35,14 @@ class StudentAdmin(ModelAdmin):
 
 
 @admin.register(Teacher)
-class TeacherAdmin(ModelAdmin):
+class TeacherAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ("user", "school", "phone")
     list_filter = ("school",)
     search_fields = ("user__username", "school__name", "phone")
     ordering = ("user",)
 
 
-class CustomUserAdmin(ModelAdmin):
+class CustomUserAdmin(ModelAdmin, ImportExportModelAdmin):
     inlines = [StudentInline, TeacherInline]
     ordering = ('date_joined',)
     list_display = ('username', 'email', 'is_staff',

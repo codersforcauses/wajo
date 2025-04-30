@@ -27,7 +27,7 @@ export default function CompetitionQuizPage() {
   const [start, setStart] = useState(false);
   const handleStart = () => {
     setStart(true);
-    console.log(compId);
+    // console.log(compId);
   };
 
   const {

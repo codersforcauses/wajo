@@ -109,6 +109,10 @@ export interface CompetitionSlot {
   quiz_attempt_id?: number;
 }
 
+export interface CompetitionSubmitResponse {
+  status: string;
+}
+
 export interface QuestionAnswer {
   question: number;
   answer_student: string;
