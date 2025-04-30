@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import { MutableRefObject } from "react";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -31,3 +32,35 @@ export function pickKeys<T, K extends keyof T>(
     {} as Pick<T, K>,
   );
 }
+
+/**
+ * Throttles a function to only run once every specified delay.
+ * @param fn - The function to throttle.
+ * @param delay - The delay in milliseconds to throttle the function.
+ * @param timeoutIdRef - A reference to the timeout ID to clear the timeout.
+ * @returns A throttled function that only runs once every specified delay.
+ *
+ * This function is useful when you want to limit the number of times a function is called within a
+ * specific time frame. It ensures that the function is only called once every specified delay and
+ * prevents it from being called multiple times in quick succession.
+ *
+ * @example
+ * const throttledFunction = throttle((value) => console.log(value), 1000);
+ * throttledFunction('Hello'); // Does not log 'Hello'
+ * throttledFunction('World'); // Logs 'World' after 1 second
+ */
+export const useThrottle = (
+  fn: Function,
+  delay: number,
+  timeoutIdRef: MutableRefObject<NodeJS.Timeout | null>,
+) => {
+  return function (...args: any[]) {
+    if (timeoutIdRef.current) {
+      clearTimeout(timeoutIdRef.current);
+    }
+    timeoutIdRef.current = setTimeout(() => {
+      fn(...args);
+      timeoutIdRef.current = null;
+    }, delay);
+  };
+};

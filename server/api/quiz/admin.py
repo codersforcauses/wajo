@@ -1,21 +1,22 @@
 from django.contrib import admin
-
+from unfold.admin import ModelAdmin
+from import_export.admin import ImportExportModelAdmin
 # Register your models here.
 from .models import QuizAttempt, Quiz, QuizSlot, QuestionAttempt
 
 
 @admin.register(Quiz)
-class QuizAdmin(admin.ModelAdmin):
+class QuizAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ("name", "intro")
 
 
 @admin.register(QuizSlot)
-class QuizSlotsAdmin(admin.ModelAdmin):
+class QuizSlotsAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ("id", "quiz_id")
 
 
 @admin.register(QuizAttempt)
-class QuizAttemptAdmin(admin.ModelAdmin):
+class QuizAttemptAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = (
         "id",
         "quiz_id",
@@ -23,12 +24,9 @@ class QuizAttemptAdmin(admin.ModelAdmin):
 
 
 @admin.register(QuestionAttempt)
-class QuestionAttemptAdmin(admin.ModelAdmin):
+class QuestionAttemptAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = (
         "id",
-        "student",
-        "question",
-        "quiz_attempt",
-        "answer_student",
-        "is_correct",
+        "quiz_attempt_id",
+        "question_id",
     )

@@ -82,6 +82,13 @@ export interface QuizSlot {
   status: number;
 }
 
+export interface GetPagedList<T> {
+  count: number;
+  next: string;
+  previous: string;
+  results: T[];
+}
+
 export enum QuizStatus {
   NormalPractice = 0,
   Upcoming = 1,
@@ -106,7 +113,7 @@ export interface CompetitionResponse extends GenericResponse {
 
 export interface CompetitionSlotData {
   id: number;
-  question: Question;
+  question: Partial<Question>;
   slot_index: number;
   block: number;
   quiz: number;
@@ -115,7 +122,11 @@ export interface CompetitionSlotData {
 export interface CompetitionSlot {
   data: CompetitionSlotData[];
   end_time: Date;
-  quiz_attempt_id: number;
+  quiz_attempt_id?: number;
+}
+
+export interface CompetitionSubmitResponse {
+  status: string;
 }
 
 export interface QuestionAnswer {
@@ -123,11 +134,13 @@ export interface QuestionAnswer {
   answer_student: string;
 }
 
-export interface QuestionAttempt extends QuestionAnswer {
+export interface QuestionAttempt {
   id: number;
   is_correct: boolean;
-  student: number;
+  answer_student: string;
+  question: number;
   quiz_attempt: number;
+  student: number;
 }
 
 export interface QuestionAttemptResponse extends GenericResponse {

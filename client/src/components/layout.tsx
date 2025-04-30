@@ -90,7 +90,7 @@ export function PublicPage({
   return (
     <div>
       {isNavBar ? <Navbar /> : null}
-      <main>{children}</main>
+      <main className="min-h-svh">{children}</main>
       {isFooter ? <Footer /> : null}
     </div>
   );

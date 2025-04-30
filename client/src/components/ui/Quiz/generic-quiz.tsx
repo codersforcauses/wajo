@@ -1,10 +1,9 @@
 import Image from "next/image";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { LatexInput } from "@/components/ui/math-input";
-import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePostMutation } from "@/hooks/use-post-data";
 import { backendURL } from "@/lib/api";
 import { Layout } from "@/types/question";
@@ -12,7 +11,6 @@ import {
   CompetitionSlotData,
   QuestionAnswer,
   QuestionAttempt,
-  QuestionAttemptResponse,
   QuizAttempt,
   QuizAttemptResponse,
 } from "@/types/quiz";
@@ -35,22 +33,6 @@ export default function GenericQuiz({
   slots,
   quizAttempt,
 }: GenericQuizProps) {
-  // Get answers from db
-
-  const {
-    data: questionData,
-    isLoading: questionDataIsLoading,
-    error: questionDataError,
-  } = useFetchData<{
-    results: QuestionAttempt[];
-    count: number;
-    next: string | null;
-    previous: string | null;
-  }>({
-    queryKey: ["quiz.question-attempts"],
-    endpoint: "/quiz/question-attempts/",
-  });
-
   // Save answer mutation
   const { mutate: saveAnswer, isPending: isSaving } =
     usePostMutation<QuestionAttempt>({
@@ -58,7 +40,6 @@ export default function GenericQuiz({
       endpoint: "/quiz/question-attempts/",
       onSuccess: () => {
         setIsSaved(true);
-        toast.success("Answer saved successfully");
       },
       onError: (err) => {
         toast.error("Failed to save answer");
@@ -74,107 +55,39 @@ export default function GenericQuiz({
   //   }
   // }, [quizAttempt]);
 
-  // filter through all question attempts to get the questions attempts for the current quiz attempt
-  const [questionAttempts, setQuestionAttempts] = useState<QuestionAttempt[]>(
-    [],
-  );
-
-  useEffect(() => {
-    if (questionData && questionData.results && quizAttempt) {
-      const attempts = questionData.results.filter(
-        (qa) => qa.quiz_attempt === quizAttempt.results[0].id,
-      );
-      setQuestionAttempts(attempts);
-      console.log("filtered attempts: ", attempts);
-      console.log("questionData", questionData);
-    }
-  }, [questionData, quizAttempt]);
-
-  const isQuestionAttemptsInitialized = useRef(false);
-
-  useEffect(() => {
-    if (!isQuestionAttemptsInitialized.current) {
-      console.log("questionAttempts", questionAttempts);
-      isQuestionAttemptsInitialized.current = true;
-    }
-  }, [questionAttempts]);
-
-  const [answers, setAnswers] = useState<QuestionAnswer[]>([]);
-  //   () => {
-  //   try {
-  //     const savedAnswers = questionAttempts.map(
-  //       (qa) =>
-  //         ({
-  //           question: qa.question,
-  //           answer_student: qa.answer_student,
-  //         }) as QuestionAnswer,
-  //     );
-  //     console.log("savedAnswers", savedAnswers);
-  //     // Ensure all questions are included in the answers state
-  //     const allAnswers = slots.map((s) => {
-  //       const existingAnswer = savedAnswers.find(
-  //         (a) => a.question === s.question.id,
-  //       );
-  //       return (
-  //         existingAnswer || {
-  //           question: s.question.id,
-  //           answer_student: "",
-  //         }
-  //       );
-  //     });
-
-  //     return allAnswers;
-  //   } catch (error) {
-  //     console.error("Error initializing answers:", error);
-  //     return slots.map((s) => ({
-  //       question: s.question.id,
-  //       answer_student: "",
-  //     }));
-  //   }
-  // });
-
-  const isAnswersInitialized = useRef(false);
-
-  useEffect(() => {
-    if (!isAnswersInitialized.current && questionData && questionData.results) {
-      const savedAnswers = questionAttempts.map(
-        (qa) =>
-          ({
-            question: qa.question,
-            answer_student: qa.answer_student,
-          }) as QuestionAnswer,
-      );
-
-      // Ensure all questions are included in the answers state
-      const allAnswers = slots.map((s) => {
-        const existingAnswer = savedAnswers.find(
+  const [answers, setAnswers] = useState<QuestionAnswer[]>(() => {
+    try {
+      // Refresh any existing localStorage data
+      const savedAnswers = localStorage.getItem(STORAGE_KEY);
+      const parsedAnswers: QuestionAnswer[] = savedAnswers
+        ? JSON.parse(savedAnswers)
+        : [];
+      const completeAnswers = slots.map((s) => {
+        const existingAnswer = parsedAnswers.find(
           (a) => a.question === s.question.id,
         );
         return (
-          existingAnswer || {
-            question: s.question.id,
-            answer_student: "",
-          }
+          existingAnswer || { question: s.question.id ?? 0, answer_student: "" }
         );
       });
-
-      setAnswers(allAnswers);
-      isAnswersInitialized.current = true;
+      return completeAnswers;
+    } catch (error) {
+      console.error("Error loading saved answers:", error);
+      return slots.map((s) => ({
+        question: s.question.id ?? 0,
+        answer_student: "",
+      }));
     }
-  }, [questionData, questionAttempts, slots]);
-
-  useEffect(() => {
-    console.log("answers", answers);
-  }, [answers]);
+  });
 
   const [isSaved, setIsSaved] = useState(true);
   const currentQuestion = slots[currentPage - 1].question;
 
   const saveAnswers = useCallback(
     (newAnswers: QuestionAnswer[]) => {
-      console.log("newAnswers", newAnswers);
-      console.log("answers", answers);
+      // console.log("newAnswers", newAnswers);
       try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newAnswers));
         const currentAnswer = newAnswers.find(
           (a) => a.question === currentQuestion.id,
         );
@@ -198,7 +111,6 @@ export default function GenericQuiz({
             // IntegrityError null value in column "is_correct" of relation "quiz_questionattempt" violates not-null constraint
             is_correct: false,
           });
-          // setAnswers(newAnswers);
         }
         // setAnswers(newAnswers);
       } catch (error) {
@@ -210,28 +122,14 @@ export default function GenericQuiz({
   );
 
   const handleAnswerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
+    // const newAnswer = e.target.value.replace(/[^0-9,\s]/g, ""); // Only allow numbers, commas, and spaces
     setAnswers((prev) => {
-      const questionExists = prev.some(
-        (a) => a.question === currentQuestion.id,
+      const newAnswers = prev.map((a) =>
+        a.question === currentQuestion.id
+          ? { ...a, answer_student: e.target.value }
+          : a,
       );
-
-      // If the question does not exist in the answers state, add it
-      if (!questionExists) {
-        return [
-          ...prev,
-          {
-            question: currentQuestion.id,
-            answer_student: value,
-          },
-        ];
-      }
-
-      // Otherwise, update the existing answer
-      return prev.map((a) =>
-        a.question === currentQuestion.id ? { ...a, answer_student: value } : a,
-      );
+      return newAnswers;
     });
     setIsSaved(false);
   };
@@ -289,22 +187,6 @@ export default function GenericQuiz({
     currentQuestion.layout === Layout.LEFT ||
     currentQuestion.layout === Layout.RIGHT;
 
-  if (questionDataIsLoading) {
-    return <p>Loading...</p>;
-  }
-
-  if (questionDataError) {
-    return <p>Error: {questionDataError.message}</p>;
-  }
-
-  if (!quizAttempt.results[0]) {
-    return <p>No quiz attempt found</p>;
-  }
-
-  if (!questionData?.results) {
-    return <p>No questions found</p>;
-  }
-
   return (
     <div className="flex w-full items-center justify-center">
       <div className="min-h-[16rem] w-3/4 rounded-lg border-8 border-[#FFE8A3] p-10">
@@ -325,7 +207,7 @@ export default function GenericQuiz({
             className={`flex ${isHorizontalLayout ? "flex-row items-center space-x-4" : "flex-col items-center space-y-4"}`}
           >
             {currentQuestion.layout === Layout.LEFT ? renderImage() : null}
-            <LatexInput>{currentQuestion.question_text}</LatexInput>
+            <LatexInput>{String(currentQuestion.question_text)}</LatexInput>
             {currentQuestion.layout === Layout.RIGHT ? renderImage() : null}
           </div>
           {currentQuestion.layout === Layout.BOTTOM ? renderImage() : null}

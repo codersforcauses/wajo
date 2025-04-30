@@ -10,7 +10,7 @@ from .views import (
 
 router = DefaultRouter()
 router.register(r"admin-quizzes", AdminQuizViewSet, basename="")
-router.register(r"all_quizzes", QuizViewSet)
+router.register(r"all-quizzes", QuizViewSet)
 router.register(r"competition", CompetitionQuizViewSet, basename="competition")
 router.register(r"quiz-slots", QuizSlotViewSet)
 router.register(r"quiz-attempts", QuizAttemptViewSet)

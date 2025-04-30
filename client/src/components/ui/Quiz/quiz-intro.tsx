@@ -3,19 +3,19 @@ import DateTimeDisplay from "@/components/ui/date-format";
 
 interface Props {
   onStart: () => void;
-  quizName?: string;
+  quizName: string;
   startTime: string | Date;
   quizDuration: number;
   numberOfQuestions: number;
 }
 
-export default function QuizStartPage({
+export default function QuizIntro({
   onStart,
   quizName,
   startTime,
   quizDuration,
   numberOfQuestions,
-}: Props) {
+}: Partial<Props>) {
   let headingStyle = `text-xl sm:text-2xl md:text-3xl text-slate-800 font-bold`;
   let generalInstructions =
     '<span class="font-bold">General instructions:</span> There are 16 questions. Each question has an answer that is a positive integer less than 1000. Calculators are <span class="font-bold">not</span> permitted. Diagrams are provided to clarify wording only, and should <span class="font-bold">not</span> be expected to be to scale.';
@@ -41,10 +41,9 @@ export default function QuizStartPage({
         {/* <p>{generalInstructions}</p> */}
         {/* <p dangerouslySetInnerHTML={{ __html: generalInstructions }}></p> */}
         <p>
-          <span className="font-bold">General instructions:</span> There are{" "}
-          {numberOfQuestions} questions. Each question has an answer that is a
-          positive integer less than 1000. Calculators are{" "}
-          <span className="font-bold"> not </span>
+          <span className="font-bold">General instructions:</span> Each question
+          has an answer that is a positive integer less than 1000. Calculators
+          are <span className="font-bold"> not </span>
           permitted. Diagrams are provided to clarify wording only, and should
           <span className="font-bold"> not </span> be expected to be to scale.
         </p>
