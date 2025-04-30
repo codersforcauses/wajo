@@ -21,6 +21,7 @@ drf-spectacular = "^0.28.0"
 django-filter = "^24.3"
 pillow = "^11.1.0"
 django-unfold = "^0.50.0"
+django-import-export = "^4.3.7"
 
 
 

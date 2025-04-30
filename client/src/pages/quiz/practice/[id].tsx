@@ -19,7 +19,7 @@ export default function PracticeQuizPage() {
     error: QuizDataError,
   } = useFetchData<AdminQuizSlot[]>({
     queryKey: [`quiz.${id}`],
-    endpoint: `/quiz/all_quizzes/${id}/slots/`,
+    endpoint: `/quiz/all-quizzes/${id}/slots/`,
   });
 
   // console.log("Quiz Data: ", quizData);

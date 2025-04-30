@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils"; // Import cn utility
 
 interface DateTimeDisplayProps {
-  date: string | Date;
+  date: string | Date | undefined;
   className?: string;
 }
 

@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     "api.team",
     "api.invoice",
     "drf_spectacular",
+    'import_export',
 ]
 UNFOLD = {
     "COLORS": {

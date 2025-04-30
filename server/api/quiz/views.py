@@ -125,7 +125,8 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
         slots: Retrieve slots for a specific quiz.
     """
 
-    queryset = Quiz.objects.filter(status=0, visible=True).order_by("-created_at")
+    queryset = Quiz.objects.filter(
+        status=0, visible=True).order_by("-created_at")
     serializer_class = QuizSerializer
 
     @action(detail=True, methods=["get"])
@@ -166,7 +167,8 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         slots: Retrieve slots for a specific competition quiz.
     """
 
-    queryset = Quiz.objects.filter(status=1, visible=True).order_by("-created_at")
+    queryset = Quiz.objects.filter(
+        status=1, visible=True).order_by("-created_at")
     serializer_class = UserQuizSerializer
 
     def get_permissions(self):
@@ -179,6 +181,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
     def submit(self, request, pk=None):
         """
         Submit the quiz attempt, changing its state to 2 (submitted).
+        api: /api/quiz/competition/1/submit/
         """
         user = request.user.student
         attempt = user.quiz_attempts.get(quiz_id=pk)
@@ -331,6 +334,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
             # run attempt.is_available to update the dead_line
             attempt.is_available
             end_time = attempt.dead_line
+            existing_attempt = attempt
         else:
             end_time = existing_attempt.dead_line
         # wrap the end_time into the response
@@ -501,6 +505,7 @@ class QuestionAttemptViewSet(
         """
 
         quiz_attempt_id = request.data.get("quiz_attempt")
+        print("quiz_attempt_id", quiz_attempt_id)
         comp_attempt = QuizAttempt.objects.get(
             pk=quiz_attempt_id, student_id=request.user.student.id
         )
@@ -512,27 +517,44 @@ class QuestionAttemptViewSet(
             )
 
         question_id = request.data.get("question")
-        student_id = int(request.data.get("student"))
+        print("question_id", question_id)
+        # student_id = int(request.data.get("student"))
         # TODO: Uncomment this line when using JWT authentication
-        # student_id = request.user.id
-        current_user = request.user
+        # student_user_id = request.user.id
+        student_id = request.user.student.id
+        print("student2222222_id", request.data)
 
-        if (
-            int(student_id) != int(current_user.student.id)
-            and not current_user.is_staff
-        ):
-            return Response(
-                {"error": "You are not authorized to perform this action."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        # if (
+        #     int(student_user_id) != int(student_id)
+        # ):
+        #     print("studentxxxxxx_id")
+        #     return Response(
+        #         {"error": "You are not authorized to perform this action."},
+        #         status=status.HTTP_403_FORBIDDEN,
+        #     )
 
         existing_attempt = QuestionAttempt.objects.filter(
-            quiz_attempt=quiz_attempt_id, question=question_id, student=student_id
+            quiz_attempt_id=quiz_attempt_id, question_id=question_id, student_id=student_id
         ).first()
-
+        print("existing_attempt", existing_attempt)
         if existing_attempt:
+            isSameStduent = existing_attempt.quiz_attempt.student.id == student_id
+            if not isSameStduent:
+                return Response(
+                    {"error": "You are not authorized to perform this action."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+            new_answer = request.data.get("answer_student")
+
+            # if the answer is empty, do nothing
+            if new_answer == "":
+                return Response(
+                    {"message": "Answer not updated."},
+                    status=status.HTTP_200_OK,
+                )
             # modify the answer
-            existing_attempt.answer_student = request.data.get("answer_student")
+            existing_attempt.answer_student = request.data.get(
+                "answer_student")
             existing_attempt.save()
             new_answer = QuestionAttemptSerializer(existing_attempt).data[
                 "answer_student"
@@ -541,6 +563,9 @@ class QuestionAttemptViewSet(
                 {"message": "Answer updated successfully.", "new_answer": new_answer},
                 status=status.HTTP_200_OK,
             )
+        print("xxxxx", request.data)
+        request.data["student"] = student_id
+        request.data["is_correct"] = False
 
         return super().create(request, *args, **kwargs)
 

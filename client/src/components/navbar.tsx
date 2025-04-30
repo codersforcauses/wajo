@@ -7,6 +7,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import MobileNav from "@/components/ui/mobilenav";
 import { LoginModal } from "@/components/ui/Users/login-modal";
+import WajoLogo from "@/components/wajo-logo";
 import { useAuth } from "@/context/auth-provider";
 import styles from "@/styles/modules/navbar.module.css";
 
@@ -18,12 +19,7 @@ export default function Navbar() {
       <div className="container mx-auto flex items-center">
         <div className="flex-auto">
           <Link href="/">
-            <Image
-              src="/wajo_white.svg"
-              alt="WAJO logo with white background"
-              width={105}
-              height={105}
-            />
+            <WajoLogo className="w-24" />
           </Link>
         </div>
         <div className="flex flex-shrink items-center justify-between gap-20 text-xl font-medium max-md:hidden">
@@ -43,8 +39,8 @@ export default function Navbar() {
           ) : (
             <LoginModal>
               <Button
-                variant={"outline"}
-                size={"lg"}
+                variant="outline"
+                size="lg"
                 className="border-2 border-black font-roboto text-lg"
               >
                 Login
