@@ -1,11 +1,9 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import * as React from "react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import DateTimeDisplay from "@/components/ui/date-format";
-import DeleteModal from "@/components/ui/delete-modal";
 import { SortIcon } from "@/components/ui/icon";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
@@ -16,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useDynamicPatchMutation } from "@/hooks/use-put-data";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
 import { AdminQuiz } from "@/types/quiz";
@@ -24,7 +21,7 @@ import { AdminQuiz } from "@/types/quiz";
 /**
  * Renders a paginated data grid for displaying competition information.
  *
- * The `CompetitionDataGrid` component displays a table of competitions with pagination
+ * The `CompetitionResultsDataGrid` component displays a table of competitions with pagination
  * and sorting functionality. It allows sorting by the competition status and handles
  * pagination of the data. The data grid updates when changes occur in the data context.
  *
@@ -44,7 +41,7 @@ import { AdminQuiz } from "@/types/quiz";
  *   };
  *
  *   return (
- *     <CompetitionDataGrid
+ *     <CompetitionResultsDataGrid
  *       datacontext={competitions}
  *       onDataChange={handleDataChange}
  *       changePage={page}
@@ -55,27 +52,9 @@ export function CompetitionResultsDataGrid({
   datacontext,
   isLoading,
   startIdx,
-  onDeleteSuccess,
   onOrderingChange = () => {},
 }: DatagridProps<AdminQuiz>) {
   const router = useRouter();
-
-  const { mutate: setVisible, isPending } = useDynamicPatchMutation({
-    baseUrl: "/quiz/admin-quizzes",
-    queryKeys: [["quiz.admin-quizzes"], ["competition.visible"]],
-    mutationKey: ["competition.visible"],
-    onSuccess: () => {
-      toast.success(`The competition has been updated.`);
-      router.reload();
-    },
-  });
-
-  const onVisible = (id: number, visible: boolean) => {
-    setVisible({
-      id: id,
-      data: { visible },
-    });
-  };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
@@ -104,6 +83,7 @@ export function CompetitionResultsDataGrid({
               <TableHead className={commonTableHeadClasses}>
                 Time Window
               </TableHead>
+              <TableHead className={commonTableHeadClasses}>Attempts</TableHead>
               <TableHead
                 className={cn(
                   commonTableHeadClasses,
@@ -136,6 +116,9 @@ export function CompetitionResultsDataGrid({
                   </TableCell>
                   <TableCell className="w-0">{item.time_limit}</TableCell>
                   <TableCell className="w-0">{item.time_window}</TableCell>
+                  <TableCell className="w-0">
+                    {item.quiz_attempt_count}
+                  </TableCell>
                   <TableCell className="sticky right-0 bg-white">
                     <Button asChild className="me-1">
                       <Link href={`${router.pathname}/${item.id}`}>

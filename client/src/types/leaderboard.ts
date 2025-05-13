@@ -41,6 +41,7 @@ export interface TeamLeaderboard {
   is_country: boolean;
   students: Student[];
   max_year: number;
+  quiz_attempt_count?: number;
 }
 
 export interface Ranking {

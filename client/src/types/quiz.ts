@@ -13,6 +13,7 @@ export interface AdminQuiz {
   time_limit: number;
   time_window: number;
   status: number;
+  quiz_attempt_count?: number;
 }
 
 export interface AdminQuizResponse {

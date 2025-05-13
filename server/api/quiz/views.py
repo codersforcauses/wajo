@@ -18,6 +18,7 @@ from rest_framework import status, serializers, filters
 from datetime import timedelta
 from django.utils.timezone import now
 from api.team.models import TeamMember
+from django.db.models import Count
 
 
 @permission_classes([IsAdminUser])
@@ -28,8 +29,8 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     Methods:
         slots: Retrieve or create slots for a specific quiz.
     """
-
-    queryset = Quiz.objects.all().order_by("-created_at")
+    # queryset = Quiz.objects.all().order_by("-created_at")
+    queryset = Quiz.objects.annotate(quiz_attempt_count=Count("attempts")).order_by("-created_at")
     serializer_class = AdminQuizSerializer
     status = serializers.IntegerField(default=0, required=False)
     filter_backends = [
@@ -40,6 +41,12 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     search_fields = ["name"]
     filterset_fields = ["is_comp", "status"]
     ordering_fields = ["time_created"]
+
+    # def get_queryset(self):
+    #     queryset = Quiz.objects.annotate(quiz_attempt_count=Count("attempts")).order_by("-created_at")
+    #     print(queryset.query)
+    #     print(queryset)
+    #     return queryset
 
     @action(detail=True, methods=["get", "post"])
     def slots(self, request, pk=None):
@@ -464,12 +471,11 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
         ).first()
 
         if existing_attempt:
-            
             if not existing_attempt.is_available:
                 return Response(
                     {"error": "Quiz has finished"}, status=status.HTTP_403_FORBIDDEN
                 )
-            
+
             serializer = self.get_serializer(existing_attempt)
             data = serializer.data
 

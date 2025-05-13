@@ -45,7 +45,7 @@ class TeacherAdmin(ModelAdmin, ImportExportModelAdmin):
 class CustomUserAdmin(ModelAdmin, ImportExportModelAdmin):
     inlines = [StudentInline, TeacherInline]
     ordering = ('date_joined',)
-    list_display = ('username', 'email', 'is_staff',
+    list_display = ('username', 'first_name', 'last_name', 'email', 'is_staff',
                     'is_active', 'date_joined')
 
     def save_model(self, request, obj, form, change):

@@ -59,9 +59,7 @@ function TeamLeaderboardIndex() {
     });
 
   useEffect(() => {
-    if (data) {
-      console.log("data: ", data);
-    }
+    console.log("data: ", data);
   }, [data]);
 
   useEffect(() => {

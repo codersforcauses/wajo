@@ -30,9 +30,11 @@ function Index() {
   console.log(quizName);
   return (
     <div className="flex h-[80vh] flex-col items-center justify-center gap-20">
-      <h2 className="flex w-full items-center justify-center text-3xl font-bold">
-        {quizName}
-      </h2>
+      <div className="flex flex-col items-center justify-center gap-5">
+        <h2 className="text-3xl font-bold">{quizName}</h2>
+        <h3 className="text-xl italic">Select results:</h3>
+      </div>
+
       <div className="flex items-center justify-center gap-10">
         {links.map(({ href, label }) => (
           <div
