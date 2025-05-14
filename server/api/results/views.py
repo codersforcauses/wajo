@@ -5,9 +5,9 @@ from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
 from django.db.models import Sum, Max
 from django.db.models.functions import Cast
 from ..quiz.models import Quiz, QuizAttempt, QuestionAttempt
-from .serializers import IndividualResultsSerializer, TeamResultsSerializer, QuestionAttemptsSerializer
-from ..users.models import School, Student
+from .serializers import IndividualResultsSerializer, TeamResultsSerializer, TeamListSerializer, QuestionAttemptsSerializer
 from ..team.models import Team
+from ..users.models import School, Student
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action, permission_classes
@@ -272,4 +272,55 @@ class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
 
         question_attempts = self.get_queryset()
         serializer = self.get_serializer(question_attempts, many=True)
+        return Response(serializer.data)
+
+
+@permission_classes([IsAdminUser])
+class TeamListViewSet(viewsets.ReadOnlyModelViewSet):
+    def get_queryset(self):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            raise ValidationError({"quiz_id": "This query parameter is required."})
+
+        try:
+            quiz_id = int(quiz_id)
+        except ValueError:
+            raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
+        queryset = Team.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct()
+
+        # Annotate additional fields for the queryset
+        queryset = queryset.annotate(
+            total_marks=Sum("quiz_attempts__total_marks"),
+        )
+
+        return queryset
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        quiz_id = self.request.query_params.get("quiz_id")
+        context.update({"quiz_id": quiz_id})
+        return context
+
+    serializer_class = TeamListSerializer
+    filterset_class = TeamResultsFilter
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter,
+    ]
+    search_fields = ["school__name", "id"]
+    ordering_fields = ["total_marks", "id", "school__name"]
+    ordering = ["-total_marks"]
+
+    # action for getting non-paginated results
+    @action(detail=False, methods=["get"], pagination_class=None)
+    def non_paginated(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        team_results = self.get_queryset()
+        serializer = self.get_serializer(team_results, many=True)
         return Response(serializer.data)

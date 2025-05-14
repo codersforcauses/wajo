@@ -29,8 +29,6 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     Methods:
         slots: Retrieve or create slots for a specific quiz.
     """
-    # queryset = Quiz.objects.all().order_by("-created_at")
-    queryset = Quiz.objects.annotate(quiz_attempt_count=Count("attempts")).order_by("-created_at")
     serializer_class = AdminQuizSerializer
     status = serializers.IntegerField(default=0, required=False)
     filter_backends = [
@@ -42,11 +40,14 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     filterset_fields = ["is_comp", "status"]
     ordering_fields = ["time_created"]
 
-    # def get_queryset(self):
-    #     queryset = Quiz.objects.annotate(quiz_attempt_count=Count("attempts")).order_by("-created_at")
-    #     print(queryset.query)
-    #     print(queryset)
-    #     return queryset
+    def get_queryset(self):
+        queryset = Quiz.objects.all().order_by("-created_at")
+
+        # Annotate additional fields for the queryset
+        queryset = queryset.annotate(
+            quiz_attempt_count=Count("attempts")
+        )
+        return queryset
 
     @action(detail=True, methods=["get", "post"])
     def slots(self, request, pk=None):

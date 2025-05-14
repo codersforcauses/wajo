@@ -87,9 +87,6 @@ export function QuestionAttemptsDataGrid({
                 </div>
               </TableHead>
               <TableHead className={cn(commonTableHeadClasses)}>
-                Question text
-              </TableHead>
-              <TableHead className={cn(commonTableHeadClasses)}>
                 <div className="flex items-center text-white">
                   <span>Student Answer</span>
                   <span
@@ -139,7 +136,7 @@ export function QuestionAttemptsDataGrid({
                   <TableCell>{item.student_name}</TableCell>
                   <TableCell>{item.student_year_level}</TableCell>
                   <TableCell>{item.question_id}</TableCell>
-                  <TableCell>{item.question_text}</TableCell>
+                  {/* <TableCell>{item.question_text}</TableCell> */}
                   <TableCell>{item.answer_student}</TableCell>
                   <TableCell>
                     {item.is_correct === true

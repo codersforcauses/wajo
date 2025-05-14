@@ -4,6 +4,7 @@ from api.quiz.models import QuizAttempt, QuestionAttempt
 from api.team.models import Team
 from ..users.models import Student, User
 import uuid
+from django.db.models import Sum
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -70,6 +71,60 @@ class TeamResultsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ["name", "school", "id", "total_marks", "is_country", "students", "max_year"]
+
+    def to_representation(self, instance):
+        """Sort students by ID before returning the response."""
+        response = super().to_representation(instance)
+        response["students"] = sorted(response["students"], key=lambda x: x["id"])
+        return response
+
+
+class StudentWithScoreSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    student_score = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Student
+        fields = ['id', 'name', 'year_level', 'student_score']
+
+    def get_name(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}" if obj.user.first_name else obj.user.username
+
+
+class TeamListSerializer(serializers.ModelSerializer):
+
+    name = serializers.StringRelatedField()
+    school = serializers.StringRelatedField()
+    students = serializers.SerializerMethodField()
+    total_marks = serializers.IntegerField()
+
+    class Meta:
+        model = Team
+        fields = ["name", "school", "id", "total_marks", "students",]
+
+    def get_students(self, obj):
+        quiz_id = self.context.get('quiz_id')
+        students_with_scores = []
+
+        for student in obj.students.all():
+            # Get the student's score for this quiz
+            attempt = QuizAttempt.objects.filter(
+                student=student,
+                quiz_id=quiz_id
+            ).first()
+
+            student_score = attempt.total_marks if attempt else 0
+
+            # Add the score to the student data
+            student_data = {
+                'id': student.id,
+                'name': f"{student.user.first_name} {student.user.last_name}" if student.user.first_name else student.user.username,
+                'year_level': student.year_level,
+                'student_score': student_score
+            }
+            students_with_scores.append(student_data)
+
+        return students_with_scores
 
     def to_representation(self, instance):
         """Sort students by ID before returning the response."""

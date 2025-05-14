@@ -17,7 +17,7 @@ import { IndividualLeaderboard } from "@/types/leaderboard";
  * Renders a paginated data grid for displaying leaderboard information for individuals.
  *
  * The `IndividualDataGrid` component displays a table with columns for student name, year level,
- * school information, and total marks. Users can sort the data by clicking on each sortable column’s
+ * school information, and Individual Score. Users can sort the data by clicking on each sortable column’s
  * heading. The grid is updated whenever the `datacontext` prop changes or a column is re-sorted.
  *
  * @function IndividualDataGrid
@@ -87,7 +87,7 @@ export function IndividualDataGrid({
                 className={cn(commonTableHeadClasses, "rounded-tr-lg")}
               >
                 <div className="flex items-center text-white">
-                  <span>Total Marks</span>
+                  <span>Individual Score</span>
                   <span
                     className="ml-2 cursor-pointer"
                     onClick={() => onOrderingChange("total_marks")}
