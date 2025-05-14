@@ -4,7 +4,6 @@ from api.quiz.models import QuizAttempt, QuestionAttempt
 from api.team.models import Team
 from ..users.models import Student, User
 import uuid
-from django.db.models import Sum
 
 
 class UserSerializer(serializers.ModelSerializer):

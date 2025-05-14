@@ -58,6 +58,15 @@ class ResultsAPITest(APITestCase):
             year_level="10",
         )
 
+        User.objects.create_user(
+            username="testAdmin",
+            password="password",
+            first_name="Test",
+            last_name="Admin",
+        )
+
+        self.client.login(username="testAdmin", password="password")
+
         quiz1 = Quiz.objects.create(
             name="Test Quiz 1", intro="This is test1 quiz.", total_marks=100, open_time_date=datetime.now(tz=awst)
         )
