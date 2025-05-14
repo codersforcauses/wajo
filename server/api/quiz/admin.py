@@ -20,6 +20,8 @@ class QuizAttemptAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = (
         "id",
         "quiz_id",
+        "student",
+        "team"
     )
 
 

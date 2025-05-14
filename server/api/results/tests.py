@@ -58,6 +58,16 @@ class ResultsAPITest(APITestCase):
             year_level="10",
         )
 
+        User.objects.create_user(
+            username="testAdmin",
+            password="password",
+            first_name="Test",
+            last_name="Admin",
+            is_staff=True,  # Add this line to ensure the user has admin permissions
+        )
+
+        self.client.login(username="testAdmin", password="password")
+
         quiz1 = Quiz.objects.create(
             name="Test Quiz 1", intro="This is test1 quiz.", total_marks=100, open_time_date=datetime.now(tz=awst)
         )
@@ -134,7 +144,9 @@ class ResultsAPITest(APITestCase):
     def test_team_leaderboard_should_list_results(self):
         # Act
         url = reverse("results:team-list")
-        response = self.client.get(url)
+        print("url-list: ", url)
+        response = self.client.get(url + "?quiz_id=1")
+        print("response-list: ", response)
 
         # Assert
         self.assertEqual(response.status_code, 200)
@@ -154,7 +166,9 @@ class ResultsAPITest(APITestCase):
     def test_team_leaderboard_should_filter_by_type(self):
         # Act
         url = reverse("results:team-list")
-        response = self.client.get(url, {"school_type": "Independent"})
+        response = self.client.get(url + "?quiz_id=2", {"school_type": "Independent"})
+        print("url-filter: ", url)
+        print("response-filter: ", response)
 
         # Assert
         self.assertEqual(response.status_code, 200)
