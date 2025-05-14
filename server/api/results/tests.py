@@ -144,7 +144,9 @@ class ResultsAPITest(APITestCase):
     def test_team_leaderboard_should_list_results(self):
         # Act
         url = reverse("results:team-list")
+        print("url-list: ", url)
         response = self.client.get(url + "?quiz_id=1")
+        print("response-list: ", response)
 
         # Assert
         self.assertEqual(response.status_code, 200)
@@ -165,6 +167,8 @@ class ResultsAPITest(APITestCase):
         # Act
         url = reverse("results:team-list")
         response = self.client.get(url + "?quiz_id=2", {"school_type": "Independent"})
+        print("url-filter: ", url)
+        print("response-filter: ", response)
 
         # Assert
         self.assertEqual(response.status_code, 200)
