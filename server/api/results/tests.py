@@ -63,6 +63,7 @@ class ResultsAPITest(APITestCase):
             password="password",
             first_name="Test",
             last_name="Admin",
+            is_staff=True,  # Add this line to ensure the user has admin permissions
         )
 
         self.client.login(username="testAdmin", password="password")
