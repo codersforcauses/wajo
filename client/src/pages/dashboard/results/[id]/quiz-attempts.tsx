@@ -15,15 +15,15 @@ import {
   SelectRow,
   toQueryString,
 } from "@/components/ui/pagination";
-import { TeamListDataGrid } from "@/components/ui/Results/teamlist-data-grid";
 import { SearchInput } from "@/components/ui/search";
+import { QuizAttemptsDataGrid } from "@/components/ui/Test/quiz-atttempts-data-grid";
 import { useFetchData, useFetchDataTable } from "@/hooks/use-fetch-data";
 import {
   OrderingItem,
   orderingToString,
   stringToOrdering,
 } from "@/types/data-grid";
-import { TeamLeaderboard } from "@/types/leaderboard";
+import { QuizAttempts } from "@/types/leaderboard";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
@@ -31,17 +31,20 @@ export default function PageConfig() {
   return (
     <ProtectedPage requiredRoles={roles}>
       <ResultsLayout>
-        <TeamLeaderboardIndex />
+        <QuizAttemptsIndex />
       </ResultsLayout>
     </ProtectedPage>
   );
 }
 
-function TeamLeaderboardIndex() {
+function QuizAttemptsIndex() {
   const router = useRouter();
   const { query, isReady, push } = router;
   const { quizId, quizName } = useQuizResultsContext();
 
+  if (!quizId) {
+    return <div>Error: Quiz ID is missing</div>;
+  }
   const [orderings, setOrderings] = useState<OrderingItem>({});
 
   const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
@@ -52,15 +55,33 @@ function TeamLeaderboardIndex() {
   });
 
   const { data, isLoading, error, totalPages } =
-    useFetchDataTable<TeamLeaderboard>({
-      queryKey: [`results.teamlist.${quizId}`],
-      endpoint: `/results/teamlist/?quiz_id=${quizId}`,
+    useFetchDataTable<QuizAttempts>({
+      queryKey: [`results.quiz-attempts.${quizId}`],
+      endpoint: `/results/quiz-attempts/?quiz_id=${quizId}`,
       searchParams: searchParams,
     });
 
+  const [exportIsClicked, setExportIsClicked] = useState(false);
+
+  const {
+    data: nonPaginatedData,
+    isLoading: nonPaginatedIsLoading,
+    error: nonPaginatedError,
+  } = useFetchData<QuizAttempts>({
+    queryKey: [`results.quiz-attempts.${quizId}.non-paginated`],
+    endpoint: `/results/quiz-attempts/non_paginated/?quiz_id=${quizId}`,
+    enabled: exportIsClicked,
+  });
+
   useEffect(() => {
-    console.log("data: ", data);
-  }, [data]);
+    console.log("Non-Paginated Data:", nonPaginatedData);
+  }, [nonPaginatedData]);
+
+  useEffect(() => {
+    console.log("Search Params:", searchParams);
+    console.log("Data fetched:", data);
+    console.log("Error:", error);
+  }, [data, error, searchParams]);
 
   useEffect(() => {
     if (isReady && !isLoading) {
@@ -86,7 +107,7 @@ function TeamLeaderboardIndex() {
     setSearchParams(updatedParams);
     push(
       { query: toQueryString(updatedParams) },
-      `/dashboard/results/${quizId}/teams`,
+      `/dashboard/results/${quizId}/quiz-attempts`,
       { shallow: true },
     );
   };
@@ -102,145 +123,93 @@ function TeamLeaderboardIndex() {
     });
   };
 
-  const [exportIsClicked, setExportIsClicked] = useState(false);
-
-  const {
-    data: nonPaginatedData,
-    isLoading: nonPaginatedIsLoading,
-    error: nonPaginatedError,
-  } = useFetchData<TeamLeaderboard>({
-    queryKey: [`results.team.${quizId}.non-paginated`],
-    endpoint: `/results/team/non_paginated/?quiz_id=${quizId}`,
-    enabled: exportIsClicked,
-  });
+  useEffect(() => {
+    console.log("Data fetched:", data);
+  }, [data]);
 
   useEffect(() => {
     if (exportIsClicked && !nonPaginatedIsLoading && nonPaginatedData) {
-      console.log(
-        "Request URL:",
-        `/results/teamlist/non_paginated/?quiz_id=${quizId}`,
-      );
-      console.log("nonPaginatedData: ", nonPaginatedData);
-      downloadTeamsCSV(nonPaginatedData);
+      downloadQuestionAttemptsCSV(nonPaginatedData);
       setExportIsClicked(false); // Reset the state
     }
   }, [exportIsClicked, nonPaginatedData, nonPaginatedIsLoading]);
 
-  useEffect(() => {
-    if (data) {
-      console.log("data: ", data);
-    }
-  });
-
   if (error) return <div>Error: {error.message}</div>;
+  if (!isReady || isLoading) return <WaitingLoader />;
 
   // For CSV export
   type ResultsRecord = {
-    schoolName: string;
-    teamId: number;
-    student1: {
-      name: string;
-      year_level: number;
-      score: number;
-    };
-    student2: {
-      name: string;
-      year_level: number;
-      score: number;
-    };
-    student3: {
-      name: string;
-      year_level: number;
-      score: number;
-    };
-    student4: {
-      name: string;
-      year_level: number;
-      score: number;
-    };
-    totalMarks: number;
+    username: number;
+    student_lastname: string;
+    student_firstname: string;
+    state: string;
+    started_on: string;
+    completed: string;
+    time_taken: string;
+    year_level: number;
+    total_marks: number;
+    responses: Record<string, number | null>;
   };
 
   /**
    * Download a CSV file from the db data.
    * The CSV will contain the following columns:
-   *   School Name, Team Id, Total Marks, Is Country, Max Year Level, Student 1, Student 2, Student 3
-   *   Student 4
+   *   Student Name, year Level, School Type, is Country, Total Marks,
    */
-  const downloadTeamsCSV = (data: TeamLeaderboard) => {
+  const downloadQuestionAttemptsCSV = (data: QuizAttempts) => {
     if (exportIsClicked && nonPaginatedData && !nonPaginatedIsLoading) {
-      // instead of getting from localStorage, use the data fetched from the API
+      console.log("nonPaginatedData:", data);
       const csvData: ResultsRecord[] = (Array.isArray(data) ? data : []).map(
         (record) => ({
-          schoolName: record.school,
-          teamId: record.id,
-          student1: {
-            name: record.students[0]?.name as string,
-            year_level: record.students[0]?.year_level,
-            score: record.students[0]?.student_score,
-          },
-          student2: {
-            name: record.students[1]?.name as string,
-            year_level: record.students[1]?.year_level,
-            score: record.students[1]?.student_score,
-          },
-          student3: {
-            name: record.students[2]?.name as string,
-            year_level: record.students[2]?.year_level,
-            score: record.students[2]?.student_score,
-          },
-          student4: {
-            name: record.students[3]?.name as string,
-            year_level: record.students[3]?.year_level,
-            score: record.students[3]?.student_score,
-          },
-          totalMarks: record.total_marks,
+          username: record.username,
+          student_lastname: record.student_lastname,
+          student_firstname: record.student_firstname,
+          state: record.state,
+          started_on: record.started_on,
+          completed: record.completed,
+          time_taken: record.time_taken,
+          year_level: record.student_year_level,
+          total_marks: record.total_marks,
+          responses: record.student_responses,
         }),
       );
 
-      console.log("csv data: ", csvData);
+      console.log("CSV Data:", csvData);
 
       if (csvData.length === 0) {
-        toast.warning("No data available to export.");
+        toast.warning("No data available to export. Please try again.");
         return;
       }
 
+      const num_responses = Object.keys(csvData[0].responses).length;
       // CSV headers in the order you want them
       const csvHeaders = [
-        "School Name",
-        "Team ID",
-        "Name",
-        "Year",
-        "Score",
-        "Name",
-        "Year",
-        "Score",
-        "Name",
-        "Year",
-        "Score",
-        "Name",
-        "Year",
-        "Score",
-        "Total Marks",
+        "studentId",
+        "studentLastName",
+        "studentFirstName",
+        "state",
+        "startedOn",
+        "completed",
+        "timeTaken",
+        "yearLevel",
+        "totalMarks",
+        ...Array.from({ length: num_responses }, (_, i) => `response_${i + 1}`),
       ];
 
       // Build each row from csvData
       const csvRows = csvData.map((record) => [
-        record.schoolName,
-        record.teamId,
-        record.student1.name,
-        record.student1.year_level,
-        record.student1.score,
-        record.student2.name,
-        record.student2.year_level,
-        record.student2.score,
-        record.student3.name,
-        record.student3.year_level,
-        record.student3.score,
-        record.student4.name,
-        record.student4.year_level,
-        record.student4.score,
-        record.totalMarks,
+        record.username,
+        record.student_lastname,
+        record.student_firstname,
+        record.state,
+        record.started_on,
+        record.completed,
+        record.time_taken,
+        record.year_level,
+        record.total_marks,
+        ...Array.from({ length: num_responses }, (_, i) =>
+          record.responses[i] !== undefined ? record.responses[i] : "-",
+        ),
       ]);
 
       // Convert to CSV string
@@ -254,7 +223,7 @@ function TeamLeaderboardIndex() {
       const link = document.createElement("a");
 
       link.href = url;
-      link.setAttribute("download", "TeamList_WAJO.csv");
+      link.setAttribute("download", "Quiz_Attempts_WAJO.csv");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -270,7 +239,7 @@ function TeamLeaderboardIndex() {
         <SearchInput
           label=""
           value={searchParams.search ?? ""}
-          placeholder="Search Schools and Teams"
+          placeholder="Search Students"
           onSearch={(newSearch: string) => {
             setAndPush({ search: newSearch, page: 1 });
           }}
@@ -290,7 +259,7 @@ function TeamLeaderboardIndex() {
 
       <Suspense fallback={<WaitingLoader />}>
         <div>
-          <TeamListDataGrid
+          <QuizAttemptsDataGrid
             datacontext={data ?? []}
             isLoading={!isReady || isLoading}
             onOrderingChange={onOrderingChange}

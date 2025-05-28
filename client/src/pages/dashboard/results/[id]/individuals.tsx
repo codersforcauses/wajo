@@ -186,7 +186,7 @@ function IndividualLeaderboardIndex() {
     const link = document.createElement("a");
 
     link.href = url;
-    link.setAttribute("download", "Student_Results_WAJO.csv");
+    link.setAttribute("download", "Individual_Results_WAJO.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

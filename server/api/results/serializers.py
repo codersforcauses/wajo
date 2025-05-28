@@ -1,6 +1,7 @@
+from django.forms import ValidationError
 from rest_framework import serializers
 
-from api.quiz.models import QuizAttempt, QuestionAttempt
+from api.quiz.models import QuizAttempt, QuestionAttempt, QuizSlot
 from api.team.models import Team
 from ..users.models import Student, User
 import uuid
@@ -132,7 +133,7 @@ class TeamListSerializer(serializers.ModelSerializer):
         return response
 
 
-class QuestionAttemptsSerializer(serializers.ModelSerializer):
+class QuestionAttemptSerializer(serializers.ModelSerializer):
     """
     Serializer for the question attempts data.
 
@@ -189,3 +190,122 @@ class QuestionAttemptsSerializer(serializers.ModelSerializer):
         if marks_awarded < 0:
             raise serializers.ValidationError("Marks awarded cannot be negative.")
         return super().validate(attrs)
+
+
+class QuizAttemptSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the quiz attempt data.
+
+    This serializer is designed for handling quiz attempts in the competition results. Each entry represents
+    a quiz attempt, including its details and the student's score.
+    """
+
+    username = serializers.SerializerMethodField()
+    student_firstname = serializers.SerializerMethodField()
+    student_lastname = serializers.SerializerMethodField()
+    state = serializers.SerializerMethodField()
+    started_on = serializers.DateTimeField(source="time_start", allow_null=True)
+    completed = serializers.DateTimeField(source="time_finish", allow_null=True)
+    time_taken = serializers.SerializerMethodField()
+    student_responses = serializers.SerializerMethodField()
+    student_year_level = serializers.IntegerField(source="student.year_level")
+    total_marks = serializers.IntegerField()
+
+    def get_username(self, obj):
+        return obj.student.user.username
+
+    def get_student_firstname(self, obj):
+        return f"{obj.student.user.first_name}".strip()
+
+    def get_student_lastname(self, obj):
+        return f"{obj.student.user.last_name}".strip()
+
+    def get_state(self, obj):
+        # Map the state of the quiz attempt to a readable format
+
+        def map_state(state):
+            state_mapping = {
+                1: "Unattempted",
+                2: "In Progress",
+                3: "Submitted",
+                4: "Completed",
+            }
+            return state_mapping.get(state)
+        return map_state(obj.state)
+
+    def get_time_taken(self, obj):
+        if obj.time_start and obj.time_finish:
+            return obj.time_finish - obj.time_start
+        return None
+
+    def get_student_responses(self, obj):
+        """
+        Get student responses for a specific quiz.
+        This function retrieves the responses of each student for a given quiz.
+        """
+        quiz_id = self.context.get('quiz_id')
+        if not quiz_id:
+            raise serializers.ValidationError({"quiz_id": "Quiz ID is required to fetch student responses."})
+        # queryset = queryset.prefetch_related("question_attempts")
+        # all_students = Student.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct() if quiz_id else Student.objects.all()
+        student = obj.student
+        if not student:
+            raise serializers.ValidationError({"student_id": "Student ID is required to fetch responses."})
+
+        # results = []
+        # for student in all_students:
+        try:
+            student_id = int(student.id)
+        except ValueError:
+            raise ValidationError({"student_id": "Invalid student_id. Must be an integer."})
+
+        # Get the quiz attempts for the student
+        quiz_attempts = QuizAttempt.objects.filter(student_id=student_id, quiz=quiz_id)
+        # Get the first quiz attempt for the student
+        quiz_attempt = quiz_attempts.first()
+
+        # Prepare the student responses dictionary
+        student_responses = {
+            # "student_id": student_id,
+            # "student_lastname": f"{student.user.last_name}" if student.user.last_name else student.user.username,
+            # "student_firstname": f"{student.user.first_name}" if student.user.first_name else "",
+            # "state": map_state(quiz_attempt.state) if quiz_attempt else "",
+            # "started_on": quiz_attempt.time_start if quiz_attempt else None,
+            # "completed": quiz_attempt.time_finish if quiz_attempt else None,
+            # "time_taken": quiz_attempt.time_finish - quiz_attempt.time_start,
+            # "year_level": student.year_level,
+            # "total_marks": quiz_attempt.total_marks if quiz_attempt else 0,
+            # "responses": {},
+        }
+        # Iterate through the quiz slots to get the student's responses
+        for slot in QuizSlot.objects.filter(quiz_id=quiz_id).order_by("quiz_question_id"):
+            question_id = slot.quiz_question_id
+            # Get the student's response for the question
+            response = QuestionAttempt.objects.filter(
+                quiz_attempt=quiz_attempt,
+                question=slot.question,
+                student_id=student_id
+            ).first()
+            if response:
+                student_responses[question_id] = response.answer_student
+            else:
+                student_responses[question_id] = None
+        # results.append(student_responses)
+        # return results
+        return student_responses
+
+    class Meta:
+        model = QuizAttempt
+        fields = [
+            "id",
+            "username",
+            "student_firstname",
+            "student_lastname",
+            "state",
+            "started_on",
+            "completed",
+            "time_taken",
+            "student_responses",
+            "student_year_level",
+            "total_marks",
+        ]

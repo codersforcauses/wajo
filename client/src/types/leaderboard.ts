@@ -82,3 +82,17 @@ export interface QuestionAttempts {
   is_correct: boolean;
   marks_awarded: number;
 }
+
+export interface QuizAttempts {
+  // quiz_name: string;
+  username: number;
+  student_lastname: string;
+  student_firstname: string;
+  state: string;
+  started_on: string;
+  completed: string;
+  time_taken: string;
+  student_year_level: number;
+  total_marks: number;
+  responses: Record<string, number | null>;
+}

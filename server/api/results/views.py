@@ -5,7 +5,7 @@ from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
 from django.db.models import Sum, Max
 from django.db.models.functions import Cast
 from ..quiz.models import Quiz, QuizAttempt, QuestionAttempt
-from .serializers import IndividualResultsSerializer, TeamResultsSerializer, TeamListSerializer, QuestionAttemptsSerializer
+from .serializers import IndividualResultsSerializer, TeamResultsSerializer, TeamListSerializer, QuestionAttemptSerializer, QuizAttemptSerializer
 from ..team.models import Team
 from ..users.models import School, Student
 from rest_framework.response import Response
@@ -227,7 +227,7 @@ class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     queryset = QuestionAttempt.objects.all()
-    serializer_class = QuestionAttemptsSerializer
+    serializer_class = QuestionAttemptSerializer
 
     def get_queryset(self):
         quiz_id = self.request.query_params.get("quiz_id")
@@ -272,6 +272,44 @@ class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
 
         question_attempts = self.get_queryset()
         serializer = self.get_serializer(question_attempts, many=True)
+        return Response(serializer.data)
+
+
+class QuizAttemptViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    View to retrieve all quiz attempts for a specific quiz, along with their question attempts.
+    """
+    queryset = QuizAttempt.objects.all()
+    serializer_class = QuizAttemptSerializer
+
+    def get_queryset(self):
+        quiz_id = self.request.query_params.get("quiz_id")
+        queryset = self.queryset
+        if quiz_id:
+            try:
+                quiz_id = int(quiz_id)
+                queryset = queryset.filter(quiz=quiz_id)
+            except ValueError:
+                raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
+
+        return queryset
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['quiz_id'] = self.request.query_params.get('quiz_id')
+        return context
+
+    # action for getting non-paginated results
+    @action(detail=False, methods=["get"], pagination_class=None)
+    def non_paginated(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        quiz_attempts = self.get_queryset()
+        serializer = self.get_serializer(quiz_attempts, many=True)
         return Response(serializer.data)
 
 

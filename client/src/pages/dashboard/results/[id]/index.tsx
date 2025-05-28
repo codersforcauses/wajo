@@ -25,6 +25,7 @@ function Index() {
     { href: `${quizId}/teams`, label: "Teams" },
     { href: `${quizId}/insights`, label: "Insights" },
     { href: `${quizId}/question-attempts`, label: "Question attempts" },
+    { href: `${quizId}/quiz-attempts`, label: "Quiz attempts" },
     { href: `${quizId}/teamlist`, label: "Team list" },
   ];
   console.log(quizId);
