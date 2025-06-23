@@ -1,14 +1,75 @@
-import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRef } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
+import { useForm } from "react-hook-form";
+import z from "zod";
 
 import { PublicPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import WajoLogo from "@/components/wajo-logo";
+import { contactFormSchema } from "@/types/contact";
+
+type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 export default function ContactPage() {
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      contactNumber: "",
+      school: "",
+      subject: "",
+      enquiry: "",
+      recaptcha: "",
+    },
+  });
+
+  const onSubmit = async (data: ContactFormValues) => {
+    // Reset reCAPTCHA after submission
+    if (recaptchaRef.current) {
+      recaptchaRef.current.reset();
+    }
+    form.setValue("recaptcha", "");
+
+    alert(JSON.stringify(data, null, 2));
+  };
+
+  const handleRecaptchaChange = (token: string | null) => {
+    if (token) {
+      form.setValue("recaptcha", token);
+      form.clearErrors("recaptcha");
+    } else {
+      form.setValue("recaptcha", "");
+    }
+  };
+
   return (
     <PublicPage>
       <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-6 py-16">
+        <div className="container mx-auto px-20 py-10">
           <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-8">
             <div className="space-y-8 lg:col-span-5">
               <div className="space-y-4">
@@ -44,22 +105,192 @@ export default function ContactPage() {
               </div>
 
               <div className="pt-4">
-                <Button className="flex transform items-center gap-3 rounded-full bg-amber-400 px-8 py-3 font-semibold text-black shadow-lg transition-all hover:bg-amber-500">
-                  Contact us Form
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-black"
-                  >
-                    <path d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                  </svg>
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="flex transform items-center gap-3 rounded-full bg-amber-400 px-8 py-3 font-semibold text-black shadow-lg transition-all hover:bg-amber-500">
+                      Contact us Form
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="text-black"
+                      >
+                        <path d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                      </svg>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[90vh] w-[95vw] max-w-[500px] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>
+                        <div className="text-xl font-bold">Contact us</div>
+                        <div className="h-[3px] w-16 bg-amber-400"></div>
+                      </DialogTitle>
+                    </DialogHeader>
+
+                    <Form {...form}>
+                      <form
+                        onSubmit={form.handleSubmit(onSubmit)}
+                        className="space-y-4"
+                      >
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name="firstName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>First name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="First name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="lastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Last name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Last name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email Address</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="email"
+                                    placeholder="example@email.com"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="contactNumber"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Contact number</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="0412345678" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={form.control}
+                          name="school"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>School</FormLabel>
+                              <FormControl>
+                                <Input placeholder="School Name" {...field} />
+                              </FormControl>
+                              <FormDescription className="text-xs text-gray-500">
+                                *If your school is registered with us, you can
+                                search for it
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="subject"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Subject</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Enquiry subject"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="enquiry"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Enquiry</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder="Enter your enquiry here"
+                                  className="min-h-[120px] resize-none"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="recaptcha"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <div className="flex justify-center">
+                                  <ReCAPTCHA
+                                    ref={recaptchaRef}
+                                    sitekey={
+                                      process.env
+                                        .NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
+                                      "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                                    }
+                                    onChange={handleRecaptchaChange}
+                                    onExpired={() =>
+                                      handleRecaptchaChange(null)
+                                    }
+                                    onError={() => handleRecaptchaChange(null)}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <DialogFooter>
+                          <Button
+                            type="submit"
+                            className="w-full bg-amber-400 font-semibold text-black hover:bg-amber-500"
+                          >
+                            Submit
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               <div className="space-y-6 border-t border-gray-200 pt-8">
@@ -115,7 +346,8 @@ export default function ContactPage() {
                         href="#"
                         className="transition-colors hover:text-amber-600"
                       >
-                        Dr Miccal Matthews (UWA)
+                        <span className="underline">Dr Miccal Matthews</span>{" "}
+                        (UWA)
                       </a>
                     </p>
                   </div>
@@ -125,7 +357,8 @@ export default function ContactPage() {
                         href="#"
                         className="transition-colors hover:text-amber-600"
                       >
-                        Dr Jamie Simpson (Curtin Univ.)
+                        <span className="underline">Dr Jamie Simpson</span>{" "}
+                        (Curtin Univ.)
                       </a>
                     </p>
                     <p className="text-sm text-gray-600">
@@ -133,7 +366,8 @@ export default function ContactPage() {
                         href="#"
                         className="transition-colors hover:text-amber-600"
                       >
-                        Dr Elena Stoyanova (Education Consultant)
+                        <span className="underline">Dr Elena Stoyanova</span>{" "}
+                        (Education Consultant)
                       </a>
                     </p>
                     <p className="text-sm text-gray-600">
@@ -141,7 +375,8 @@ export default function ContactPage() {
                         href="#"
                         className="transition-colors hover:text-amber-600"
                       >
-                        Mr Mark White (Perth Modern School)
+                        <span className="underline">Mr Mark White</span> (Perth
+                        Modern School)
                       </a>
                     </p>
                     <p className="text-sm text-gray-600">
@@ -150,7 +385,7 @@ export default function ContactPage() {
                         className="transition-colors hover:text-amber-600"
                       >
                         <span className="underline">Mrs Paula McMahon</span>{" "}
-                        (MAWA Executive Officer)
+                        (MAWA)
                       </a>
                     </p>
                   </div>
