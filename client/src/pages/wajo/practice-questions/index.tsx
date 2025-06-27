@@ -98,6 +98,15 @@ function PracticeQuestionsPage() {
   };
 
   const handleSubmit = () => {
+    const results = {
+      quizId,
+      userAnswers,
+      questions: quizSlots,
+      quizData,
+      submittedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("practiceResults", JSON.stringify(results));
     router.push("/wajo/practice-results");
   };
 
