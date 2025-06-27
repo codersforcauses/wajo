@@ -23,6 +23,7 @@ function PracticePage() {
   } = useFetchData<QuizResponse>({
     queryKey: ["quizzes.all"],
     endpoint: "/quiz/all-quizzes/",
+    params: { is_comp: "false" },
   });
 
   if (isQuizDataLoading || !quizData) return <WaitingLoader />;
