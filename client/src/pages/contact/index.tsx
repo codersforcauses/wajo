@@ -63,7 +63,7 @@ export default function ContactPage() {
                     sectionKey="main"
                     initialContent={data.value?.main || "[Add Text here]"}
                   />
-                  <div className="space-y-3">
+                  {/* <div className="space-y-3">
                     <p className="text-lg text-gray-700">
                       <span className="font-medium">Email:</span>{" "}
                       wajo-maths@uwa.edu.au
@@ -88,7 +88,7 @@ export default function ContactPage() {
                       that email to this list will be limited to the couple of
                       months before each olympiad.
                     </p>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="pt-4">
                   <DialogForm />
@@ -101,7 +101,7 @@ export default function ContactPage() {
                     sectionKey={"committee"}
                     initialContent={data.value?.committee || "[Add Text here]"}
                   />
-                  <div className="space-y-3">
+                  {/* <div className="space-y-3">
                     <h3 className="text-lg font-semibold text-gray-800">
                       This website is maintained by the Western Australian
                       Mathematical Olympiads Committee (WAMOC):
@@ -200,7 +200,7 @@ export default function ContactPage() {
                         </a>
                       </p>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
