@@ -64,3 +64,74 @@ export const useThrottle = (
     }, delay);
   };
 };
+
+/**
+ * List of allowed URL protocols for sanitization.
+ */
+const SUPPORTED_URL_PROTOCOLS = new Set([
+  "http:",
+  "https:",
+  "mailto:",
+  "sms:",
+  "tel:",
+]);
+
+/**
+ * Sanitizes a URL to ensure it's using a safe protocol.
+ * Falls back to "about:blank" if the protocol is unsupported.
+ *
+ * @param url - The input URL string to sanitize.
+ * @returns A sanitized URL string.
+ */
+export function sanitizeUrl(url: string): string {
+  try {
+    const parsedUrl = new URL(url);
+    // eslint-disable-next-line no-script-url
+    if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
+      return "about:blank";
+    }
+  } catch {
+    return url;
+  }
+  return url;
+}
+
+/**
+ * Regular expression to validate general URL format.
+ *
+ * @see [StackOverflow](https://stackoverflow.com/a/8234912/2013580)
+ */
+const urlRegExp = new RegExp(
+  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/,
+);
+/**
+ * Validates a URL string against a general URL pattern.
+ * Also allows "https://" as a minimal valid input.
+ *
+ * @param url - The URL string to validate.
+ * @returns True if the URL is valid, otherwise false.
+ */
+export function validateUrl(url: string): boolean {
+  return url === "https://" || urlRegExp.test(url);
+}
+
+/**
+ * Converts an RGB color string (e.g., "rgb(255, 255, 255)") to HEX format (e.g., "#ffffff").
+ *
+ * @param rgb - A valid CSS RGB color string.
+ * @returns A HEX color string, or the original input if parsing fails.
+ */
+export function rgbToHex(rgb: string): string {
+  const match = rgb.match(/^rgb\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)$/);
+  if (!match) return rgb; // fallback to raw value if not a valid rgb format
+  const [, r, g, b] = match.map(Number);
+  return (
+    "#" +
+    [r, g, b]
+      .map((x) => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      })
+      .join("")
+  );
+}

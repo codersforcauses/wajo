@@ -35,6 +35,7 @@ api_urls = [
     path("question/", include("api.question.urls")),
     path("auth/", include("api.auth.urls")),
     path("team/", include("api.team.urls")),
+    path("setting/", include("api.setting.urls")),
 ]
 
 urlpatterns = [
@@ -47,6 +48,7 @@ urlpatterns = [
     path("api/users/", include("api.users.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/invoice/", include("api.invoice.urls")),
+    path("api/setting/", include("api.setting.urls")),
     # Optional UI:
     path(
         "api/schema/swagger-ui/",
