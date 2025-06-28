@@ -9,6 +9,12 @@ class SettingSerializer(serializers.ModelSerializer):
         model = Setting
         fields = ['id', 'key', 'value']
 
+    def to_representation(self, instance: Setting):
+        """Ensure value is returned as a JSON object."""
+        ret = super().to_representation(instance)
+        ret['value'] = instance.get_value()
+        return ret
+
     def create(self, validated_data):
         value = validated_data.pop('value')
         setting = Setting(**validated_data)

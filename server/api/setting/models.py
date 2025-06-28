@@ -13,7 +13,7 @@ class Setting(models.Model):
         value (str): A serialized string (typically JSON) that holds the value.
     """
     key = models.CharField(max_length=100, unique=True)
-    value = models.TextField(default="{}")
+    value = models.TextField(default=dict)
 
     def get_value(self):
         """

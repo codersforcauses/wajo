@@ -7,6 +7,7 @@ export enum SettingKey {
 export interface Setting {
   id: number;
   key: SettingKey;
+  value: any;
 }
 
 export interface ContactUsSetting extends Setting {
