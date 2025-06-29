@@ -81,20 +81,22 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
             serializer = QuizSlotSerializer(instance, many=True)
             return Response(serializer.data)
         if request.method == "POST":
-            # check if the quiz slots already exist, if so, detele them in database
+            # check if the quiz slots already exist, if so, delete them in database
             if QuizSlot.objects.filter(quiz_id=pk).exists():
                 QuizSlot.objects.filter(quiz_id=pk).delete()
 
             serializer = QuizSlotSerializer(data=request.data, many=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            quiz = Quiz.objects.get(pk=pk)
-            quiz_slots = quiz.quiz_slots.all()
-            questions = [slot.question for slot in quiz_slots]
-            quiz.total_marks = sum([question.mark for question in questions])
-            quiz.save()
+            # serializer.is_valid(raise_exception=True)
+            if serializer.is_valid():
+                serializer.save()
+                quiz = Quiz.objects.get(pk=pk)
+                quiz_slots = quiz.quiz_slots.all()
+                questions = [slot.question for slot in quiz_slots]
+                quiz.total_marks = sum([question.mark for question in questions])
+                quiz.save()
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=["get"])
     def marking(self, request, pk=None):

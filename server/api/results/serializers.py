@@ -246,14 +246,11 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
         quiz_id = self.context.get('quiz_id')
         if not quiz_id:
             raise serializers.ValidationError({"quiz_id": "Quiz ID is required to fetch student responses."})
-        # queryset = queryset.prefetch_related("question_attempts")
-        # all_students = Student.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct() if quiz_id else Student.objects.all()
+
         student = obj.student
         if not student:
             raise serializers.ValidationError({"student_id": "Student ID is required to fetch responses."})
 
-        # results = []
-        # for student in all_students:
         try:
             student_id = int(student.id)
         except ValueError:
@@ -265,21 +262,10 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
         quiz_attempt = quiz_attempts.first()
 
         # Prepare the student responses dictionary
-        student_responses = {
-            # "student_id": student_id,
-            # "student_lastname": f"{student.user.last_name}" if student.user.last_name else student.user.username,
-            # "student_firstname": f"{student.user.first_name}" if student.user.first_name else "",
-            # "state": map_state(quiz_attempt.state) if quiz_attempt else "",
-            # "started_on": quiz_attempt.time_start if quiz_attempt else None,
-            # "completed": quiz_attempt.time_finish if quiz_attempt else None,
-            # "time_taken": quiz_attempt.time_finish - quiz_attempt.time_start,
-            # "year_level": student.year_level,
-            # "total_marks": quiz_attempt.total_marks if quiz_attempt else 0,
-            # "responses": {},
-        }
+        student_responses = {}
         # Iterate through the quiz slots to get the student's responses
-        for slot in QuizSlot.objects.filter(quiz_id=quiz_id).order_by("quiz_question_id"):
-            question_id = slot.quiz_question_id
+        for slot in QuizSlot.objects.filter(quiz_id=quiz_id).order_by("slot_index"):
+            question_id = slot.slot_index
             # Get the student's response for the question
             response = QuestionAttempt.objects.filter(
                 quiz_attempt=quiz_attempt,
@@ -290,8 +276,7 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
                 student_responses[question_id] = response.answer_student
             else:
                 student_responses[question_id] = None
-        # results.append(student_responses)
-        # return results
+
         return student_responses
 
     class Meta:

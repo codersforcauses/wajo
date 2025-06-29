@@ -33,10 +33,10 @@ export function QuizAttemptsDataGrid({
   onOrderingChange = () => {},
 }: DatagridProps<QuizAttempts>) {
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
-  console.log("responses: ", datacontext[0].student_responses);
+  console.log("responses: ", datacontext[0].responses);
   console.log(
     "responses length: ",
-    Object.keys(datacontext[0].student_responses || {}).length,
+    Object.keys(datacontext[0].responses || {}).length,
   );
 
   return (
@@ -148,8 +148,7 @@ export function QuizAttemptsDataGrid({
                 Array.from(
                   {
                     length:
-                      Object.keys(datacontext[0].student_responses || {})
-                        .length || 0,
+                      Object.keys(datacontext[0].responses || {}).length || 0,
                   },
                   (_, i) => (
                     <TableHead key={i} className={cn(commonTableHeadClasses)}>
@@ -157,9 +156,7 @@ export function QuizAttemptsDataGrid({
                         <span>Response {i + 1}</span>
                         <span
                           className="ml-2 cursor-pointer"
-                          onClick={() =>
-                            onOrderingChange(`student_responses.${i}`)
-                          }
+                          onClick={() => onOrderingChange(`responses.${i}`)}
                         >
                           <SortIcon />
                         </span>
@@ -193,12 +190,12 @@ export function QuizAttemptsDataGrid({
                     Array.from(
                       {
                         length:
-                          Object.keys(datacontext[0].student_responses || {})
-                            .length || 0,
+                          Object.keys(datacontext[0].responses || {}).length ||
+                          0,
                       },
                       (_, i) => (
                         <TableCell key={i}>
-                          {item.student_responses?.[i] || "-"}
+                          {item.responses?.[i] || "-"}
                         </TableCell>
                       ),
                     )}

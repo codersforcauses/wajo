@@ -16,7 +16,7 @@ import {
   toQueryString,
 } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search";
-import { QuizAttemptsDataGrid } from "@/components/ui/Test/quiz-atttempts-data-grid";
+import { QuizAttemptsDataGrid } from "@/components/ui/Test/quiz-attempts-data-grid";
 import { useFetchData, useFetchDataTable } from "@/hooks/use-fetch-data";
 import {
   OrderingItem,

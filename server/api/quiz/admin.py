@@ -12,7 +12,7 @@ class QuizAdmin(ModelAdmin, ImportExportModelAdmin):
 
 @admin.register(QuizSlot)
 class QuizSlotsAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ("id", "quiz_id", "quiz_question_id", "slot_index", "question_id")
+    list_display = ("id", "quiz_id", "slot_index", "question_id")
 
 
 @admin.register(QuizAttempt)

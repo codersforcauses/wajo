@@ -68,26 +68,12 @@ class QuizSlot(models.Model):
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, default=None, related_name="slots"
     )
-    # an index of the question in the quiz
+    # an index of the question in the whole of the quiz
     slot_index = models.IntegerField(db_index=True)
     block = models.IntegerField()
 
-    quiz_question_id = models.IntegerField()
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['quiz', 'quiz_question_id'], name='unique_quiz_question_id_per_quiz')
-        ]
-
     def __str__(self):
         return f"{self.id} {self.quiz} {self.question} {self.slot_index}"
-
-    def save(self, *args, **kwargs):
-        if not self.quiz_question_id:
-            # Get the current highest quiz_question_id for this quiz
-            max_id = QuizSlot.objects.filter(quiz=self.quiz).aggregate(models.Max('quiz_question_id'))['quiz_question_id__max']
-            self.quiz_question_id = (max_id or 0) + 1
-        super().save(*args, **kwargs)
 
 
 class QuizAttempt(models.Model):
