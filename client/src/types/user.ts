@@ -78,6 +78,7 @@ export interface Student extends User {
   created_at: Date;
   extension_time: number;
   plaintext_password?: string;
+  student_score: number;
 }
 
 /**

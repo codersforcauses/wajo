@@ -68,7 +68,7 @@ class QuizSlot(models.Model):
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, default=None, related_name="slots"
     )
-    # an index of the question in the quiz
+    # an index of the question in the whole of the quiz
     slot_index = models.IntegerField(db_index=True)
     block = models.IntegerField()
 
