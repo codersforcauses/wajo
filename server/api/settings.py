@@ -44,6 +44,10 @@ CSRF_TRUSTED_ORIGINS = (
     else []
 )
 
+# Allow browser JavaScript (e.g., Axios) to access the 'Content-Disposition' header
+# so we can extract the filename when downloading files (e.g., invoice.docx).
+CORS_EXPOSE_HEADERS = ["Content-Disposition"]
+
 # Application definition
 
 INSTALLED_APPS = [
