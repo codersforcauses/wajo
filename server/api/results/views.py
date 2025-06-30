@@ -98,7 +98,6 @@ class IndividualResultsViewSet(viewsets.ReadOnlyModelViewSet):
 class TeamResultsFilter(FilterSet):
     quiz_name = ModelChoiceFilter(
         field_name="quiz_attempts__quiz__name",  # Correctly reference the quiz name
-        # field_name="quiz_attempt__quiz__name",
         queryset=Quiz.objects.all(),
         label="Quiz Name",
         to_field_name="name",

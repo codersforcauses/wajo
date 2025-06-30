@@ -348,6 +348,9 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
         Returns:
             Response: The response object containing the slots data.
         """
+        # Find the team for the student
+        team_member = TeamMember.objects.filter(student=student.id).first()
+        team_id = team_member.team.id if team_member else None
 
         if existing_attempt is None:
             quiz_attempt_serializer = QuizAttemptSerializer(
@@ -355,6 +358,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
                     "quiz": quiz_id,
                     "student": student.id,
                     "state": QuizAttempt.State.IN_PROGRESS,
+                    "team": team_id,
                 }
             )
             quiz_attempt_serializer.is_valid(raise_exception=True)

@@ -210,6 +210,7 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
     student_responses = serializers.SerializerMethodField()
     student_year_level = serializers.IntegerField(source="student.year_level")
     total_marks = serializers.IntegerField()
+    team = serializers.IntegerField()
 
     def get_username(self, obj):
         return obj.student.user.username
@@ -293,4 +294,5 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
             "student_responses",
             "student_year_level",
             "total_marks",
+            "team",
         ]

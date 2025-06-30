@@ -88,6 +88,7 @@ class QuizAttempt(models.Model):
         time_finish (DateTimeField): Finish time of the attempt
         time_modified (DateTimeField):  Last modified time of the quiz
         total_marks (IntegerField): Total marks for a particular quiz attempt
+        team (ForeignKey): The id of the team this student belongs to
 
     """
 
