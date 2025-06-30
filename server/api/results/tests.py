@@ -144,7 +144,7 @@ class ResultsAPITest(APITestCase):
     def test_team_leaderboard_should_list_results(self):
         # Act
         url = reverse("results:team-list")
-        response = self.client.get(url + "?quiz_id=1")
+        response = self.client.get(url, {"quiz_id": 1})
         # Assert
         self.assertEqual(response.status_code, 200)
         data = response.json()["results"]
@@ -163,7 +163,7 @@ class ResultsAPITest(APITestCase):
     def test_team_leaderboard_should_filter_by_type(self):
         # Act
         url = reverse("results:team-list")
-        response = self.client.get(url + "?quiz_id=2", {"school_type": "Independent"})
+        response = self.client.get(url, {"quiz_id": 2, "school_type": "Independent"})
 
         # Assert
         self.assertEqual(response.status_code, 200)
