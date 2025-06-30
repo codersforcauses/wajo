@@ -103,7 +103,7 @@ class ResultsAPITest(APITestCase):
 
     def test_individual_leaderboard_should_list_results(self):
         # Act
-        url = reverse("results:individual-list")
+        url = reverse("results:individual")
         response = self.client.get(url)
 
         # Assert
@@ -124,7 +124,7 @@ class ResultsAPITest(APITestCase):
 
     def test_individual_leaderboard_should_filter_by_school_type(self):
         # Act
-        url = reverse("results:individual-list")
+        url = reverse("results:individual")
         response = self.client.get(url, {"school_type": "Public"})
         # Assert
         self.assertEqual(response.status_code, 200)
@@ -133,7 +133,7 @@ class ResultsAPITest(APITestCase):
 
     def test_individual_leaderboard_should_filter_by_year_level(self):
         # Act
-        url = reverse("results:individual-list")
+        url = reverse("results:individual")
         response = self.client.get(url, {"year_level": 10})
 
         # Assert
@@ -143,7 +143,7 @@ class ResultsAPITest(APITestCase):
 
     def test_team_leaderboard_should_list_results(self):
         # Act
-        url = reverse("results:team-list")
+        url = reverse("results:team")
         print("url-list: ", url)
         response = self.client.get(url + "?quiz_id=1")
         print("response-list: ", response)
@@ -165,7 +165,7 @@ class ResultsAPITest(APITestCase):
 
     def test_team_leaderboard_should_filter_by_type(self):
         # Act
-        url = reverse("results:team-list")
+        url = reverse("results:team")
         response = self.client.get(url + "?quiz_id=2", {"school_type": "Independent"})
         print("url-filter: ", url)
         print("response-filter: ", response)

@@ -127,15 +127,6 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
         return Response({"message": "Quiz attempt marked successfully."})
 
     @action(detail=False, methods=["get"])
-    def quiz_names_and_ids(self, request):
-        """
-        Retrieve only the names and IDs of all competition quizzes.
-        """
-        self.queryset = Quiz.objects.filter(status__in=[1, 2]).order_by("-created_at")
-        quizzes = self.filter_queryset(self.queryset).values("id", "name")
-        return Response(quizzes)
-
-    @action(detail=False, methods=["get"])
     def get_quiz_name(self, request):
         """
         Retrieve the name of a specific quiz by its ID.
