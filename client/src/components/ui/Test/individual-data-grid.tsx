@@ -78,7 +78,15 @@ export function IndividualDataGrid({
                 </div>
               </TableHead>
               <TableHead className={cn(commonTableHeadClasses)}>
-                School Type
+                <div className="flex items-center text-white">
+                  <span>School Type</span>
+                  <span
+                    className="ml-2 cursor-pointer"
+                    onClick={() => onOrderingChange("student__school__type")}
+                  >
+                    <SortIcon />
+                  </span>
+                </div>
               </TableHead>
               <TableHead className={cn(commonTableHeadClasses)}>
                 Country School
