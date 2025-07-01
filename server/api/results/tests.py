@@ -15,11 +15,11 @@ class ResultsAPITest(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
-        # Arrange
-        city_high_school = School.objects.create(
+        # Create schools
+        self.school1 = School.objects.create(
             name="City High", code="TEST1", type="Public", is_country=False
         )
-        outback_school = School.objects.create(
+        self.school2 = School.objects.create(
             name="Outback School", code="SAMPLE", type="Independent", is_country=True
         )
 
@@ -41,20 +41,20 @@ class ResultsAPITest(APITestCase):
             first_name="Inactive",
             last_name="User",
         )
-
+        # Create students
         self.student1 = Student.objects.create(
             user=user1,
-            school=city_high_school,
+            school=self.school1,
             year_level="10",
         )
         self.student2 = Student.objects.create(
             user=user2,
-            school=outback_school,
+            school=self.school2,
             year_level="11",
         )
         self.student3 = Student.objects.create(
             user=user3,
-            school=city_high_school,
+            school=self.school1,
             year_level="10",
         )
 
@@ -68,38 +68,58 @@ class ResultsAPITest(APITestCase):
 
         self.client.login(username="testAdmin", password="password")
 
-        quiz1 = Quiz.objects.create(
-            name="Test Quiz 1", intro="This is test1 quiz.", total_marks=100, open_time_date=datetime.now(tz=awst)
-        )
-        quiz2 = Quiz.objects.create(
-            name="Test Quiz 2", intro="This is test2 quiz.", total_marks=100, open_time_date=datetime.now(tz=awst)
-        )
-
-        QuizAttempt.objects.create(
-            quiz=quiz1,
-            student=self.student1,
-            total_marks=100,
-            current_page=1,
-        )
-        QuizAttempt.objects.create(
-            quiz=quiz2,
-            student=self.student2,
-            total_marks=85,
-            current_page=2,
-        )
-        QuizAttempt.objects.create(
-            quiz=quiz1,
-            student=self.student3,
-            total_marks=40,
-            current_page=3,
-        )
-
-        self.team1 = Team.objects.create(name="Team A", school=city_high_school)
-        self.team2 = Team.objects.create(name="Team B", school=outback_school)
-
+        # create teams
+        self.team1 = Team.objects.create(name="Team A", school=self.school1)
+        self.team2 = Team.objects.create(name="Team B", school=self.school2)
+        # assign students to teams
         TeamMember.objects.create(student=self.student1, team=self.team1)
         TeamMember.objects.create(student=self.student2, team=self.team2)
         TeamMember.objects.create(student=self.student3, team=self.team1)
+
+        print(f"Team A students: {self.team1.students.all()}")
+        print(f"Team B students: {self.team2.students.all()}")
+
+        self.quiz1 = Quiz.objects.create(  # Store as instance variable
+            name="Test Quiz 1",
+            intro="This is test1 quiz.",
+            total_marks=100,
+            open_time_date=datetime.now(tz=awst)
+        )
+        self.quiz2 = Quiz.objects.create(  # Store as instance variable
+            name="Test Quiz 2",
+            intro="This is test2 quiz.",
+            total_marks=100,
+            open_time_date=datetime.now(tz=awst)
+        )
+
+        # Create quiz attempts using the actual quiz instances
+        self.quiz_attempt1 = QuizAttempt.objects.create(
+            quiz=self.quiz1,
+            student=self.student1,
+            total_marks=100,
+            current_page=1,
+            team=self.team1,
+        )
+
+        self.quiz_attempt2 = QuizAttempt.objects.create(
+            quiz=self.quiz2,
+            student=self.student2,
+            total_marks=85,
+            current_page=2,
+            team=self.team2,
+        )
+        self.quiz_attempt3 = QuizAttempt.objects.create(
+            quiz=self.quiz1,
+            student=self.student3,
+            total_marks=40,
+            current_page=3,
+            team=self.team1,
+        )
+
+        print(f"all quiz attempts: {QuizAttempt.objects.all()}")
+        print(f"quiz_attempt1: {self.quiz_attempt1}")
+        print(f"quiz_attempt2: {self.quiz_attempt2}")
+        print(f"quiz_attempt3: {self.quiz_attempt3}")
 
     def test_individual_leaderboard_should_list_results(self):
         # Act
@@ -144,11 +164,17 @@ class ResultsAPITest(APITestCase):
     def test_team_leaderboard_should_list_results(self):
         # Act
         url = reverse("results:team-list")
-        response = self.client.get(url, {"quiz_id": 1})
+        response = self.client.get(url, {"quiz_id": self.quiz1.id})
+        # Debug output
+        if response.status_code != 200:
+            print(f"Status Code: {response.status_code}")
+            print(f"Response Content: {response.content}")
+            print(f"Quiz ID used: {self.quiz1.id}")
+        print(f"List Results Response data: {response.json()}")
         # Assert
         self.assertEqual(response.status_code, 200)
         data = response.json()["results"]
-        self.assertEqual(len(data), 2)
+        self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["id"], self.team1.id)
         self.assertEqual(data[0]["school"], "City High")
         self.assertEqual(data[0]["is_country"], False)
@@ -163,8 +189,13 @@ class ResultsAPITest(APITestCase):
     def test_team_leaderboard_should_filter_by_type(self):
         # Act
         url = reverse("results:team-list")
-        response = self.client.get(url, {"quiz_id": 2, "school_type": "Independent"})
-
+        response = self.client.get(url, {"quiz_id": self.quiz2.id, "school_type": "Independent"})
+        # Debug output
+        if response.status_code != 200:
+            print(f"Status Code: {response.status_code}")
+            print(f"Response Content: {response.content}")
+            print(f"Quiz ID used: {self.quiz2.id}")
+        print(f"Filter by Type Response data: {response.json()}")
         # Assert
         self.assertEqual(response.status_code, 200)
         data = response.json()["results"]
