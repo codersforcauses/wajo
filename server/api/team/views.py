@@ -28,13 +28,17 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         user = self.request.user
-        if hasattr(user, "teacher") and not user.teacher.school_id == request.school_id:
-            return Response(
-                {"error": "Teacher cannot create team for different school."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        teams = request.data if isinstance(request.data, list) else request.data.get("teams", [])
 
-        serializer = self.get_serializer(data=request.data, many=True)
+        for team in teams:
+            school_id = team.get("school_id")
+            if hasattr(user, "teacher") and school_id and not user.teacher.school_id == int(school_id):
+                return Response(
+                    {"error": "Teacher cannot create team for different school."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        serializer = self.get_serializer(data=teams, many=True)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

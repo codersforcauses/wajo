@@ -41,6 +41,7 @@ export interface TeamLeaderboard {
   is_country: boolean;
   students: Student[];
   max_year: number;
+  quiz_attempt_count?: number;
 }
 
 export interface Ranking {
@@ -69,4 +70,29 @@ export interface Insight {
   year_7: number;
   year_8: number;
   year_9: number;
+}
+
+export interface QuestionAttempts {
+  quiz_name: string;
+  student_name: string;
+  student_year_level: number;
+  question_id: number;
+  question_text: string;
+  answer_student: string;
+  is_correct: boolean;
+  marks_awarded: number;
+}
+
+export interface QuizAttempts {
+  // quiz_name: string;
+  username: number;
+  student_lastname: string;
+  student_firstname: string;
+  state: string;
+  started_on: string;
+  completed: string;
+  time_taken: string;
+  student_year_level: number;
+  total_marks: number;
+  student_responses: Record<string, number | null>;
 }

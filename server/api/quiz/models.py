@@ -68,7 +68,7 @@ class QuizSlot(models.Model):
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, default=None, related_name="slots"
     )
-    # an index of the question in the quiz
+    # an index of the question in the whole of the quiz
     slot_index = models.IntegerField(db_index=True)
     block = models.IntegerField()
 
@@ -88,6 +88,7 @@ class QuizAttempt(models.Model):
         time_finish (DateTimeField): Finish time of the attempt
         time_modified (DateTimeField):  Last modified time of the quiz
         total_marks (IntegerField): Total marks for a particular quiz attempt
+        team (ForeignKey): The id of the team this student belongs to
 
     """
 

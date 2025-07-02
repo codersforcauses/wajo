@@ -20,6 +20,7 @@ from rest_framework.views import APIView
 class AdminUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(is_staff=True)
     serializer_class = UserSerializer
+    ordering_fields = ["first_name", "last_name"]
 
     def create(self, request, *args, **kwargs):
         try:
@@ -50,6 +51,7 @@ class AdminUserViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    ordering_fields = ["first_name", "last_name"]
 
     def get_queryset(self):
         return self.queryset
@@ -68,6 +70,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ["school", "year_level"]
     search_fields = ["user__username"]
+    ordering_fields = ["user__first_name", "user__last_name"]
 
     def get_queryset(self):
         if hasattr(self.request.user, "teacher"):
@@ -150,6 +153,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ["school"]
     search_fields = ["user__username"]
+    ordering_fields = ["user__first_name", "user__last_name"]
 
     def list(self, request, *args, **kwargs):
         if request.user.is_staff:
@@ -231,6 +235,7 @@ class SchoolViewSet(viewsets.ModelViewSet):
     serializer_class = SchoolSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ["name", "abbreviation", "type", "is_country"]
+    ordering_fields = ["name", "abbreviation", "type", "is_country"]
 
     def get_queryset(self):
         """Filter based on user role."""

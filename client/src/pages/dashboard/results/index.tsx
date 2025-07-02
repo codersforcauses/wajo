@@ -1,57 +1,70 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { ProtectedPage } from "@/components/layout";
-import { WaitingLoader } from "@/components/ui/loading";
+import { Button } from "@/components/ui/button";
 import {
   Pagination,
   PaginationSearchParams,
   SelectRow,
   toQueryString,
 } from "@/components/ui/pagination";
+import { CompetitionResultsDataGrid } from "@/components/ui/Results/competition-results-data-grid";
 import { SearchInput } from "@/components/ui/search";
-import { TeamDataGrid } from "@/components/ui/Test/team-data-grid";
-import { useFetchDataTable } from "@/hooks/use-fetch-data";
+import { useFetchData, useFetchDataTable } from "@/hooks/use-fetch-data";
+import { pickKeys } from "@/lib/utils";
 import {
   OrderingItem,
   orderingToString,
   stringToOrdering,
 } from "@/types/data-grid";
-import { TeamLeaderboard } from "@/types/leaderboard";
+import { AdminQuiz, QuizStatus } from "@/types/quiz";
 import { Role } from "@/types/user";
 
 export default function PageConfig() {
   const roles = [Role.ADMIN];
   return (
     <ProtectedPage requiredRoles={roles}>
-      <TeamLeaderboardIndex />
+      <Index />
     </ProtectedPage>
   );
 }
 
-function TeamLeaderboardIndex() {
+type CustomSearchParams = PaginationSearchParams & {
+  status: QuizStatus;
+};
+
+function Index() {
   const router = useRouter();
   const { query, isReady, push } = router;
 
   const [orderings, setOrderings] = useState<OrderingItem>({});
 
-  const [searchParams, setSearchParams] = useState<PaginationSearchParams>({
+  const defaultSearchParams: PaginationSearchParams = {
     ordering: orderingToString(orderings),
     search: "",
     nrows: 5,
     page: 1,
+  };
+
+  const [searchParams, setSearchParams] = useState<CustomSearchParams>({
+    status: QuizStatus.Upcoming,
+    ...defaultSearchParams,
   });
 
-  const { data, isLoading, error, totalPages } =
-    useFetchDataTable<TeamLeaderboard>({
-      queryKey: ["results.team"],
-      endpoint: "/results/team/",
+  const { data, isLoading, error, totalPages, refetch } =
+    useFetchDataTable<AdminQuiz>({
+      queryKey: ["quiz.admin-quizzes"],
+      endpoint: "/quiz/admin-quizzes/",
       searchParams: searchParams,
     });
 
   useEffect(() => {
-    if (isReady && !isLoading) {
+    if (!isLoading) {
       setSearchParams((prev) => ({
+        ...prev,
         ordering: (query.ordering as string) || prev.ordering,
         search: (query.search as string) || prev.search,
         nrows: Number(query.nrows) || prev.nrows,
@@ -59,19 +72,17 @@ function TeamLeaderboardIndex() {
       }));
       setOrderings(stringToOrdering(query.ordering as string));
     }
-  }, [
-    query.ordering,
-    query.search,
-    query.nrows,
-    query.page,
-    isReady,
-    isLoading,
-  ]);
+  }, [query.ordering, query.search, query.nrows, query.page, !isLoading]);
 
-  const setAndPush = (newParams: Partial<PaginationSearchParams>) => {
+  const setAndPush = (newParams: Partial<CustomSearchParams>) => {
     const updatedParams = { ...searchParams, ...newParams };
     setSearchParams(updatedParams);
-    push({ query: toQueryString(updatedParams) }, undefined, { shallow: true });
+
+    const queryParams = pickKeys(
+      updatedParams,
+      ...(Object.keys(defaultSearchParams) as []),
+    );
+    push({ query: toQueryString(queryParams) }, undefined, { shallow: true });
   };
 
   const onOrderingChange = (field: keyof OrderingItem) => {
@@ -93,21 +104,24 @@ function TeamLeaderboardIndex() {
         <SearchInput
           label=""
           value={searchParams.search ?? ""}
-          placeholder="Search Schools and Teams"
+          placeholder="Search Competition"
           onSearch={(newSearch: string) => {
             setAndPush({ search: newSearch, page: 1 });
           }}
         />
       </div>
 
-      <Suspense fallback={<WaitingLoader />}>
+      <Suspense>
         <div>
-          <TeamDataGrid
+          <CompetitionResultsDataGrid
             datacontext={data ?? []}
             isLoading={!isReady || isLoading}
+            startIdx={(searchParams.page - 1) * searchParams.nrows + 1}
             onOrderingChange={onOrderingChange}
+            onDeleteSuccess={refetch}
           />
           <div className="flex items-center justify-between p-4">
+            {/* Rows Per Page Selector */}
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-600">Rows per page:</span>
               <SelectRow
@@ -118,6 +132,7 @@ function TeamLeaderboardIndex() {
                 }
               />
             </div>
+            {/* Pagination Controls */}
             <Pagination
               totalPages={totalPages}
               currentPage={searchParams.page}

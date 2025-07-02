@@ -1,8 +1,8 @@
 import {
   BookType,
+  ChartNoAxesColumnIncreasing,
   FileJson,
   LucideIcon,
-  SquareDashedMousePointer,
   UserRoundCog,
 } from "lucide-react";
 
@@ -53,18 +53,23 @@ export const navData: NavigationData = {
       items: [
         { title: "Practice Test", url: "/dashboard/test" },
         { title: "Competitions", url: "/dashboard/test/competition" },
-        {
-          title: "Results & Rankings",
-          url: "/dashboard/test/results",
-          items: [
-            {
-              title: "Individuals",
-              url: "/dashboard/test/results/individuals",
-            },
-            { title: "Teams", url: "/dashboard/test/results/teams" },
-            { title: "Insights", url: "/dashboard/test/results/insights" },
-          ],
-        },
+      ],
+    },
+    {
+      title: "Results & Rankings",
+      icon: ChartNoAxesColumnIncreasing,
+      items: [
+        { title: "Quizzes", url: "/dashboard/results/" },
+        // {
+        //   title: "Individuals",
+        //   url: "/dashboard/results/individuals",
+        // },
+        // { title: "Teams", url: "/dashboard/results/teams" },
+        // { title: "Insights", url: "/dashboard/results/insights" },
+        // {
+        //   title: "Question Attempts",
+        //   url: "/dashboard/results/question-attempts",
+        // },
       ],
     },
     {
