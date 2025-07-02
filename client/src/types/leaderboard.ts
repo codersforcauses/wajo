@@ -94,5 +94,5 @@ export interface QuizAttempts {
   time_taken: string;
   student_year_level: number;
   total_marks: number;
-  responses: Record<string, number | null>;
+  student_responses: Record<string, number | null>;
 }

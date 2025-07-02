@@ -99,12 +99,11 @@ export function QuestionAttemptsDataGrid({
               </TableHead>
               <TableHead className={cn(commonTableHeadClasses)}>
                 <div className="flex items-center text-white">
-                  <span>Is correct</span>
                   <span
                     className="ml-2 cursor-pointer"
                     onClick={() => onOrderingChange("is_correct")}
                   >
-                    <SortIcon />
+                    <SortIcon title="Is correct" />
                   </span>
                 </div>
               </TableHead>

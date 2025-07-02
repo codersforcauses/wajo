@@ -227,6 +227,9 @@ class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = QuestionAttempt.objects.all()
     serializer_class = QuestionAttemptSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["student__user__first_name", "student__user__last_name"]
+    ordering_fields = ["student__year_level", "question__id", "is_correct" "marks"]
 
     def get_queryset(self):
         quiz_id = self.request.query_params.get("quiz_id")
@@ -280,6 +283,9 @@ class QuizAttemptViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = QuizAttempt.objects.all()
     serializer_class = QuizAttemptSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["student__user__first_name", "student__user__last_name"]
+    ordering_fields = ["student__user__last_name", "student__user__first_name", "time_start"]
 
     def get_queryset(self):
         quiz_id = self.request.query_params.get("quiz_id")

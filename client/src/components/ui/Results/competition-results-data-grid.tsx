@@ -74,8 +74,11 @@ export function CompetitionResultsDataGrid({
               <TableHead className={commonTableHeadClasses}>
                 Total Marks
               </TableHead>
-              <TableHead className={commonTableHeadClasses}>
-                Open Date
+              <TableHead
+                className={commonTableHeadClasses}
+                onClick={() => onOrderingChange("open_time_date")}
+              >
+                <SortIcon title="Open Date" />
               </TableHead>
               <TableHead className={commonTableHeadClasses}>
                 Time Limit
@@ -83,7 +86,9 @@ export function CompetitionResultsDataGrid({
               <TableHead className={commonTableHeadClasses}>
                 Time Window
               </TableHead>
-              <TableHead className={commonTableHeadClasses}>Attempts</TableHead>
+              <TableHead className={commonTableHeadClasses}>
+                Num Attempts
+              </TableHead>
               <TableHead
                 className={cn(
                   commonTableHeadClasses,

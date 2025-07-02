@@ -38,7 +38,7 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
     ]
     search_fields = ["name"]
     filterset_fields = ["is_comp", "status"]
-    ordering_fields = ["time_created"]
+    ordering_fields = ["name", "time_created", "open_time_date"]
 
     def get_queryset(self):
         queryset = Quiz.objects.all().order_by("-created_at")

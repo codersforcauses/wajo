@@ -143,6 +143,8 @@ class QuestionAttemptSerializer(serializers.ModelSerializer):
 
     quiz_name = serializers.CharField(source="quiz_attempt.quiz.name")
     student_name = serializers.SerializerMethodField()
+    first_name = serializers.CharField(source="student.user.first_name")
+    last_name = serializers.CharField(source="student.user.last_name")
     student_year_level = serializers.IntegerField(source="student.year_level")
     question_id = serializers.IntegerField(source="question.id")
     question_text = serializers.CharField(source="question.question_text")
@@ -159,6 +161,8 @@ class QuestionAttemptSerializer(serializers.ModelSerializer):
         fields = [
             "quiz_name",
             "student_name",
+            "first_name",
+            "last_name",
             "student_year_level",
             "question_id",
             "question_text",
@@ -210,7 +214,10 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
     student_responses = serializers.SerializerMethodField()
     student_year_level = serializers.IntegerField(source="student.year_level")
     total_marks = serializers.IntegerField()
-    team = serializers.IntegerField()
+    team = serializers.SerializerMethodField()
+
+    def get_team(self, obj):
+        return obj.team.id if obj.team else None
 
     def get_username(self, obj):
         return obj.student.user.username
@@ -236,7 +243,8 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
 
     def get_time_taken(self, obj):
         if obj.time_start and obj.time_finish:
-            return obj.time_finish - obj.time_start
+            delta = obj.time_finish - obj.time_start
+            return str(delta)
         return None
 
     def get_student_responses(self, obj):
@@ -266,7 +274,10 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
         student_responses = {}
         # Iterate through the quiz slots to get the student's responses
         for slot in QuizSlot.objects.filter(quiz_id=quiz_id).order_by("slot_index"):
-            question_id = slot.slot_index
+            # may need to edit, as I think the question assigned to slot_index may change when a block is shuffled
+            # therefore, we need to reference question id not the slot_index
+            # question_id = slot.slot_index
+            question_id = slot.question.id
             # Get the student's response for the question
             response = QuestionAttempt.objects.filter(
                 quiz_attempt=quiz_attempt,
@@ -274,9 +285,9 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
                 student_id=student_id
             ).first()
             if response:
-                student_responses[question_id] = response.answer_student
+                student_responses[str(question_id) + "|" + str(slot.question.name)] = response.answer_student
             else:
-                student_responses[question_id] = None
+                student_responses[str(question_id) + "|" + str(slot.question.name)] = None
 
         return student_responses
 

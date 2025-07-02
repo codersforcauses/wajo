@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import DateTimeDisplay from "@/components/ui/date-format";
 import DeleteModal from "@/components/ui/delete-modal";
+import { SortIcon } from "@/components/ui/icon";
 import { WaitingLoader } from "@/components/ui/loading";
 import {
   Table,
@@ -56,7 +57,7 @@ export function DataGrid({
   isLoading,
   startIdx,
   onDeleteSuccess,
-  onOrderingChange,
+  onOrderingChange = () => {},
 }: DatagridProps<User | Student | Teacher>) {
   const { userId } = useAuth();
   const router = useRouter();
@@ -88,14 +89,25 @@ export function DataGrid({
               <TableHead className={commonTableHeadClasses}>
                 User Name
               </TableHead>
-              <TableHead className={commonTableHeadClasses}>
-                First Name
+              <TableHead
+                className={commonTableHeadClasses}
+                onClick={() => onOrderingChange("first_name")}
+              >
+                <SortIcon title="First Name" />
               </TableHead>
-              <TableHead className={commonTableHeadClasses}>
-                Last Name
+              <TableHead
+                className={commonTableHeadClasses}
+                onClick={() => onOrderingChange("last_name")}
+              >
+                <SortIcon title="Last Name" />
               </TableHead>
-              {role !== Role.ADMIN && (
-                <TableHead className={commonTableHeadClasses}>School</TableHead>
+              {role == Role.ADMIN && (
+                <TableHead
+                  className={commonTableHeadClasses}
+                  onClick={() => onOrderingChange("school")}
+                >
+                  <SortIcon title="School" />
+                </TableHead>
               )}
               <TableHead
                 className={cn(commonTableHeadClasses, "rounded-tr-lg")}
@@ -133,7 +145,7 @@ export function DataGrid({
                   <TableCell className="w-1/4">
                     {!item.id ? "" : item.last_name ? item.last_name : "-"}
                   </TableCell>
-                  {role !== Role.ADMIN && item.id && (
+                  {role == Role.ADMIN && item.id && (
                     <TableCell className="w-1/4">
                       {item.school?.name ? item.school.name : "-"}
                     </TableCell>

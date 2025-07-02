@@ -1,5 +1,6 @@
 import React from "react";
 
+import DateTimeDisplay from "@/components/ui/date-format";
 import { SortIcon } from "@/components/ui/icon";
 import {
   Table,
@@ -33,10 +34,16 @@ export function QuizAttemptsDataGrid({
   onOrderingChange = () => {},
 }: DatagridProps<QuizAttempts>) {
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
-  console.log("responses: ", datacontext[0].responses);
+  console.log("datacontext: ", datacontext);
   console.log(
-    "responses length: ",
-    Object.keys(datacontext[0].responses || {}).length,
+    "student_responses: ",
+    datacontext.length > 0 ? datacontext[0].student_responses : [],
+  );
+  console.log(
+    "student_responses length: ",
+    datacontext
+      ? Object.keys(datacontext[0].student_responses || {}).length
+      : null,
   );
 
   return (
@@ -48,12 +55,7 @@ export function QuizAttemptsDataGrid({
               <TableHead className={cn(commonTableHeadClasses)}>
                 <div className="flex items-center text-white">
                   <span>Username</span>
-                  <span
-                    className="ml-2 cursor-pointer"
-                    onClick={() => onOrderingChange("username")}
-                  >
-                    <SortIcon />
-                  </span>
+                  <span className="ml-2 cursor-pointer"></span>
                 </div>
               </TableHead>
               <TableHead className={cn(commonTableHeadClasses)}>
@@ -114,12 +116,7 @@ export function QuizAttemptsDataGrid({
               <TableHead className={cn(commonTableHeadClasses)}>
                 <div className="flex items-center text-white">
                   <span>Time taken</span>
-                  <span
-                    className="ml-2 cursor-pointer"
-                    onClick={() => onOrderingChange("time_taken")}
-                  >
-                    <SortIcon />
-                  </span>
+                  <span className="ml-2 cursor-pointer"></span>
                 </div>
               </TableHead>
               <TableHead className={cn(commonTableHeadClasses)}>
@@ -138,7 +135,7 @@ export function QuizAttemptsDataGrid({
                   <span>Year level</span>
                   <span
                     className="ml-2 cursor-pointer"
-                    onClick={() => onOrderingChange("student_year_level")}
+                    onClick={() => onOrderingChange("student__year_level")}
                   >
                     <SortIcon />
                   </span>
@@ -147,19 +144,14 @@ export function QuizAttemptsDataGrid({
               {datacontext.length > 0 &&
                 Array.from(
                   {
-                    length:
-                      Object.keys(datacontext[0].responses || {}).length || 0,
+                    length: Object.keys(datacontext[0].student_responses ?? {})
+                      .length,
                   },
-                  (_, i) => (
+                  (response, i) => (
                     <TableHead key={i} className={cn(commonTableHeadClasses)}>
                       <div className="flex items-center text-white">
                         <span>Response {i + 1}</span>
-                        <span
-                          className="ml-2 cursor-pointer"
-                          onClick={() => onOrderingChange(`responses.${i}`)}
-                        >
-                          <SortIcon />
-                        </span>
+                        <span className="ml-2 cursor-pointer"></span>
                       </div>
                     </TableHead>
                   ),
@@ -181,21 +173,25 @@ export function QuizAttemptsDataGrid({
                   <TableCell>{item.student_lastname}</TableCell>
                   <TableCell>{item.student_firstname}</TableCell>
                   <TableCell>{item.state}</TableCell>
-                  <TableCell>{item.started_on}</TableCell>
-                  <TableCell>{item.completed}</TableCell>
+                  <TableCell>
+                    <DateTimeDisplay date={item.started_on} />
+                  </TableCell>
+                  <TableCell>
+                    <DateTimeDisplay date={item.completed} />
+                  </TableCell>
                   <TableCell>{item.time_taken}</TableCell>
                   <TableCell>{item.total_marks}</TableCell>
                   <TableCell>{item.student_year_level}</TableCell>
                   {datacontext.length > 0 &&
                     Array.from(
                       {
-                        length:
-                          Object.keys(datacontext[0].responses || {}).length ||
-                          0,
+                        length: Object.keys(
+                          datacontext[0].student_responses || {},
+                        ).length,
                       },
                       (_, i) => (
                         <TableCell key={i}>
-                          {item.responses?.[i] || "-"}
+                          {item.student_responses?.[i] || "-"}
                         </TableCell>
                       ),
                     )}

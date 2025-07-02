@@ -36,7 +36,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     ]
     search_fields = ["name"]
     filterset_fields = ["mark", "answers__value"]
-    ordering_fields = ["time_created", "time_modified", "diff_level", "mark"]
+    ordering_fields = ["name", "time_created", "time_modified", "diff_level", "mark"]
 
     # override the create method
     def create(self, request, *args, **kwargs):
