@@ -451,7 +451,7 @@ function MemberBlock({ school_id, formControl }: EditMembersProps) {
                         {field?.student?.first_name || stu.first_name}
                       </TableCell>
                       <TableCell className="w-1/2 py-2">
-                        {field?.student?.last_name || stu.first_name}
+                        {field?.student?.last_name || stu.last_name}
                       </TableCell>
                       <TableCell className="w-0 py-2 text-right">
                         <Button

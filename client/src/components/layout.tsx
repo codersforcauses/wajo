@@ -1,6 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import Footer from "@/components/ui/footer";
 import { WaitingLoader } from "@/components/ui/loading";
 import { useAuth } from "@/context/auth-provider";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { AdminQuizName } from "@/types/quiz";
 import { Role } from "@/types/user";
 
 interface ProtectedPageProps {
@@ -119,5 +121,57 @@ function NotAuthorizedPage() {
         {userRole ? "Back to Dashboard" : "Logout"}
       </Button>
     </div>
+  );
+}
+
+// Create a context to store the quiz ID and name for the results pages
+interface QuizResultsContextType {
+  quizId: number;
+  quizName: string | undefined;
+}
+// Create a context to store the quiz ID and name for the results pages
+const QuizResultsContext = createContext<QuizResultsContextType | undefined>(
+  undefined,
+);
+
+export const useQuizResultsContext = () => {
+  const context = useContext(QuizResultsContext);
+  if (!context) {
+    throw new Error(
+      "useQuizResultsContext must be used within a QuizResultsContext.Provider",
+    );
+  }
+  return context;
+};
+
+export function ResultsLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const { id } = router.query;
+
+  const quizId = typeof id === "string" ? parseInt(id, 10) : undefined;
+
+  // fetch quiz name
+  const { data, isLoading, error } = useFetchData<AdminQuizName>({
+    queryKey: [`quiz.admin-quizzes.get_quiz_name.${quizId}`],
+    endpoint: `/quiz/admin-quizzes/get_quiz_name/?quiz_id=${quizId}`,
+  });
+
+  const quizName = data?.name;
+
+  if (!quizId || isNaN(quizId)) {
+    return <div>Error: Quiz ID is missing or invalid</div>;
+  }
+
+  if (isLoading) {
+    return <WaitingLoader />;
+  }
+
+  if (error) {
+    return <div>Error: Failed to fetch quiz data</div>;
+  }
+  return (
+    <QuizResultsContext.Provider value={{ quizId, quizName }}>
+      <div>{children}</div>
+    </QuizResultsContext.Provider>
   );
 }

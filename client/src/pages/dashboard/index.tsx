@@ -17,7 +17,7 @@ function Dashboard() {
   return (
     <div className="container flex h-[90vh] items-center justify-center text-balance">
       <h1>
-        Welcome to{" "}
+        Welcome to the{" "}
         {userRole && `${userRole.charAt(0).toUpperCase()}${userRole.slice(1)}`}{" "}
         Dashboard
       </h1>

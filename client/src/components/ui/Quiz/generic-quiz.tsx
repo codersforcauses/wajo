@@ -93,6 +93,16 @@ export default function GenericQuiz({
         );
         // console.log("currentAnswer", currentAnswer);
         if (currentAnswer) {
+          console.log("Saving currentAnswer to the backend: ", currentAnswer);
+          console.log("quizAttempt: ", quizAttempt);
+
+          const quizAttemptResult = quizAttempt?.results?.[0];
+          if (!quizAttemptResult) {
+            console.error("No quiz attempt found for saving answers.");
+            toast.error("Failed to save answers: No quiz attempt found.");
+            return;
+          }
+
           saveAnswer({
             student: quizAttempt.results[0].student,
             question: currentAnswer.question,

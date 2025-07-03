@@ -38,7 +38,7 @@ class Question(models.Model):
         image: The image associated with the question.
         mark: The mark for the question.
         time_created: The timestamp when the question was created.
-    gi    time_modified: The timestamp when the question was modified.
+        time_modified: The timestamp when the question was modified.
     """
 
     id = models.AutoField(primary_key=True)

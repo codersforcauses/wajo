@@ -4,11 +4,14 @@ from rest_framework import viewsets, filters, status
 from django_filters import FilterSet, ChoiceFilter, ModelChoiceFilter
 from django.db.models import Sum, Max
 from django.db.models.functions import Cast
-from ..quiz.models import Quiz, QuizAttempt
-from .serializers import IndividualResultsSerializer, TeamResultsSerializer
-from ..users.models import School, Student
+from ..quiz.models import Quiz, QuizAttempt, QuestionAttempt
+from .serializers import IndividualResultsSerializer, TeamResultsSerializer, TeamListSerializer, QuestionAttemptSerializer, QuizAttemptSerializer
 from ..team.models import Team
+from ..users.models import School, Student
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import action, permission_classes
+from rest_framework.permissions import IsAdminUser
 
 
 class IndividualResultsFilter(FilterSet):
@@ -39,6 +42,7 @@ class IndividualResultsFilter(FilterSet):
         fields = ["quiz_name", "quiz_id", "year_level", "school_type"]
 
 
+@permission_classes([IsAdminUser])
 class IndividualResultsViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ResultsView API view to manage Results data.
@@ -53,7 +57,6 @@ class IndividualResultsViewSet(viewsets.ReadOnlyModelViewSet):
         - get(request): Handles GET requests. Returns sample data for the Results.
     """
 
-    queryset = QuizAttempt.objects.select_related("quiz", "student__school")
     serializer_class = IndividualResultsSerializer
     filterset_class = IndividualResultsFilter
     filter_backends = [
@@ -71,15 +74,36 @@ class IndividualResultsViewSet(viewsets.ReadOnlyModelViewSet):
     ]
     ordering = ["-student__year_level"]
 
+    def get_queryset(self):
+        queryset = QuizAttempt.objects.select_related("quiz", "student__school")
+        quiz_id = self.request.query_params.get("quiz_id")
+        if quiz_id:
+            queryset = queryset.filter(quiz_id=quiz_id)
+        return queryset
+
+    # action for getting non-paginated results
+    @action(detail=False, methods=["get"], pagination_class=None)
+    def non_paginated(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        individual_results = self.get_queryset()
+        serializer = self.get_serializer(individual_results, many=True)
+        return Response(serializer.data)
+
 
 class TeamResultsFilter(FilterSet):
     quiz_name = ModelChoiceFilter(
-        field_name="quiz_attempt__quiz__name",
+        field_name="quiz_attempts__quiz__name",  # Correctly reference the quiz name
         queryset=Quiz.objects.all(),
         label="Quiz Name",
         to_field_name="name",
     )
     quiz_id = ModelChoiceFilter(
+        field_name="quiz_attempts__quiz__id",  # Correctly reference the quiz ID
         queryset=Quiz.objects.all().values_list("id", flat=True),
         label="Quiz ID",
     )
@@ -102,11 +126,28 @@ class TeamResultsFilter(FilterSet):
         fields = ["quiz_name", "quiz_id", "year_level", "school_type"]
 
 
+@permission_classes([IsAdminUser])
 class TeamResultsViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Team.objects.annotate(
-        total_marks=Sum("quiz_attempts__total_marks"),
-        max_year=Max(Cast("students__year_level", output_field=BigIntegerField())),
-    )
+    def get_queryset(self):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            raise ValidationError({"quiz_id": "This query parameter is required."})
+
+        try:
+            quiz_id = int(quiz_id)
+        except ValueError:
+            raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
+
+        # Filter teams that are referenced in the `team` field of a QuizAttempt for the given quiz
+        queryset = Team.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct()
+
+        # Annotate additional fields for the queryset
+        queryset = queryset.annotate(
+            total_marks=Sum("quiz_attempts__total_marks"),
+            max_year=Max(Cast("students__year_level", output_field=BigIntegerField())),
+        )
+        return queryset
+
     serializer_class = TeamResultsSerializer
     filterset_class = TeamResultsFilter
     filter_backends = [
@@ -118,16 +159,31 @@ class TeamResultsViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ["total_marks", "max_year", "id", "school__name"]
     ordering = ["-total_marks"]
 
+    # action for getting non-paginated results
+    @action(detail=False, methods=["get"], pagination_class=None)
+    def non_paginated(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
+        team_results = self.get_queryset()
+        serializer = self.get_serializer(team_results, many=True)
+        return Response(serializer.data)
+
+
+@permission_classes([IsAdminUser])
 class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
     # need to define get_queryset, but we don't use
     def get_queryset(self):
         return Student.objects.none()
 
     def list(self, request, *args, **kwargs):
-        all_students = Student.objects.all()
+        quiz_id = self.request.query_params.get("quiz_id")
+        all_students = Student.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct() if quiz_id else Student.objects.all()
         scored_students = all_students.filter(quiz_attempts__total_marks__gt=0)
-        all_teams = Team.objects.all()
+        all_teams = Team.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct() if quiz_id else Team.objects.all()
         scored_team = all_teams.filter(
             students__quiz_attempts__total_marks__gt=0
         ).distinct()
@@ -162,3 +218,152 @@ class InsightsViewSet(viewsets.ReadOnlyModelViewSet):
         ]
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+class QuestionAttemptsViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    View to retrieve all question attempts for a specific quiz.
+    """
+
+    queryset = QuestionAttempt.objects.all()
+    serializer_class = QuestionAttemptSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["student__user__first_name", "student__user__last_name"]
+    ordering_fields = ["student__year_level", "question__id", "is_correct" "marks"]
+
+    def get_queryset(self):
+        quiz_id = self.request.query_params.get("quiz_id")
+        queryset = self.queryset
+        if quiz_id:
+            try:
+                quiz_id = int(quiz_id)
+                queryset = queryset.filter(quiz_attempt__quiz=quiz_id)
+            except ValueError:
+                raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if quiz_id:
+            try:
+                quiz_id = int(quiz_id)
+            except ValueError:
+                return Response(
+                    {"detail": "Invalid Quiz ID. Must be an integer."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            quiz = Quiz.objects.filter(id=quiz_id).first()
+            if not quiz:
+                return Response(
+                    {"detail": "Quiz not found."}, status=status.HTTP_404_NOT_FOUND
+                )
+        else:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().list(request, *args, **kwargs)
+
+    # action for getting non-paginated results
+    @action(detail=False, methods=["get"], pagination_class=None)
+    def non_paginated(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        question_attempts = self.get_queryset()
+        serializer = self.get_serializer(question_attempts, many=True)
+        return Response(serializer.data)
+
+
+class QuizAttemptViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    View to retrieve all quiz attempts for a specific quiz, along with their question attempts.
+    """
+    queryset = QuizAttempt.objects.all()
+    serializer_class = QuizAttemptSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["student__user__first_name", "student__user__last_name"]
+    ordering_fields = ["student__user__last_name", "student__user__first_name", "time_start"]
+
+    def get_queryset(self):
+        quiz_id = self.request.query_params.get("quiz_id")
+        queryset = self.queryset
+        if quiz_id:
+            try:
+                quiz_id = int(quiz_id)
+                queryset = queryset.filter(quiz=quiz_id)
+            except ValueError:
+                raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
+
+        return queryset
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['quiz_id'] = self.request.query_params.get('quiz_id')
+        return context
+
+    # action for getting non-paginated results
+    @action(detail=False, methods=["get"], pagination_class=None)
+    def non_paginated(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        quiz_attempts = self.get_queryset()
+        serializer = self.get_serializer(quiz_attempts, many=True)
+        return Response(serializer.data)
+
+
+@permission_classes([IsAdminUser])
+class TeamListViewSet(viewsets.ReadOnlyModelViewSet):
+    def get_queryset(self):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            raise ValidationError({"quiz_id": "This query parameter is required."})
+
+        try:
+            quiz_id = int(quiz_id)
+        except ValueError:
+            raise ValidationError({"quiz_id": "Invalid quiz_id. Must be an integer."})
+        queryset = Team.objects.filter(quiz_attempts__quiz_id=quiz_id).distinct()
+
+        # Annotate additional fields for the queryset
+        queryset = queryset.annotate(
+            total_marks=Sum("quiz_attempts__total_marks"),
+        )
+
+        return queryset
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        quiz_id = self.request.query_params.get("quiz_id")
+        context.update({"quiz_id": quiz_id})
+        return context
+
+    serializer_class = TeamListSerializer
+    filterset_class = TeamResultsFilter
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter,
+    ]
+    search_fields = ["school__name", "id"]
+    ordering_fields = ["total_marks", "id", "school__name"]
+    ordering = ["-total_marks"]
+
+    # action for getting non-paginated results
+    @action(detail=False, methods=["get"], pagination_class=None)
+    def non_paginated(self, request, *args, **kwargs):
+        quiz_id = self.request.query_params.get("quiz_id")
+        if not quiz_id:
+            return Response(
+                {"detail": "Quiz ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        team_results = self.get_queryset()
+        serializer = self.get_serializer(team_results, many=True)
+        return Response(serializer.data)

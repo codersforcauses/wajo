@@ -90,6 +90,8 @@ class UserQuizSerializer(serializers.ModelSerializer):
 
 
 class AdminQuizSerializer(serializers.ModelSerializer):
+    quiz_attempt_count = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Quiz
         fields = "__all__"

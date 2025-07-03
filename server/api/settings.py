@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     "api.quiz",
     "api.team",
     "api.invoice",
+    "api.setting",
     "drf_spectacular",
     'import_export',
 ]

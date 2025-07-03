@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { AlertTriangle } from "lucide-react";
+import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -93,13 +94,15 @@ export function DataTableForm(schoolID: DataTableFormProps) {
     name: "users",
   });
 
+  const router = useRouter();
   const { mutate: createUser, isPending } = usePostMutation<Student[]>({
     mutationKey: ["students"],
     endpoint: "/users/students/",
-    onSuccess: (res) => {
-      console.log(res.data);
+    onSuccess: (response) => {
+      console.log(response.data);
 
       toast.success("Students created successfully!");
+      router.push("/dashboard/users/students/");
     },
   });
 

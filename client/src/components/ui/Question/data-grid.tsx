@@ -41,16 +41,18 @@ export function Datagrid({
           <TableHeader className="bg-black text-lg font-semibold">
             <TableRow className="hover:bg-muted/0">
               <TableHead className={commonTableHeadClasses}>No.</TableHead>
-              <TableHead className={commonTableHeadClasses}>Name</TableHead>
               <TableHead
                 className={commonTableHeadClasses}
-                onClick={() => onOrderingChange("categories")}
+                onClick={() => onOrderingChange("name")}
               >
-                <SortIcon title="Categories" />
+                <SortIcon title="Name" />
+              </TableHead>
+              <TableHead className={commonTableHeadClasses}>
+                Categories
               </TableHead>
               <TableHead
                 className={commonTableHeadClasses}
-                onClick={() => onOrderingChange("diff_level")}
+                onClick={() => onOrderingChange("mark")}
               >
                 <SortIcon title="Marks" />
               </TableHead>

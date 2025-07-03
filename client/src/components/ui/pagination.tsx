@@ -9,14 +9,24 @@ import { cn } from "@/lib/utils";
 import { PaginationProps } from "@/types/data-grid";
 
 export function Pagination({
-  totalPages,
-  currentPage,
+  totalPages = 1,
+  currentPage = 1,
   onPageChange,
   className,
 }: PaginationProps) {
   const siblings = 1;
 
   const getPaginationItems = () => {
+    if (!totalPages || isNaN(totalPages) || totalPages < 1) {
+      // console.error("Invalid totalPages:", totalPages);
+      return [];
+    }
+
+    if (!currentPage || isNaN(currentPage) || currentPage < 1) {
+      // console.error("Invalid currentPage:", currentPage);
+      return [];
+    }
+
     const items: (number | string)[] = [];
 
     if (totalPages <= 5) {
@@ -45,6 +55,11 @@ export function Pagination({
 
         const start = Math.max(2, currentPage - siblings);
         const end = Math.min(totalPages - 1, currentPage + siblings);
+
+        if (isNaN(start) || isNaN(end)) {
+          console.error("Invalid start or end values:", { start, end });
+          return [];
+        }
 
         for (let i = start; i <= end; i++) {
           items.push(i);
@@ -89,7 +104,7 @@ export function Pagination({
         </li>
 
         {paginationItems.map((item, index) =>
-          typeof item === "number" ? (
+          typeof item === "number" && !isNaN(item) ? (
             <li key={index}>
               <button
                 onClick={() => onPageChange(item)}
