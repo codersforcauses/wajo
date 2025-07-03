@@ -183,18 +183,11 @@ export function QuizAttemptsDataGrid({
                   <TableCell>{item.total_marks}</TableCell>
                   <TableCell>{item.student_year_level}</TableCell>
                   {datacontext.length > 0 &&
-                    Array.from(
-                      {
-                        length: Object.keys(
-                          datacontext[0].student_responses || {},
-                        ).length,
-                      },
-                      (_, i) => (
-                        <TableCell key={i}>
-                          {item.student_responses?.[i] || "-"}
-                        </TableCell>
-                      ),
-                    )}
+                    Object.keys(item.student_responses ?? {}).map((x, i) => (
+                      <TableCell key={i}>
+                        {item.student_responses?.[x] || "-"}
+                      </TableCell>
+                    ))}
                 </TableRow>
               ))
             ) : (
