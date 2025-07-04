@@ -3,6 +3,7 @@ import {
   ChartNoAxesColumnIncreasing,
   FileJson,
   LucideIcon,
+  Settings,
   UserRoundCog,
 } from "lucide-react";
 
@@ -89,6 +90,11 @@ export const navData: NavigationData = {
         { title: "Teams", url: "/dashboard/users/team" },
         { title: "Admin Portal", url: `${backendURL}admin`, isNewTab: true },
       ],
+    },
+    {
+      title: "Settings Management",
+      icon: Settings,
+      items: [{ title: "Invoice", url: "/dashboard/settings" }],
     },
   ],
   teacher: [
