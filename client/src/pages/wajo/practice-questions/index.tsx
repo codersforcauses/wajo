@@ -14,7 +14,7 @@ import { useFetchData } from "@/hooks/use-fetch-data";
 import { backendURL } from "@/lib/api";
 import { AdminQuizSlot, Quiz } from "@/types/quiz";
 
-function PracticeQuestionsPage() {
+export default function PracticeQuestionsPage() {
   const router = useRouter();
   const { quizId } = router.query;
   const [hasStarted, setHasStarted] = useState(false);
@@ -257,5 +257,3 @@ function PracticeQuestionsPage() {
     </PublicPage>
   );
 }
-
-export default PracticeQuestionsPage;

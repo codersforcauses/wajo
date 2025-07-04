@@ -18,7 +18,7 @@ interface PracticeResults {
   submittedAt: string;
 }
 
-function PracticeResultsPage() {
+export default function PracticeResultsPage() {
   const router = useRouter();
   const [results, setResults] = useState<PracticeResults | null>(null);
   const [score, setScore] = useState(0);
@@ -254,5 +254,3 @@ function PracticeResultsPage() {
     </PublicPage>
   );
 }
-
-export default PracticeResultsPage;

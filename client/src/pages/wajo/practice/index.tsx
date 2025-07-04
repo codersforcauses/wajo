@@ -14,7 +14,7 @@ import { WaitingLoader } from "@/components/ui/loading";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { QuizResponse } from "@/types/quiz";
 
-function PracticePage() {
+export default function PracticePage() {
   const {
     data: quizData,
     isLoading: isQuizDataLoading,
@@ -79,5 +79,3 @@ function PracticePage() {
     </PublicPage>
   );
 }
-
-export default PracticePage;
