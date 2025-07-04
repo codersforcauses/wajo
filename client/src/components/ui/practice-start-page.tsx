@@ -37,7 +37,7 @@ export default function PracticeStartPage({
           <span className="font-bold"> not </span> be expected to be to scale.
         </p>
         <div className="h-4 w-full"></div>
-        <Button size="lg" onClick={onStart}>
+        <Button className="w-full" onClick={onStart}>
           Start
         </Button>
       </div>
