@@ -22,22 +22,20 @@ export interface PaymentSettings {
   accountName: string;
   bsb: string;
   accountNumber: string;
-  department: string;
   chairTitle: string;
   chairName: string;
   signature: string;
 }
 
 export const paymentSettingsSchema = z.object({
-  address: z.string().min(1),
+  address: z.string().min(1, "Required"),
   email: z.string().email(),
   website: z.string().url(),
   fees: z.number().min(1),
-  accountName: z.string().min(1),
-  bsb: z.string().min(1),
-  accountNumber: z.string().min(1),
-  department: z.string().min(1),
-  chairName: z.string().min(1),
-  chairTitle: z.string().min(1),
-  signature: z.string().min(1, "Signature is required"),
+  accountName: z.string().min(1, "Required"),
+  bsb: z.string().min(1, "Required"),
+  accountNumber: z.string().min(1, "Required"),
+  chairName: z.string().min(1, "Required"),
+  chairTitle: z.string().min(1, "Required"),
+  signature: z.string().min(1, "Required"),
 });

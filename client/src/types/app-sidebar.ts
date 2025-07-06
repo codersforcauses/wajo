@@ -104,6 +104,7 @@ export const navData: NavigationData = {
       items: [
         { title: "Students", url: "/dashboard/users/students" },
         { title: "Teams", url: "/dashboard/users/team" },
+        { title: "Invoice", url: "/dashboard/users/school" },
       ],
     },
   ],

@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Download, ImageIcon } from "lucide-react";
 import Image from "next/image";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -43,12 +43,7 @@ function InvoiceSettingsPage() {
   const { data, isLoading, isError, error } = useFetchData<PaymentSetting>({
     queryKey: [`setting.config.${SettingKey.INVOICE_DETAILS}`],
     endpoint: `/setting/config/?key=${SettingKey.INVOICE_DETAILS}`,
-    enabled: false,
   });
-
-  // wait BE to merge
-  return <SettingsForm setting={{ value: {} } as PaymentSetting} />;
-
   if (isLoading || !data) return <WaitingLoader />;
   else if (isError) return <div>Error: {error?.message}</div>;
   else
@@ -69,7 +64,6 @@ function SettingsForm({ setting }: { setting: PaymentSetting }) {
       accountName: invoiceVal.accountName || "",
       bsb: invoiceVal.bsb || "",
       accountNumber: invoiceVal.accountNumber || "",
-      department: invoiceVal.department || "",
       chairTitle: invoiceVal.chairTitle || "",
       chairName: invoiceVal.chairName || "",
       signature: invoiceVal.signature || "",
@@ -102,18 +96,26 @@ function SettingsForm({ setting }: { setting: PaymentSetting }) {
     reader.readAsDataURL(file);
   };
 
+  useEffect(() => {
+    if (invoiceVal.signature) {
+      setSignatureBase64(invoiceVal.signature);
+    }
+  }, [invoiceVal.signature]);
+
   const onSubmit = (value: FormValues) => {
-    console.log("Form submitted with values:", value);
-    // wait BE to merge
-    // saveSettings({
-    //   id: setting.id,
-    //   data: { value },
-    // });
+    saveSettings({
+      id: setting.id,
+      data: { value },
+    });
   };
 
   const downloadInvoice = useDownloadInvoiceDocx({
     onSuccess: () => {
       toast.success("Sample invoice download successfully!");
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error;
+      toast.error(errorMessage || "Failed to download sample invoice");
     },
   });
 
@@ -152,11 +154,11 @@ function SettingsForm({ setting }: { setting: PaymentSetting }) {
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company Address</FormLabel>
+                <FormLabel>Department & Company Address</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder={`123 Main Street\nSuburb WA 6000`}
-                    rows={3}
+                    placeholder={`Department of Math\n123 Main Street\nSuburb WA 6000`}
+                    rows={4} // to adjust height
                     {...field}
                   />
                 </FormControl>
@@ -165,8 +167,8 @@ function SettingsForm({ setting }: { setting: PaymentSetting }) {
             )}
           />
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
+            <div className="md:col-span-3">
               {/* Website */}
               <FormField
                 name="website"
@@ -187,7 +189,7 @@ function SettingsForm({ setting }: { setting: PaymentSetting }) {
               />
             </div>
 
-            <div className="md:col-span-1">
+            <div className="md:col-span-2">
               {/* Email */}
               <FormField
                 name="email"
@@ -215,7 +217,7 @@ function SettingsForm({ setting }: { setting: PaymentSetting }) {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Fees Amount (AUD)</FormLabel>
+                    <FormLabel>Fees (AUD)</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -284,24 +286,7 @@ function SettingsForm({ setting }: { setting: PaymentSetting }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-            <div className="md:col-span-2">
-              {/* Department */} {/* 2 columns */}
-              <FormField
-                name="department"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Department of Math" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="md:col-span-1">
               {/* Chair Name */} {/* 1 columns */}
               <FormField

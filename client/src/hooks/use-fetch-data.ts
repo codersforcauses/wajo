@@ -169,9 +169,12 @@ export const useDownloadInvoiceDocx = <TError = AxiosError>(args?: {
   onSuccess?: () => void;
   onError?: (error: TError) => void;
 }) => {
-  return useMutation<void, TError, { timeout?: number }>({
+  return useMutation<void, TError, { school_id?: number; timeout?: number }>({
     mutationFn: async (param) => {
       const response = await api.get("/invoice/invoice_docx/", {
+        params: {
+          school_id: param.school_id || null,
+        },
         timeout: param.timeout || 5000,
         responseType: "blob",
       });
@@ -203,8 +206,35 @@ export const useDownloadInvoiceDocx = <TError = AxiosError>(args?: {
       if (args?.onSuccess) args.onSuccess();
     },
 
-    onError: (error) => {
-      if (args?.onError) args.onError(error);
+    onError: async (error) => {
+      const parsedError = (await parseAxiosBlobError(error)) as TError;
+      if (args?.onError) args.onError(parsedError as TError);
     },
   });
 };
+
+export async function parseAxiosBlobError(
+  error: unknown,
+): Promise<AxiosError | unknown> {
+  if (error instanceof AxiosError && error.response?.data instanceof Blob) {
+    try {
+      const text = await error.response.data.text();
+      const json = JSON.parse(text);
+      // Rebuild the error with parsed data
+      return new AxiosError(
+        error.message,
+        error.code,
+        error.config,
+        error.request,
+        {
+          ...error.response,
+          data: json,
+        },
+      );
+    } catch {
+      // Failed to parse as JSON, return original error
+      return error;
+    }
+  }
+  return error;
+}
