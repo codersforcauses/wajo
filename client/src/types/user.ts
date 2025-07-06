@@ -87,11 +87,13 @@ export interface Student extends User {
  * @interface School
  * @property {number} id - The unique identifier for the school.
  * @property {string} name - The name of the school.
+ * @property {string} address - The address of the school.
  * @property {Date} time_created - The timestamp of when the school was created.
  */
 export type School = {
   id: number;
   name: string;
+  address: string;
   type: string;
   is_country: boolean;
   created_at?: Date; // need from server
@@ -211,6 +213,7 @@ export const updateStudentSchema = updateStaffSchema.extend({
  */
 export const createSchoolSchema = z.object({
   name: z.string().min(1, "Required"),
+  address: z.string().min(1, "Required"),
   type: SchoolTypeEnum,
   is_country: z.boolean(),
   abbreviation: z.string().min(1, "Required"),
@@ -232,6 +235,7 @@ export interface Profile {
   school_id: School["id"];
   school_name?: School["name"];
   school_type?: SchoolType;
+  address?: School["address"];
   student_id?: string;
   year_level?: string;
   teacher_email?: string;

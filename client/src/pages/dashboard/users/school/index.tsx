@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { Suspense, useEffect, useState } from "react";
@@ -26,6 +27,8 @@ export default function PageConfig() {
 }
 
 function SchoolList() {
+  const isAdmin = Cookies.get("user_role") === Role.ADMIN;
+
   const router = useRouter();
   const { query, isReady, push } = router;
 
@@ -62,19 +65,21 @@ function SchoolList() {
 
   return (
     <div className="m-4 space-y-4">
-      <div className="flex justify-between">
-        <SearchInput
-          label=""
-          value={searchParams.search ?? ""}
-          placeholder="Search School"
-          onSearch={(newSearch: string) => {
-            setAndPush({ search: newSearch, page: 1 });
-          }}
-        />
-        <Button asChild className="mr-6 h-auto">
-          <Link href={`${router.pathname}/create`}>Create a School</Link>
-        </Button>
-      </div>
+      {isAdmin && (
+        <div className="flex justify-between">
+          <SearchInput
+            label=""
+            value={searchParams.search ?? ""}
+            placeholder="Search School"
+            onSearch={(newSearch: string) => {
+              setAndPush({ search: newSearch, page: 1 });
+            }}
+          />
+          <Button asChild className="mr-6 h-auto">
+            <Link href={`${router.pathname}/create`}>Create a School</Link>
+          </Button>
+        </div>
+      )}
 
       <Suspense>
         <div>
@@ -83,6 +88,7 @@ function SchoolList() {
             isLoading={!isReady || isLoading}
             startIdx={(searchParams.page - 1) * searchParams.nrows + 1}
             onDeleteSuccess={refetch}
+            isAdmin={isAdmin}
           />
           <div className="flex items-center justify-between p-4">
             {/* Rows Per Page Selector */}

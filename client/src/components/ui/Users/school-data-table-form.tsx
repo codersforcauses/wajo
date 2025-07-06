@@ -28,6 +28,8 @@ import { usePostMutation } from "@/hooks/use-post-data";
 import { cn } from "@/lib/utils";
 import { createSchoolSchema } from "@/types/user";
 
+import { Textarea } from "../textarea";
+
 type School = z.infer<typeof createSchoolSchema>;
 
 /**
@@ -93,6 +95,9 @@ export function SchoolDataTableForm() {
                   No.
                 </TableHead>
                 <TableHead className={commonTableHeadClasses}>Name*</TableHead>
+                <TableHead className={commonTableHeadClasses}>
+                  Address*
+                </TableHead>
                 <TableHead className={commonTableHeadClasses}>Type*</TableHead>
                 <TableHead
                   className={cn(commonTableHeadClasses, "text-center")}
@@ -113,7 +118,7 @@ export function SchoolDataTableForm() {
                   key={field.id}
                   className="divide-gray-200 border-gray-50 text-sm text-black"
                 >
-                  <TableCell className="text-lg font-semibold">
+                  <TableCell className="align-top text-lg font-semibold">
                     {index + 1}
                   </TableCell>
                   <TableCell className="align-top">
@@ -124,6 +129,24 @@ export function SchoolDataTableForm() {
                         <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
                           <FormControl>
                             <Input {...field} placeholder="Enter School Name" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TableCell>
+                  <TableCell className="align-top">
+                    <FormField
+                      control={createSchoolForm.control}
+                      name={`schools.${index}.address`}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col justify-between gap-1.5 space-y-0">
+                          <FormControl>
+                            <Textarea
+                              placeholder={`Department of Math\n123 Main Street\nSuburb WA 6000`}
+                              rows={3} // to adjust height
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

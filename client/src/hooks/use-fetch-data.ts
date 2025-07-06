@@ -164,3 +164,77 @@ export const useMarkCompetition = <TError = AxiosError>({ ...args }) => {
     },
   });
 };
+
+export const useDownloadInvoiceDocx = <TError = AxiosError>(args?: {
+  onSuccess?: () => void;
+  onError?: (error: TError) => void;
+}) => {
+  return useMutation<void, TError, { school_id?: number; timeout?: number }>({
+    mutationFn: async (param) => {
+      const response = await api.get("/invoice/invoice_docx/", {
+        params: {
+          school_id: param.school_id || null,
+        },
+        timeout: param.timeout || 5000,
+        responseType: "blob",
+      });
+
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      });
+
+      let filename = "invoice.docx"; // default fallback
+      const contentDisposition = response.headers["content-disposition"];
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+?)"?$/);
+        if (match?.[1]) {
+          filename = decodeURIComponent(match[1]);
+        }
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    },
+
+    onSuccess: (_, __, ___) => {
+      if (args?.onSuccess) args.onSuccess();
+    },
+
+    onError: async (error) => {
+      const parsedError = (await parseAxiosBlobError(error)) as TError;
+      if (args?.onError) args.onError(parsedError as TError);
+    },
+  });
+};
+
+export async function parseAxiosBlobError(
+  error: unknown,
+): Promise<AxiosError | unknown> {
+  if (error instanceof AxiosError && error.response?.data instanceof Blob) {
+    try {
+      const text = await error.response.data.text();
+      const json = JSON.parse(text);
+      // Rebuild the error with parsed data
+      return new AxiosError(
+        error.message,
+        error.code,
+        error.config,
+        error.request,
+        {
+          ...error.response,
+          data: json,
+        },
+      );
+    } catch {
+      // Failed to parse as JSON, return original error
+      return error;
+    }
+  }
+  return error;
+}

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { WaitingLoader } from "@/components/ui/loading";
+import { Textarea } from "@/components/ui/textarea";
 import { SelectSchoolType } from "@/components/ui/Users/select-school";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePutMutation } from "@/hooks/use-put-data";
@@ -68,6 +69,7 @@ function EditSchoolForm({ school }: { school: School }) {
     resolver: zodResolver(createSchoolSchema),
     defaultValues: {
       name: school.name,
+      address: school.address,
       type: school.type as SchoolType,
       is_country: school.is_country,
       abbreviation: school.abbreviation,
@@ -77,6 +79,7 @@ function EditSchoolForm({ school }: { school: School }) {
   const onSubmit = (data: UpdateSchool) => {
     updateSchool({
       name: data.name,
+      address: data.address,
       type: data.type,
       is_country: data.is_country,
       abbreviation: data.abbreviation,
@@ -99,6 +102,24 @@ function EditSchoolForm({ school }: { school: School }) {
                 <FormLabel>Name {requiredStar}</FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="Please input school name" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Address */}
+          <FormField
+            control={updateForm.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Address {requiredStar}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder={`Please input school address`}
+                    rows={3} // to adjust height
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
