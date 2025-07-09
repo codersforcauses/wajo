@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { PublicPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LatexInput } from "@/components/ui/math-input";
 import { Separator } from "@/components/ui/separator";
 import { backendURL } from "@/lib/api";
 import { AdminQuizSlot, Quiz } from "@/types/quiz";
@@ -49,18 +50,18 @@ export default function PracticeResultsPage() {
       setTotalMarks(total);
     } else {
       // No results found, redirect back to practice page
-      router.push("/wajo/practice");
+      router.push("/quiz/practice");
     }
   }, [router]);
 
   const handleRetry = () => {
     if (results) {
-      router.push(`/wajo/practice-questions?quizId=${results.quizId}`);
+      router.push(`/quiz/practice-questions?quizId=${results.quizId}`);
     }
   };
 
   const handleBackToPractice = () => {
-    router.push("/wajo/practice");
+    router.push("/quiz/practice");
   };
 
   const isAnswerCorrect = (questionIndex: number): boolean => {
@@ -91,7 +92,7 @@ export default function PracticeResultsPage() {
             No practice results were found. Please complete a practice quiz
             first.
           </p>
-          <Link href="/wajo/practice">
+          <Link href="/quiz/practice">
             <Button>Back to Practice</Button>
           </Link>
         </div>
@@ -172,9 +173,11 @@ export default function PracticeResultsPage() {
                 <CardContent className="space-y-6">
                   <div>
                     <h4 className="mb-2 text-lg font-semibold">Question:</h4>
-                    <p className="leading-relaxed text-gray-700">
-                      {questionSlot.question.question_text}
-                    </p>
+                    <div className="leading-relaxed text-gray-700">
+                      <LatexInput>
+                        {questionSlot.question.question_text}
+                      </LatexInput>
+                    </div>
                   </div>
 
                   {questionSlot.question.images &&
@@ -219,9 +222,11 @@ export default function PracticeResultsPage() {
                     <div>
                       <h4 className="mb-2 text-lg font-semibold">Solution:</h4>
                       <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                        <p className="leading-relaxed text-gray-700">
-                          {questionSlot.question.solution_text}
-                        </p>
+                        <div className="leading-relaxed text-gray-700">
+                          <LatexInput>
+                            {questionSlot.question.solution_text}
+                          </LatexInput>
+                        </div>
                       </div>
                     </div>
                   )}

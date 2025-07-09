@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WaitingLoader } from "@/components/ui/loading";
+import { LatexInput } from "@/components/ui/math-input";
 import PracticeStartPage from "@/components/ui/practice-start-page";
 import ButtonList from "@/components/ui/Quiz/button-list";
 import { useFetchData } from "@/hooks/use-fetch-data";
@@ -107,7 +108,7 @@ export default function PracticeQuestionsPage() {
     };
 
     localStorage.setItem("practiceResults", JSON.stringify(results));
-    router.push("/wajo/practice-results");
+    router.push("/quiz/practice-results");
   };
 
   const handleNext = () => {
@@ -193,7 +194,7 @@ export default function PracticeQuestionsPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="text-lg leading-relaxed">
-              {currentQuestion.question.question_text}
+              <LatexInput>{currentQuestion.question.question_text}</LatexInput>
             </div>
 
             {currentQuestion.question.images &&
