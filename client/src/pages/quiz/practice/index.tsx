@@ -1,21 +1,83 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { use } from "react";
+import React from "react";
 
 import { PublicPage } from "@/components/layout";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { WaitingLoader } from "@/components/ui/loading";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { QuizResponse } from "@/types/quiz";
 
-export default function PracticeQuizPage() {
-  const router = useRouter();
-  const handleGoBack = () => {
-    router.back();
-  };
+export default function PracticePage() {
+  const {
+    data: quizData,
+    isLoading: isQuizDataLoading,
+    isError: isQuizDataError,
+    error: QuizDataError,
+  } = useFetchData<QuizResponse>({
+    queryKey: ["quizzes.all"],
+    endpoint: "/quiz/all-quizzes/",
+    params: { is_comp: "false" },
+  });
+
+  if (isQuizDataLoading || !quizData) return <WaitingLoader />;
+  if (isQuizDataError) return <div>Error: {QuizDataError?.message}</div>;
 
   return (
     <PublicPage>
-      <div className="mx-auto my-3 flex items-center justify-center gap-3 lg:max-w-lg">
-        Quiz Practice not finished yet
-        <Button onClick={handleGoBack}>Go back </Button>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8 text-center">
+          <h1 className="mb-2 text-3xl font-bold text-gray-800">
+            Practice Quizzes
+          </h1>
+          <p className="text-gray-600">
+            Choose a practice quiz to start practicing. No login required!
+          </p>
+        </div>
+
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {quizData.results.map((quiz) => (
+            <Card
+              key={quiz.id}
+              className="flex h-full flex-col transition-shadow hover:shadow-lg"
+            >
+              <CardHeader className="flex-grow">
+                <CardTitle className="text-lg">{quiz.name}</CardTitle>
+                <CardDescription className="text-sm">
+                  {quiz.intro}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="mt-auto flex flex-col space-y-3">
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Total Marks: {parseInt(quiz.total_marks)}</span>
+                  <span>Time Limit: {quiz.time_limit} min</span>
+                </div>
+                <Link
+                  href={`/quiz/practice-questions?quizId=${quiz.id}`}
+                  className="w-full"
+                >
+                  <Button className="w-full" variant="default">
+                    Start Practice
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {quizData.results.length === 0 && (
+          <div className="py-12 text-center">
+            <p className="text-lg text-gray-500">
+              No practice quizzes available at the moment.
+            </p>
+          </div>
+        )}
       </div>
     </PublicPage>
   );
