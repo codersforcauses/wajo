@@ -234,8 +234,8 @@ class SchoolViewSet(viewsets.ModelViewSet):
 
     serializer_class = SchoolSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ["name", "abbreviation", "type", "is_country"]
-    ordering_fields = ["name", "abbreviation", "type", "is_country"]
+    search_fields = ["name", "address", "abbreviation", "type", "is_country"]
+    ordering_fields = ["name", "address", "abbreviation", "type", "is_country"]
 
     def get_queryset(self):
         """Filter based on user role."""
@@ -292,6 +292,7 @@ class UserProfileView(APIView):
                 'student_id': user.student.id,
                 'school': user.student.school.name,
                 'school_name': user.student.school.name,
+                'address': user.teacher.school.address,
                 'year_level': user.student.year_level if hasattr(user, 'student') else None,
             }
             profile.update(student_profile_fields)
@@ -302,6 +303,7 @@ class UserProfileView(APIView):
                 'school_id': user.teacher.school.id,
                 'is_country': user.teacher.school.is_country,
                 'school_type': user.teacher.school.type,
+                'address': user.teacher.school.address,
                 'phone': user.teacher.phone,
                 'teacher_email': user.teacher.email,
             }
