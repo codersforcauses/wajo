@@ -24,6 +24,7 @@ export default function CompetitionQuizPage() {
   const router = useRouter();
   const compId = router.query.id as string;
   const [start, setStart] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
   const handleStart = () => {
     setStart(true);
     // console.log(compId);
@@ -40,6 +41,17 @@ export default function CompetitionQuizPage() {
     enabled: !!compId, // Only run the query if compId is defined
   });
 
+  useEffect(() => {
+    if (compData) {
+      const endTime = new Date(compData.open_time_date);
+      endTime.setMinutes(endTime.getMinutes() + compData.time_limit);
+      const now = new Date();
+      if (now > endTime) {
+        setIsFinished(true);
+      }
+    }
+  }, [compData]);
+
   if (!compId) return <WaitingLoader />;
 
   console.log(compId);
@@ -51,6 +63,7 @@ export default function CompetitionQuizPage() {
           quizDuration: compData?.time_limit,
           startTime: compData?.open_time_date,
           onStart: handleStart,
+          isFinished: isFinished,
         }}
       />
     );

@@ -7,6 +7,7 @@ interface Props {
   startTime: string | Date;
   quizDuration: number;
   numberOfQuestions: number;
+  isFinished?: boolean;
 }
 
 export default function QuizIntro({
@@ -15,6 +16,7 @@ export default function QuizIntro({
   startTime,
   quizDuration,
   numberOfQuestions,
+  isFinished,
 }: Partial<Props>) {
   let headingStyle = `text-xl sm:text-2xl md:text-3xl text-slate-800 font-bold`;
   let generalInstructions =
@@ -48,9 +50,15 @@ export default function QuizIntro({
           <span className="font-bold"> not </span> be expected to be to scale.
         </p>
         <div className="h-4 w-full"></div>
-        <Button size="lg" onClick={onStart}>
-          Start
-        </Button>
+        {isFinished ? (
+          <Button size="lg" variant={"inactive"}>
+            Competition has finished
+          </Button>
+        ) : (
+          <Button size="lg" onClick={onStart}>
+            Start
+          </Button>
+        )}
       </div>
     </div>
   );
