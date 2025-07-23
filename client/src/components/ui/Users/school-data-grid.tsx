@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import * as React from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import DeleteModal from "@/components/ui/delete-modal";
@@ -13,9 +14,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useDownloadInvoiceDocx } from "@/hooks/use-fetch-data";
 import { cn } from "@/lib/utils";
 import { DatagridProps } from "@/types/data-grid";
 import { School } from "@/types/user";
+
+export interface SchoolDatagridProps<T> extends DatagridProps<T> {
+  isAdmin?: boolean;
+}
 
 /**
  * Renders a paginated data grid for displaying school information.
@@ -33,8 +39,23 @@ export function SchoolDataGrid({
   startIdx,
   onDeleteSuccess,
   onOrderingChange,
-}: DatagridProps<School>) {
+  isAdmin = false,
+}: SchoolDatagridProps<School>) {
   const router = useRouter();
+
+  const downloadInvoice = useDownloadInvoiceDocx({
+    onSuccess: () => {
+      toast.success(`The invoice has been downloaded.`);
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error;
+      toast.error(errorMessage || "Failed to download invoice");
+    },
+  });
+
+  const handleDownload = (id: number) => {
+    downloadInvoice.mutate({ school_id: id, timeout: 1000 });
+  };
 
   const commonTableHeadClasses = "w-auto text-white text-nowrap";
   return (
@@ -45,6 +66,7 @@ export function SchoolDataGrid({
             <TableRow className="hover:bg-muted/0">
               <TableHead className={commonTableHeadClasses}>No.</TableHead>
               <TableHead className={commonTableHeadClasses}>Name</TableHead>
+              <TableHead className={commonTableHeadClasses}>Address</TableHead>
               <TableHead className={commonTableHeadClasses}>Type</TableHead>
               <TableHead className={commonTableHeadClasses}>
                 Is Country
@@ -69,28 +91,44 @@ export function SchoolDataGrid({
                   key={item.id}
                   className="divide-gray-200 border-gray-50 text-sm text-black"
                 >
-                  <TableCell className="w-1/4">
+                  <TableCell className="w-1/12">
                     {startIdx ? startIdx + index : item.id}
                   </TableCell>
                   <TableCell className="w-1/4">{item.name}</TableCell>
-                  <TableCell className="w-1/4">{item.type}</TableCell>
-                  <TableCell className="w-1/4">
+                  <TableCell className="w-1/2">{item.address}</TableCell>
+                  <TableCell className="">{item.type}</TableCell>
+                  <TableCell className="">
                     {item.is_country ? "Yes" : "No"}
                   </TableCell>
-                  <TableCell className="w-1/4">{item.abbreviation}</TableCell>
+                  <TableCell className="">{item.abbreviation}</TableCell>
                   <TableCell className="sticky right-0 flex bg-white">
                     <div className="flex w-full justify-between">
-                      <Button asChild className="me-2">
-                        <Link href={`${router.pathname}/${item.id}`}>View</Link>
-                      </Button>
-                      <DeleteModal
-                        baseUrl="/users/schools"
-                        entity="school"
-                        id={item.id}
-                        onSuccess={onDeleteSuccess}
+                      <Button
+                        className="me-3 bg-blue-500 text-white hover:bg-blue-400"
+                        onClick={() => handleDownload(item.id)}
+                        disabled={downloadInvoice.isPending}
                       >
-                        <Button variant={"destructive"}>Delete</Button>
-                      </DeleteModal>
+                        {downloadInvoice.isPending
+                          ? "Downloading..."
+                          : "Invoice"}
+                      </Button>
+                      {isAdmin && (
+                        <>
+                          <Button asChild className="me-2">
+                            <Link href={`${router.pathname}/${item.id}`}>
+                              View
+                            </Link>
+                          </Button>
+                          <DeleteModal
+                            baseUrl="/users/schools"
+                            entity="school"
+                            id={item.id}
+                            onSuccess={onDeleteSuccess}
+                          >
+                            <Button variant={"destructive"}>Delete</Button>
+                          </DeleteModal>
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

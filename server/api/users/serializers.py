@@ -91,6 +91,7 @@ class SchoolSerializer(serializers.ModelSerializer):
     """
 
     name = serializers.CharField(required=True)
+    address = serializers.CharField(default="", required=False)
     type = serializers.ChoiceField(
         choices=School.SchoolType.choices, required=False, allow_blank=True
     )
