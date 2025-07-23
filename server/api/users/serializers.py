@@ -107,6 +107,7 @@ class StudentSerializer(serializers.ModelSerializer):
     It handles the serialization and deserialization of Student instances, including nested user data.
 
     Fields:
+        - user_id: get matching user id from user table
         - first_name: CharField, required, maps to user.first_name
         - last_name: CharField, required, maps to user.last_name
         - password: CharField, required, write-only, maps to user.password
@@ -122,19 +123,21 @@ class StudentSerializer(serializers.ModelSerializer):
         - model: Student
         - exclude: ['user']
     """
-
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
     first_name = serializers.CharField(required=True, source="user.first_name")
     last_name = serializers.CharField(required=True, source="user.last_name")
     student_id = serializers.CharField(source="user.username", read_only=True)
     password = serializers.CharField(
         required=True, source="user.password", write_only=True
     )
-    year_level = serializers.IntegerField(required=True, min_value=0, max_value=12)
+    year_level = serializers.IntegerField(
+        required=True, min_value=0, max_value=12)
     school_id = serializers.PrimaryKeyRelatedField(
         queryset=School.objects.all(), write_only=True, source="school"
     )
     school = SchoolSerializer(read_only=True)
-    quiz_attempts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    quiz_attempts = serializers.PrimaryKeyRelatedField(
+        many=True, read_only=True)
 
     def create(self, validated_data) -> Student:
         """
@@ -153,13 +156,15 @@ class StudentSerializer(serializers.ModelSerializer):
         user = validated_data.pop("user")
         random_str = self.random_digits(4)
 
-        random_str = str(now().year) + str(validated_data["school"].id) + random_str
+        random_str = str(now().year) + \
+            str(validated_data["school"].id) + random_str
         user["username"] = random_str
         user_serializer = UserSerializer(data=user)
         # if the username clashes with another student, generate a new one
         while User.objects.filter(username=random_str).exists():
             random_str = self.random_digits(4)
-            random_str = str(now().year) + str(validated_data["school"].id) + random_str
+            random_str = str(now().year) + \
+                str(validated_data["school"].id) + random_str
             user["username"] = random_str
             user_serializer = UserSerializer(data=user)
         user_serializer.is_valid(raise_exception=True)
@@ -215,6 +220,7 @@ class TeacherSerializer(serializers.ModelSerializer):
     It handles the serialization and deserialization of Teacher instances, including nested user data.
 
     Fields:
+        - user_id: get matching user id from user table
         - first_name: CharField, required, maps to user.first_name
         - last_name: CharField, required, maps to user.last_name
         - password: CharField, required, write-only, maps to user.password
@@ -232,6 +238,7 @@ class TeacherSerializer(serializers.ModelSerializer):
         - exclude: ['user']
     """
 
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
     first_name = serializers.CharField(required=True, source="user.first_name")
     last_name = serializers.CharField(required=True, source="user.last_name")
     password = serializers.CharField(
@@ -257,7 +264,8 @@ class TeacherSerializer(serializers.ModelSerializer):
         # Extract and create the nested User instance
         user_data = validated_data.pop("user")
         # user_data['username'] = user_data['email']
-        user_data["username"] = user_data["first_name"] + user_data["last_name"]
+        user_data["username"] = user_data["first_name"] + \
+            user_data["last_name"]
         user_serializer = UserSerializer(data=user_data)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
