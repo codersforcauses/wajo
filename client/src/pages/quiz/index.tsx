@@ -1,5 +1,6 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { createContext, useContext, useEffect } from "react";
 
 import { PublicPage } from "@/components/layout";
@@ -41,22 +42,24 @@ const QuizPage = () => {
     endpoint: "/quiz/competition/",
   });
 
+  const userRole = Cookies.get("user_role");
   if (isQuizDataLoading || !quizData || isCompQuizDataLoading || !compQuizData)
     return <WaitingLoader />;
   if (isQuizDataError) return <div>Error Quiz: {QuizDataError?.message}</div>;
-  if (isCompQuizDataError)
+  if (userRole && isCompQuizDataError)
     return <div>Error Competition: {compQuizDataError?.message}</div>;
 
   return (
     <div className="md:grid-cols mx-1 my-20 mt-10 grid auto-rows-min gap-4">
-      {compQuizData.results.length > 0 ? (
-        <CompetitionCard
-          className="mx-auto w-full max-w-lg"
-          {...compQuizData}
-        />
-      ) : (
-        <NoCompetitionCard className="mx-auto w-full max-w-lg" />
-      )}
+      {userRole &&
+        (compQuizData.results.length > 0 ? (
+          <CompetitionCard
+            className="mx-auto w-full max-w-lg"
+            {...compQuizData}
+          />
+        ) : (
+          <NoCompetitionCard className="mx-auto w-full max-w-lg" />
+        ))}
       <PracticeCard className="mx-auto w-full max-w-lg" {...quizData} />
     </div>
   );

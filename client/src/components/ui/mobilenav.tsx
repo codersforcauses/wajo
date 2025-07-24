@@ -1,12 +1,16 @@
 import { AlignJustify, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { Drawer } from "vaul";
 
 import { Button } from "@/components/ui/button";
 import { LoginModal } from "@/components/ui/Users/login-modal";
+import { useAuth } from "@/context/auth-provider";
 
 export default function MobileNav() {
+  const router = useRouter();
+  const { isLoggedIn } = useAuth();
   return (
     <Drawer.Root direction="top">
       <Drawer.Trigger className="relative flex h-10 flex-shrink-0 items-center justify-center gap-2 overflow-hidden rounded-full bg-white px-4 text-sm font-medium shadow-sm transition-all hover:bg-[#FAFAFA] dark:bg-[#161615] dark:text-white dark:hover:bg-[#1A1A19]">
@@ -42,15 +46,26 @@ export default function MobileNav() {
               <Link href="/awards">Awards</Link>
               <Link href="/quiz">Quizzes</Link>
               <Link href="/contact">Contact us</Link>
-              <LoginModal>
+              {isLoggedIn ? (
                 <Button
                   variant={"outline"}
                   size={"lg"}
                   className="border-2 border-black font-roboto text-lg"
+                  onClick={() => router.push("/dashboard")}
                 >
-                  Login
+                  Dashboard
                 </Button>
-              </LoginModal>
+              ) : (
+                <LoginModal>
+                  <Button
+                    variant={"outline"}
+                    size={"lg"}
+                    className="border-2 border-black font-roboto text-lg"
+                  >
+                    Login
+                  </Button>
+                </LoginModal>
+              )}
             </Drawer.Description>
             {/* </div> */}
           </div>

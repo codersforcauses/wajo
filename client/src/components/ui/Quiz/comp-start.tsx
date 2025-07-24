@@ -182,8 +182,7 @@ export function CompStart({
           });
         window.alert("Your answers have been submitted successfully.");
         // refresh the page to get the latest data
-        window.location.reload();
-        router.push("/");
+        window.location.href = "/quiz";
       }
       console.log("Final answers:", userAnswers);
     }

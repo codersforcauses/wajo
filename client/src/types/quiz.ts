@@ -163,8 +163,10 @@ export interface QuizAttempt {
   time_finish: Date;
   time_modified: Date;
   total_marks: number;
+  dead_line: Date;
   quiz: number;
   student: number;
+  student_user_id: number;
   team: number;
 }
 

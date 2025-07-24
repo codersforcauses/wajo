@@ -41,7 +41,8 @@ class QuizSlotSerializer(serializers.ModelSerializer):
         required=True,
         allow_null=True,
     )
-    slot_index = serializers.IntegerField(required=True, min_value=0, max_value=99)
+    slot_index = serializers.IntegerField(
+        required=True, min_value=0, max_value=99)
     quiz_id = serializers.PrimaryKeyRelatedField(
         queryset=Quiz.objects.all(),
         write_only=True,
@@ -55,7 +56,8 @@ class QuizSlotSerializer(serializers.ModelSerializer):
         quiz = data["quiz"]
         slot_index = data["slot_index"]
         if QuizSlot.objects.filter(quiz=quiz, slot_index=slot_index).exists():
-            raise serializers.ValidationError("Slot index already exists for this quiz")
+            raise serializers.ValidationError(
+                "Slot index already exists for this quiz")
         return data
 
     class Meta:
@@ -100,6 +102,8 @@ class AdminQuizSerializer(serializers.ModelSerializer):
 class QuizAttemptSerializer(serializers.ModelSerializer):
     current_page = serializers.IntegerField(default=0, required=False)
     total_marks = serializers.IntegerField(default=0, required=False)
+    student_user_id = serializers.IntegerField(
+        source='student.user.id', read_only=True)
 
     class Meta:
         model = QuizAttempt
