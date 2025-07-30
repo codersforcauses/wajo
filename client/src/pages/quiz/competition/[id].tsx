@@ -18,15 +18,18 @@ import {
   CompetitionSlot,
   QuizAttempt,
   QuizAttemptResponse,
+  QuizState,
 } from "@/types/quiz";
 
 export default function CompetitionQuizPage() {
   const router = useRouter();
   const compId = router.query.id as string;
   const [start, setStart] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
+  const [isEntryClosed, setIsEntryClosed] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const handleStart = () => {
     setStart(true);
-    // console.log(compId);
   };
 
   const {
@@ -40,9 +43,53 @@ export default function CompetitionQuizPage() {
     enabled: !!compId, // Only run the query if compId is defined
   });
 
-  if (!compId) return <WaitingLoader />;
+  const {
+    data: quizAttemptData,
+    isLoading: isQuizAttemptDataLoading,
+    error: quizAttemptDataError,
+  } = useFetchData<{
+    results: QuizAttempt[];
+    count: number;
+    next: string | null;
+    previous: string | null;
+  }>({
+    queryKey: ["quizAttemptList"],
+    endpoint: `/quiz/quiz-attempts/`,
+  });
 
-  console.log(compId);
+  const { userId } = useAuth();
+  useEffect(() => {
+    if (compData) {
+      const filteredAttempt = quizAttemptData?.results?.filter(
+        (attempt) =>
+          attempt.student_user_id === userId &&
+          attempt.quiz === compData.id &&
+          (attempt.state === QuizState.SUBMITTED ||
+            attempt.state === QuizState.COMPLETED),
+      );
+      if (filteredAttempt?.length === 1) setIsSubmitted(true);
+    }
+  }, [quizAttemptData, compData]);
+
+  useEffect(() => {
+    if (compData) {
+      const endTime = new Date(compData.open_time_date);
+      endTime.setMinutes(endTime.getMinutes() + compData.time_limit);
+      const endWindowTime = new Date(compData.open_time_date);
+      endWindowTime.setMinutes(
+        endWindowTime.getMinutes() + compData.time_window,
+      );
+      const now = new Date();
+      if (now > endTime) {
+        setIsFinished(true);
+      } else if (now > endWindowTime) {
+        setIsEntryClosed(true);
+      }
+    }
+  }, [compData]);
+
+  if (!compId || !quizAttemptData) return <WaitingLoader />;
+
   if (!start) {
     return (
       <QuizIntro
@@ -50,7 +97,11 @@ export default function CompetitionQuizPage() {
           quizName: compData?.name,
           quizDuration: compData?.time_limit,
           startTime: compData?.open_time_date,
+          timeWindow: compData?.time_window,
           onStart: handleStart,
+          isFinished: isFinished,
+          isEntryClosed: isEntryClosed,
+          isSubmitted: isSubmitted,
         }}
       />
     );

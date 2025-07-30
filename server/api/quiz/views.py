@@ -92,7 +92,8 @@ class AdminQuizViewSet(viewsets.ModelViewSet):
                 quiz = Quiz.objects.get(pk=pk)
                 quiz_slots = quiz.quiz_slots.all()
                 questions = [slot.question for slot in quiz_slots]
-                quiz.total_marks = sum([question.mark for question in questions])
+                quiz.total_marks = sum(
+                    [question.mark for question in questions])
                 quiz.save()
 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -197,7 +198,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     queryset = Quiz.objects.filter(
-        status=1, visible=True).order_by("-created_at")
+        status=1, visible=True, is_comp=True).order_by("-created_at")
     serializer_class = UserQuizSerializer
 
     def get_permissions(self):
@@ -443,8 +444,10 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
         print("request.user: ", request.user)
         print("request.user.student: ", request.user.student)
         print("request.user.student.id: ", request.user.student.id)
-        print("request.user.student.quiz_attempts: ", request.user.student.quiz_attempts)
-        print("request.user.student.quiz_attempts.all(): ", request.user.student.quiz_attempts.all())
+        print("request.user.student.quiz_attempts: ",
+              request.user.student.quiz_attempts)
+        print("request.user.student.quiz_attempts.all(): ",
+              request.user.student.quiz_attempts.all())
         print("-----------------------------------------")
         print("-----------------------------------------\n\n")
         quiz_id = request.data.get("quiz")
@@ -504,7 +507,8 @@ class QuizAttemptViewSet(viewsets.ModelViewSet):
             # return super().create(request, *args, **kwargs)
             # Create a new QuizAttempt and assign the team
             data = request.data.copy()
-            data["team"] = team.id if team else None  # Assign the team ID or None if no team is found
+            # Assign the team ID or None if no team is found
+            data["team"] = team.id if team else None
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)

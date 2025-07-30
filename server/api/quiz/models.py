@@ -19,6 +19,7 @@ class Quiz(models.Model):
        visible (BooleanField): Notes whether the quiz is visible.
        open_time_date (DateTimeField): Notes when the quiz opens.
        time_limit (Integer): Denotes the time allotted for each quiz.
+       time_window: The amount of time after quiz start that a student has to be able to start the quiz
     """
 
     id = models.AutoField(primary_key=True)
@@ -42,9 +43,11 @@ class Quiz(models.Model):
     def clean(self):
         if self.is_comp:
             if self.open_time_date is None:
-                raise ValidationError({'open_time_date': 'This field is required for competition quizzes.'})
+                raise ValidationError(
+                    {'open_time_date': 'This field is required for competition quizzes.'})
             if self.time_window is None:
-                raise ValidationError({'time_window': 'This field is required for competition quizzes.'})
+                raise ValidationError(
+                    {'time_window': 'This field is required for competition quizzes.'})
         super().clean()
 
     def save(self, *args, **kwargs):
@@ -64,7 +67,8 @@ class QuizSlot(models.Model):
     """
 
     id = models.AutoField(primary_key=True)
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="quiz_slots")
+    quiz = models.ForeignKey(
+        Quiz, on_delete=models.CASCADE, related_name="quiz_slots")
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, default=None, related_name="slots"
     )
@@ -99,7 +103,8 @@ class QuizAttempt(models.Model):
         COMPLETED = 4
 
     id = models.AutoField(primary_key=True)
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="attempts")
+    quiz = models.ForeignKey(
+        Quiz, on_delete=models.CASCADE, related_name="attempts")
     student = models.ForeignKey(
         Student,
         on_delete=models.CASCADE,
@@ -108,7 +113,8 @@ class QuizAttempt(models.Model):
         null=True,
     )
     current_page = models.IntegerField()
-    state = models.IntegerField(choices=State.choices, default=State.UNATTEMPTED)
+    state = models.IntegerField(
+        choices=State.choices, default=State.UNATTEMPTED)
     time_start = models.DateTimeField(auto_now_add=True)
     time_finish = models.DateTimeField(null=True, blank=True)
     time_modified = models.DateTimeField(auto_now=True)

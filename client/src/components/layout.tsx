@@ -64,12 +64,7 @@ export function ProtectedPage({ children, requiredRoles }: ProtectedPageProps) {
       );
     case "authorized":
       return (
-        <Sidebar
-          role={userRole.toLowerCase() as Role}
-          isShowBreadcrumb={userRole !== Role.STUDENT}
-        >
-          {children}
-        </Sidebar>
+        <Sidebar role={userRole.toLowerCase() as Role}>{children}</Sidebar>
       );
     default:
       return <WaitingLoader />;

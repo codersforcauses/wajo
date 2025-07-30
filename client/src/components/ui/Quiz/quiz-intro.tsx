@@ -5,16 +5,24 @@ interface Props {
   onStart: () => void;
   quizName: string;
   startTime: string | Date;
+  timeWindow: number;
   quizDuration: number;
   numberOfQuestions: number;
+  isFinished: boolean;
+  isEntryClosed: boolean;
+  isSubmitted: boolean;
 }
 
 export default function QuizIntro({
   onStart,
   quizName,
   startTime,
+  timeWindow,
   quizDuration,
   numberOfQuestions,
+  isFinished,
+  isEntryClosed,
+  isSubmitted,
 }: Partial<Props>) {
   let headingStyle = `text-xl sm:text-2xl md:text-3xl text-slate-800 font-bold`;
   let generalInstructions =
@@ -34,6 +42,9 @@ export default function QuizIntro({
             className="flex-row gap-1 font-bold"
           />
         </div>
+        <div className="my-4 flex gap-2">
+          Competition will allow entering within {timeWindow} minutes
+        </div>
         <div className="mb-2 flex items-center justify-between">
           <h2 className={headingStyle}>Individual Quiz</h2>
           <h2 className={headingStyle}>{quizDuration} minutes</h2>
@@ -48,9 +59,23 @@ export default function QuizIntro({
           <span className="font-bold"> not </span> be expected to be to scale.
         </p>
         <div className="h-4 w-full"></div>
-        <Button size="lg" onClick={onStart}>
-          Start
-        </Button>
+        {isFinished ? (
+          <Button size="lg" variant={"inactive"}>
+            Competition has finished
+          </Button>
+        ) : isEntryClosed ? (
+          <Button size="lg" variant={"inactive"}>
+            Entries for the competition are now closed
+          </Button>
+        ) : isSubmitted ? (
+          <Button size="lg" variant={"inactive"}>
+            You have submitted your answer
+          </Button>
+        ) : (
+          <Button size="lg" onClick={onStart}>
+            Start
+          </Button>
+        )}
       </div>
     </div>
   );
