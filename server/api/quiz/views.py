@@ -198,7 +198,7 @@ class CompetitionQuizViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     queryset = Quiz.objects.filter(
-        status=1, visible=True, is_comp=True).order_by("-created_at")
+        status=1, visible=True).order_by("-created_at")
     serializer_class = UserQuizSerializer
 
     def get_permissions(self):
